@@ -42,9 +42,9 @@ function s.initial_effect(c)
 	e4:SetOperation(s.lpop)
 	c:RegisterEffect(e4)
 end
-s.listed_names={10000010}
+s.listed_names={CARD_RA}
 function s.actcon(e)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsOriginalCodeRule,10000010),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsOriginalCodeRule,CARD_RA),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
@@ -57,7 +57,7 @@ function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,cost)
 end
 function s.atkfilter(c)
-	return c:IsFaceup() and c:IsCode(10000010) and c:IsSummonType(SUMMON_TYPE_SPECIAL)
+	return c:IsFaceup() and c:IsCode(CARD_RA) and c:IsSummonType(SUMMON_TYPE_SPECIAL)
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_MZONE,0,1,nil) and Duel.GetFlagEffect(tp,id)==0 end
@@ -79,7 +79,7 @@ function s.lpcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 end
 function s.lpfilter(c)
-	return c:IsFaceup() and c:IsCode(10000010) and c:GetAttack()>0
+	return c:IsFaceup() and c:IsCode(CARD_RA) and c:GetAttack()>0
 end
 function s.lptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
