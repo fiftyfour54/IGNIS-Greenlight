@@ -1,3 +1,4 @@
+--魔鏡導士サイコ・バウンダー
 --Psychic Bounder
 local s,id=GetID()
 function s.initial_effect(c)
@@ -15,16 +16,14 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
 	--destroy
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_DAMAGE)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_BATTLE_CONFIRM)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCondition(s.descon)
-	e1:SetTarget(s.destg)
-	e1:SetOperation(s.desop)
-	c:RegisterEffect(e1)
+	local e3=Effect.CreateEffect(c)
+	e3:SetCategory(CATEGORY_DESTROY)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetTarget(s.destg)
+	e3:SetOperation(s.desop)
+	c:RegisterEffect(e3)
 end
 s.listed_names={CARD_JINZO}
 
@@ -43,27 +42,18 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	local c=Duel.GetAttackTarget()
-	return not c==e:GetHandler()
-end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return not e:GetHandler():IsRelateToBattle() and Duel.GetAttacker():GetControler()~=tp end
 	local tg=Duel.GetAttacker()
-	if chkc then return false end
-	if chk==0 then return tg:IsOnField() and (tg:IsDestructable() or e:GetHandler():IsDestructable()) end
-	local g=Group.CreateGroup()
-	g:AddCard(tg) 
-	g:AddCard(e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	local g=Group.FromCards(tg,e:GetHandler())
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,2,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetAttacker()
-	if not c:IsRelateToEffect(e) or not tc then return end
-	local g=Group.CreateGroup()
-	g:AddCard(tg) 
-	g:AddCard(e:GetHandler())
-	local ct=#g
-	if ct>0 then
-		local dc=Duel.Destroy(g,REASON_EFFECT)
+	if tg:IsRelateToBattle() and not tg:IsStatus(STATUS_ATTACK_CANCELED) then
+		local g=Group.FromCards(tg,e:GetHandler())
+		if #g>0 then
+			Duel.Destroy(g,REASON_EFFECT)
+		end
 	end
 end
