@@ -1,10 +1,11 @@
 --宇宙の法則
---Law of the Universe
+--Law of the Cosmos
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -31,7 +32,7 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local summon=false
 	local g=Duel.GetMatchingGroup(s.setfilter,tp,0,LOCATION_HAND+LOCATION_DECK,nil)
-	if Duel.GetLocationCount(1-tp,LOCATION_SZONE,1-tp,LOCATION_REASON_TOFIELD)>0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+	if Duel.GetLocationCount(1-tp,LOCATION_SZONE,1-tp,LOCATION_REASON_TOFIELD)>0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SET)
 		local sg=g:Select(1-tp,1,1,nil)
 		Duel.SSet(1-tp,sg)
