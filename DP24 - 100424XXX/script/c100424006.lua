@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 end
-s.listed_names={83764718,10000010}
+s.listed_names={83764718,CARD_RA}
 function s.thcfilter(c)
 	return c:IsRace(RACE_DIVINE) and c:IsAbleToGraveAsCost()
 end
@@ -88,7 +88,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e3,tp)
 end
 function s.regfilter(c,tp,re)
-	return c:IsFaceup() and c:GetOriginalCode()==10000010 and c:IsControler(tp) and re and re:GetHandler():IsCode(83764718)
+	return c:IsFaceup() and c:GetOriginalCode()==CARD_RA and c:IsControler(tp) and re and re:GetHandler():IsCode(83764718)
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(s.regfilter,nil,tp,re)
@@ -98,7 +98,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.gyfilter(c)
-	return c:GetOriginalCode()==10000010 and c:GetFlagEffect(id)~=0
+	return c:GetOriginalCode()==CARD_RA and c:GetFlagEffect(id)~=0
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.gyfilter,tp,LOCATION_MZONE,0,nil)
