@@ -34,7 +34,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 	--Specifically lists itself and "Jinzo"
-s.listed_names={id,77585513}
+s.listed_names={id,CARD_JINZO}
 
 	--Check for a monster that is owned by your opponent
 function s.cfilter(c,e)
@@ -68,7 +68,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 	--Check for "Jinzo"
 function s.filter(c)
-	return c:IsFaceup() and c:IsCode(77585513)
+	return c:IsFaceup() and c:IsCode(CARD_JINZO)
 end
 	--Opponent draws during draw phase
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
