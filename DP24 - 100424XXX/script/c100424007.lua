@@ -4,19 +4,19 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
-    local e1=Effect.CreateEffect(c)
-    e1:SetType(EFFECT_TYPE_ACTIVATE)
-    e1:SetCode(EVENT_FREE_CHAIN)
-    c:RegisterEffect(e1)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	c:RegisterEffect(e1)
 	--act in set turn
-    local e2=Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_SINGLE)
-    e2:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-    e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-    e2:SetCondition(s.actcon)
-    c:RegisterEffect(e2)
-    --gain atk
-    local e3=Effect.CreateEffect(c)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e2:SetCondition(s.actcon)
+	c:RegisterEffect(e2)
+	--gain atk
+	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
@@ -44,7 +44,7 @@ function s.initial_effect(c)
 end
 s.listed_names={10000010}
 function s.actcon(e)
-    return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsOriginalCodeRule,10000010),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsOriginalCodeRule,10000010),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
@@ -75,27 +75,27 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.lpcost(e,tp,eg,ep,ev,re,r,rp,chk)
-    e:SetLabel(1)
-    if chk==0 then return true end
+	e:SetLabel(1)
+	if chk==0 then return true end
 end
 function s.lpfilter(c)
-	return c:IsFaceup() and c:IsCode(10000010) and c:IsAttackAbove(0)
+	return c:IsFaceup() and c:IsCode(10000010) and c:GetAttack()>0
 end
 function s.lptg(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then
-        if e:GetLabel()~=1 then return false end
-        e:SetLabel(0)
-        return Duel.CheckReleaseGroupCost(tp,s.lpfilter,1,false,nil,nil) and Duel.GetFlagEffect(tp,id)==0 end
-    local sg=Duel.SelectReleaseGroupCost(tp,s.lpfilter,1,1,false,nil,nil)
-    local tc=sg:GetFirst()
-    local rec=tc:GetAttack()
-    Duel.Release(tc,REASON_COST)
-    Duel.SetTargetPlayer(tp)
-    Duel.SetTargetParam(rec)
-    Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,rec)
-    Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
+	if chk==0 then
+		if e:GetLabel()~=1 then return false end
+		e:SetLabel(0)
+		return Duel.CheckReleaseGroupCost(tp,s.lpfilter,1,false,nil,nil) and Duel.GetFlagEffect(tp,id)==0 end
+	local sg=Duel.SelectReleaseGroupCost(tp,s.lpfilter,1,1,false,nil,nil)
+	local tc=sg:GetFirst()
+	local rec=tc:GetAttack()
+	Duel.Release(tc,REASON_COST)
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(rec)
+	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,rec)
+	Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
 end
 function s.lpop(e,tp,eg,ep,ev,re,r,rp)
-    local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-    Duel.Recover(p,d,REASON_EFFECT)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Recover(p,d,REASON_EFFECT)
 end
