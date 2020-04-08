@@ -23,9 +23,9 @@ function s.initial_effect(c)
 	e2:SetOperation(s.checktribute)
 	c:RegisterEffect(e2)
 end
-s.listed_names={10000010}
+s.listed_names={CARD_RA}
 function s.filter(c)
-	return c:IsCode(10000010) and c:IsAbleToHand()
+	return c:IsCode(CARD_RA) and c:IsAbleToHand()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
