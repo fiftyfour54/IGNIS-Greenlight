@@ -41,7 +41,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 	--Specifically lists itself and "The Winged Dragon of Ra"
-s.listed_names={id,10000010}
+s.listed_names={id,CARD_RA}
 
 	--If player took battle or effect damage
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
