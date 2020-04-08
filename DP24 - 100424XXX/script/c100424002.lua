@@ -1,4 +1,4 @@
---
+--リアクター・スライム
 --Reactor Slime
 --Scripted by Hel
 local s,id=GetID()
