@@ -31,7 +31,7 @@ function s.initial_effect(c)
 end
 s.listed_names={83764718,10000010}
 function s.thcfilter(c)
-	return c:IsRace(RACE_DEVINE) and c:IsAbleToGraveAsCost()
+	return c:IsRace(RACE_DIVINE) and c:IsAbleToGraveAsCost()
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thcfilter,tp,LOCATION_HAND,0,1,nil) end
@@ -74,7 +74,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCondition(s.regcon)
+	--e2:SetCondition(s.regcon)
 	e2:SetOperation(s.regop)
 	e2:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e2,tp)
@@ -87,12 +87,11 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e3,tp)
 end
-function s.regfilter(c,tp)
-	local rc=c:GetReasonCard()
-	return c:IsFaceup() and c:GetOriginalCode()==10000010 and c:IsControler(tp) and rc and rc:IsCode(83764718)
+function s.regfilter(c,tp,re)
+	return c:IsFaceup() and c:GetOriginalCode()==10000010 and c:IsControler(tp) and re and re:GetHandler():IsCode(83764718)
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	local g=eg:Filter(s.regfilter,nil,tp)
+	local g=eg:Filter(s.regfilter,nil,tp,re)
 	if #g==0 then return end
 	for tc in aux.Next(g) do
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,3))

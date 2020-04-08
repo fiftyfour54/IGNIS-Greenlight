@@ -1,4 +1,5 @@
 --ラーの翼神竜
+--The Winged Dragon of Ra
 local s,id=GetID()
 function s.initial_effect(c)
 	--summon with 3 tribute
