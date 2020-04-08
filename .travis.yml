@@ -9,9 +9,9 @@ install:
 - cp ignis-test/script_syntax_check ignis-test/libocgcore.so .
 - rm -rf ignis-test
 script:
-- for $DIR in */; do
-    cp *.lua script_syntax_check libocgcore.so $DIR
-    cd $DIR
-    ./script_syntax_check
-    cd ..
+- for DIR in */; do
+    cp *.lua script_syntax_check libocgcore.so $DIR &&
+    cd $DIR &&
+    ./script_syntax_check &&
+    cd ..;
   done
