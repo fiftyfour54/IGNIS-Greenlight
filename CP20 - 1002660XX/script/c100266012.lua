@@ -30,7 +30,7 @@ end
 	--Lists "Fossil" archetype
 s.listed_series={0x243}
 	--Specifically lists "Fossil Fusion"
-s.listed_names={100266011}
+s.listed_names={CARD_FOSSIL_FUSION}
 
 	--Check for "Fossil" fusion monster to tribute
 function s.filter(c,e,tp)

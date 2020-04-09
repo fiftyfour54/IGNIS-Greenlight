@@ -37,7 +37,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 	--Specifically lists itself, "Fossil Fusion", and "Time Stream"
-s.listed_names={id,100266011,100266012}
+s.listed_names={id,CARD_FOSSIL_FUSION,100266012}
 
 	--Handle its special summon condition
 function s.splimit(e,se,sp,st)

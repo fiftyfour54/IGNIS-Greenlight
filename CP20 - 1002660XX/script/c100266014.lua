@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-s.listed_names={100266011}
+s.listed_names={CARD_FOSSIL_FUSION}
 function s.tgfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_ROCK) and c:IsLevelBelow(4) and c:IsAbleToGrave()
 end
@@ -25,7 +25,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if g and #g>0 and Duel.SendtoGrave(g:GetFirst(),REASON_EFFECT) and g:GetFirst():IsLocation(LOCATION_GRAVE) then
-		if Duel.IsExistingMatchingCard(aux.FilterBoolFunction(Card.IsCode,100266011),tp,LOCATION_GRAVE,0,1,nil) then
+		if Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,CARD_FOSSIL_FUSION) then
 			Duel.BreakEffect()
 			Duel.Draw(tp,1,REASON_EFFECT)
 		end

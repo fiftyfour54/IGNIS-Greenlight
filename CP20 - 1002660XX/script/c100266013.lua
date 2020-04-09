@@ -14,9 +14,9 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-s.listed_names={100266011}
+s.listed_names={CARD_FOSSIL_FUSION}
 function s.fffilter(c)
-	return c:IsCode(100266011) and not c:IsPublic()
+	return c:IsCode(CARD_FOSSIL_FUSION) and not c:IsPublic()
 end
 function s.tgyfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()

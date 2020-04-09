@@ -34,12 +34,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 	--Specifically lists itself and "Fossil Fusion"
-s.listed_names={id,100266011}
+s.listed_names={id,CARD_FOSSIL_FUSION}
 
 	--Check for "Fossil Fusion" or 1 card that specifically lists "Fossil Fusion"
 function s.thfilter(c)
 	return c:IsAbleToHand() and not c:IsCode(id)
-	 and (c:IsCode(100266011) or aux.IsCodeListed(c,100266011))
+	 and (c:IsCode(CARD_FOSSIL_FUSION) or aux.IsCodeListed(c,CARD_FOSSIL_FUSION))
 end
 	--If sent to the GY by card effect
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)

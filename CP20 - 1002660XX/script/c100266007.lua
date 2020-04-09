@@ -43,7 +43,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 	--Specifically lists itself and "Fossil Fusion"
-s.listed_names={id,100266011}
+s.listed_names={id,CARD_FOSSIL_FUSION}
 function s.matfilter(c)
 	return c:HasLevel() and c:IsLevel(6,7)
 end
