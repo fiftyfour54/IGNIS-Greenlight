@@ -24,11 +24,10 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if #g>0 then
-		Duel.SendtoGrave(g,REASON_EFFECT)
-	end
-	if Duel.IsExistingMatchingCard(aux.FilterBoolFunction(Card.IsCode,100266011),tp,LOCATION_GRAVE,0,1,nil) then
-		Duel.BreakEffect()
-		Duel.Draw(tp,1,REASON_EFFECT)
+	if g and #g>0 and Duel.SendtoGrave(g:GetFirst(),REASON_EFFECT) and g:GetFirst():IsLocation(LOCATION_GRAVE) then
+		if Duel.IsExistingMatchingCard(aux.FilterBoolFunction(Card.IsCode,100266011),tp,LOCATION_GRAVE,0,1,nil) then
+			Duel.BreakEffect()
+			Duel.Draw(tp,1,REASON_EFFECT)
+		end
 	end
 end
