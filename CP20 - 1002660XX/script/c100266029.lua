@@ -89,7 +89,7 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 					return sc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
 				end,function(c)
 					Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP) end,
-				aux.Stringid(id,2)
+				aux.Stringid(id,3)
 				)
 			else
 				Duel.SendtoHand(sc,nil,REASON_EFFECT)
