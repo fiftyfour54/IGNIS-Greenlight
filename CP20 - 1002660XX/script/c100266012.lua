@@ -34,12 +34,12 @@ s.listed_names={100266011}
 
 	--Check for "Fossil" fusion monster to tribute
 function s.filter(c,e,tp)
-	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsSet(0x243) and c:IsReleasableByEffect()
+	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsSetCard(0x243) and c:IsReleasableByEffect()
 	 and Duel.IsExistingMatchingCard(s.ssfilter,tp,LOCATION_EXTRA,0,1,nil,c:GetLevel(),e,tp)
 end
 	--Check for "Fossil" fusion monster with 2 levels higher than one in "filter"
 function s.ssfilter(c,lv,e,tp)
-	return c:IsType(TYPE_FUSION) and c:IsSet(0x243) and c:IsLevel(lv+2)
+	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x243) and c:IsLevel(lv+2)
 	 and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 and c:IsCanBeSpecialSummoned(e,0,tp,true,true,POS_FACEUP)
 end
 	--Activation legality
@@ -56,11 +56,10 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
 		if Duel.Release(tc,REASON_EFFECT)==0 then return end
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			local sg=Duel.SelectMatchingCard(tp,s.ssfilter,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetLevel(),e,tp):GetFirst()
-			if #sg>0 then 
-				Duel.SpecialSummonStep(sg,0,tp,tp,true,true,POS_FACEUP)
-			end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=Duel.SelectMatchingCard(tp,s.ssfilter,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetLevel(),e,tp):GetFirst()
+		if #sg>0 then 
+			Duel.SpecialSummonStep(sg,0,tp,tp,true,true,POS_FACEUP)
 		end
 	end
 end

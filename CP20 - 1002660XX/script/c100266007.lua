@@ -7,7 +7,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
-	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsRace,RACE_ROCK),aux.FilterBoolFunctionEx(Card.IsLevel,{6,7}))
+	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsRace,RACE_ROCK),s.matfilter)
 	--Must first be special summoned with "Fossil Fusion"
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
@@ -44,7 +44,9 @@ function s.initial_effect(c)
 end
 	--Specifically lists itself and "Fossil Fusion"
 s.listed_names={id,100266011}
-
+function s.matfilter(c)
+	return c:HasLevel() and c:IsLevel(6,7)
+end
 	--Handle its special summon condition
 function s.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or st==SUMMON_TYPE_FUSION+0x20
