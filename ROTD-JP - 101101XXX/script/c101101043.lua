@@ -35,7 +35,7 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,5) end
 end
 function s.thfilter(c)
-	return c:IsAbleToHand() and c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIUBTE_DARK)
+	return c:IsAbleToHand() and c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsPlayerCanDiscardDeck(tp,5) then return end
@@ -55,7 +55,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.cfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIUBTE_DARK) and c:IsAbleToRemoveAsCost()
+	return c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and c:IsAbleToRemoveAsCost()
 		and aux.SpElimFilter(c,true)
 end
 function s.rescon(sg,e,tp,mg)
