@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon
 	local e1=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -43,8 +43,8 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_GRAVE,nil,e)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and aux.SelectUnselectGroup(g,e,tp,4,4,s.spcheck,0) end
-	local tg=aux.SelectUnselectGroup(g,e,tp,4,4,s.spcheck,1,tp,HINTMSG_REMOVE)
+		and #g>=4 end --aux.SelectUnselectGroup(g,e,tp,4,4,s.spcheck,0) end
+	local tg=g:Select(tp,4,4,nil) --aux.SelectUnselectGroup(g,e,tp,4,4,s.spcheck,1,tp,HINTMSG_REMOVE)
 	Duel.SetTargetCard(tg)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,tg,4,0,0)
