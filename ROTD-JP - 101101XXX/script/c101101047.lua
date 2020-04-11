@@ -4,14 +4,14 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
-	Xyz.AddProcedure(c,nil,5,2,s.ovfilter,aux.Stringid(id,0))
+	Xyz.AddProcedure(c,nil,5,2,aux.FilterFaceupFunction(Card.IsRank,4),aux.Stringid(id,0))
 	c:EnableReviveLimit()
 	--pierce
-    local e1=Effect.CreateEffect(c)
-    e1:SetType(EFFECT_TYPE_SINGLE)
-    e1:SetCode(EFFECT_PIERCE)
-    c:RegisterEffect(e1)
-    --special summon
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_PIERCE)
+	c:RegisterEffect(e1)
+	--special summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -23,9 +23,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-end
-function s.ovfilter(c)
-    return c:IsFaceup() and c:IsRank(4)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
