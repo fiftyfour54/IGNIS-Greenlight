@@ -41,5 +41,15 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local eq=g:GetFirst()
 	if eq then
 		Duel.Equip(tp,eq,tc,true)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_EQUIP_LIMIT)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetValue(s.eqlimit)
+		e1:SetLabelObject(tc)
+		eq:RegisterEffect(e1)
 	end
+end
+function s.eqlimit(e,c)
+	return c==e:GetLabelObject()
 end
