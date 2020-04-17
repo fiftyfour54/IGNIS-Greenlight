@@ -28,15 +28,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x245}
-function s.tnfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x245) and c:IsRace(RACE_INSECT)
-end
 function s.tntg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.tnfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.tnfilter,tp,LOCATION_MZONE,0,1,c) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() and chkc:IsSetCard(0x245) end
+	if chk==0 then return Duel.IsExistingTarget(aux.FilterFaceupFunction(Card.IsSetCard,0x245),tp,LOCATION_MZONE,0,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.tnfilter,tp,LOCATION_MZONE,0,1,1,c)
+	Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsSetCard,0x245),tp,LOCATION_MZONE,0,1,1,c)
 end
 function s.tnop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -51,8 +48,7 @@ function s.tnop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local tg=eg:GetFirst()
-	return #eg==1 and tg~=e:GetHandler() and tg:GetSummonType()==SUMMON_TYPE_SYNCHRO
+	return not eg:IsContains(e:GetHandler()) and eg:IsExists(IsSummonType,1,nil,SUMMON_TYPE_SYNCHRO)
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x245) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
