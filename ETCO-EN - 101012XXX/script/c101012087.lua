@@ -31,7 +31,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.negtg)
 	e2:SetOperation(s.negop)
 	c:RegisterEffect(e2)
-	--search
 end
 s.listed_series={0x13f}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
@@ -39,7 +38,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return ph==PHASE_MAIN1 or ph==PHASE_MAIN2
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x13f) and (c:IsFaceup() or not c:IsLocation(LOCATION_HAND))
+	return c:IsSetCard(0x13f) and (c:IsFaceup() or not c:IsLocation(LOCATION_SZONE))
 		and c:IsOriginalType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

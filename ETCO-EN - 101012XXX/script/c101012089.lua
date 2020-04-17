@@ -49,7 +49,6 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	for gc in aux.Next(Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,nil)) do
 		att=att|gc:GetAttribute()
 	end
-	Debug.Message(att>0)
 	if chk==0 then return att>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,att) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
