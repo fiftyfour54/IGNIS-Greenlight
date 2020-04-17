@@ -64,7 +64,7 @@ function s.eqpop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or not eg then return end
 	local tc=eg:FilterSelect(tp,s.eqptgfilter,1,1,nil,tp):GetFirst()
 	if tc then
-		s.equipop(e:GetHandler(),e,tp,tc)
+		s.equipop(tc,e,tp,e:GetHandler())
 	end
 end
 function s.equipop(c,e,tp,tc)
