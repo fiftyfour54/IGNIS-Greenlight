@@ -13,19 +13,19 @@ function s.initial_effect(c)
 	e1:SetTarget(s.tntg)
 	e1:SetOperation(s.tnop)
 	c:RegisterEffect(e1)
-   --draw
-    local e2=Effect.CreateEffect(c)
-    e2:SetDescription(aux.Stringid(id,1))
-    e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-    e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-    e2:SetRange(LOCATION_MZONE)
-    e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-    e2:SetProperty(EFFECT_FLAG_DELAY)
-    e2:SetCountLimit(1,id+100)
-    e2:SetCondition(s.spcon)
-    e2:SetTarget(s.sptg)
-    e2:SetOperation(s.spop)
-    c:RegisterEffect(e2)
+	--draw
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCountLimit(1,id+100)
+	e2:SetCondition(s.spcon)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
+	c:RegisterEffect(e2)
 end
 s.listed_series={0x245}
 function s.tnfilter(c)
@@ -51,19 +51,17 @@ function s.tnop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-    local tg=eg:GetFirst()
-    return #eg==1 and tg~=e:GetHandler() and tg:GetSummonType()==SUMMON_TYPE_SYNCHRO
+	local tg=eg:GetFirst()
+	return #eg==1 and tg~=e:GetHandler() and tg:GetSummonType()==SUMMON_TYPE_SYNCHRO
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x245) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-	--Activation legality
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
 end
-	--Special summon listed material from hand or deck
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
