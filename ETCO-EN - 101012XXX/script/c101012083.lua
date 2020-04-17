@@ -27,7 +27,6 @@ function s.valcheck(e,c)
 	local g=c:GetMaterial()
 	if not g then return end
 	local typ=0
-	local tc=g:GetFirst()
 	for tc in aux.Next(g) do
 		typ=(typ|tc:GetType())
 	end
@@ -47,8 +46,8 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_CANNOT_ACTIVATE)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetTargetRange(0,1)
-		e1:SetCondition(s.fscond)
-		e1:SetValue(s.fslimit)
+		e1:SetCondition(s.fuscond)
+		e1:SetValue(s.fuslimit)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		c:RegisterEffect(e1)
 		c:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,1))
