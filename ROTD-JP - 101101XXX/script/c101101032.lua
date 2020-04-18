@@ -42,12 +42,12 @@ function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,1500)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(Card.IsSummonLocation,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(Card.IsSummonLocation,tp,LOCATION_MZONE,LOCATION_MZONE,nil,LOCATION_EXTRA)
 	if chk==0 then return #g>0 end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsSummonLocation,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(Card.IsSummonLocation,tp,LOCATION_MZONE,LOCATION_MZONE,nil,LOCATION_EXTRA)
 	if #g>0 then
 		Duel.Destroy(g,REASON_EFFECT)
 	end
@@ -79,7 +79,7 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetLabelObject():SetLabel(fid)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(Card.IsSummonLocation,tp,LOCATION_MZONE,LOCATION_MZONE,2,nil)
+	return Duel.IsExistingMatchingCard(Card.IsSummonLocation,tp,LOCATION_MZONE,LOCATION_MZONE,2,nil,LOCATION_EXTRA)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
