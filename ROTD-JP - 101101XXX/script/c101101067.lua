@@ -31,7 +31,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.SendtoHand(g,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,g)
 		end
-	elseif c:IsRelateToEffect(e)
+	elseif c:IsRelateToEffect(e) then
 		c:CancelToGrave()
 		local r2=Duel.TossDice(tp,1)
 		if r2==1 or r2==6 then
