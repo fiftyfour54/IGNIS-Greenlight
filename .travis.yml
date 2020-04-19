@@ -4,14 +4,12 @@ dist: bionic
 git:
   depth: 5
 install:
-- curl --retry 5 --connect-timeout 30 --location --remote-header-name --output ignis-test-bin.tar.gz https://github.com/ProjectIgnis/Checker/releases/download/1.0.0/ignis-test-bin.tar.gz
+- git clone --depth=1 --no-checkout https://github.com/ProjectIgnis/CardScripts.git BaseUtils
+- git -C BaseUtils checkout master -- *.lua
+- curl --retry 5 --connect-timeout 30 --location --remote-header-name --output ignis-test-bin.tar.gz https://github.com/ProjectIgnis/Checker/releases/download/1.1.0/ignis-test-bin.tar.gz
 - tar xf ignis-test-bin.tar.gz
 - cp ignis-test/script_syntax_check ignis-test/libocgcore.so .
-- rm -rf ignis-test
+- rm -rf ignis-test ignis-test-bin.tar.gz
 script:
-- for DIR in */; do
-    cp *.lua script_syntax_check libocgcore.so $DIR &&
-    cd $DIR &&
-    ./script_syntax_check &&
-    cd ..;
-  done
+# Get all direct subdirectories, excluding hidden paths
+- find . -maxdepth 1 ! -path '.' ! -path './.*' -type d -exec ./script_syntax_check {} \+
