@@ -8,6 +8,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e1:SetCountLimit(1)
 	e1:SetTarget(s.eqtg)
 	e1:SetOperation(s.eqop)
 	c:RegisterEffect(e1)
@@ -33,7 +34,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x13}
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetEquipGroup():IsExists(Card.IsType,1,nil,TYPE_SYNCHRO)
+	return e:GetHandler():GetEquipGroup():IsExists(Card.IsOriginalType,1,nil,TYPE_SYNCHRO)
 end
 function s.eqfilter(c,tp)
 	return c:CheckUniqueOnField(tp) and c:IsType(TYPE_MONSTER) and not c:IsForbidden()
@@ -52,20 +53,29 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.ConfirmCards(tp,Duel.GetFieldGroup(tp,0,LOCATION_EXTRA))
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-		local sg=g:Select(tp,1,1,nil)
+		local sg=g:Select(tp,1,1,nil):GetFirst()
 		if Duel.Equip(tp,sg,c,true) then
 			local atk=sg:GetTextAttack()
 			if atk<0 then atk=0 end
-			if not aux.EquipByEffectAndLimitRegister(c,e,tp,sg,id) then return end
 			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_EQUIP)
-			e1:SetCode(EFFECT_UPDATE_ATTACK)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_EQUIP_LIMIT)
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-			e1:SetValue(atk)
+			e1:SetValue(s.eqlimit)
+			e1:SetLabelObject(c)
 			sg:RegisterEffect(e1)
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_EQUIP)
+			e2:SetCode(EFFECT_UPDATE_ATTACK)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+			e2:SetValue(atk)
+			sg:RegisterEffect(e2)
+			Duel.ShuffleExtra(1-tp)
 		end
-		Duel.ShuffleExtra(1-tp)
 	end
+end
+function s.eqlimit(e,c)
+	return c==e:GetLabelObject()
 end
 function s.spfilter(c)
 	return c:IsSetCard(0x13) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
