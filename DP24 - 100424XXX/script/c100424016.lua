@@ -53,7 +53,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(tp,Duel.GetFieldGroup(tp,0,LOCATION_EXTRA))
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 		local sg=g:Select(tp,1,1,nil)
-		if Duel.Equip(tp,sg,c,true)	then
+		if Duel.Equip(tp,sg,c,true) then
 			local atk=sg:GetTextAttack()
 			if atk<0 then atk=0 end
 			if not aux.EquipByEffectAndLimitRegister(c,e,tp,sg,id) then return end
