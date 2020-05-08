@@ -23,12 +23,12 @@ function s.filter(c,e,tp)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCountFromEx(tp)>0
+	if chk==0 then return Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_XYZ)>0
 		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.check(sg,e,tp)
-	return Duel.GetLocationCountFromEx(tp)>=#sg and aux.dncheck(sg,e,tp)
+	return Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_XYZ)>=#sg and aux.dncheck(sg,e,tp)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
