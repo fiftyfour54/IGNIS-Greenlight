@@ -23,13 +23,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2,false,REGISTER_FLAG_DETACH_XMAT)
 end
 s.listed_series={0x246}
-function s.filter(c)
-    return c:IsFaceup() and c:IsSetCard(0x246)
-end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-    local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_MZONE,0,nil)
-    local tc=g:GetFirst()
-    for tc in aux.Next(g) do
+	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsSetCard,0x246),tp,LOCATION_MZONE,0,nil)
+	for tc in aux.Next(g) do
 		local e1=Effect.CreateEffect(tc)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
