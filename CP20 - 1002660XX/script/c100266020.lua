@@ -1,11 +1,11 @@
 --ヌメロン・ウォール
 --Numeron Wall
+--scripted by King Yamato and Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--add to hand
+	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_HAND+LOCATION_MZONE)
@@ -31,10 +31,10 @@ function s.filter(c)
 	return not (c:IsFaceup() and c:IsCode(100266020))
 end
 function s.field(c)
-	return c:IsCode(100266026) and c:IsAbleToHand()
+	return c:IsCode(100266026) and not c:IsForbidden() and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)==0 or not Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -42,15 +42,12 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(c,REASON_COST)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.field,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.field,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil) end
+	if not Duel.CheckPhaseActivity() then Duel.RegisterFlagEffect(tp,CARD_MAGICAL_MIDBREAKER,RESET_CHAIN,0,1) end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local tg=Duel.GetFirstMatchingCard(s.field,tp,LOCATION_DECK,0,nil)
-	if tg then
-		Duel.SendtoHand(tg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,tg)
-	end
+	local tc=Duel.SelectMatchingCard(tp,s.field,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,tp):GetFirst()
+	return aux.PlayFieldSpell(tc,e,tp,eg,ep,ev,re,r,rp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
