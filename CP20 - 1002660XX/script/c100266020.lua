@@ -1,3 +1,4 @@
+--ヌメロン・ウォール
 --Numeron Wall
 local s,id=GetID()
 function s.initial_effect(c)
@@ -14,7 +15,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	
 	--special summon
     local e2=Effect.CreateEffect(c)
     e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -26,31 +26,25 @@ function s.initial_effect(c)
     e2:SetOperation(s.spop)
     c:RegisterEffect(e2)
 end
-
-s.listed_names={100266020, 100266026}
+s.listed_names={100266020,CARD_NUMERON_NETWORK}
 function s.filter(c)
 	return not (c:IsFaceup() and c:IsCode(100266020))
 end
-
 function s.field(c)
-	return c:IsCode(100266026) and c:IsAbleToHand()
+	return c:IsCode(CARD_NUMERON_NETWORK) and c:IsAbleToHand()
 end
-
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
 end
-
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
     local c=e:GetHandler()
     if chk==0 then return c:IsAbleToGraveAsCost() end
     Duel.SendtoGrave(c,REASON_COST)
 end
-
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.IsExistingMatchingCard(s.field,tp,LOCATION_DECK,0,1,nil) end
     Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
     local tg=Duel.GetFirstMatchingCard(s.field,tp,LOCATION_DECK,0,nil)
     if tg then
@@ -58,13 +52,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
         Duel.ConfirmCards(1-tp,tg)
     end
 end
-
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
         and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
     Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
     if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
