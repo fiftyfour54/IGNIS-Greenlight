@@ -27,9 +27,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2,false,REGISTER_FLAG_DETACH_XMAT)
 end
 
-s.listed_series={0x244}
+s.listed_series={0x246}
 function s.filter(c)
-    return c:IsFaceup() and c:IsSetCard(0x244)
+    return c:IsFaceup() and c:IsSetCard(0x246)
 end
 
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
