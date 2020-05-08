@@ -13,11 +13,11 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-s.listed_names={100266026}
+s.listed_names={CARD_NUMERON_NETWORK}
 s.listed_series={0x1246}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
-	return fc and fc:IsFaceup() and fc:IsCode(100266026) and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
+	return fc and fc:IsFaceup() and fc:IsCode(CARD_NUMERON_NETWORK) and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function s.filter(c,e,tp)
 	return c:IsSetCard(0x1246) and c:IsType(TYPE_XYZ) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

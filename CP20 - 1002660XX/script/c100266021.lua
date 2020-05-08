@@ -24,7 +24,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.xyz_number=1
-s.listed_names={100266022,100266026}
+s.listed_names={100266022,CARD_NUMERON_NETWORK}
 function s.ovfilter(c,tp,lc)
 	return c:IsFaceup() and c:IsSummonCode(lc,SUMMON_TYPE_XYZ,tp,100266022)
 end
@@ -69,7 +69,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local atk=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsType,TYPE_XYZ),tp,LOCATION_REMOVED,LOCATION_REMOVED,c):GetSum(Card.GetAttack)
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0
-		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,100266026),tp,LOCATION_ONFIELD,0,1,nil) and atk>0 then
+		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_NUMERON_NETWORK),tp,LOCATION_ONFIELD,0,1,nil) and atk>0 then
 		Duel.BreakEffect()
 		Duel.Damage(1-tp,atk,REASON_EFFECT)
 	end

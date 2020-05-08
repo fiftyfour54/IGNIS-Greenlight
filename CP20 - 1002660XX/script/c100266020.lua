@@ -26,12 +26,12 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={100266020,100266026}
+s.listed_names={100266020,CARD_NUMERON_NETWORK}
 function s.filter(c)
 	return not (c:IsFaceup() and c:IsCode(100266020))
 end
 function s.field(c)
-	return c:IsCode(100266026) and not c:IsForbidden() and c:GetActivateEffect():IsActivatable(tp,true,true)
+	return c:IsCode(CARD_NUMERON_NETWORK) and not c:IsForbidden() and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)==0 or not Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_ONFIELD,0,1,nil)
