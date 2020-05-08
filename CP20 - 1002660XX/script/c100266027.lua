@@ -36,7 +36,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sg=aux.SelectUnselectGroup(g,e,tp,1,4,s.check,1,tp,HINTMSG_SPSUMMON)
 	if #sg>0 then
 		local fid=c:GetFieldID()
-		local tc=sg:GetFirst()
 		for tc in aux.Next(sg) do
 			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
 			tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
@@ -55,7 +54,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e0:SetOperation(s.rmop)
 		Duel.RegisterEffect(e0,tp)
 	end
-	if not e:IsHasType(EFFECT_TYPE_ACTIVATE) then return end
 	local spc=Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)+Duel.GetActivityCount(tp,ACTIVITY_SUMMON)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
