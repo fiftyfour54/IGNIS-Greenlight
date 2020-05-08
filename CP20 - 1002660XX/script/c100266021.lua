@@ -66,8 +66,8 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function s.cfilter=aux.FilterFaceupFunction(Card.IsCode,100266026)
-function s.xyzfilter=aux.FilterFaceupFunction(Card.IsType,TYPE_XYZ)
+s.cfilter=aux.FilterFaceupFunction(Card.IsCode,100266026)
+s.xyzfilter=aux.FilterFaceupFunction(Card.IsType,TYPE_XYZ)
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local atk=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_REMOVED,LOCATION_REMOVED,c):GetSum(Card.GetAttack)
