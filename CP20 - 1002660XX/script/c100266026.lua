@@ -3,12 +3,12 @@
 --Scripted by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
-    --Activate
-    local e1=Effect.CreateEffect(c)
-    e1:SetType(EFFECT_TYPE_ACTIVATE)
-    e1:SetCode(EVENT_FREE_CHAIN)
-    c:RegisterEffect(e1)
-    --copy spell
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	c:RegisterEffect(e1)
+	--copy spell
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_IGNITION)
@@ -17,8 +17,8 @@ function s.initial_effect(c)
 	e2:SetCost(s.cpcost)
 	e2:SetTarget(s.cptg)
 	e2:SetOperation(s.cpop)
-    c:RegisterEffect(e2)
-    --negate cost
+	c:RegisterEffect(e2)
+	--negate cost
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(id)
@@ -40,8 +40,7 @@ function s.cptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()==0 then return false end
 		e:SetLabel(0)
-		return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
-			and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil)
+		return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil)
 	end
 	e:SetLabel(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
