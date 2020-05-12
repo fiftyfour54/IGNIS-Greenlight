@@ -61,14 +61,14 @@ function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 		opt=Duel.SelectOption(tp,aux.Stringid(id,2))+1
 	else return end
 	if opt==0 then
-		e0:GetLabel()=(e0:GetLabel()-2)
+		e0:SetLabel(e0:GetLabel()-2)
 		Debug.Message(e0:GetLabel() .. "counter on the Skill")
 		local g=Duel.GetFieldGroup(1-tp,LOCATION_HAND,0)
 		if #g==0 then return end
 		local sg=g:RandomSelect(1-tp,1)
 		Duel.SendtoGrave(sg,REASON_DISCARD+REASON_EFFECT)
 	else opt==1 then
-		e0:GetLabel()=(e0:GetLabel()-3)
+		e0:SetLabel(e0:GetLabel()-3)
 		Debug.Message(e0:GetLabel() .. "counter on the Skill")
 		local g=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
 		if #g==0 then return end
@@ -89,7 +89,7 @@ function s.lpop1(e,tp,eg,ep,ev,re,r,rp)
 	local p=e:GetHandler():GetControler()
 	e:SetLabel(Duel.GetLP(p))
 	if e:GetLabelObject():GetLabel()<3 then
-		e:GetLabelObject():GetLabel()=(e:GetLabelObject():GetLabel()+1)
+		e:GetLabelObject():SetLabel(e:GetLabelObject():GetLabel()+1)
 		Debug.Message(e0:GetLabel() .. "counter on the Skill")
 	end 
 end
@@ -97,7 +97,7 @@ function s.lpop2(e,tp,eg,ep,ev,re,r,rp)
 	local p=e:GetHandler():GetControler()
 	e:SetLabel(Duel.GetLP(1-p))
 	if e:GetLabelObject():GetLabel()<3 then
-		e:GetLabelObject():GetLabel()=(e:GetLabelObject():GetLabel()+1)
+		e:GetLabelObject():SetLabel(e:GetLabelObject():GetLabel()+1)
 		Debug.Message(e0:GetLabel() .. "counter on the Skill")
 	end 
 end
