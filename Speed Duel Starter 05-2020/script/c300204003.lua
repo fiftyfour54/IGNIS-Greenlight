@@ -11,11 +11,17 @@ function s.flipcon(e,tp,eg,ep,ev,re,r,rp)
 	)
 end
 s.listed_names={64631466,63519819}
+function s.cfilter(c,tp)
+	local mg1=Duel.GetFusionMaterial(tp)
+	local res=Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_EXTRA,0,1,c,e,tp,mg1,nil,tp)
+	return c:IsDiscardable() and res
+end
 function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SKILL_FLIP,tp,id|(1<<32))
 	Duel.Hint(HINT_CARD,tp,id)
 	--cost
-	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD,nil)
+	-- Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD,nil)
+	Duel.DiscardHand(tp,s.cfilter,1,1,REASON_COST+REASON_DISCARD,nil,tp)
 	--ritual
 	local g1=false	
 	--fusion
