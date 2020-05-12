@@ -67,7 +67,7 @@ function s.nttg(e,c)
 	return c:IsLevelAbove(5) and c:IsCode(6368038)
 end
 function s.effilter(c)
-	return c:IsFaceup() and (c::IsSetCard(0xbd) or c:IsCode(CARD_GAIA_CHAMPION))
+	return c:IsFaceup() and (c:IsSetCard(0xbd) or c:IsCode(CARD_GAIA_CHAMPION))
 end
 function s.effcon(e)
 	return Duel.IsExistingMatchingCard(s.effilter,tp,LOCATION_MZONE,0,1,nil)
@@ -79,7 +79,7 @@ end
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	local bc=tc:GetBattleTarget()
-	return tc:IsControler(tp) and bc and bc:IsDefensePos() and (tc::IsSetCard(0xbd) or tc:IsCode(CARD_GAIA_CHAMPION))
+	return tc:IsControler(tp) and bc and bc:IsDefensePos() and (tc:IsSetCard(0xbd) or tc:IsCode(CARD_GAIA_CHAMPION))
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
