@@ -67,7 +67,7 @@ function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 		if #g==0 then return end
 		local sg=g:RandomSelect(1-tp,1)
 		Duel.SendtoGrave(sg,REASON_DISCARD+REASON_EFFECT)
-	else then
+	else 
 		e0:SetLabel(e0:GetLabel()-3)
 		Debug.Message(e0:GetLabel() .. "counter on the Skill")
 		local g=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
