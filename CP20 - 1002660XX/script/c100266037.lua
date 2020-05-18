@@ -47,6 +47,6 @@ function s.condition2(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	return tg and tg:IsExists(s.tgfilter,1,nil,tp) and Duel.IsChainDisablable(ev)
 end
-function s.operation2(e,tp)
+function s.operation2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)
 end
