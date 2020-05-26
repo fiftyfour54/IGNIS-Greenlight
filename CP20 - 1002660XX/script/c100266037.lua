@@ -1,52 +1,94 @@
---Special Dititanium Metal
+--複写機塊コピーボックル
+--Appliancer Copybokkle
+--Anime card scripted by pyrQ, updated by Yamato
 local s,id=GetID()
 function s.initial_effect(c)
-	--effect 1
+	--Special Summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCondition(s.condition1)
-	e1:SetTarget(s.target1)
-	e1:SetOperation(s.operation1)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,id)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--effect 2
+	
+	--Special Summon from Deck
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_ACTIVATE)
-	e2:SetCategory(CATEGORY_DISABLE)
-	e2:SetCode(EVENT_CHAINING)
-	e2:SetCondition(s.condition2)
-	e2:SetOperation(s.operation2)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCountLimit(1,id+1)
+	e2:SetCondition(aux.exccon)
+	e2:SetCost(aux.bfgcost)
+	e2:SetTarget(s.dsstg)
+	e2:SetOperation(s.dssop)
 	c:RegisterEffect(e2)
 end
-function s.condition1(e,tp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_JINZO),tp,LOCATION_ONFIELD,0,1,nil)
+
+s.listed_series={0x244}
+s.listed_names={id}
+function s.spfilter(c)
+	return not c:IsCode(id) and c:IsFaceup() and c:IsSetCard(0x244)
 end
-function s.target1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_MACHINE),tp,LOCATION_MZONE,0,1,nil) end
-end
-function s.operation1(e,tp,eg,ep,ev,re,r,rp)
+
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsRace,RACE_MACHINE),tp,LOCATION_MZONE,0,nil)
-	for tc in aux.Next(g) do
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.spfilter(chkc) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_MZONE,0,1,nil,c) end
+	Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_MZONE,0,1,1,nil,c)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,LOCATION_HAND)
+end
+
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if not (c:IsRelateToEffect(e) and tc:IsRelateToEffect(e)) then return end
+	if Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
+		--change name
+		local code=tc:GetOriginalCode()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e1:SetValue(s.efilter)
-		tc:RegisterEffect(e1)
+		e1:SetCode(EFFECT_CHANGE_CODE)
+		e1:SetValue(code)
+		c:RegisterEffect(e1)
 	end
+	Duel.SpecialSummonComplete()
 end
-function s.efilter(e,re,rp)
-	return e:GetHandlerPlayer()~=rp
+
+function s.filter(c,e,tp)
+	if not c:IsFaceup() or not c:IsSetCard(0x244) then return false end
+	local g=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_DECK+LOCATION_HAND,0,nil,e,tp,c)
+	return g:GetClassCount(Card.GetCode)>0
 end
-function s.tgfilter(c,tp)
-	return c:IsControler(tp) and c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsType(TYPE_MONSTER)
+
+function s.filter2(c,e,tp,tc)
+	return c:IsCode(tc:GetCode()) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.condition2(e,tp,eg,ep,ev,re,r,rp)
-	if not s.condition1(e,tp) or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
-	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return tg and tg:IsExists(s.tgfilter,1,nil,tp) and Duel.IsChainDisablable(ev)
+
+function s.dsstg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
 end
-function s.operation2(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateEffect(ev)
+
+function s.dssop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		g=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,false,nil,e,tp,tc)
+		if #g>0 then
+			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+		end
+	end
 end
