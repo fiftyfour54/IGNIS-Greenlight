@@ -1,11 +1,11 @@
 --掃除機塊バキューネシア
 --Appliancer Vacculephant
---scripted by pyrQ
+--Anime version scripted by pyrQ, updated by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
 	--Link Summon
 	c:EnableReviveLimit()
-	Link.AddProcedure(c,s.matfilter,1)
+	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x244),1)
 	--cannot be Link Material
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	--Destroy monster if co-linked
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(21420702,0))
+	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_DESTROY)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetType(EFFECT_TYPE_IGNITION)
@@ -34,7 +34,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	--Destroy card
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(5556499,0))
+	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_DESTROY)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetType(EFFECT_TYPE_IGNITION)
@@ -45,10 +45,7 @@ function s.initial_effect(c)
 	e4:SetOperation(s.desop)
 	c:RegisterEffect(e4)
 end
-s.listed_series={0x57a}
-function s.matfilter(c,lc,sumtype,tp)
-	return c:IsSetCard(0x57a,fc,sumtype,tp) and c:IsLevel(1)
-end
+s.listed_series={0x244}
 function s.lkcon(e)
 	local c=e:GetHandler()
 	return c:IsStatus(STATUS_SPSUMMON_TURN) and c:IsSummonType(SUMMON_TYPE_LINK)

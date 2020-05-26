@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Link Summon
 	c:EnableReviveLimit()
-	Link.AddProcedure(c,s.matfilter,1)
+	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x244),1)
 	--cannot be Link Material
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -33,10 +33,7 @@ function s.initial_effect(c)
 	e3:SetLabel(0)
 	c:RegisterEffect(e3)
 end
-s.listed_series={0x57a}
-function s.matfilter(c,lc,sumtype,tp)
-	return c:IsSetCard(0x57a,fc,sumtype,tp) and c:IsLevel(1)
-end
+s.listed_series={0x244}
 function s.lkcon(e)
 	local c=e:GetHandler()
 	return c:IsStatus(STATUS_SPSUMMON_TURN) and c:IsSummonType(SUMMON_TYPE_LINK)
@@ -49,7 +46,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function s.spfilter(c,e,tp,colinked)
-	return c:IsSetCard(0x57a) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
+	return c:IsSetCard(0x244) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
 		and ((c:IsType(TYPE_LINK) and colinked) or (c:IsLevelBelow(4) and not colinked))
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
