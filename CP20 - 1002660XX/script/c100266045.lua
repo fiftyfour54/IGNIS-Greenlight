@@ -33,9 +33,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={0x244}
-s.listed_names={id}
 function s.thfilter(c)
-	return c:IsType(TYPE_SPELL) and c:IsSetCard(0x244) and c:IsAbleToHand() and not c:IsCode(id)
+	return c:IsType(TYPE_SPELL) and not c:IsType(TYPE_FIELD) and c:IsSetCard(0x244) and c:IsAbleToHand()
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
@@ -79,7 +78,7 @@ function s.mvtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(37480144,0))
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,0))
 	local tc=Duel.SelectMatchingCard(tp,s.mvfilter,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
 	if tc and not tc:IsImmuneToEffect(e) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOZONE)
