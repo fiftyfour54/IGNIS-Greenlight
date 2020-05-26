@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--link summon
 	c:EnableReviveLimit()
-	Link.AddProcedure(c,s.matfilter,1)
+	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x244),1)
 	--cannot link material
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -42,9 +42,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 s.listed_series={0x244}
-function s.matfilter(c,lc,sumtype,tp)
-	return c:IsSetCard(0x244,fc,sumtype,tp) and c:IsLink(1)
-end
 function s.lkcon(e)
 	local c=e:GetHandler()
 	return c:IsStatus(STATUS_SPSUMMON_TURN) and c:IsSummonType(SUMMON_TYPE_LINK)
