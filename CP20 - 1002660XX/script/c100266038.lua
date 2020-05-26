@@ -1,6 +1,6 @@
 --充電機塊セルトパス
 --Appliancer Celtopus
---Anime versino scripted by pyrQ, updated by AlphaKretin
+--Anime version scripted by pyrQ, updated by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
 	--Link Summon
