@@ -58,7 +58,7 @@ function s.thfilter2(c)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter2,tp,LOCATION_GRAVE,0,1,nil) end
-	local g=Duel.GetMatchingGroup(tp,s.thfilter2,tp,LOCATION_GRAVE,0,nil)
+	local g=Duel.GetMatchingGroup(s.thfilter2,tp,LOCATION_GRAVE,0,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,LOCATION_GRAVE)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
@@ -69,9 +69,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	end
 end
-function s.mvfilter(c)
-	return c:GetSequence()<5 and c:IsSetCard(0x244) and c:IsType(TYPE_LINK) and c:IsLink(1)
-end
+s.mvfilter=aux.FilterFaceupFunction(Card.IsSetCard,0x244)
 function s.mvtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.mvfilter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
