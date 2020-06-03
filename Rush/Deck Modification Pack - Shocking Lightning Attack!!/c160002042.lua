@@ -1,4 +1,4 @@
---
+--神風剣
 --Kamikaze Blade
 --scripted by Naim
 local s,id=GetID()
@@ -13,17 +13,17 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.filter1(c,e)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_NORMAL) and c:IsDestructable(e)
+	return c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsDestructable(e)
 end
 function s.filter2(c,e)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:HasLevel() and c:IsLevelBelow(8) and c:IsDestructable(e)
+	return c:IsFaceup() and c:HasLevel() and c:IsLevelBelow(8) and c:IsDestructable(e)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g1=Duel.GetMatchingGroup(s.filter1,tp,LOCATION_ONFIELD,0,nil,e)
-	local g2=Duel.GetMatchingGroup(s.filter2,tp,0,LOCATION_ONFIELD,nil,e)
+	local g1=Duel.GetMatchingGroup(s.filter1,tp,LOCATION_MZONE,0,nil,e)
+	local g2=Duel.GetMatchingGroup(s.filter2,tp,0,LOCATION_MZONE,nil,e)
 	if chk==0 then return #g1>1 and #g2>0 end
 	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g1,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g1,3,0,LOCATION_MZONE)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
