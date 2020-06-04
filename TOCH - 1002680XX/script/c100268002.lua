@@ -1,3 +1,4 @@
+--
 --Toon Harpie Lady
 --Scripted by Hel
 local s,id=GetID()
@@ -22,6 +23,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 	--special summon and destroy
 	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(id,0))
 	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e5:SetType(EFFECT_TYPE_ACTIVATE)
 	e5:SetCode(EVENT_FREE_CHAIN)
@@ -52,20 +54,19 @@ function s.dircon(e)
 		and not Duel.IsExistingMatchingCard(s.cfilter2,tp,0,LOCATION_MZONE,1,nil)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
+	return Duel.IsExistingMatchingCard(s.cfilter1,tp,LOCATION_ONFIELD,0,1,nil)
 end
-function s.target()
-if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_SPELL+TYPE_TRAP)
 	if not c:IsRelateToEffect(e) then return end
+	local g=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_SPELL+TYPE_TRAP)
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
-		if #g>0 and Duel.IsExistingMatchingCard(s.cfilter2,tp,LOCATION_ONFIELD,0,1,c) 
-			and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		if #g>0 and Duel.IsExistingMatchingCard(s.cfilter2,tp,LOCATION_ONFIELD,0,1,c)
+			and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.BreakEffect()
 			local sg=g:Select(tp,1,1,nil)
 			Duel.HintSelection(sg)
