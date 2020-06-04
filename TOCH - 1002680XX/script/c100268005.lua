@@ -1,3 +1,4 @@
+--
 --Toon Terror
 --Scripted by Hel
 local s,id=GetID()
