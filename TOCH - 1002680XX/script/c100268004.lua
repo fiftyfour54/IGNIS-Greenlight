@@ -34,6 +34,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tg=rg:RandomSelect(1-tp,1)
 	local tc=tg:GetFirst()
 	if tc and tc:IsCanBeSpecialSummoned(e,0,tp,true,false) then
-		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
 	end
 end 
