@@ -26,15 +26,15 @@ function s.initial_effect(c)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT+ATTRIBUTE_DARK))
 	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
-	--Destroy cards
+	--Banish cards
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetCategory(CATEGORY_DESTROY)
+	e3:SetCategory(CATEGORY_REMOVE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,id)
-	e3:SetTarget(s.destg)
-	e3:SetOperation(s.desop)
+	e3:SetTarget(s.rmvtg)
+	e3:SetOperation(s.rmvop)
 	c:RegisterEffect(e3)
 end
 function s.rescon(sg,e,tp,mg)
@@ -80,18 +80,18 @@ end
 function s.tgcond(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.fspfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end
-function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.rmvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() end
 	if chk==0 then return Duel.IsExistingMatchingCard(s.fspfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-		and Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
+		and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	local ct=Duel.GetMatchingGroupCount(s.fspfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,ct,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,ct,nil)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
 end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.rmvop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetTargetCards(e)
 	if #g>0 then
-		Duel.Destroy(g,REASON_EFFECT)
+		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 end
