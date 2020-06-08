@@ -17,8 +17,9 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_ACTIVATE)
 	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetHintTiming(0,TIMING_SPSUMMON,TIMING_SPSUMMON)
 	c:RegisterEffect(e3)
-	--destroy
+	--Destroy
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,0))
 	e4:SetCategory(CATEGORY_DESTROY)
@@ -31,7 +32,7 @@ function s.initial_effect(c)
 	e4:SetTarget(s.destg)
 	e4:SetOperation(s.desop)
 	c:RegisterEffect(e4)
-	--set
+	--Set
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,1))
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
