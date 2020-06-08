@@ -35,7 +35,7 @@ function s.filter2(c,e,tp,mc,rk,pg)
 		and mc:IsCanBeXyzMaterial(c,tp) and (#pg<=0 or pg:IsContains(mc)) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function s.rmfilter(c)
-    return c:IsAttribute(ATTRIBUTE_DARK) and and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true,false)
+    return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true,false)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
     local g=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_GRAVE+LOCATION_MZONE,0,nil)
