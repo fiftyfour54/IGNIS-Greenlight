@@ -61,7 +61,6 @@ function s.xyzfilter(c)
 	return c:IsFaceup() and c:GetOverlayCount()>0 and c:GetOverlayGroup():IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_DARK)
 end
 function s.spcon2(e,tp,eg,ep,ev,re,r,rp)
-Debug.Message(Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_MZONE,0,1,nil))
 	return Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
