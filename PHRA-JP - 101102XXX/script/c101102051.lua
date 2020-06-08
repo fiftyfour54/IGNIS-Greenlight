@@ -1,15 +1,16 @@
 --ＲＵＭ－ファントム・フォース
 --Rank-Up-Magic - Phantom Knights' Force
---Scripted by AlphaKretin
---Card selection parts by edo9300
+--scripted by AlphaKretin and by edo9300
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(s.condition)
 	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
@@ -73,7 +74,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	ge1:SetType(EFFECT_TYPE_FIELD)
 	ge1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
 	ge1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	ge1:SetDescription(aux.Stringid(id,0))
+	ge1:SetDescription(aux.Stringid(id,2))
 	ge1:SetTargetRange(1,0)
 	ge1:SetTarget(s.splimit)
 	ge1:SetReset(RESET_PHASE+PHASE_END)
