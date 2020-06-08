@@ -33,7 +33,7 @@ function s.initial_effect(c)
 	e4:SetValue(aux.tgoval)
 	c:RegisterEffect(e4)
 end
-s..listed_series={0x10db,0xba}
+s.listed_series={0x10db,0xba}
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsAttribute(ATTRIBUTE_DARK)
 end
