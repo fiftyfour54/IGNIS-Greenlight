@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_names={id}
-s.listed_series={0x107}
+s.listed_series={0x107,0xb2}
 function s.thfilter(c)
 	return c:IsAbleToHand() and ((c:IsType(TYPE_MONSTER) and c:IsLocation(LOCATION_DECK) and (c:IsSetCard(0x107) or c:IsSetCard(0xb2)))
 		or  (c:IsCode(19814508) and c:IsLocation(LOCATION_GRAVE)))
