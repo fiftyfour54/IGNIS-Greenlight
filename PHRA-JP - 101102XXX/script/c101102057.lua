@@ -5,6 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_HANDES+CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON+CATEGORY_TOKEN)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -18,7 +19,7 @@ s.listed_series={0x246}
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0 
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+100,0x246,TYPES_TOKEN,0,0,2,RACE_WARRIOR,ATTRIBUTE_LIGHT) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+100,0x247,TYPES_TOKEN,0,0,2,RACE_WARRIOR,ATTRIBUTE_LIGHT) end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,ft,tp,0)
@@ -53,9 +54,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e4:SetReset(RESET_PHASE+PHASE_END)
 	e4:SetOperation(s.desop)
 	Duel.RegisterEffect(e4,tp)
-	aux.RegisterClientHint(c,nil,tp,1,0,aux.Stringid(id,0),nil)
+	aux.RegisterClientHint(c,nil,tp,1,0,aux.Stringid(id,1),nil)
 	if Duel.DiscardHand(tp,nil,1,1,REASON_EFFECT+REASON_DISCARD)>0 
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+100,0x246,TYPES_TOKEN,0,0,2,RACE_WARRIOR,ATTRIBUTE_LIGHT) then
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+100,0x247,TYPES_TOKEN,0,0,2,RACE_WARRIOR,ATTRIBUTE_LIGHT) then
 		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 		if ft<=0 or (Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and ft>1) then return end
 		for i=1,ft do
@@ -65,8 +66,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummonComplete()
 		local fc=2
 		while fc>0 do
-			local params={aux.FilterBoolFunction(Card.IsSetCard,0x246)}
-			if not (Fusion.SummonEffTG(table.unpack(params))(e,tp,eg,ep,ev,re,r,rp,0) and Duel.SelectYesNo(tp,aux.Stringid(id,1))) then return end
+			local params={aux.FilterBoolFunction(Card.IsSetCard,0x247)}
+			if not (Fusion.SummonEffTG(table.unpack(params))(e,tp,eg,ep,ev,re,r,rp,0) and Duel.SelectYesNo(tp,aux.Stringid(id,2))) then return end
 			Fusion.SummonEffOP(table.unpack(params))(e,tp,eg,ep,ev,re,r,rp)
 			fc=fc-1
 		end
