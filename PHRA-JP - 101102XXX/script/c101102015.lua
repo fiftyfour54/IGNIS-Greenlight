@@ -39,7 +39,7 @@ function s.spfilter(c,tp)
 		and c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.spfilter,1,nil,tp) --and Duel.GetTurnPlayer()==1-tp
+	return eg:IsExists(s.spfilter,1,nil,tp) and Duel.GetTurnPlayer()==1-tp
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
