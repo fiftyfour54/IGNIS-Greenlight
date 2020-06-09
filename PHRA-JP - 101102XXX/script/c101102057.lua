@@ -68,6 +68,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		while fc>0 do
 			local params={aux.FilterBoolFunction(Card.IsSetCard,0x247)}
 			if not (Fusion.SummonEffTG(table.unpack(params))(e,tp,eg,ep,ev,re,r,rp,0) and Duel.SelectYesNo(tp,aux.Stringid(id,2))) then return end
+			Duel.BreakEffect()
 			Fusion.SummonEffOP(table.unpack(params))(e,tp,eg,ep,ev,re,r,rp)
 			fc=fc-1
 		end
