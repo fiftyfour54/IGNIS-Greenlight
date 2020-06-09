@@ -1,5 +1,6 @@
 --阿吽の呼吸
 --Two As One
+--Scripted by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
