@@ -1,5 +1,5 @@
---双天脚の鴻鵠
---Koukoku of the Souten Kicks
+--双天拳の熊羆
+--Yuubi of the Souten Fists
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
