@@ -35,10 +35,10 @@ function s.desfilter(c,e,tp)
 		and c:IsDestructable(e) and not c:IsStatus(STATUS_DESTROY_CONFIRMED)
 end
 function s.repfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsReason(REASON_BATTLE) and c:IsSetCard(0x247)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsReason(REASON_BATTLE) and c:IsSetCard(0x247) and c:IsType(TYPE_FUSION)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(s.repfilter,1,nil,tp)
+	if chk==0 then return #(eg:Filter(s.repfilter,nil,tp))==1
 		and Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_MZONE,0,1,eg,e,tp) end
 	if Duel.SelectEffectYesNo(tp,e:GetHandler(),96) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESREPLACE)
