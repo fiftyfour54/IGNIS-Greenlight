@@ -17,9 +17,9 @@ end
 s.listed_names={id+100}
 s.listed_series={0x246}
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0 
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+100,0x247,TYPES_TOKEN,0,0,2,RACE_WARRIOR,ATTRIBUTE_LIGHT) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,101102157,0x247,TYPES_TOKEN,0,0,2,RACE_WARRIOR,ATTRIBUTE_LIGHT) end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,ft,tp,0)
@@ -55,12 +55,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e4:SetOperation(s.desop)
 	Duel.RegisterEffect(e4,tp)
 	aux.RegisterClientHint(c,nil,tp,1,0,aux.Stringid(id,1),nil)
-	if Duel.DiscardHand(tp,nil,1,1,REASON_EFFECT+REASON_DISCARD)>0 
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+100,0x247,TYPES_TOKEN,0,0,2,RACE_WARRIOR,ATTRIBUTE_LIGHT) then
+	if Duel.DiscardHand(tp,nil,1,1,REASON_EFFECT+REASON_DISCARD)>0
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,101102157,0x247,TYPES_TOKEN,0,0,2,RACE_WARRIOR,ATTRIBUTE_LIGHT) then
 		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 		if ft<=0 or (Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and ft>1) then return end
 		for i=1,ft do
-			local token=Duel.CreateToken(tp,id+100)
+			local token=Duel.CreateToken(tp,101102157)
 			Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 		end
 		Duel.SpecialSummonComplete()
