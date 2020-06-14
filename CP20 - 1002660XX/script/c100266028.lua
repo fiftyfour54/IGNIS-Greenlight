@@ -7,6 +7,7 @@ function s.initial_effect(c)
 	Xyz.AddProcedure(c,nil,3,2)
 	--Special Summon an Insect
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_CHANGE_POS)
@@ -17,7 +18,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	--Negate effects
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DISABLE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_CHAINING)
@@ -49,8 +50,10 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	return (loc&LOCATION_ONFIELD)~=0
-		and re:IsActiveType(TYPE_MONSTER) and aux.disfilter1(re:GetHandler()) and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
+	local rc=re:GetHandler()
+	return (loc&LOCATION_ONFIELD)~=0 and re:IsActiveType(TYPE_MONSTER) and aux.disfilter1(re:GetHandler())
+		and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
+		and re:GetHandler():IsRelateToEffect(re) and rc:IsCanBeEffectTarget(e)
 end
 function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -86,6 +89,7 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		local sc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil):GetFirst()
 		if not sc then return end
+		Duel.HintSelection(Group.FromCards(sc))
 		Duel.BreakEffect()
 		if sc:IsCanChangePosition() and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.ChangePosition(sc,POS_FACEUP_DEFENSE,0,POS_FACEUP_ATTACK,0)
