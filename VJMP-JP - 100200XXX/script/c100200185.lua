@@ -57,7 +57,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ct,zones=e:GetLabel(),Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ct<1 or zones<1 or not Duel.IsPlayerCanSpecialSummonMonster(tp,id+100,0,TYPES_TOKEN,2000,0,1,RACE_REPTILE,ATTRIBUTE_DARK) then return end
-	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and ct>2 then ct=2 end
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and ct>=2 then ct=1 end
 	if ct>zones then ct=zones end
 	for i=1,ct do
 		local token=Duel.CreateToken(tp,id+100)
