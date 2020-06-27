@@ -27,6 +27,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_MZONE,0,1,2,e:GetHandler())
 	local ct=Duel.SendtoGrave(g,REASON_COST)
 	if ct>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local dg=Duel.SelectMatchingCard(tp,Card.IsDefensePos,tp,0,LOCATION_MZONE,1,ct,nil)
 		if #dg>0 then
 			Duel.Destroy(dg,REASON_EFFECT)
