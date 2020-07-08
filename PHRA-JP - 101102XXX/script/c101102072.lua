@@ -24,13 +24,16 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	--Increase/Decrease target's level/rank by 3
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetRange(LOCATION_GRAVE)
-	e3:SetCountLimit(1,id+100)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetRange(LOCATION_GRAVE)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetCountLimit(1,id+100)
+	e3:SetHintTiming(0,TIMING_MAIN_END)
 	e3:SetCost(aux.bfgcost)
-	e3:SetTarget(s.target)
-	e3:SetOperation(s.operation)
+	e3:SetCondition(s.lvrkcon)
+	e3:SetTarget(s.lvrktg)
+	e3:SetOperation(s.lvrkop)
 	c:RegisterEffect(e3)
 end
 s.listed_series={0x248}
@@ -52,23 +55,27 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local g=Duel.GetMatchingGroup(s.tdfilter,tp,LOCATION_REMOVED,0,nil)
 	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,aux.dncheck,1,tp,HINTMSG_TODECK)
-	if #sg==2 then
-		if Duel.SendtoDeck(sg,nil,0,REASON_EFFECT)==2 and tc and tc:IsRelateToEffect(e) then
+	if #sg==2 and Duel.SendtoDeck(sg,nil,0,REASON_EFFECT)==2 then
+		local og=Duel.GetOperatedGroup()
+		if og:FilterCount(Card.IsLocation,nil,LOCATION_DECK)==2 and tc and tc:IsRelateToEffect(e) then
 			Duel.BreakEffect()
 			Duel.Destroy(tc,REASON_EFFECT)
 		end
 	end
 end
-function s.filter(c)
+function s.lvrkcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsMainPhase() and Duel.IsTurnPlayer(tp)
+end
+function s.lvrkfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x248) and (c:HasLevel() or c:IsType(TYPE_XYZ))
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil) end
+function s.lvrktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.lvrkfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.lvrkfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,s.lvrkfilter,tp,LOCATION_MZONE,0,1,1,nil)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.lvrkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		local value=0
