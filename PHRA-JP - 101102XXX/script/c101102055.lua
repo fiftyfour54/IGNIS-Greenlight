@@ -28,18 +28,17 @@ function s.tfop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.tffilter),tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
 	if tc and Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 		local ct=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsSetCard,0x1248),tp,LOCATION_ONFIELD,0,nil)
-		local atkg=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsSetCard,0x248),tp,LOCATION_MZONE,0,nil)
-		if ct>=2 and #atkg>0 then
+		if ct>=2 then
 			Duel.BreakEffect()
 			local c=e:GetHandler()
-			for tc in aux.Next(atkg) do
-				local e1=Effect.CreateEffect(c)
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_UPDATE_ATTACK)
-				e1:SetValue(200)
-				e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-				tc:RegisterEffect(e1)
-			end
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_FIELD)
+			e1:SetCode(EFFECT_UPDATE_ATTACK)
+			e1:SetTargetRange(LOCATION_MZONE,0)
+			e1:SetValue(200)
+			e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x248))
+			e1:SetReset(RESET_PHASE+PHASE_END)
+			Duel.RegisterEffect(e1,tp)
 		end
 		if ct>=3 and Duel.IsPlayerCanDiscardDeck(tp,3) then
 			Duel.BreakEffect()
@@ -69,16 +68,15 @@ function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x248) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.exfilter1(c)
-	return c:IsLocation(LOCATION_EXTRA) and c:IsFacedown() and c:IsType(TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ)
+	return c:IsFacedown() and c:IsType(TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ)
 end
 function s.exfilter2(c)
-	return c:IsLocation(LOCATION_EXTRA) and (c:IsType(TYPE_LINK) or (c:IsFaceup() and c:IsType(TYPE_PENDULUM)))
+	return c:IsType(TYPE_LINK) or (c:IsFaceup() and c:IsType(TYPE_PENDULUM))
 end
 function s.rescon(ft1,ft2,ft3,ft)
 	return	function(sg,e,tp,mg)
-				local exnpct=sg:FilterCount(s.exfilter1,nil,LOCATION_EXTRA)
-				local expct=sg:FilterCount(s.exfilter2,nil,LOCATION_EXTRA)
-				local exct=sg:FilterCount(Card.IsLocation,nil,LOCATION_EXTRA)
+				local exnpct=sg:FilterCount(s.exfilter1,nil)
+				local expct=sg:FilterCount(s.exfilter2,nil)
 				local groupcount=#sg
 				local classcount=sg:GetClassCount(Card.GetCode)
 				local res=ft2>=exnpct and ft3>=expct and ft>=groupcount and classcount==groupcount
