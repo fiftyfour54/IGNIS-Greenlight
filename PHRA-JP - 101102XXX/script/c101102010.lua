@@ -13,6 +13,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
+s.listed_series={0x248}
 local key=TYPE_MONSTER+TYPE_SPELL+TYPE_TRAP
 function s.foolishfilter(c,type)
 	return c:IsSetCard(0x248) and not c:IsType(type&key) and c:IsAbleToGrave()
