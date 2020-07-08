@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Xyz Summon
 	c:EnableReviveLimit()
-	Xyz.AddProcedure(c,nil,3,2,nil,nil,7)
+	Xyz.AddProcedure(c,nil,3,2,nil,nil,99)
 	--Prevent destruction by battle
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -24,7 +24,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_BATTLED)
 	e2:SetCountLimit(1)
-	e2:SetCondition(s.rmop)
+	e2:SetCondition(s.rmcon)
 	e2:SetTarget(s.rmtg)
 	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
@@ -41,7 +41,7 @@ function s.indtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.indop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(aux.Stringid(id,2))
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -53,7 +53,7 @@ function s.indop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.rescon(sg,e,tp,mg)
-	return sg:GetClassCount(Card.GetOriginalRace(c))==1 and sg:GetClassCount(Card.GetOriginalAttribute(c))==1
+	return sg:GetClassCount(Card.GetOriginalRace)==1 and sg:GetClassCount(Card.GetOriginalAttribute)==1
 end
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
@@ -68,7 +68,7 @@ end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()
 	if tc==e:GetHandler() then tc=Duel.GetAttackTarget() end
-	if tc:IsRelateToBattle() and tc:IsControler(1-tp) then
+	if tc and tc:IsRelateToBattle() and tc:IsControler(1-tp) then
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 	end
 end
