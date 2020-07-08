@@ -59,7 +59,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.rmfilter(c)
-	return c:IsType(TYPE_MONSTER) and aux.SpElimFilter(c,true,false)
+	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true,false)
 end
 function s.rescon(sg,e,tp,mg)
 	return sg:GetClassCount(Card.GetOriginalRace(c))==#sg and sg:GetClassCount(Card.GetOriginalAttribute(c))==#sg
@@ -67,6 +67,8 @@ end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_GRAVE+LOCATION_MZONE,0,e:GetHandler())
 	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,0) end
+	local g=aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,1,tp,HINTMSG_REMOVE,nil,nil)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
