@@ -55,7 +55,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		local tg=Duel.SelectMatchingCard(tp,s.tgvfilter,tp,LOCATION_DECK,0,1,1,nil,tc:GetType()&key)
 		if #tg>0 and Duel.SendtoGrave(tg,nil,REASON_EFFECT>0 then
 			local ogc=Duel.GetOperatedGroup():GetFirst()
-			if ogc:IsLocation(LOCATION_GRAVE) and c:IsRelateToEffect(e) Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+			if ogc:IsLocation(LOCATION_GRAVE) and c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
 				local tg1=tg:GetFirst()
 				if Duel.IsExistingMatchingCard(s.tgvfilter2,tp,LOCATION_DECK,0,1,nil,tc:GetType()&key,tg1:GetType()&key) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
