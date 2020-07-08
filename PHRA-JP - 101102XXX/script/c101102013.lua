@@ -16,6 +16,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x248}
+s.listed_names={id}
 local key=TYPE_MONSTER+TYPE_SPELL+TYPE_TRAP
 function s.tgtfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0x248) and Duel.IsExistingMatchingCard(s.tgvfilter,tp,LOCATION_DECK,0,1,nil,c:GetType()&key)
@@ -29,13 +30,12 @@ end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsControler(tp) and s.tgtfilter(chkc,tp) end
 	if chk==0 then return Duel.IsExistingTarget(s.tgtfilter,tp,LOCATION_ONFIELD,0,1,nil,tp)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,s.tgtfilter,tp,LOCATION_ONFIELD,0,1,1,nil,tp)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,0,LOCATION_DECK)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,LOCATION_HAND)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -51,11 +51,14 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	aux.RegisterClientHint(c,EFFECT_FLAG_OATH,tp,1,0,aux.Stringid(id,1),nil)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and not tc:IsFacedown() then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local tg=Duel.SelectMatchingCard(tp,s.tgvfilter,tp,LOCATION_DECK,0,1,1,nil,tc:GetType()&key)
-		if #tg>0 and Duel.SendtoGrave(tg,nil,REASON_EFFECT)~=0 and c:IsRelateToEffect(e) then
-			if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+		if #tg>0 and Duel.SendtoGrave(tg,nil,REASON_EFFECT>0 then
+			local ogc=Duel.GetOperatedGroup():GetFirst()
+			if ogc:IsLocation(LOCATION_GRAVE) and c:IsRelateToEffect(e) Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
 				local tg1=tg:GetFirst()
 				if Duel.IsExistingMatchingCard(s.tgvfilter2,tp,LOCATION_DECK,0,1,nil,tc:GetType()&key,tg1:GetType()&key) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 					local tg2=Duel.SelectMatchingCard(tp,s.tgvfilter2,tp,LOCATION_DECK,0,1,1,nil,tc:GetType()&key,tg1:GetType()&key)
 					if #tg2>0 then
 						Duel.BreakEffect()
