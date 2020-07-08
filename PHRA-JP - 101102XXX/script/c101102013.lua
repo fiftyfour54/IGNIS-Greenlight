@@ -50,7 +50,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e0,tp)
 	aux.RegisterClientHint(c,EFFECT_FLAG_OATH,tp,1,0,aux.Stringid(id,1),nil)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToEffect(e) and not tc:IsFacedown() then
 		local tg=Duel.SelectMatchingCard(tp,s.tgvfilter,tp,LOCATION_DECK,0,1,1,nil,tc:GetType()&key)
 		if #tg>0 and Duel.SendtoGrave(tg,nil,REASON_EFFECT)~=0 and c:IsRelateToEffect(e) then
 			if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
