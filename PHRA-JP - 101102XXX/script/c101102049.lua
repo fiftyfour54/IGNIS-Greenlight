@@ -5,8 +5,8 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Link Summon
 	c:EnableReviveLimit()
-    Link.AddProcedure(c,s.mfilter,1,1)
-    --Link Summon once per turn
+	Link.AddProcedure(c,s.mfilter,1,1)
+	--Link Summon once per turn
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
@@ -16,10 +16,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	--Replace "Prank-Kids" monsters' Tribute cost (hardcoded by auxiliary function)
 	local e2=Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_SINGLE)
-    e2:SetCode(CARD_PRANKKIDS_MEW)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(CARD_PRANKKIDS_MEW)
 	e2:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
-    c:RegisterEffect(e2)
+	c:RegisterEffect(e2)
 end
 s.listed_series={0x120}
 function s.mfilter(c,lc,sumtype,tp)
