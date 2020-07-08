@@ -24,15 +24,16 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_RELEASE)
 	e2:SetCountLimit(1,id+100)
+	e2:SetCondition(s.regcond)
 	e2:SetOperation(s.regop)
 	c:RegisterEffect(e2)
 	--Register when destroyed by a "Nephthys" card
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_DESTROYED)
-	e3:SetCondition(s.regcond)
 	c:RegisterEffect(e3)
 end
-s.listed_series={0x1248}
+s.listed_names={23459650,id}
+s.listed_series={0x11f}
 function s.spcond(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL)
 end
