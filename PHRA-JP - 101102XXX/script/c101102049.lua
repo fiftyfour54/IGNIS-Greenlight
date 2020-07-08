@@ -1,5 +1,5 @@
 --プランキッズ・ミュー
---Prank-Kids Mew
+--Prank-Kids Meow-Meow
 --Scripted by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
@@ -16,12 +16,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	--Replace "Prank-Kids" monsters' Tribute cost (hardcoded by auxiliary function)
 	local e2=Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_FIELD)
-    e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e2:SetCode(id)
-    e2:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
-    e2:SetTargetRange(1,0)
+    e2:SetType(EFFECT_TYPE_SINGLE)
+    e2:SetCode(CARD_PRANKKIDS_MEW)
+	e2:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
     c:RegisterEffect(e2)
+end
+s.listed_series={0x120}
+function s.mfilter(c,lc,sumtype,tp)
+	return c:IsSetCard(0x120,lc,sumtype,tp) and c:IsLevelBelow(4)
 end
 function s.regcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
