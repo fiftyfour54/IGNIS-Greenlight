@@ -72,11 +72,7 @@ function s.desfilter(c,e)
 	return c:IsSetCard(0x11f) and c:IsDestructable(e) and not c:IsRitualMonster() and (c:IsFaceup() or not c:IsLocation(LOCATION_ONFIELD))
 end
 function s.bitfilter(c)
-	if c:IsLocation(LOCATION_MZONE+LOCATION_SZONE) then
-		return (c:GetLocation()|LOCATION_ONFIELD)
-	else
-		return c:GetLocation()
-	end
+	return (c:GetLocation()&LOCATION_ONFIELD)~=0 and LOCATION_ONFIELD or c:GetLocation()
 end
 function s.descheck(sg,e,tp,mg)
 	local ct1=sg:GetClassCount(s.bitfilter)
