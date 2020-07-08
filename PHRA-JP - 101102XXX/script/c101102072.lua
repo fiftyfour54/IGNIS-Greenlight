@@ -57,9 +57,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,aux.dncheck,1,tp,HINTMSG_TODECK)
 	if #sg==2 and Duel.SendtoDeck(sg,nil,0,REASON_EFFECT)==2 then
 		local og=Duel.GetOperatedGroup()
-		local ogd=og:FilterCount(Card.IsLocation,nil,LOCATION_DECK)
-		local oged=og:FilterCount(Card.IsLocation,nil,LOCATION_EXTRA)
-		if ogd+oged==2 and tc and tc:IsRelateToEffect(e) then
+		if og:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)==2 and tc and tc:IsRelateToEffect(e) then
 			Duel.BreakEffect()
 			Duel.Destroy(tc,REASON_EFFECT)
 		end
