@@ -8,12 +8,12 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DECKDES+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(s.tftg)
 	e1:SetOperation(s.tfop)
 	c:RegisterEffect(e1)
 end
-s.listed_series={0x1248}
+s.listed_series={0x1248,0x248}
 function s.tffilter(c,tp)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSetCard(0x1248) and not c:IsForbidden() and c:CheckUniqueOnField(tp)
 end
@@ -25,7 +25,7 @@ end
 function s.tfop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.tffilter),tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.tffilter,tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
 	if tc and Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 		local ct=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsSetCard,0x1248),tp,LOCATION_ONFIELD,0,nil)
 		if ct>=2 then
