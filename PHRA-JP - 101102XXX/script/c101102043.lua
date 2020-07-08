@@ -40,11 +40,11 @@ function s.rmvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_ONFIELD,1,nil)
 		and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g1=Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,1,nil)
+	local g1=Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g2=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
 	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g1,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g1,2,0,LOCATION_ONFIELD+LOCATION_GRAVE)
 end
 function s.rmvop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetTargetCards(e)
@@ -59,7 +59,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 		and c:IsSummonType(SUMMON_TYPE_XYZ) and rp==1-tp
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x248) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
+	return c:IsSetCard(0x248) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
 end
 function s.rescon(sg,e,tp,mg)
 	return sg:GetClassCount(Card.GetRace)==1 and sg:GetClassCount(Card.GetAttribute)==1
@@ -71,16 +71,13 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
 		return aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,0)
 	end
-	e:GetHandler():CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) or Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
 	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,1,tp,HINTMSG_SPSUMMON)
-	if sg then
+	if sg and #sg==2 then
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
-		Duel.ConfirmCards(1-tp,sg)
 	end
 end
