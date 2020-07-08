@@ -1,5 +1,5 @@
---電脳堺甲ー甲々
---Datascape Shell – Jiajia
+--電脳堺甲－甲々
+--Datascape Shell - Jiajia
 --Scripted by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
@@ -62,7 +62,7 @@ end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=Duel.GetAttacker()
 	if tc==e:GetHandler() then tc=Duel.GetAttackTarget() end
-	if chk==0 then return tc and tc:IsRelateToBattle() and tc:IsAbleToRemove() end
+	if chk==0 then return tc and tc:IsRelateToBattle() and tc:IsAbleToRemove() and tc:IsControler(1-tp) end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,tc,1,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
