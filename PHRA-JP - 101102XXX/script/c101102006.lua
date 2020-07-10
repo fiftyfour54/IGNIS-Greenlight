@@ -55,6 +55,16 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Effect.CreateEffect(e:GetHandler())
+    e1:SetDescription(aux.Stringid(id,2))
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+    e1:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+    e1:SetTargetRange(1,0)
+    e1:SetTarget(s.matlimit)
+	e1:SetValue(1)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	Duel.RegisterEffect(e1,tp)
 	local ct=e:GetLabel()
 	if not ct then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -62,6 +72,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 	end
+end
+function s.matlimit(e,c,sumtype,pos)
+    return not c:IsRace(RACES_BEAST_BWARRIOR_WINGB)
 end
 function s.thfilter(c)
     return c:IsSetCard(0x249) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
