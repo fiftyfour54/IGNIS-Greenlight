@@ -1,6 +1,6 @@
 --鉄獣の抗戦
 --Tribrigade Revolt
---Scripted by Naim
+--Scripted by Naim and pyrQ
 local s,id=GetID()
 function s.initial_effect(c)
 	--Special Summon from hand
