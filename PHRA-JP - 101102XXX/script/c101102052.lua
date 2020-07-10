@@ -37,7 +37,7 @@ function s.initial_effect(c)
 	e4:SetOperation(s.limop)
 	c:RegisterEffect(e4)
 end
-function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
+function s.splimit(e,c)
 	return c:IsLocation(LOCATION_EXTRA) and not c:IsAttribute(RACES_BEAST_BWARRIOR_WINGB )
 end
 function s.thfilter(c,typ)
