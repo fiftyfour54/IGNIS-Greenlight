@@ -17,13 +17,10 @@ function s.initial_effect(c)
 end
 s.listed_series={0x249}
 function s.spfilter2(c,fg,minmat,maxmat)
-	return c:IsSetCard(0x249) and c:IsLinkSummonable(nil,fg)
-	--return c:IsSetCard(0x249) and c:IsLinkSummonable(nil,fg,minmat,maxmat)
+	return c:IsSetCard(0x249) and c:IsLinkSummonable(nil,fg,minmat,maxmat)
 end
-function s.spfilter(c,e,tp,fg,minmat,maxmt)
-	return c:IsRace(RACES_BEAST_BWARRIOR_WINGB) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and (c:IsLocation(LOCATION_GRAVE) or (c:IsLocation(LOCATION_REMOVED) and c:IsFaceup()))
-		and Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_EXTRA,0,1,nil,fg,minmat,maxmt)
+function s.rescon(sg,e,tp,mg)
+	return Duel.GetMatchingGroupCount(s.spfilter2,tp,LOCATION_EXTRA,0,nil,sg,#sg,#sg)>0
 end
 function s.filtercheck(c,e,tp)
 	return c:IsCanBeLinkMaterial() and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsRace(RACES_BEAST_BWARRIOR_WINGB)
@@ -32,16 +29,17 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local fg=Duel.GetMatchingGroup(s.filtercheck,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil,e,tp)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp,fg,ft,#fg)
-		and Duel.IsPlayerCanSpecialSummonCount(tp,2) and ft>0 end
+	if chk==0 then return aux.SelectUnselectGroup(fg,e,tp,1,ft,s.rescon,0)
+		and Duel.IsPlayerCanSpecialSummonCount(tp,2)
+		and ft>0 and Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_LINK)>=0
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,nil,tp,LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_EXTRA)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local fg=Duel.GetMatchingGroup(s.filtercheck,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil,e,tp)
 	if ft<1 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,ft,nil,e,tp,fg,ft,#fg)
+	local g=aux.SelectUnselectGroup(fg,e,tp,1,99,s.rescon,1,tp,HINTMSG_SPSUMMON,s.rescon,nil,false)
 	if not g or #g==0  then
 		return false
 	end
@@ -58,30 +56,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 	end
 	Duel.SpecialSummonComplete()
-	local tg=Duel.GetMatchingGroup(s.spfilter2,tp,LOCATION_EXTRA,0,nil,g,ft,#fg)
+	local tg=Duel.GetMatchingGroup(s.spfilter2,tp,LOCATION_EXTRA,0,nil,g,#g,#g)
 	if #tg>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=tg:Select(tp,1,1,nil)
 		local sc=sg:GetFirst()
-		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-		e3:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
-		e3:SetOperation(s.regop)
-		sc:RegisterEffect(e3)
 		Duel.LinkSummon(tp,sc,g,g)
 	end
-end
-function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	local rc=e:GetOwner()
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(rc)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_ATTACK)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_CANNOT_TRIGGER)
-	c:RegisterEffect(e2)
-	e:Reset()
 end
