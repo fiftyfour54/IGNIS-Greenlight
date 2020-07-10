@@ -17,10 +17,12 @@ function s.initial_effect(c)
 end
 s.listed_series={0x249}
 function s.spfilter2(c,fg,minmat,maxmat)
-	return c:IsSetCard(0x249) and c:IsLinkSummonable(nil,fg,minmat,maxmat)
+	return c:IsSetCard(0x249) and c:IsLinkSummonable(nil,fg,c:GetLink(),c:GetLink())
 end
-function s.rescon(sg,e,tp,mg)
-	return Duel.GetMatchingGroupCount(s.spfilter2,tp,LOCATION_EXTRA,0,nil,sg,#sg,#sg)>0
+function s.spfilter(c,e,tp,fg,minmat,maxmt)
+	return c:IsRace(RACES_BEAST_BWARRIOR_WINGB) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and (c:IsLocation(LOCATION_GRAVE) or (c:IsLocation(LOCATION_REMOVED) and c:IsFaceup()))
+		and Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_EXTRA,0,1,nil,fg,minmat,maxmt)
 end
 function s.filtercheck(c,e,tp)
 	return c:IsCanBeLinkMaterial() and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsRace(RACES_BEAST_BWARRIOR_WINGB)
@@ -29,20 +31,33 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local fg=Duel.GetMatchingGroup(s.filtercheck,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil,e,tp)
-	if chk==0 then return aux.SelectUnselectGroup(fg,e,tp,1,ft,s.rescon,0)
+	if chk==0 then return ft>0 and Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_LINK)>=0
+		and Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_EXTRA,0,1,nil,fg)
 		and Duel.IsPlayerCanSpecialSummonCount(tp,2)
-		and ft>0 and Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_LINK)>=0
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,nil,tp,LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_EXTRA)
+end
+function s.testfitler(c,fg)
+	return c:IsSetCard(0x249) and c:IsLinkSummonable(nil,fg,#fg,c:GetLink())
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local fg=Duel.GetMatchingGroup(s.filtercheck,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil,e,tp)
 	if ft<1 then return end
-	local g=aux.SelectUnselectGroup(fg,e,tp,1,99,s.rescon,1,tp,HINTMSG_SPSUMMON,s.rescon,nil,false)
-	if not g or #g==0  then
-		return false
+	local linkg=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_EXTRA,0,nil,0x249)
+	local linkr_min=99
+	local linkr_max=-1
+	for lc in aux.Next(linkg) do
+		if lc:GetLink()>linkr_max then
+			linkr_max=lc:GetLink()
+		end
+		if lc:GetLink()<linkr_min then
+			linkr_min=lc:GetLink()
+		end
 	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,linkr_min,linkr_max,nil,e,tp,fg,ft,#fg)
+	if not g or #g==0  then return end
 	local c=e:GetHandler()
 	for tc in aux.Next(g) do
 		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
@@ -56,7 +71,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 	end
 	Duel.SpecialSummonComplete()
-	local tg=Duel.GetMatchingGroup(s.spfilter2,tp,LOCATION_EXTRA,0,nil,g,#g,#g)
+	local tg=Duel.GetMatchingGroup(s.testfitler,tp,LOCATION_EXTRA,0,nil,g)
 	if #tg>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=tg:Select(tp,1,1,nil)
