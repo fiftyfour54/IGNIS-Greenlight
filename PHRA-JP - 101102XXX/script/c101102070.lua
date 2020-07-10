@@ -76,6 +76,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=tg:Select(tp,1,1,nil)
 		local sc=sg:GetFirst()
-		Duel.LinkSummon(tp,sc,g,g)
+		Duel.LinkSummon(tp,sc,nil,g,#g,#g)
 	end
 end
