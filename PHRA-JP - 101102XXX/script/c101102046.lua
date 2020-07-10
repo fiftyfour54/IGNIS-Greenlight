@@ -3,10 +3,10 @@
 --Scripted by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
-    --Link Summon
-    Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACES_BEAST_BWARRIOR_WINGB),2,2)
-    c:EnableReviveLimit()
-    --Special Summon from hand
+	--Link Summon
+	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACES_BEAST_BWARRIOR_WINGB),2,2)
+	c:EnableReviveLimit()
+	--Special Summon from hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -15,8 +15,8 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
-    c:RegisterEffect(e1)
-    --Draw 1 card
+	c:RegisterEffect(e1)
+	--Draw 1 card
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DRAW)
@@ -38,13 +38,13 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-    local e1=Effect.CreateEffect(e:GetHandler())
-    e1:SetDescription(aux.Stringid(id,2))
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-    e1:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
-    e1:SetTargetRange(1,0)
-    e1:SetTarget(s.matlimit)
+	e1:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(s.matlimit)
 	e1:SetValue(1)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	Duel.RegisterEffect(e1,tp)
@@ -55,7 +55,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.matlimit(e,c,sumtype,pos)
-    return not c:IsRace(RACES_BEAST_BWARRIOR_WINGB)
+	return not c:IsRace(RACES_BEAST_BWARRIOR_WINGB)
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end

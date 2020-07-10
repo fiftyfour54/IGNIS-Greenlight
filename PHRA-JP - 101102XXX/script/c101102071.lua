@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--negate
+	--Negate
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DISABLE)
@@ -51,9 +51,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_BEAST),tp,LOCATION_ONFIELD,0,1,nil) and
-		Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_BEASTWARRIOR),tp,LOCATION_ONFIELD,0,1,nil) and
-		Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_WINGEDBEAST),tp,LOCATION_ONFIELD,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_BEAST),tp,LOCATION_ONFIELD,0,1,nil)
+		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_BEASTWARRIOR),tp,LOCATION_ONFIELD,0,1,nil)
+		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_WINGEDBEAST),tp,LOCATION_ONFIELD,0,1,nil)
 end
 function s.negfilter(c)
 	return aux.disfilter1(c) and c:IsType(TYPE_SPELL+TYPE_TRAP)
