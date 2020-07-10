@@ -76,7 +76,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.matlimit(e,c)
-    return not c:IsRace(RACES_BEAST_BWARRIOR_WINGB)
+	return not c:IsRace(RACES_BEAST_BWARRIOR_WINGB)
 end
 function s.sumlimit(e,c)
 	if not c then return false end

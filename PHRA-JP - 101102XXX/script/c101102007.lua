@@ -50,7 +50,7 @@ function s.rmfilter(c)
 end
 function s.spfilter(c,e,tp,ct)
 	return c:IsRace(RACES_BEAST_BWARRIOR_WINGB) and c:IsType(TYPE_LINK) and c:IsLink(ct)
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
 end
 function s.spcost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
@@ -64,7 +64,7 @@ function s.spcost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_LVRANK)
 	local ct=Duel.AnnounceNumber(tp,table.unpack(nums))
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local rg=g:Select(tp,ct,ct)
+	local rg=g:Select(tp,ct,ct,nil)
 	Duel.Remove(rg,POS_FACEUP,REASON_COST)
 	e:SetLabel(ct)
 end
@@ -73,24 +73,30 @@ function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.spop2(e,tp,eg,ep,ev,re,r,rp)
+	--register material limitation
 	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
-	e1:SetTargetRange(1,0)
 	e1:SetTarget(s.matlimit)
-	e1:SetValue(1)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e1:SetTargetRange(LOCATION_ALL,LOCATION_ALL)
+	e1:SetValue(s.sumlimit)
+	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	--client hint
+	aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,2),nil)
+	--special Summon
 	local ct=e:GetLabel()
 	if not ct then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,e,tp,ct)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,ct)
 	if #g>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_ATTACK)
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function s.matlimit(e,c,sumtype,pos)
+function s.matlimit(e,c)
 	return not c:IsRace(RACES_BEAST_BWARRIOR_WINGB)
+end
+function s.sumlimit(e,c)
+	if not c then return false end
+	return c:IsControler(e:GetHandlerPlayer())
 end
