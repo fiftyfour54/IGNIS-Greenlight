@@ -1,4 +1,4 @@
---ペンギンの勇者
+--ペンギン勇者
 --Penguin Heroes
 --Scripted by AlphaKretin
 local s,id=GetID()
