@@ -19,14 +19,14 @@ function s.initial_effect(c)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	--Protect from targeting
-    local e2=Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_FIELD)
-    e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-    e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE)
-    e2:SetRange(LOCATION_MZONE)
-    e2:SetTargetRange(LOCATION_MZONE,0)
-    e2:SetTarget(s.tglimit)
-    e2:SetValue(aux.tgoval)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetTargetRange(LOCATION_MZONE,0)
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsFacedown))
+	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	--Flip face-up
 	local e3=Effect.CreateEffect(c)
@@ -61,11 +61,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)
 	end
 end
-function s.tglimit(e,c)
-    return c:IsFacedown()
-end
 function s.poscon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and ep~=tp
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and ep==1-tp
 		and re:IsActiveType(TYPE_MONSTER)
 end
 function s.posfilter(c)
