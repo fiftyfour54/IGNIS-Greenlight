@@ -69,7 +69,7 @@ function s.poscon(e,tp,eg,ep,ev,re,r,rp)
 		and re:IsActiveType(TYPE_MONSTER)
 end
 function s.posfilter(c)
-	return c:IsRace(RACE_AQUA) and c:IsFacedown() and c:IsCanChangePosition()
+	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsFacedown() and c:IsCanChangePosition()
 end
 function s.postg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.posfilter,tp,LOCATION_MZONE,0,1,nil) end
