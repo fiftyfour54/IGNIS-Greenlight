@@ -3,18 +3,18 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-    --fusion material
+    --Fusion Material
     c:EnableReviveLimit()
     Fusion.AddProcMix(c,true,true,6007213,32491822,69890967)
-    --change name
+    --Name change on the field
     local e1=Effect.CreateEffect(c)
     e1:SetType(EFFECT_TYPE_SINGLE)
     e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
     e1:SetCode(EFFECT_CHANGE_CODE)
-    e1:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
+    e1:SetRange(LOCATION_MZONE)
     e1:SetValue(43378048)
     c:RegisterEffect(e1)
-    --control
+    --Give control
     local e2=Effect.CreateEffect(c)
     e2:SetDescription(aux.Stringid(id,1))
     e2:SetCategory(CATEGORY_CONTROL)
@@ -24,7 +24,7 @@ function s.initial_effect(c)
     e2:SetTarget(s.cttg)
     e2:SetOperation(s.ctop)
     c:RegisterEffect(e2)
-    --register
+    --Register the control switch
     local e3=Effect.CreateEffect(c)
     e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
     e3:SetCode(EVENT_CONTROL_CHANGED)
@@ -51,10 +51,10 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
     local e1=Effect.CreateEffect(c)
     e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_REMOVE)
-    e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+    e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
     e1:SetCode(EVENT_PHASE+PHASE_END)
     e1:SetRange(LOCATION_MZONE)
-    e1:SetCountLimit(1,id)
+    e1:SetCountLimit(1)
     e1:SetTarget(s.rmtg)
     e1:SetOperation(s.rmop)
     e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
@@ -64,7 +64,6 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return true end
     local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,LOCATION_ONFIELD,0,nil)
     Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
-    Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,e:GetHandler():GetOwner(),LOCATION_EXTRA)
 end
 function s.spfilter(c,e,tp)
     return c:IsCode(43378048) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
