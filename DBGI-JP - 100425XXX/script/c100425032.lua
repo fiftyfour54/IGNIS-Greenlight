@@ -1,12 +1,13 @@
 --流星輝巧群
 --Meteornis Draitron
---Scripted by Eerie Code
+--Scripted by Eerie Code and edo9300
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
-	Ritual.AddProcGreater({handler=c,lv=Card.GetAttack,matfilter=s.filter,location=LOCATION_HAND|LOCATION_GRAVE,requirementfunc=Card.GetAttack})
-   	--to hand
+	--Ritual Summon
+	Ritual.AddProcGreater({handler=c,lv=Card.GetAttack,matfilter=s.filter,location=LOCATION_HAND|LOCATION_GRAVE,requirementfunc=Card.GetAttack},desc=aux.Stringid(id,0))
+	--Add itself to hand
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
