@@ -1,4 +1,4 @@
---ドライトロン流星群
+--竜輝巧流星群
 --Draitron Meteor Shower
 --Scripted by Naim
 local s,id=GetID()
@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_DISABLE_SUMMON+CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_SUMMON)
-	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_SINGLE)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentChain()==0 and eg:IsExists(Card.IsControler,1,nil,1-tp)
+	return Duel.GetCurrentChain()==0 and eg:IsExists(Card.IsSummonPlayer,1,nil,1-tp)
 		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRitualMonster),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -33,7 +33,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=eg:Filter(Card.IsControler,nil,1-tp)
-	DDuel.NegateSummon(g)
+	local g=eg:Filter(Card.IsSummonPlayer,nil,1-tp)
+	Duel.NegateSummon(g)
 	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 end
