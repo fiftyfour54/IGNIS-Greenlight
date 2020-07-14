@@ -26,7 +26,6 @@ function s.initial_effect(c)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.sumfilter)
 end
 s.listed_series={0x24a}
-s.listed_names={id}
 function s.spconlimit(e,se,sp,st)
 	return se:IsHasType(EFFECT_TYPE_ACTIONS) and se:GetHandler():IsSetCard(0x24a)
 end
