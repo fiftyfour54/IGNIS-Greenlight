@@ -1,5 +1,5 @@
 --復活のバブル-ミラーボール-
---Bubble Revival – Mirror Ball 
+--Mirror Ball
 local s,id=GetID()
 function s.initial_effect(c)
 	--If opponent normal summons, special summon 1 Aqua  monster from GY
@@ -12,7 +12,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	
 end
 function s.filter1(c,e,tp)
 	return c:IsSummonPlayer(1-tp) and c:IsLocation(LOCATION_MZONE) and c:IsLevelAbove(5)
