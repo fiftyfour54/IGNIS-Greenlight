@@ -1,4 +1,4 @@
---竜輝巧-ファフニール
+--竜輝巧－ファフニール
 --Draitron Fafnir
 --Scripted by Naim
 local s,id=GetID()
@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e4:SetProperty(EFFECT_FLAG_DELAY)
 	e4:SetRange(LOCATION_FZONE)
 	e4:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
 	e4:SetCondition(s.lvcond)
