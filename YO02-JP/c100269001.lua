@@ -18,13 +18,12 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,id)
 	e2:SetCost(s.spcost)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 end
-s.listed_series={0xfc}
-s.listed_names={id}
 function s.cfilter(c)
 	return c:IsFacedown() or not (c:IsRace(RACE_PSYCHIC) or c:IsRace(RACE_WYRM))
 end
