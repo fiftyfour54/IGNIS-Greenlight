@@ -20,7 +20,7 @@ function s.descond()
 	return Duel.IsMainPhase
 end
 function s.atkfilter(c)
-	return c:IsFaceup() and c:GetAttack()>=1000 and (c:IsSetCard(0x2016) or c:IsRitualMonster())
+	return c:IsFaceup() and c:GetAttack()>=1000 and (c:IsSetCard(0x24a) or c:IsRitualMonster())
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
