@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(s.descond)
 	e1:SetTarget(s.destg)
 	e1:SetOperation(s.desop)
@@ -17,7 +17,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x24a}
 function s.descond()
-	return Duel.IsMainPhase
+	return Duel.IsMainPhase()
 end
 function s.atkfilter(c)
 	return c:IsFaceup() and c:GetAttack()>=1000 and (c:IsSetCard(0x24a) or c:IsRitualMonster())
@@ -40,7 +40,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	local dc=g:GetNext()
 	if not tc==e:GetLabelObject() then tc,dc=dc,tc end
-	if tc and tc:UpdateAttack(-1000,RESET_PHASE+PHASE_END+RESET_OPPO_TURN)==-1000 and dc and not dc:IsFacedown() then
+	if tc and tc:UpdateAttack(-1000,RESET_PHASE+PHASE_END+RESET_OPPO_TURN,c)==-1000 and dc and dc:IsControler(1-tp) and not dc:IsFacedown() then
 		 Duel.Destroy(dc,REASON_EFFECT)
 	end
 end
