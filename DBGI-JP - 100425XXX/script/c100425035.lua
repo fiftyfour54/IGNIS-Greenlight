@@ -40,7 +40,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	local dc=g:GetNext()
 	if not tc==e:GetLabelObject() then tc,dc=dc,tc end
-	if tc and tc:UpdateAttack(-1000,RESET_PHASE+PHASE_END+RESET_OPPO_TURN,c)==-1000 and dc and dc:IsControler(1-tp) and not dc:IsFacedown() then
+	if tc and tc:UpdateAttack(-1000,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,c)==-1000 and dc and dc:IsControler(1-tp) and not dc:IsFacedown() then
 		 Duel.Destroy(dc,REASON_EFFECT)
 	end
 end
