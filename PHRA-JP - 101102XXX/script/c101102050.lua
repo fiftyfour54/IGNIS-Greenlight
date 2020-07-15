@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetCondition(s.indcon)
 	e1:SetTarget(s.indtg)
-	e1:SetValue(s.indval)
+	e1:SetValue(aux.indoval)
 	c:RegisterEffect(e1)
 	--Switch control
 	local e2=Effect.CreateEffect(c)
@@ -35,9 +35,6 @@ end
 function s.indtg(e,c)
 	local oc=e:GetHandler()
 	return c==oc or oc:GetLinkedGroup():IsContains(c)
-end
-function s.indval(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function s.concon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetLinkedGroupCount()==2
