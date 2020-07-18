@@ -3,11 +3,10 @@
 --Scripted by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
-	--Add to hand
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_COIN)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id)
@@ -16,10 +15,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	--Normal Summon
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,id+100)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.nstg)
 	e2:SetOperation(s.nsop)
@@ -34,11 +34,12 @@ end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) and
 		Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,0,LOCATION_DECK,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,nil,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local sel
-	if Duel.IsEnvironment(id,tp) then
+	if Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,73206827),tp,LOCATION_FZONE,0,1,nil) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_COIN)
 		sel=1-Duel.SelectOption(tp,true,SELECT_HEADS,SELECT_TAILS)
 	else
@@ -53,10 +54,10 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	else
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
-		local g=Duel.SelectMatchingCard(1-tp,s.thfilter,tp,0,LOCATION_DECK,1,1,nil)
+		local g=Duel.SelectMatchingCard(1-tp,Card.IsAbleToHand,tp,0,LOCATION_DECK,1,1,nil)
 		if #g>0 then
 			Duel.SendtoHand(g,nil,REASON_EFFECT)
-			Duel.ConfirmCards(tp,g)
+			--Duel.ConfirmCards(tp,g)
 		end
 	end
 end
