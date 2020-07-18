@@ -1,18 +1,18 @@
---
+--夢弦のフォルダーブリッツ
 --Foldablitz of the Dream Strings
 local s,id=GetID()
 function s.initial_effect(c)
-	--damage
+	--Inflict 1500 damage
 	local e1=Effect.CreateEffect(c)
-    e1:SetDescription(aux.Stringid(id,0))
-    e1:SetCategory(CATEGORY_DAMAGE)
-    e1:SetType(EFFECT_TYPE_IGNITION)
-    e1:SetCountLimit(1)
-    e1:SetRange(LOCATION_MZONE)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_DAMAGE)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetCountLimit(1)
+	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(s.damcon)
-    e1:SetTarget(s.damtg)
-    e1:SetOperation(s.damop)
-    c:RegisterEffect(e1)
+	e1:SetTarget(s.damtg)
+	e1:SetOperation(s.damop)
+	c:RegisterEffect(e1)
 end
 function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetLP(tp)<=Duel.GetLP(1-tp)-2000
