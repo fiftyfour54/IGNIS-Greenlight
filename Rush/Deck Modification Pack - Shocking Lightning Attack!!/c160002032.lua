@@ -1,5 +1,5 @@
--- 波導砲ビッグ・マグロム
--- Hydrocannon Big Magurom 
+--波導砲ビッグ・マグロム
+--Hydrocannon Big Magurom
 local s,id=GetID()
 function s.initial_effect(c)
 	--Direct attack
