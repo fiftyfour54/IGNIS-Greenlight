@@ -9,6 +9,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
 	e1:SetTarget(s.rmtg)
 	e1:SetOperation(s.rmop)
 	c:RegisterEffect(e1)
@@ -25,9 +26,10 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if #g==0 or #og==0 then return end
 	local ct=math.min(#g,#og)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local rg=g:Select(tp,1,ct)
+	local rg=g:Select(tp,1,ct,nil)
 	local rmct=Duel.Remove(rg,POS_FACEDOWN,REASON_EFFECT)
-	if rmct>0 then
+	local rmog=Duel.GetOperatedGroup()
+	if rmct>0 and rmct==rmog:FilterCount(Card.IsLocation,nil,LOCATION_REMOVED) then
 		local org=og:RandomSelect(tp,rmct)
 		if Duel.Remove(org,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY)>0 then
 			local fid=c:GetFieldID()
