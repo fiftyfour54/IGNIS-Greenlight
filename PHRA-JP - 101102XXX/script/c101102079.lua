@@ -1,4 +1,4 @@
---アルカナリーディング
+--魔獣の大餌
 --Feed Back
 --Scripted by AlphaKretin
 local s,id=GetID()
@@ -9,51 +9,51 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.rmtg)
 	e1:SetOperation(s.rmop)
 	c:RegisterEffect(e1)
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,LOCATION_EXTRA,0,1,nil) and
-		Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_EXTRA,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,2,nil,0)
+		Duel.IsExistingMatchingCard(aux.AND(Card.IsAbleToRemove,Card.IsFacedown),tp,0,LOCATION_EXTRA,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,2,nil,LOCATION_EXTRA)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,LOCATION_EXTRA,0,nil)
-	local og=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_EXTRA,nil)
+	local og=Duel.GetMatchingGroup(aux.AND(Card.IsAbleToRemove,Card.IsFacedown),tp,0,LOCATION_EXTRA,nil)
+	if #g==0 or #og==0 then return end
 	local ct=math.min(#g,#og)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local rg=g:Select(tp,1,ct)
 	local rmct=Duel.Remove(rg,POS_FACEDOWN,REASON_EFFECT)
-	if rmct~=0 then
-		local org=og:RandomSelect(1-tp,rmct)
-		if Duel.Remove(org,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY)~=0 then
+	if rmct>0 then
+		local org=og:RandomSelect(tp,rmct)
+		if Duel.Remove(org,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY)>0 then
 			local fid=c:GetFieldID()
 			local opg=Duel.GetOperatedGroup()
 			for oc in aux.Next(opg) do
 				oc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
 			end
+			opg:KeepAlive()
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+			e1:SetCode(EVENT_PHASE+PHASE_END)
+			e1:SetCountLimit(1)
+			e1:SetLabel(fid)
+			e1:SetLabelObject(opg)
+			e1:SetCondition(s.retcon)
+			e1:SetOperation(s.retop)
+			e1:SetReset(RESET_PHASE+PHASE_END)
+			Duel.RegisterEffect(e1,tp)
 		end
-		opg:KeepAlive()
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-		e1:SetCode(EVENT_PHASE+PHASE_END)
-		e1:SetCountLimit(1)
-		e1:SetLabel(fid)
-		e1:SetLabelObject(opg)
-		e1:SetCondition(s.retcon)
-		e1:SetOperation(s.retop)
-		e1:SetReset(RESET_PHASE+PHASE_END)
-		Duel.RegisterEffect(e1,tp)
 	end
 end
 function s.retfilter(c,fid)
 	return c:GetFlagEffectLabel(id)==fid
 end
 function s.retcon(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return false end
 	local g=e:GetLabelObject()
 	if not g:IsExists(s.retfilter,1,nil,e:GetLabel()) then
 		g:DeleteGroup()
