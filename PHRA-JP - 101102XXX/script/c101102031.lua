@@ -40,7 +40,7 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_PHASE+PHASE_END)
 	e4:SetCountLimit(1,id)
 	e4:SetRange(LOCATION_GRAVE)
-	e4:SetCondition(s.thcon)
+	e4:SetCondition(s.condition)
 	e4:SetTarget(s.target)
 	e4:SetOperation(s.operation)
 	c:RegisterEffect(e4)
@@ -57,11 +57,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 end
-function s.thfilter(c)
-	return c:GetLevel()==3 and c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_FIEND)
-		and not c:IsCode(id) and c:IsAbleToHand()
-end
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(id)>0
 end
 function s.filter(c,e,tp)
