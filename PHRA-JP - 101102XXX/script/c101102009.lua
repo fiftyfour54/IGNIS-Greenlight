@@ -39,7 +39,7 @@ function s.initial_effect(c)
 	e3:SetCondition(s.atkcon)
 	e3:SetTarget(s.atktg)
 	e3:SetOperation(s.atkop)
-	c:RegisterEffect(e4)
+	c:RegisterEffect(e3)
 end
 s.listed_series={0x146}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
