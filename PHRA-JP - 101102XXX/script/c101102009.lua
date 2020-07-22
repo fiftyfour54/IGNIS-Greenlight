@@ -11,14 +11,14 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCode(EVENT_TOGRAVE)
-	e1:SetCountLimit(1,id+100)
+	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.spcon)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	--Add to hand
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -47,8 +47,8 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
