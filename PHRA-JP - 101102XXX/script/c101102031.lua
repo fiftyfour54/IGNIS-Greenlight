@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetCondition(s.tgcond)
 	e2:SetTarget(s.tgtg)
-	e2:SetValue(aux.tgoval)
+	e2:SetValue(s.tgval)
 	c:RegisterEffect(e2)
 	--Register when sent to the GY
 	local e3=Effect.CreateEffect(c)
@@ -52,6 +52,9 @@ function s.tgcond(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.tgtg(e,c)
 	return c~=e:GetHandler()
+end
+function s.tgval(e,re,rp)
+	return re:IsActiveType(TYPE_MONSTER) and aux.tgoval(e,re,rp)
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
