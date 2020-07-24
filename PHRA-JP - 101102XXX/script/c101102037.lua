@@ -1,12 +1,13 @@
+--インフェルニティ・ヘル・デーモン
 --Infernity Hell Archfiend
 local s,id=GetID()
 function s.initial_effect(c)
-	--synchro summon
+	--Synchro Summon procedure
 	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),1,99)
 	c:EnableReviveLimit()
 	--Negate
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -22,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetCondition(s.damcon)
 	e2:SetValue(aux.ChangeBattleDamage(1,DOUBLE_DAMAGE))
 	c:RegisterEffect(e2)
-	--effect
+	--Provide effect when used as material
 	local e3=Effect.CreateEffect(c)
 	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
@@ -31,7 +32,6 @@ function s.initial_effect(c)
 	e3:SetOperation(s.efop)
 	c:RegisterEffect(e3)
 end
-
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and aux.disfilter1(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(aux.disfilter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
@@ -53,17 +53,15 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp,chk)
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e2)
-		if Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_HAND,0)==0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		if Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_HAND,0)==0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.AdjustInstantly(tc)
 			Duel.Destroy(tc,REASON_EFFECT)
 		end
 	end
 end
-
 function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattleTarget()~=nil and Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_HAND,0)==0
 end
-
 function s.efcon(e,tp,eg,ep,ev,re,r,rp)
 	return r==REASON_SYNCHRO and e:GetHandler():GetReasonCard():IsAttribute(ATTRIBUTE_DARK)
 end
@@ -72,12 +70,11 @@ function s.efop(e,tp,eg,ep,ev,re,r,rp)
 	local rc=c:GetReasonCard()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_EXTRA_ATTACK_MONSTER)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	e1:SetValue(1)
 	rc:RegisterEffect(e1)
 end
-
-
