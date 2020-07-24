@@ -1,8 +1,9 @@
 --インフェルニティ・サプレッション
---Infernity Suppression
+--Infernity Supression
 --Scripted by ahtelel
 local s,id=GetID()
 function s.initial_effect(c)
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DAMAGE)
@@ -13,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--act in set turn
+	--Can be activated during the turn it was Set
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
@@ -28,9 +29,6 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
-	if re:GetHandler():HasLevel() then
-		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,0)
-	end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateEffect(ev) and re:GetHandler():HasLevel() and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
