@@ -5,10 +5,10 @@ function s.initial_effect(c)
 	--Synchro Summon procedure
 	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),1,99)
 	c:EnableReviveLimit()
-	--Negate
+	--Negate and destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_ATKCHANGE)
+	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
@@ -53,14 +53,14 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp,chk)
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e2)
-		if Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_HAND,0)==0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		if Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.AdjustInstantly(tc)
 			Duel.Destroy(tc,REASON_EFFECT)
 		end
 	end
 end
 function s.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetBattleTarget()~=nil and Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_HAND,0)==0
+	return e:GetHandler():GetBattleTarget()~=nil and e:GetHandler():GetBattleTarget():IsControler(1-e:GetHandlerPlayer()) and Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_HAND,0)==0
 end
 function s.efcon(e,tp,eg,ep,ev,re,r,rp)
 	return r==REASON_SYNCHRO and e:GetHandler():GetReasonCard():IsAttribute(ATTRIBUTE_DARK)
