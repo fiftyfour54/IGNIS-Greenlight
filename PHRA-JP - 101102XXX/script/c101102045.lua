@@ -9,10 +9,12 @@ function s.initial_effect(c)
 	--Send to gy
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCost(s.gycost)
+	e1:SetTarget(s.gytg)
 	e1:SetOperation(s.gyop)
 	c:RegisterEffect(e1)
 	--Attach 1 card to itself
@@ -55,6 +57,11 @@ end
 function s.gycost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,2,2,REASON_COST)
+end
+function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
+	if chk==0 then return #g>0 end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,#g,0,0)
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
