@@ -22,6 +22,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id+100)
+	e2:SetCost(s.lvcost)
 	e2:SetCondition(s.lvcon)
 	e2:SetTarget(s.lvtg)
 	e2:SetOperation(s.lvop)
@@ -58,7 +59,7 @@ function s.lvcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0
 end
 function s.lvfilter(c)
-	return c:IsRace(RACE_WINGEDBEAST) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
+	return c:IsSetCard(0xb) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
 end
 function s.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.lvfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,e:GetHandler()) end
