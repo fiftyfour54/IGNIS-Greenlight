@@ -5,8 +5,8 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:AddSetcodesRule(0x10db,0xba)
 	c:EnableReviveLimit()
-	--Xyz summon procedure
-	Xyz.AddProcedure(c,nil,4,2)
+	--Xyz Summon procedure
+	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_DARK),4,2)
 	--Xyz Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -19,6 +19,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1,false,REGISTER_FLAG_DETACH_XMAT)
 end
+s.listed_series={0x10db,0xba,0x2073}
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
@@ -73,7 +74,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp
+	return Duel.IsTurnPlayer(1-tp)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local sc=e:GetLabelObject()
