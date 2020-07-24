@@ -1,5 +1,5 @@
-
---Raider's Night
+--レイダーズ・ナイト
+--Raiders' Knight
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
+	e1:SetCountLimit(1,id)
 	e1:SetCost(s.spcost)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
@@ -64,23 +64,17 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 				e1:SetLabelObject(sc)
 				e1:SetCondition(s.descon)
 				e1:SetOperation(s.desop)
-				if Duel.GetCurrentPhase()==PHASE_END and Duel.GetTurnPlayer()~=tp then
-					e1:SetLabel(Duel.GetTurnCount())
-					e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,2)
-				else
-					e1:SetLabel(0)
-					e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
-				end
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+				sc:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,1))
 				Duel.RegisterEffect(e1,tp)
 			end
 		end
 	end
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	return Duel.GetTurnPlayer()~=tp and Duel.GetTurnCount()~=e:GetLabel() and tc:IsRelateToEffect(e)
+	return Duel.GetTurnPlayer()~=tp
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	Duel.Destroy(tc,REASON_EFFECT)
+	local sc=e:GetLabelObject()
+	Duel.Destroy(sc,REASON_EFFECT)
 end
