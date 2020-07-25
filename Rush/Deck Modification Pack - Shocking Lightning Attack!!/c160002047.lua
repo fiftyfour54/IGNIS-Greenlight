@@ -23,6 +23,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	and Duel.GetFieldGroupCount(1-tp,LOCATION_MZONE,0)<=1 end
 	Duel.SetChainLimit(s.chlimit)
 end
+function s.chlimit(e,ep,tp)
+	return not e:IsHasType(EFFECT_TYPE_ACTIVATE)
+end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	--Requirement
 	
