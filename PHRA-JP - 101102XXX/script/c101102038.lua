@@ -75,12 +75,24 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.equipop(c,e,tp,tc)
-	if not aux.EquipByEffectAndLimitRegister(c,e,tp,tc,id) then return end
-	local e2=Effect.CreateEffect(tc)
-	e2:SetType(EFFECT_TYPE_EQUIP)
-	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OWNER_RELATE)
-	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	if not aux.EquipByEffectAndLimitRegister(c,e,tp,tc,nil,true) then return end
+	--ATK increase
+	local e1=Effect.CreateEffect(tc)
+	e1:SetType(EFFECT_TYPE_EQUIP)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OWNER_RELATE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e1:SetValue(500)
+	tc:RegisterEffect(e1)
+	--Equip limit
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_EQUIP_LIMIT)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetValue(s.eqlimit)
 	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-	e2:SetValue(500)
 	tc:RegisterEffect(e2)
+end
+function s.eqlimit(e,c)
+	return c:GetControler()==e:GetHandlerPlayer()
 end
