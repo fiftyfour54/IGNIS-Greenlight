@@ -2,7 +2,7 @@
 --Romic’n’Roller
 local s,id=GetID()
 function s.initial_effect(c)
-	--Mill
+	--Atk/Def change
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
