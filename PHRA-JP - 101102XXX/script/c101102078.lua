@@ -29,6 +29,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not eg or #eg<1 then return end
 	local c=e:GetHandler()
 	for tc in aux.Next(eg) do
+		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+		--Negate its effects
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
@@ -37,23 +39,22 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		tc:RegisterEffect(e2)
+		--Cannot attack
 		local e3=Effect.CreateEffect(c)
 		e3:SetType(EFFECT_TYPE_SINGLE)
 		e3:SetCode(EFFECT_CANNOT_ATTACK)
 		e3:SetValue(1)
 		e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e3)
-		local e4=e3:Clone()
-		e4:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
+		--Cannot be used as material for a Fusion/Synchro/Xyz/Link Summon
+		local e4=Effect.CreateEffect(c)
+		e4:SetType(EFFECT_TYPE_SINGLE)
+		e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+		e4:SetCode(EFFECT_CANNOT_BE_MATERIAL)
+		e4:SetValue(function(e,c,sumtype,tp)
+						local sum=sumtype&(SUMMON_TYPE_FUSION|SUMMON_TYPE_SYNCHRO|SUMMON_TYPE_XYZ|SUMMON_TYPE_LINK)
+						return (sum==SUMMON_TYPE_FUSION or sum==SUMMON_TYPE_SYNCHRO or sum==SUMMON_TYPE_XYZ or sum==SUMMON_TYPE_LINK) and 1 or 0
+					end)
 		tc:RegisterEffect(e4)
-		local e5=e3:Clone()
-		e5:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
-		tc:RegisterEffect(e5)
-		local e6=e3:Clone()
-		e6:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
-		tc:RegisterEffect(e6)
-		local e7=e3:Clone()
-		e7:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
-		tc:RegisterEffect(e7)
 	end
 end
