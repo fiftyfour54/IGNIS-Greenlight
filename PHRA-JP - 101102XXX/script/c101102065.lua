@@ -1,5 +1,5 @@
---
---New Winds Fur Hire
+--新風の空牙団
+--New Style Fur Hire
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
