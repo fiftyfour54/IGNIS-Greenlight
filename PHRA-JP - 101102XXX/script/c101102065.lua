@@ -38,21 +38,22 @@ function s.atktg(e,c)
 	return not c:IsSetCard(0x114)
 end
 function s.costfilter(c,e,tp,ft)
-	return c:HasLevel() and (ft>0 or c:IsInMainMZone()) and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,c:GetLevel(),e,tp)
+	return c:HasLevel() and (ft>0 or (c:IsInMainMZone() and c:IsControler(tp)))
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,c:GetLevel(),e,tp)
 end
 function s.spfilter(c,lv,e,tp)
 	return (c:GetOriginalLevel()==lv+1 or c:GetOriginalLevel()==lv-1) and c:IsSetCard(0x114) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
-		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 		return e:IsHasType(EFFECT_TYPE_ACTIVATE) and ft>-1
 			and Duel.CheckReleaseGroupCost(tp,s.costfilter,1,false,nil,nil,e,tp,ft)
 	end
 	e:SetLabel(0)
-	local g=Duel.SelectReleaseGroupCost(tp,s.costfilter,1,1,false,nil,nil,e,tp)
+	local g=Duel.SelectReleaseGroupCost(tp,s.costfilter,1,1,false,nil,nil,e,tp,ft)
 	Duel.Release(g,REASON_COST)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
