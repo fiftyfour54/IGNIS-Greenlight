@@ -1,5 +1,5 @@
 --機巧牙－御神尊真神
---Gizmek Anewone, the Awesome Alliterative Addition
+--Gizmek Mikoto, the Cutthroat Cyclone Canine
 --scripted by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
