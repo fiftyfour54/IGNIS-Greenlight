@@ -40,11 +40,11 @@ function s.othfilter(c)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.sthfilter(chkc) end
-	if chk==0 then return Duel.IsExistingMatchingCard(s.sthfilter,tp,LOCATION_MZONE,0,1,nil)
+	if chk==0 then return Duel.IsExistingTarget(s.sthfilter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(s.othfilter,tp,0,LOCATION_MZONE,1,nil) end
 	local ct=Duel.GetMatchingGroupCount(s.othfilter,tp,0,LOCATION_MZONE,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local tg=Duel.SelectMatchingCard(tp,s.sthfilter,tp,LOCATION_MZONE,0,1,ct,nil)
+	local tg=Duel.SelectTarget(tp,s.sthfilter,tp,LOCATION_MZONE,0,1,ct,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,tg,ct*2,PLAYER_ALL,0)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
@@ -57,6 +57,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 		local sg=g:Select(tp,ct,ct)
+		Duel.HintSelection(sg)
 		Duel.SendtoHand(sg,nil,REASON_EFFECT)
 	end
 end
