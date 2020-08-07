@@ -81,10 +81,10 @@ function s.top(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.stfilter(c)
-	return c:GetType()==TYPE_TRAP and c:IsSSetable()
+	return c:GetType()==TYPE_TRAP and c:IsSSetable() and c:IsFaceup()
 end
 function s.stcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and e:GetHandler():IsPreviousControler(tp)
+	return rp==1-tp and e:GetHandler():IsPreviousControler(tp)
 end
 function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
