@@ -14,31 +14,38 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function s.thfilter(c,e,tp)
-	return c:IsLevel(1) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+function s.thfilter(c)
+	return c:IsLevel(1) and c:IsType(TYPE_MONSTER)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local rvg=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil,e,tp)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and rvg:GetClassCount(Card.GetCode)>=3 end
+	local rvg=Duel.GetMatchingGroup(aux.AND(s.thfilter,Card.IsAbleToHand),tp,LOCATION_DECK,0,nil)
+	if chk==0 then return rvg:GetClassCount(Card.GetCode)>=3 end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,PLAYER_ALL,LOCATION_DECK)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,3,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local rvg=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil,e,tp)
+	local rvg=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
 	local g=aux.SelectUnselectGroup(rvg,e,tp,3,3,aux.dncheck,1,tp,HINTMSG_CONFIRM)
 	if #g==3 then
 		Duel.ConfirmCards(1-tp,g)
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
 		local sg=g:Select(1-tp,1,1,nil):GetFirst()
+		if sg:IsAbleToHand() then
+			Duel.SendtoHand(sg,1-tp,REASON_EFFECT)
+			Duel.ConfirmCards(tp,sg)
+			Duel.ShuffleHand(1-tp)
+		else
+			Duel.SendtoGrave(sg,REASON_RULE)
+		end
 		g:RemoveCard(sg)
-		Duel.SendtoHand(sg,1-tp,REASON_EFFECT)
-		Duel.ConfirmCards(tp,sg)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local tg=g:Select(tp,1,1,nil):GetFirst()
-		Duel.SendtoHand(tg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,tg)
+		if tg:IsAbleToHand() then
+			Duel.SendtoHand(tg,tp,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,tg)
+			Duel.ShuffleHand(tp)
+		else
+			Duel.SendtoGrave(tg,REASON_RULE)
+		end
+		Duel.ShuffleDeck(tp)
 	end
 end
