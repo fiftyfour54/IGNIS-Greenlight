@@ -30,7 +30,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 							function(c) Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP) end,
 							aux.Stringid(id,1)
 						)
-		end
 	else
 		local op=Duel.SelectOption(1-tp,aux.Stringid(id,2),aux.Stringid(id,3))
 		local p=e:GetHandler():GetControler()
@@ -38,7 +37,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.SetLP(p,100)
 		elseif op==1 then
 			local recv=8000-Duel.GetLP(1-p)
-			if recv<0 then recv=0
+			if recv<0 then recv=0 end
 			Duel.Recover(p,recv,REASON_EFFECT)
 		end
 	end
