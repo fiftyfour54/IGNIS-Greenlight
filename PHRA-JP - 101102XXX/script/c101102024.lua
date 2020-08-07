@@ -3,7 +3,7 @@
 --Scripted by Hel
 local s,id=GetID()
 function s.initial_effect(c)
-	--banish trap as cost to gain 1 level
+	--Banish 1 Trap form Deck to gain 1 level
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
-	--target trap and banish to gain 1 level
+	--Banish 1 Trap to gain 1 level
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_REMOVE)
@@ -27,7 +27,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.ttg)
 	e3:SetOperation(s.top)
 	c:RegisterEffect(e3)
-	--set a trap
+	--Set a banished Trap
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)

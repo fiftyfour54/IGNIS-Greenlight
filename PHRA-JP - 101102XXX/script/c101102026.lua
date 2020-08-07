@@ -3,7 +3,7 @@
 --Scripted by Hel
 local s,id=GetID()
 function s.initial_effect(c)
-	--indes
+	--Cannot be destroyed
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -37,7 +37,7 @@ function s.incon(e)
 	return Duel.IsExistingMatchingCard(s.indesfil,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp
+	return Duel.GetTurnPlayer()==1-tp
 end
 function s.cfilter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_CONTINUOUS) and c:IsAbleToGraveAsCost()
