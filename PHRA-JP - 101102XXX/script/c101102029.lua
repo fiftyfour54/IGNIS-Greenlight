@@ -1,5 +1,5 @@
 --禰須三破鳴比
---Nezumi Hanabi
+--Nezumihanabi
 --scripted by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
@@ -53,11 +53,11 @@ function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
-		e:GetHandler():AddCounter(0x203,3)
+		e:GetHandler():AddCounter(0x203,6)
 	end
 end
 function s.ctlcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp
+	return Duel.IsTurnPlayer(tp)
 end
 function s.ctltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsControlerCanBeChanged() end
@@ -80,7 +80,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp,chk)
 	if not c:IsCanRemoveCounter(tp,0x203,1,REASON_EFFECT) then return end
 	local ct=math.min(Duel.TossDice(tp,1),c:GetCounter(0x203))
 	c:RemoveCounter(tp,0x203,ct,REASON_EFFECT)
-	if c:GetCounter(0x203)==0 and Duel.Destroy(c,REASON_EFFECT)~=0 then
+	if c:GetCounter(0x203)==0 and Duel.Destroy(c,REASON_EFFECT)>0 then
 		Duel.Damage(tp,2000,REASON_EFFECT)
 	end
 end
