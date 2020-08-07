@@ -33,7 +33,7 @@ local c1=e:GetLabelObject()
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local tc=g:GetFirst()
 	if tc==c1 then tc=g:GetNext() end
-	if c1:IsRelateToEffect(e) not tc:IsFacedown() and tc:IsRelateToEffect(e) then
+	if c1:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsFacedown() then
 		Duel.Overlay(c,tc)
 	end
 end
