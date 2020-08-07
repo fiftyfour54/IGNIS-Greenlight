@@ -24,7 +24,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return end
 	Duel.ConfirmDecktop(tp,1)
 	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
-	if tc:IsType(TYPE_MONSTER) and (c:IsLevel(1) or c:IsLevel(8)) then
+	if tc:IsType(TYPE_MONSTER) and (tc:IsLevel(1) or tc:IsLevel(8)) then
 		aux.ToHandOrElse(tc,tp,
 							function(c) return tc:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end,
 							function(c) Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP) end,
@@ -34,11 +34,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		local op=Duel.SelectOption(1-tp,aux.Stringid(id,2),aux.Stringid(id,3))
 		local p=e:GetHandler():GetControler()
 		if op==0 then
-			Duel.SetLP(p,100)
+			Duel.SetLP(p,1000)
 		elseif op==1 then
 			local recv=8000-Duel.GetLP(1-p)
 			if recv<0 then recv=0 end
-			Duel.Recover(p,recv,REASON_EFFECT)
+			Duel.Recover(1-p,recv,REASON_EFFECT)
 		end
 	end
 end
