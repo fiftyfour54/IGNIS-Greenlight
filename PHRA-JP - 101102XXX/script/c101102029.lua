@@ -3,6 +3,7 @@
 --scripted by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
+	c:EnableCounterPermit(0x203)
 	--Cannot be used as material for a Fusion/Synchro/Xyz/Link Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
