@@ -18,7 +18,7 @@ function s.atchfilter(c,atk)
 end
 function s.xyzfilter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_XYZ)
-		and Duel.IsExistingTarget(s.atchfilter,tp,0,LOCATION_MZONE,1,nil)
+		and Duel.IsExistingTarget(s.atchfilter,tp,0,LOCATION_MZONE,1,nil,c:GetAttack())
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
@@ -34,7 +34,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local tc=g:GetFirst()
 	if tc==c1 then tc=g:GetNext() end
-	if c1:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsFacedown() then
-		Duel.Overlay(c,tc)
+	if c1:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
+		local og=tc:GetOverlayGroup()
+		if #og>0 then
+			Duel.SendtoGrave(og,REASON_RULE)
+		end
+		Duel.Overlay(c1,Group.FromCards(tc))
 	end
 end

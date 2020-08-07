@@ -74,7 +74,7 @@ function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local tc=g:GetFirst()
 	if tc==c1 then tc=g:GetNext() end
-	if not c1:HasLevel() or c1:IsFacedown() or not c1:IsRelateToEffect(e) or not c:IsControler(tp) then return end
+	if not c1:HasLevel() or c1:IsFacedown() or not c1:IsRelateToEffect(e) or not c1:IsControler(tp) then return end
 	if not tc:IsFacedown() or tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
