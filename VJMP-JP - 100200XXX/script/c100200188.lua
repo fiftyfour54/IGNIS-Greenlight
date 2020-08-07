@@ -2,7 +2,7 @@
 --Dragunity Guisarme
 --scripted by pyrQ
 local s,id=GetID()
-function initial_effect(c)
+function s.initial_effect(c)
 	--Special Summon 1 Level 4 or lower WIND Dragon/Winged Beast from your GY
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
