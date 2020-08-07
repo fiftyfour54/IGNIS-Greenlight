@@ -1,0 +1,34 @@
+--魍魎跋扈
+--Revenants Running Rampant
+--Scripted by Hel
+local s,id=GetID()
+function s.initial_effect(c)
+	--Normal Summon/Set
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_SUMMON)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(s.condition)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
+	c:RegisterEffect(e1)
+end
+function s.filter(c)
+	return c:IsSummonable(true,nil) or c:IsMSetable(true,nil)
+end
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsMainPhase()
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,0,0)
+end
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND,0,1,1,nil)
+	local tc=g:GetFirst()
+	if tc then
+		Duel.Summon(tp,tc,true,nil,0)
+	end
+end
