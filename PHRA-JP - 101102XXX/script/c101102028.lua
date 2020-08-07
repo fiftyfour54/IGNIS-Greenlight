@@ -52,12 +52,12 @@ function s.lvcst(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD,nil)
 end
-function s.lvfilter(c,lv)
-	return c:IsType(TYPE_MONSTER) and c:IsFaceup() and c:HasLevel() and c:GetLevel()~=lv
-end
 function s.filter1(c,tp)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_FAIRY) and c:HasLevel()
 		and Duel.IsExistingTarget(s.lvfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,c,c:GetLevel()) 
+end
+function s.lvfilter(c,lv)
+	return c:IsType(TYPE_MONSTER) and c:IsFaceup() and c:HasLevel() and c:GetLevel()~=lv
 end
 function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
@@ -75,7 +75,7 @@ function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if tc==c1 then tc=g:GetNext() end
 	if not c1:HasLevel() or c1:IsFacedown() or not c1:IsRelateToEffect(e) or not c1:IsControler(tp) then return end
-	if not tc:IsFacedown() or tc:IsRelateToEffect(e) then
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CHANGE_LEVEL)
