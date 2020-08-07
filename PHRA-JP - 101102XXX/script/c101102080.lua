@@ -9,6 +9,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
@@ -31,6 +32,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 							aux.Stringid(id,1)
 						)
 	else
+		if not Duel.SelectEffectYesNo(1-tp,e:GetHandler()) then return end
 		local op=Duel.SelectOption(1-tp,aux.Stringid(id,2),aux.Stringid(id,3))
 		local p=e:GetHandler():GetControler()
 		if op==0 then
