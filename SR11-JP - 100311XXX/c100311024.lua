@@ -60,5 +60,5 @@ function s.imop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.AdjustInstantly(Duel.GetAttacker())
 end
 function s.efilter(e,te)
-  return te:GetHandlerPlayer()~=e:GetOwnerPlayer()
+	return te:GetHandlerPlayer()~=e:GetOwnerPlayer()
 end
