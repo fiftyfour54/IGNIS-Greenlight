@@ -76,5 +76,5 @@ function s.eqlimit(e,c)
 	return c==e:GetLabelObject()
 end
 function s.ctval(e,c)
-    return e:GetHandlerPlayer()
+	return e:GetHandlerPlayer()
 end
