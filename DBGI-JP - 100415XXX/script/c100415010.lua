@@ -30,7 +30,6 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and Duel.IsExistingMatchingCard(s.chkfilter,tp,LOCATION_GRAVE,0,1,TYPE_SYNCHRO)
 		and Duel.IsExistingMatchingCard(s.chkfilter,tp,LOCATION_GRAVE,0,1,TYPE_XYZ)
 		and Duel.IsExistingMatchingCard(s.chkfilter,tp,LOCATION_GRAVE,0,1,TYPE_LINK)
-	Debug.Message("Are there the monster for the aditional part?"..tostring(check))
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.tgfilter(chkc,tp,check) end
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	if e:GetHandler():IsLocation(LOCATION_HAND) then ft=ft-1
