@@ -17,8 +17,8 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW)
-	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id+100)
 	e2:SetTarget(s.destg)
@@ -56,7 +56,9 @@ end
 function s.eqlimit(e,c)
 	return c==e:GetLabelObject()
 end
-s.desfilter=aux.FilterFaceupFunction(Card.IsType,TYPE_SPELL)
+function s.desfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_SPELL)
+end 
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_ONFIELD) and s.desfilter(chkc) end
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1)
