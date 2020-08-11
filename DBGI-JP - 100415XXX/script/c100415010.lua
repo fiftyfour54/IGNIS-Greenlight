@@ -15,7 +15,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-local 
 s.listed_series={0x24b}
 function s.tgfilter(c,tp,check)
 	return c:IsFaceup() and c:IsSetCard(0x24b) and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_EXTRA+LOCATION_MZONE+LOCATION_GRAVE,0,1,c,check)
