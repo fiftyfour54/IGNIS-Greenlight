@@ -33,16 +33,21 @@ s.listed_series={0x24b}
 function s.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsMainPhase()
 end
+function s.eqfilter(c,tp,ft,mmz)
+	return c:IsFaceup() and (ft>0 or c:IsControler(tp) or mmz)
+end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local mmz=c:GetSequence()<5
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() and not chkc==c end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,c) end
+		and Duel.IsExistingTarget(s.eqfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,c,tp,ft,mmz) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,c)
+	Duel.SelectTarget(tp,s.eqfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,c,tp,ft,mmz)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,c,1,0,0)
 end
-function s.equipop(e,tp,eg,ep,ev,re,r,rp)
+function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not (c:IsRelateToEffect(e) and c:IsLocation(LOCATION_MZONE) and c:IsFaceup()) then return end
 	local tc=Duel.GetFirstTarget()
