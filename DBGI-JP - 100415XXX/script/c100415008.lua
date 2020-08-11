@@ -3,6 +3,7 @@
 --Scripted by AlphaKretin
 local s,id=GetID()
 function s.initial_effect(c)
+	c:SetSPSummonOnce(id)
 	--Link Summon
 	c:EnableReviveLimit()
 	Link.AddProcedure(c,s.matfilter,1,1)
@@ -50,12 +51,11 @@ function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and #g>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local sg=g:Select(tp,1,1)
-	Duel.HintSelection(sg)
+	local sg=g:Select(tp,1,1,nil)
 	Duel.SetTargetCard(sg)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
-function s.equipop(e,tp,eg,ep,ev,re,r,rp)
+function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not (c:IsRelateToEffect(e) and c:IsFaceup() and c:IsLocation(LOCATION_MZONE)) then return end
 	local tc=Duel.GetFirstTarget()
