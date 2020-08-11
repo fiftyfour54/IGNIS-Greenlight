@@ -29,6 +29,7 @@ function s.initial_effect(c)
 	e3:SetCategory(CATEGORY_EQUIP)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_GRAVE)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCountLimit(1,id+200)
 	e3:SetCost(aux.bfgcost)
 	e3:SetTarget(s.eqtg)
@@ -37,12 +38,13 @@ function s.initial_effect(c)
 end
 s.listed_series={0x24b}
 function s.spcfilter(c,tp)
-	return c:IsSetRace(RACE_SPELLCASTER) and c:IsType(TYPE_MONSTER) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsAbleToGraveAsCost() and Duel.GetMZoneCount(tp,c)>0
+	return c:IsRace(RACE_SPELLCASTER) and c:IsType(TYPE_MONSTER) and (c:IsLocation(LOCATION_HAND)
+		or c:IsFaceup()) and c:IsAbleToGraveAsCost() and Duel.GetMZoneCount(tp,c)>0
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.spcfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_ONFIELD+LOCATION_HAND,0,1,1,nil,tp)
+	local g=Duel.SelectMatchingCard(tp,s.spcfilter,tp,LOCATION_ONFIELD+LOCATION_HAND,0,1,1,nil,tp)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -57,9 +59,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.atttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	--could be replaced with "ATTRIBUTE_ALL"
-	if chk==0 then return not c:IsAttribute(0x7f) end
+	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTRIBUTE)
+	--could be replaced with "ATTRIBUTE_ALL"
 	local att=Duel.AnnounceAttribute(tp,1,0x7f-c:GetAttribute())
 	e:SetLabel(att)
 end
@@ -92,7 +94,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	if not (tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsLocation(LOCATION_MZONE)
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local ec=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_GRAVE,0,1,1):GetFirst()
+	local ec=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_GRAVE,0,1,1,nil):GetFirst()
 	if ec then
 		Duel.Equip(tp,ec,tc,true)
 		local e1=Effect.CreateEffect(e:GetHandler())
