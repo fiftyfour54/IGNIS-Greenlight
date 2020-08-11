@@ -3,17 +3,17 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-    --Activate
-    local e1=Effect.CreateEffect(c)
-    e1:SetCategory(CATEGORY_EQUIP)
-    e1:SetType(EFFECT_TYPE_ACTIVATE)
-    e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
-    e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-    e1:SetCode(EVENT_FREE_CHAIN)
-    e1:SetCountLimit(1,id)
-    e1:SetTarget(s.target)
-    e1:SetOperation(s.activate)
-    c:RegisterEffect(e1)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_EQUIP)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,id)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
+	c:RegisterEffect(e1)
 end
 s.listed_series={0x24b}
 function s.tgfilter(c,tp,check)
