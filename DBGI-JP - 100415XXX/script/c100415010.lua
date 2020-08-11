@@ -18,7 +18,7 @@ end
 local 
 s.listed_series={0x24b}
 function s.tgfilter(c,tp,check)
-	return c:IsFaceup() and c:IsSetCard(0x24b) and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_EXTRA+LOCATION_MZONE+LOCATION_GRAVE,0,1,nil,check)
+	return c:IsFaceup() and c:IsSetCard(0x24b) and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_EXTRA+LOCATION_MZONE+LOCATION_GRAVE,0,1,c,check)
 end
 function s.eqfilter(c,check)
 	return not c:IsForbidden() and c:IsType(TYPE_MONSTER)
