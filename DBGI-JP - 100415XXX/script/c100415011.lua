@@ -11,7 +11,7 @@ end
 s.listed_series={0x24b}
 function s.matfilter(c)
 	return (c:IsLocation(LOCATION_HAND+LOCATION_MZONE) and c:IsAbleToGrave())
-		or (c:IsOriginalType(TYPE_MONSTER) and c:IsLocation(LOCATION_SZONE) and c:IsType(TYPE_EQUIP) and c:GetEquipTarget():IsSetCard(0x5008))
+		or (c:IsOriginalType(TYPE_MONSTER) and c:IsLocation(LOCATION_SZONE) and c:IsType(TYPE_EQUIP) and c:GetEquipTarget():IsSetCard(0x24b))
 end
 function s.checkmat(tp,sg,fc)
 	return (fc:IsSetCard(0x24b) or not sg:IsExists(Card.IsLocation,1,nil,LOCATION_SZONE)) and sg:IsExists(Card.IsRace,1,nil,RACE_SPELLCASTER)
