@@ -41,7 +41,7 @@ function s.initial_effect(c)
     c:RegisterEffect(e4)
 end
 s.listed_series={0x24b}
-function s.indct(e,re,r,rp)
+function s.indvalue(e,re,r,rp)
 	return r&REASON_BATTLE==REASON_BATTLE
 end
 function s.indfilter(e,c)
