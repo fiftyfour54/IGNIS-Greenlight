@@ -77,7 +77,7 @@ function s.attop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.eqfilter(c)
-	return c:IsSetCard(0x24b) and not c:IsLevel(4)
+	return c:IsSetCard(0x24b) and not c:IsLevel(4) and c:IsType(TYPE_MONSTER)
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
