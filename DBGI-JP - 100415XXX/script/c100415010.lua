@@ -46,7 +46,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.IsExistingMatchingCard(s.chkfilter,tp,LOCATION_GRAVE,0,1,TYPE_XYZ)
 		and Duel.IsExistingMatchingCard(s.chkfilter,tp,LOCATION_GRAVE,0,1,TYPE_LINK)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_DECK,0,1,1,nil,tc,check)
+	local g=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_EXTRA+LOCATION_MZONE+LOCATION_GRAVE,0,1,1,nil,tc,check)
 	local eq=g:GetFirst()
 	if eq then
 		Duel.Equip(tp,eq,tc,true)
