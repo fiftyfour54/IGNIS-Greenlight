@@ -82,9 +82,10 @@ function s.atktg(e,c)
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local fid=eg:GetFirst():GetFieldID()
-	if Duel.GetFlagEffect(tp,id)~=0 and Duel.GetFlagEffectLabel(tp,id)~=fid then
-		Duel.SetFlagEffectLabel(tp,id,0)
+	local p=eg:GetFirst():GetControler()
+	if Duel.GetFlagEffect(p,id)~=0 and Duel.GetFlagEffectLabel(p,id)~=fid then
+		Duel.SetFlagEffectLabel(p,id,0)
 	else
-		Duel.RegisterFlagEffect(tp,id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
+		Duel.RegisterFlagEffect(p,id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
 	end
 end
