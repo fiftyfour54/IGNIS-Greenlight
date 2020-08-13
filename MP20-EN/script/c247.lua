@@ -36,7 +36,7 @@ function s.initial_effect(c)
 end
 s.listed_names={CARD_BLUEEYES_W_DRAGON,CARD_DARK_MAGICIAN}
 function s.filter(c)
-	return c:IsCode(CARD_BLUEEYES_W_DRAGON) or c:IsCode(CARD_DARK_MAGICIAN) 
+	return c:IsCode(CARD_BLUEEYES_W_DRAGON) or c:IsCode(CARD_DARK_MAGICIAN)
 end
 function s.cfilter(c)
 	return (c:IsSummonType(SUMMON_TYPE_RITUAL) or c:IsSummonType(SUMMON_TYPE_FUSION))

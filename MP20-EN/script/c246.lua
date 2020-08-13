@@ -18,23 +18,23 @@ function s.initial_effect(c)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_ATTACK,s.counterfilter)
 end
 function s.counterfilter(c)
-    return true --filter here for 1 monster only
+	return true --filter here for 1 monster only
 end
 function s.filter(c,e)
 	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and c:IsAbleToGrave() and (not e or c:IsCanBeEffectTarget(e))
 end
 function s.cfilter(c)
-    return c:IsType(TYPE_MONSTER) and c:IsType(TYPE_EFFECT)
+	return c:IsType(TYPE_MONSTER) and c:IsType(TYPE_EFFECT)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-    local dg=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil,e)
-    if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,aux.ReleaseCheckTarget,nil,dg) and
+	local dg=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil,e)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,aux.ReleaseCheckTarget,nil,dg) and
 		Duel.GetCustomActivityCount(id,tp,ACTIVITY_ATTACK)==0
 	end
-    local g=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,aux.ReleaseCheckTarget,nil,dg)
-    Duel.Release(g,REASON_COST)
+	local g=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,aux.ReleaseCheckTarget,nil,dg)
+	Duel.Release(g,REASON_COST)
 	--Register can only attack with 1 monster
-    --Prevents other attacks
+	--Prevents other attacks
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OATH)
@@ -53,7 +53,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e2:SetLabelObject(e1)
 	e2:SetReset(RESET_PHASE+PHASE_BATTLE)
 	Duel.RegisterEffect(e2,tp)
-    aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,1),nil)
+	aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,1),nil)
 end
 function s.spfilter(c,e,tp)
 	return c:IsType(TYPE_NORMAL) and c:IsLevelAbove(7) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
