@@ -15,10 +15,15 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	Duel.AddCustomActivityCounter(id,ACTIVITY_ATTACK,s.counterfilter)
-end
-function s.counterfilter(c)
-	return true --filter here for 1 monster only
+	aux.GlobalCheck(s,function()
+		--Check attacking monster
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e2:SetCode(EVENT_ATTACK_ANNOUNCE)
+		e2:SetOperation(s.checkop)
+		Duel.RegisterEffect(e2,0)
+	end)
 end
 function s.filter(c,e)
 	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and c:IsAbleToGrave() and (not e or c:IsCanBeEffectTarget(e))
@@ -29,13 +34,13 @@ end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local dg=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil,e)
 	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,aux.ReleaseCheckTarget,nil,dg) and
-		Duel.GetCustomActivityCount(id,tp,ACTIVITY_ATTACK)==0
+		(Duel.GetFlagEffect(tp,id)==0 or Duel.GetFlagEffectLabel(tp,id)~=0)
 	end
 	local g=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,aux.ReleaseCheckTarget,nil,dg)
 	Duel.Release(g,REASON_COST)
 	--Register can only attack with 1 monster
 	--Prevents other attacks
-	local e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OATH)
 	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
@@ -44,15 +49,6 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetTarget(s.atktg)
 	e1:SetReset(RESET_PHASE+PHASE_BATTLE)
 	Duel.RegisterEffect(e1,tp)
-	--Check attacking monster
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_OATH)
-	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e2:SetOperation(s.checkop)
-	e2:SetLabelObject(e1)
-	e2:SetReset(RESET_PHASE+PHASE_BATTLE)
-	Duel.RegisterEffect(e2,tp)
 	aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,1),nil)
 end
 function s.spfilter(c,e,tp)
@@ -61,7 +57,7 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.filter(chkc,e) end
 	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,0,LOCATION_MZONE,1,nil,e)
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_DECK,LOCATION_HAND+LOCATION_DECK,1,nil,e,tp)	end
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_DECK,LOCATION_HAND+LOCATION_DECK,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectTarget(tp,s.filter,tp,0,LOCATION_MZONE,1,1,nil,e)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
@@ -82,11 +78,13 @@ function s.atkcon(e)
 	return Duel.GetFlagEffect(e:GetHandlerPlayer(),id)~=0
 end
 function s.atktg(e,c)
-	return c:GetFieldID()~=e:GetLabel()
+	return c:GetFieldID()~=Duel.GetFlagEffectLabel(e:GetHandlerPlayer(),id)
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():GetFlagEffect(id)~=0 then return end
 	local fid=eg:GetFirst():GetFieldID()
-	Duel.RegisterFlagEffect(e:GetHandlerPlayer(),id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-	e:GetLabelObject():SetLabel(fid)
+	if Duel.GetFlagEffect(tp,id)~=0 and Duel.GetFlagEffectLabel(tp,id)~=fid then
+		Duel.SetFlagEffectLabel(tp,id,0)
+	else
+		Duel.RegisterFlagEffect(tp,id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
+	end
 end
