@@ -1,5 +1,5 @@
---Royal Demon's Death Voice
 --ロイヤルデモンズ・デスヴォイス
+--Royal Demon's Death Voice
 local s,id=GetID()
 function s.initial_effect(c)
 	--mat check
@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
-    e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetLabelObject(e0)
@@ -29,13 +29,13 @@ function s.valcheck(e,c)
 	e:SetLabel(flag)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsStatus(STATUS_SUMMON_TURN) and e:GetLabelObject():GetLabel()~=0	
+	return e:GetHandler():IsStatus(STATUS_SUMMON_TURN) and e:GetLabelObject():GetLabel()~=0
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,1) end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,1) end
 end
 function s.filter(c)
-    return c:IsFaceup() and (c:GetAttack()>0 or c:GetDefense()>0)
+	return c:IsFaceup() and (c:GetAttack()>0 or c:GetDefense()>0)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,0,LOCATION_MZONE,1,e:GetHandler()) end
