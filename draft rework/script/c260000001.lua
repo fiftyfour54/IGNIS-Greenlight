@@ -164,5 +164,5 @@ if not DeckModificationPack_HyperspeedRushRoad then
 	end
 end
 
-edopro_exports=DeckModificationPack_HyperspeedRushRoad.export
+edopro_exports={DeckModificationPack_HyperspeedRushRoad.export,5}
 

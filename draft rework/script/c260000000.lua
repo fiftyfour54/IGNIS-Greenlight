@@ -11,8 +11,9 @@ function s.initial_effect(c)
 end
 
 function s.op(e,tp,eg,ep,ev,re,r,rp)
-	local toname=function(code)
-		return "c"..code..".lua"
+	local GetPackExports=function(code)
+		local res,export=Duel.LoadScript("c"..code..".lua",false)
+		return export
 	end
 	local fg=Duel.GetFieldGroup(0,0x43,0x43)
 	--remove all cards
@@ -32,24 +33,44 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	--variable for later
 	local pick=Group.CreateGroup()
 	local pickopp=Group.CreateGroup()
+		
+	--Preload pack group creator functions and pack counts
+	local generators={}
+	for _,_pack in ipairs(pack) do
+		if not generators[_pack] then
+			generators[_pack]=GetPackExports(_pack)
+		end
+	end
 	
-	local packopen=Group.CreateGroup()
-	local packopenopp=Group.CreateGroup()
 	--pack opening
 	Debug.Message(#pack)
 	for i=1,#pack do
 		--each player pick their pack
 		local packpick=Duel.SelectCardsFromCodes(tp,1,1,false,true,table.unpack(pack))
 		
-		local packpickopp=Duel.SelectCardsFromCodes(1-tp,1,1,false,true,table.unpack(packopp))
+		--Allows the selection of only a pack that has the same number of cards in it
+		local packcount1=generators[packpick[1]][2]
+		
+		local validoppo={}
+		validoppo[1]={}
+		validoppo[2]={}
+		
+		for _,_pack in ipairs(packopp) do
+			if generators[_pack][2]==packcount1 then
+				table.insert(validoppo[1],_pack)
+				table.insert(validoppo[2],_)
+			end
+		end
+		
+		local packpickopp=Duel.SelectCardsFromCodes(1-tp,1,1,false,true,table.unpack(validoppo[1]))
 		--remove the pack
 		table.remove(pack,packpick[2])
-		table.remove(packopp,packpickopp[2])
+		table.remove(packopp,validoppo[2][packpickopp[2]])
 		
 		--pack gen
-		packopen=({Duel.LoadScript(toname(packpick[1]),false)})[2](tp)
-		packopenopp=({Duel.LoadScript(toname(packpickopp[1]),false)})[2](1-tp)
-		pickturn=tp
+		local packopen=generators[packpick[1]][1](tp)
+		local packopenopp=generators[packpickopp[1]][1](1-tp)
+		local pickturn=tp
 		--loop that make the player pick
 		--a new token is generated in function of pick to set the owner
 		for j=1,#packopen do

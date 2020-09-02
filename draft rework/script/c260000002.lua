@@ -162,5 +162,5 @@ if not DeckModificationPack_ShockingLightningAttack then
 	end
 end
 
-edopro_exports=DeckModificationPack_ShockingLightningAttack.export
+edopro_exports={DeckModificationPack_ShockingLightningAttack.export,5}
 
