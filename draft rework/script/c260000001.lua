@@ -1,6 +1,7 @@
 -- Deck Modification Pack - Hyperspeed Rush Road!!
-local s,id=GetID()
-function s.initial_effect(c)
+if not DeckModificationPack_HyperspeedRushRoad then
+	DeckModificationPack_HyperspeedRushRoad={}
+	local s=DeckModificationPack_HyperspeedRushRoad
 	s.RushRare = {}
 	s.RushRare={
 	160001000,160301001,160302001
@@ -16,7 +17,7 @@ function s.initial_effect(c)
 	}
 	s.UltraRare.Ratio=(10)
 
-		s.SuperRare = {}
+	s.SuperRare = {}
 	s.SuperRare={
 	160001018,
 	160001022,
@@ -103,7 +104,7 @@ function s.initial_effect(c)
 	end
 	--function to generate the pac
 	-- function s.PackGen(e,tp,eg,ep,ev,re,r,rp)
-	function s.PackGen(p)
+	DeckModificationPack_HyperspeedRushRoad.export=function(p)
 		local g=Group.CreateGroup()
 		--generate the common cards
 		for i = s.CommonNumber,1,-1 do 
@@ -163,6 +164,5 @@ function s.initial_effect(c)
 	end
 end
 
-	
-
+edopro_exports=DeckModificationPack_HyperspeedRushRoad.export
 

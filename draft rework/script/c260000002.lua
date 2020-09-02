@@ -1,7 +1,6 @@
---Deck Modification Pack - Shocking Lightning Attack!!
-local s,id=GetID()
-function s.initial_effect(c)
-		
+if not DeckModificationPack_ShockingLightningAttack then
+	DeckModificationPack_ShockingLightningAttack={}
+	local s=DeckModificationPack_ShockingLightningAttack
 	s.RushRare = {}
 	s.RushRare={
 	160002000,160002017,160002031
@@ -103,7 +102,7 @@ function s.initial_effect(c)
 	end
 	--function to generate the pac
 	-- function s.PackGen(e,tp,eg,ep,ev,re,r,rp)
-	function s.PackGen(p)
+	DeckModificationPack_ShockingLightningAttack.export=function(p)
 		local g=Group.CreateGroup()
 		--generate the common cards
 		for i = s.CommonNumber,1,-1 do 
@@ -163,6 +162,5 @@ function s.initial_effect(c)
 	end
 end
 
-	
-
+edopro_exports=DeckModificationPack_ShockingLightningAttack.export
 

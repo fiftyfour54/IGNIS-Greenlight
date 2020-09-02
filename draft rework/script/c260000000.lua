@@ -11,30 +11,24 @@ function s.initial_effect(c)
 end
 
 function s.op(e,tp,eg,ep,ev,re,r,rp)
+	local toname=function(code)
+		return "c"..code..".lua"
+	end
 	local fg=Duel.GetFieldGroup(0,0x43,0x43)
 	--remove all cards
 	Duel.SendtoDeck(fg,nil,-2,REASON_RULE)
 	
 	--announce number of pack drafted
-	local r={}
-	local j=1
-	for k=1,15 do
-		r[j]=k
-		j=j+1
-	end
-	local packnum=Duel.AnnounceNumber(tp,table.unpack(r))
+	local packnum=Duel.AnnounceLevel(tp,1,15)
 	
 	--declare kind of pack
-	--maybe an array could be used instead of declare name?
-	s.announce_filter={0x700,OPCODE_ISSETCARD,code,OPCODE_ISCODE,OPCODE_NOT,OPCODE_AND}
-	local pack=Group.CreateGroup()
+	--the list of packs might be loaded from another file as well
+	local pack={}
 	for i=1,packnum do
-		local ac=Duel.AnnounceCard(tp,table.unpack(s.announce_filter))
-		
-		local c=Duel.CreateToken(tp,ac)
-		pack:AddCard(c)
+		local ac=Duel.SelectCardsFromCodes(tp,1,1,false,false,260000001,260000002)
+		table.insert(pack,ac)
 	end
-	local packopp=pack:Clone()
+	local packopp={table.unpack(pack)}
 	--variable for later
 	local pick=Group.CreateGroup()
 	local pickopp=Group.CreateGroup()
@@ -45,19 +39,16 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	Debug.Message(#pack)
 	for i=1,#pack do
 		--each player pick their pack
-		local packpick=pack:Select(tp,1,1,nil)
+		local packpick=Duel.SelectCardsFromCodes(tp,1,1,false,true,table.unpack(pack))
 		
-		local packpickopp=packopp:Select(1-tp,1,1,nil)
+		local packpickopp=Duel.SelectCardsFromCodes(1-tp,1,1,false,true,table.unpack(packopp))
 		--remove the pack
-		pack:Sub(packpick)
-		packopp:Sub(packpickopp)
+		table.remove(pack,packpick[2])
+		table.remove(packopp,packpickopp[2])
 		
 		--pack gen
-		Debug.Message(packpick)
-		local m = packpick:GetFirst():GetMetatable()
-		local n = packpickopp:GetFirst():GetMetatable()
-		packopen=m.PackGen(tp)
-		packopenopp=n.PackGen(1-tp)
+		packopen=({Duel.LoadScript(toname(packpick[1]),false)})[2](tp)
+		packopenopp=({Duel.LoadScript(toname(packpickopp[1]),false)})[2](1-tp)
 		pickturn=tp
 		--loop that make the player pick
 		--a new token is generated in function of pick to set the owner
