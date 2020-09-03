@@ -33,7 +33,6 @@ end
 s.listed_series={0x24d}
 	--Specifically lists itself
 s.listed_names={id}
-
 	--Check if no other monsters
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(nil,tp,LOCATION_MZONE,0,1,e:GetHandler())
