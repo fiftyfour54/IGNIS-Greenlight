@@ -35,7 +35,7 @@ function s.initial_effect(c)
 	e4:SetTarget(s.tgtg)
 	e4:SetOperation(s.tgop)
 	c:RegisterEffect(e4)
-	--Gain ATK with Kiskil and Lilla in GY
+	--Gain ATK/DEF with Kiskil and Lilla in GY
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_UPDATE_ATTACK)
@@ -44,6 +44,9 @@ function s.initial_effect(c)
 	e5:SetCondition(s.atkcon)
 	e5:SetValue(2200)
 	c:RegisterEffect(e5)
+	local e6=e5:Clone()
+	e6:SetCode(EFFECT_UPDATE_DEFENSE)
+	c:RegisterEffect(e6)
 end
 s.listed_series={0x24c,0x24d}
 function s.rfilter(c,tp)
