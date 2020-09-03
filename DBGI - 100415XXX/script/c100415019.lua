@@ -1,60 +1,74 @@
---Live☆Twin エントランス
---Live☆Twin Entrance
---Logical Nonsense
-
---Substitute ID
+--Live☆Twin チャンネル
+--Live☆Twin Channel
+--Scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Special summon 1 “Kisikil” or “Lilla” monster from deck
+	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_END_PHASE)
-	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	e1:SetCost(s.cost)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
+	--Negate attack
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetRange(LOCATION_FZONE)
+	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e2:SetCountLimit(1,id)
+	e2:SetCost(s.negcost)
+	e2:SetOperation(s.negop)
+	c:RegisterEffect(e2)
+	--Shuffle card into the deck or add it to hand
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_TOHAND)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCode(EVENT_PHASE+PHASE_END)
+	e3:SetRange(LOCATION_FZONE)
+	e3:SetCountLimit(1,id+100)
+	e3:SetTarget(s.thtg)
+	e3:SetOperation(s.thop)
+	c:RegisterEffect(e3)
 end
-	--Lists “Kisikil” and "Lilla" archetype
 s.listed_series={0x24c,0x24d}
-	--Specifically lists itself
-s.listed_names={id}
-	--Discard 1 card as cost
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
-	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
+function s.costfilter(c,tp)
+	return (c:IsSetCard(0x24c) or c:IsSetCard(0x24d)) and c:IsType(TYPE_MONSTER)
 end
-	--Check “Kisikil” or “Lilla” monster
-function s.filter(c,e,tp)
-	return (c:IsSetCard(0x24c) or c:IsSetCard(0x24d)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
+function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.costfilter,1,false,nil,nil) end
+	local g=Duel.SelectReleaseGroupCost(tp,s.costfilter,1,1,false,nil,nil)
+	Duel.Release(g,REASON_COST)
 end
-	--Activation legality
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+function s.negop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	Duel.NegateAttack()
 end
-	--Special summon 1 “Kisikil” or “Lilla” monster from deck
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	if #g>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+function s.cfilter(c,check)
+	return (c:IsSetCard(0x24c) or c:IsSetCard(0x24d)) and c:IsType(TYPE_MONSTER)
+		and (c:IsAbleToDeck() or (check and c:IsAbleToHand()))
+end
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local check=Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.cfilter(chkc,check) end
+	if chk==0 then return Duel.IsExistingTarget(s.cfilter,tp,LOCATION_GRAVE,0,1,nil,check) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,nil,check)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
+	if g:GetFirst():IsAbleToHand() and check then
+		Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 	end
-	--Locked into "Evil★Twin" monsters for extra deck
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(s.splimit)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
-	aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,0),nil)
 end
-	--Locked into "Evil★Twin" monsters for extra deck
-function s.splimit(e,c)
-	return not c:IsSetCard(0x24e) and c:IsLocation(LOCATION_EXTRA)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then
+		if Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 and tc:IsAbleToHand() and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+			Duel.SendtoHand(tc,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,tc)
+		else
+			Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
+		end
+	end
 end
