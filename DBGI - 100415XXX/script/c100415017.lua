@@ -59,7 +59,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,c)
 	if g then
 		g:KeepAlive()
 		e:SetLabelObject(g)
-	return true
+		return true
 	end
 	return false
 end
@@ -82,6 +82,6 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.atkcon(e)
-	local g=Duel.GetFieldGroup(e:GetControler(),LOCATION_GRAVE,0)
+	local g=Duel.GetFieldGroup(e:GetHandler():GetControler(),LOCATION_GRAVE,0)
 	return g:IsExists(Card.IsSetCard,1,nil,0x24c) and g:IsExists(Card.IsSetCard,1,nil,0x24d)
 end
