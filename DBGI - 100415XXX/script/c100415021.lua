@@ -20,7 +20,6 @@ end
 s.listed_series={0x24c,0x24d}
 	--Specifically lists itself
 s.listed_names={id}
-
 	--Check “Kisikil” or “Lilla” monster
 function s.filter(c,e,tp)
 	return (c:IsSetCard(0x24c) or c:IsSetCard(0x24d)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)

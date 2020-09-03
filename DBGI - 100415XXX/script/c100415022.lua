@@ -35,8 +35,9 @@ function s.initial_effect(c)
 	e2:SetCost(s.negcost)
 	e2:SetTarget(s.negtg)
 	e2:SetOperation(s.negop)
-	c:RegisterEffect(e2)	
+	c:RegisterEffect(e2)
 end
+s.listed_series={0x24c,0x24d}
 function s.cfilter(c,tp)
 	return (c:IsSetCard(0x24c) or c:IsSetCard(0x24d)) and c:GetBaseAttack()>0
 		and Duel.IsExistingTarget(s.atktgfilter,tp,LOCATION_MZONE,0,1,c)
