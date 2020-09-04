@@ -5,13 +5,13 @@
 --Substitute ID
 local s,id=GetID()
 function s.initial_effect(c)
-	--Also treated as a LIGHT monster on the field
+	--Also treated as a DARK monster on the field
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_ADD_ATTRIBUTE)
-	e1:SetValue(ATTRIBUTE_LIGHT)
+	e1:SetValue(ATTRIBUTE_DARK)
 	c:RegisterEffect(e1)
 	--Send 1 LIGHT/DARK monster to the GY
 	local e2=Effect.CreateEffect(c)
