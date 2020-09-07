@@ -1,5 +1,5 @@
 --クライマックス・フィナーレ
---Climaxe Finale
+--Climax Finale
 local s,id=GetID()
 function s.initial_effect(c)
 	--Increase ATK
@@ -34,6 +34,5 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(cost)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		g:GetFirst():RegisterEffect(e1)
-	end
 	end
 end
