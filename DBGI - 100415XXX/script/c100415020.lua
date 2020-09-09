@@ -1,6 +1,6 @@
 --シークレット・パスフレーズ
 --Secret Passphrase
---Scripted by AlphaKretin
+--Scripted by AlphaKretin and Naim
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
@@ -21,15 +21,15 @@ function s.thfilter(c,add)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local add=Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x24c),tp,LOCATION_MZONE,0,1,nil)
-			and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x24d),tp,LOCATION_MZONE,0,1,nil)
+		local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
+		local add=g:IsExists(Card.IsSetCard,1,nil,0x24c) and g:IsExists(Card.IsSetCard,1,nil,0x24d)
 		return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,add)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local add=Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x24c),tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x24d),tp,LOCATION_MZONE,0,1,nil)
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
+	local add=g:IsExists(Card.IsSetCard,1,nil,0x24c) and g:IsExists(Card.IsSetCard,1,nil,0x24d)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,add)
 	if #g>0 then
