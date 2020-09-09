@@ -28,14 +28,17 @@ function s.initial_effect(c)
 	e3:SetOperation(s.repop)
 	c:RegisterEffect(e3)
 end
+function s.optfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x111) and c:HasLevel()
+end
 function s.thfilter(c,lvl)
 	return c:IsSetCard(0x111) and c:IsLevelBelow(lvl) and c:IsAbleToHand()
 end
 function s.opttarget(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.optfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(aux.FilterFaceupFunction(Card.IsSetCard,0x111),tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(s.optfiler,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local tc=Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsSetCard,0x111),tp,LOCATION_MZONE,0,1,1,nil)
+	local tc=Duel.SelectTarget(tp,s.optfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	local op=0
 	if Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,nil,e:GetHandler():GetLevel()) then
 		op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
