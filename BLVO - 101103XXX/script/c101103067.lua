@@ -1,4 +1,4 @@
---
+--武装竜の万雷
 --Armed Dragon Thunderbolt
 --scripted by Hatter
 local s,id=GetID()
@@ -43,7 +43,7 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	local g=Duel.GetMatchingGroup(s.atkfilter,c:GetControler(),LOCATION_GRAVE,0,nil,c:GetLevel())
+	local g=Duel.GetMatchingGroup(s.atkfilter,c:GetControler(),LOCATION_GRAVE,0,nil,tc:GetLevel())
 	local val=g:GetClassCount(Card.GetCode)*1000
 	if val~=0 and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		local e1=Effect.CreateEffect(c)
