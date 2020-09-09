@@ -5,11 +5,12 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Must be Special Summoned via own effect
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
-	c:RegisterEffect(e0)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(0)
+	c:RegisterEffect(e1)
 	--Special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -49,34 +50,32 @@ s.listed_names={49306994}
 s.LVnum=10
 s.LVset=0x111
 function s.rescon(sg,tp)
-	local lv=sg:GetSum(Card.GetLevel)
-	return aux.ChkfMMZ(1)(sg,nil,tp) and lv>=10 and not sg:IsExists(s.rescheck,1,nil,lv)
-end
-function s.rescheck(c,lv)
-	return lv-c:GetLevel()>=10
+	return aux.ChkfMMZ(1)(sg,nil,tp) and sg:GetSum(Card.GetLevel)==10
+	--and sg:CheckWithSumEqual(Card.GetLevel,10,1,10)
 end
 function s.cfilter(c)
 	return c:IsAbleToRemoveAsCost() and c:HasLevel() and c:IsSetCard(0x111) and aux.SpElimFilter(c,true)
 end
-function s.thfilter(c)
-	return c:IsCode(49306994) and c:IsAbleToHand()
-end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
 	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,1,#g,s.rescon,0) end
-	local rg=aux.SelectUnselectGroup(g,e,tp,1,#g,s.rescon,1,tp,HINTMSG_REMOVE)
+	local rg=aux.SelectUnselectGroup(g,e,tp,1,#g,s.rescon,1,tp,HINTMSG_REMOVE,nil,nil,false)
 	Duel.Remove(rg,POS_FACEUP,REASON_COST)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return c:IsCanBeSpecialSummoned(e,0,tp,true,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+end
+function s.thfilter(c)
+	return c:IsCode(49306994) and c:IsAbleToHand()
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0
-		and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)~=0
+		and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		c:CompleteProcedure()
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local sg=g:Select(tp,1,1,nil)
