@@ -62,6 +62,10 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+function s.drcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsReason(REASON_COST) and re:IsActivated() and re:IsActiveType(TYPE_MONSTER)
+		and re:GetHandler():IsRace(RACE_DRAGON)
+end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetTargetPlayer(tp)
