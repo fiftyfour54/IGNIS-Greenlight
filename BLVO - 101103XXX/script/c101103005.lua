@@ -5,12 +5,12 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Must be Special Summoned via own effect
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(0)
-	c:RegisterEffect(e1)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e0:SetValue(0)
+	c:RegisterEffect(e0)
 	--Special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -51,15 +51,14 @@ s.LVnum=10
 s.LVset=0x111
 function s.rescon(sg,tp)
 	return aux.ChkfMMZ(1)(sg,nil,tp) and sg:GetSum(Card.GetLevel)==10
-	--and sg:CheckWithSumEqual(Card.GetLevel,10,1,10)
 end
 function s.cfilter(c)
-	return c:IsAbleToRemoveAsCost() and c:HasLevel() and c:IsSetCard(0x111) and aux.SpElimFilter(c,true)
+	return c:IsAbleToRemoveAsCost() and c:HasLevel() and c:IsSetCard(0x111) and aux.SpElimFilter(c,true,true)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
 	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,1,#g,s.rescon,0) end
-	local rg=aux.SelectUnselectGroup(g,e,tp,1,#g,s.rescon,1,tp,HINTMSG_REMOVE,nil,nil,false)
+	local rg=aux.SelectUnselectGroup(g,e,tp,1,#g,s.rescon,1,tp,HINTMSG_REMOVE,s.rescon,nil,false)
 	Duel.Remove(rg,POS_FACEUP,REASON_COST)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
