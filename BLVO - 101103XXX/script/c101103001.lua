@@ -66,6 +66,8 @@ function s.initial_effect(c)
 end
 s.listed_names={59464593}
 s.listed_series={0x111}
+s.LVnum=10
+s.LVset=0x111
 function s.regcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0x111)

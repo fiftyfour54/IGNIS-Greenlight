@@ -36,6 +36,8 @@ function s.initial_effect(c)
 end
 s.listed_names={59464593}
 s.listed_series={0x111}
+s.LVnum=7
+s.LVset=0x111
 function s.cfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
 end
