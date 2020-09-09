@@ -16,7 +16,7 @@ s.listed_series={0x24c,0x24d,0x24e,0x24f}
 function s.thfilter(c,add)
 	local c1=(c:IsSetCard(0x24e) or c:IsSetCard(0x24f)) and c:IsType(TYPE_SPELL+TYPE_TRAP)
 	local c2=c:IsSetCard(0x24e) and c:IsType(TYPE_MONSTER)
-	return (c1 or (chk and c2)) and c:IsAbleToHand()
+	return (c1 or (add and c2)) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
