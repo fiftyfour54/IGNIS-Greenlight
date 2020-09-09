@@ -22,9 +22,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	--JUU - Cannot change control
 	local e10=Effect.CreateEffect(c)
-    e10:SetType(EFFECT_TYPE_SINGLE)
-    e10:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-    e10:SetRange(LOCATION_MZONE)
+	e10:SetType(EFFECT_TYPE_SINGLE)
+	e10:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e10:SetRange(LOCATION_MZONE)
 	e10:SetCode(EFFECT_CANNOT_CHANGE_CONTROL)
 	e10:SetCondition(s.atkcon(10))
 	c:RegisterEffect(e10)
@@ -83,8 +83,8 @@ function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsTurnPlayer(tp) and s.atkcon(1000)(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
-    Duel.DiscardHand(tp,Card.IsAbleToGraveAsCost,1,1,REASON_COST)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
+	Duel.DiscardHand(tp,Card.IsAbleToGraveAsCost,1,1,REASON_COST)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
