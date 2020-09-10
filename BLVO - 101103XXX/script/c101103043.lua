@@ -51,20 +51,24 @@ end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	if tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToEffect(e) then
 		Duel.Damage(p,tc:GetAttack()//2,REASON_EFFECT)
 	end
 end
 function s.valcheck(e,c)
 	local g=c:GetMaterial()
+	if not g then return end
 	local ct=g:FilterCount(Card.IsSetCard,nil,0xf0)
-	e:GetLabelObject():SetLabel(#ct==#g)
+	if ct==#g then
+		e:GetLabelObject():SetLabel(2)
+	else
+		e:GetLabelObject():SetLabel(1)
+	end
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ct=1
-	if e:GetLabel() then
-		ct=2
+	local ct=e:GetLabel()
+	if ct==2 then
 		c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,2))
 	end
 	--Destroy a card when damage is inflicted
@@ -73,7 +77,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_DAMAGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	e1:SetCountLimit(ct)
 	e1:SetCondition(s.descon)
@@ -82,18 +86,18 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1)
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and (r&REASON_EFFECT+REASON_BATTLE)~=0
+	return ep==1-tp and (r&REASON_EFFECT+REASON_BATTLE)~=0
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-    if chkc then return chkc:IsOnField() end
-    if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-    local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
-    Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	if chkc then return chkc:IsOnField() end
+	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-    local tc=Duel.GetFirstTarget()
-    if tc and tc:IsRelateToEffect(e) then
-        Duel.Destroy(tc,REASON_EFFECT)
-    end
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
 end
