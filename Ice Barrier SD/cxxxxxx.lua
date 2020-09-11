@@ -68,35 +68,41 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		local tc=g:GetFirst()
 		local g2=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
-		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 and #g2>0 then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_SET_ATTACK)
+		e1:SetValue(3300)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
+		tc:RegisterEffect(e1)
+		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 and #g2>0 then			
 			local g3=Duel.GetMatchingGroup(aux.disfilter1,tp,0,LOCATION_MZONE,nil)
-			local tc=g3:GetFirst()
-			if not tc then return end
+			local tc2=g3:GetFirst()
+			if not tc2 then return end
 			local c=e:GetHandler()
 			for tc in aux.Next(g3) do
 				local e1=Effect.CreateEffect(c)
 				e1:SetType(EFFECT_TYPE_SINGLE)
 				e1:SetCode(EFFECT_DISABLE)
 				e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-				tc:RegisterEffect(e1)
+				tc2:RegisterEffect(e1)
 				local e2=Effect.CreateEffect(c)
 				e2:SetType(EFFECT_TYPE_SINGLE)
 				e2:SetCode(EFFECT_DISABLE_EFFECT)
 				e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-				tc:RegisterEffect(e2)
-				if tc:IsType(TYPE_TRAPMONSTER) then
+				tc2:RegisterEffect(e2)
+				if tc2:IsType(TYPE_TRAPMONSTER) then
 					local e3=Effect.CreateEffect(c)
 					e3:SetType(EFFECT_TYPE_SINGLE)
 					e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
 					e3:SetReset(RESET_EVENT+RESETS_STANDARD)
-					tc:RegisterEffect(e3)
+					tc2:RegisterEffect(e3)
 				end
 				local e4=Effect.CreateEffect(e:GetHandler())
 				e4:SetType(EFFECT_TYPE_SINGLE)
 				e4:SetCode(EFFECT_SET_ATTACK_FINAL)
 				e4:SetReset(RESET_EVENT+RESETS_STANDARD)
-				e4:SetValue(math.ceil(tc:GetBaseAttack()/2))
-				tc:RegisterEffect(e4)
+				e4:SetValue(math.ceil(tc2:GetBaseAttack()/2))
+				tc2:RegisterEffect(e4)
 			end
 		end
 	end
