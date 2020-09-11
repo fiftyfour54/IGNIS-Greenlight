@@ -1,11 +1,11 @@
 --氷結界の還零龍 トリシューラ
--- Trishula, Zeroreturn(?) Dragon of the Ice Barrier
+--Trishula, Subzero Dragon of the Ice Barrier
 local s,id=GetID()
 function s.initial_effect(c)
 	--synchro summon
 	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),2,99)
 	c:EnableReviveLimit()
-	--remove
+	--Remove
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_REMOVE)
@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.rmtg)
 	e1:SetOperation(s.rmop)
 	c:RegisterEffect(e1)
-	--special summon
+	--Special summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -42,7 +42,6 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
 	end
 end
-
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsSummonType(SUMMON_TYPE_SYNCHRO)
@@ -50,8 +49,8 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 		and c:IsPreviousPosition(POS_FACEUP)
 end
 function s.spfilter(c,e,tp)
-	return c:IsCode(52687916) 
-	and (Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 or not c:IsLocation(LOCATION_EXTRA)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(52687916) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and (Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 or not c:IsLocation(LOCATION_EXTRA))
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local loc=LOCATION_EXTRA
@@ -74,12 +73,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(3300)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
 		tc:RegisterEffect(e1)
-		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 and #g2>0 then			
+		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 and #g2>0 then
 			local g3=Duel.GetMatchingGroup(aux.disfilter1,tp,0,LOCATION_MZONE,nil)
-			local tc2=g3:GetFirst()
-			if not tc2 then return end
-			local c=e:GetHandler()
-			for tc in aux.Next(g3) do
+			for tc2 in aux.Next(g3) do
 				local e1=Effect.CreateEffect(c)
 				e1:SetType(EFFECT_TYPE_SINGLE)
 				e1:SetCode(EFFECT_DISABLE)
