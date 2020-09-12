@@ -19,7 +19,7 @@ function Auxiliary.IceBarrierDiscardCost(f,discard,minc,maxc)
 		if chk==0 then return Duel.IsExistingMatchingCard(f,tp,LOCATION_HAND,0,minc,nil) or Duel.IsExistingMatchingCard(Auxiliary.IceBarrierDiscardFilter,tp,LOCATION_GRAVE,0,1,nil,tp) end
 		local g=Duel.GetMatchingGroup(f,tp,LOCATION_HAND,0,nil)
 		g:Merge(Duel.GetMatchingGroup(Auxiliary.IceBarrierDiscardFilter,tp,LOCATION_GRAVE,0,nil,tp))
-		local sg=Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,Auxiliary.IceBarrierDiscardGroup(minc),1,tp,Auxiliary.Stringid(EFFECT_ICEBARRIER_REPLACE,1))
+		local sg=Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,Auxiliary.IceBarrierDiscardGroup(minc),1,tp,Auxiliary.Stringid(100340002,1))
 		local rm=0
 		if sg:IsExists(Card.IsHasEffect,1,nil,EFFECT_ICEBARRIER_REPLACE,tp) then
 			local te=sg:Filter(Card.IsHasEffect,nil,EFFECT_ICEBARRIER_REPLACE)
