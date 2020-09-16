@@ -1,5 +1,5 @@
---大海洋
---Big Ocean
+--アンカー・モーレイ
+--Anchor Moray
 --Scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
