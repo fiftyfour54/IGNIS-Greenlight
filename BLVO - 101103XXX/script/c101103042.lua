@@ -47,7 +47,7 @@ function s.cfilter(c,code)
 	return c:IsFaceup() and c:IsCode(code)
 end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-    return re:IsActiveType(TYPE_MONSTER) and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_FZONE,0,1,nil,CARD_DREAM_MIRROR_TERROR)
+    return re:IsActiveType(TYPE_MONSTER) and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_FZONE,LOCATION_FZONE,1,nil,CARD_DREAM_MIRROR_TERROR)
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -57,7 +57,7 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_FZONE,0,1,nil,CARD_DREAM_MIRROR_JOY)
+	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_FZONE,LOCATION_FZONE,1,nil,CARD_DREAM_MIRROR_JOY)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end
