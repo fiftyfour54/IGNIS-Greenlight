@@ -1,10 +1,11 @@
+--夢魔鏡の魘魔－ネイロス
 --Oneiros, the Dream Mirror Erlking
 --Scripted by senpaizuri
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	Fusion.AddProcMixN(c,true,true,s.ffilter,2)
-	--dual attribute
+	--Add DARK attribute
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -24,7 +25,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.negop)
 	e2:SetCountLimit(1,id)
 	c:RegisterEffect(e2)
-	--special summon
+	--Special summon
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
