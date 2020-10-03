@@ -27,8 +27,9 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local td=Duel.SelectMatchingCard(tp,s.tdfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	if Duel.SendtoDeck(td,nil,SEQ_DECKBOTTOM,REASON_COST)~0 then
-	g=Duel.SelectMatchingCard(tp,Card.IsFacedown,tp,0,LOCATION_SZONE,1,1,nil)
-	if #g>0 then
-		if tc:IsFacedown() then Duel.ConfirmCards(tp,tc) end
+		g=Duel.SelectMatchingCard(tp,Card.IsFacedown,tp,0,LOCATION_SZONE,1,1,nil)
+		if #g>0 then
+			if tc:IsFacedown() then Duel.ConfirmCards(tp,tc) end
+		end
 	end
 end
