@@ -102,7 +102,7 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		e1:SetValue(1)
 		c:RegisterEffect(e1)
-	elseif opt==1
+	elseif opt==1 then
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3008)
 		e1:SetType(EFFECT_TYPE_SINGLE)
