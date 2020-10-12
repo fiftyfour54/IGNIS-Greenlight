@@ -11,9 +11,9 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-  e1:SetCode(EVENT_TO_GRAVE)
-  e1:SetCountLimit(1,id)
-  e1:SetCondition(s.condition)
+	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetCountLimit(1,id)
+	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
@@ -32,8 +32,8 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local b2=Duel.IsExistingTarget(s.spfilter,tp,LOCATION_ONFIELD,0,1,nil,ft) 
 	if chk==0 then return b1 or b2 end
 	local op=0
-  if b1 and b2 then 
-    op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
+	if b1 and b2 then 
+		op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
 	elseif b2 then op=1 end
 	e:SetLabel(op)
 	if op==0 then
