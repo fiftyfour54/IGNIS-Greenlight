@@ -30,7 +30,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	if Duel.SendtoDeck(tg,nil,SEQ_DECKBOTTOM,REASON_COST)==1 then
 		--effect
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_FZONE,nil)
 		if #g>0 then
 			Duel.Destroy(g,REASON_EFFECT)
