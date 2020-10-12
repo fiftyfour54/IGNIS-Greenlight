@@ -11,36 +11,39 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e1:SetCode(EVENT_TO_GRAVE)
+  e1:SetCode(EVENT_TO_GRAVE)
+  e1:SetCountLimit(1,id)
+  e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
+s.listed_series={0xe1}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-		return e:GetHandler():IsPreviousLocation(LOCATION_MZONE) and e:GetHandler():IsReason(REASON_EFFECT)
+	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE) and e:GetHandler():IsReason(REASON_EFFECT)
 end
 function s.spfilter(c,ft)
-	return c:IsFaceup() and (ft>0 or c:GetSequence()<5)
+	return c:IsFaceup() and c:IsSetCard(0xe1) and (ft>0 or c:GetSequence()<5)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local b1=Duel.IsExistingTarget(Card.IsSetCard,tp,0,LOCATION_MZONE,1,nil,0xe1) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-	local b2=Duel.IsExistingTarget(s.spfilter,tp,0,LOCATION_ONFIELD,1,nil,ft) 
+	local b1=Duel.IsExistingTarget(Card.IsSetCard,tp,LOCATION_MZONE,0,1,nil,0xe1) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+	local b2=Duel.IsExistingTarget(s.spfilter,tp,LOCATION_ONFIELD,0,1,nil,ft) 
 	if chk==0 then return b1 or b2 end
 	local op=0
-	if b1 and b2 then op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
-	elseif b1 then op=Duel.SelectOption(tp,aux.Stringid(id,1))
-	else op=Duel.SelectOption(tp,aux.Stringid(id,2))+1 end
+  if b1 and b2 then 
+    op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
+	elseif b2 then op=1 end
 	e:SetLabel(op)
 	if op==0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-		local g=Duel.SelectTarget(tp,Card.IsSetCard,tp,0,LOCATION_MZONE,1,1,nil,0xe1)
+		local g=Duel.SelectTarget(tp,Card.IsSetCard,tp,LOCATION_MZONE,0,1,1,nil,0xe1)
 		e:SetCategory(CATEGORY_EQUIP)
 		Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local g=Duel.SelectTarget(tp,s.spfilter,tp,0,LOCATION_ONFIELD,1,1,nil,ft)
+		local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_ONFIELD,0,1,1,nil,ft)
 		e:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
