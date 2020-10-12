@@ -107,6 +107,6 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local c=e:GetHandler()
 	if tc and tc:IsRelateToEffect(e) then 
-		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0
+		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 	end
 end
