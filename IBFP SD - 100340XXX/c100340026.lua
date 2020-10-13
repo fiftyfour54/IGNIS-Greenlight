@@ -36,20 +36,21 @@ function s.spfilter(c,e,tp)
 end
 	--Tribute up to the number of cards in s.spfilter
 function s.check(ct)
-	return  function(sg,tp)
-				--local codes=sg:GetClass(Card.GetCode)
-				return aux.ChkfMMZ(#sg)(sg,nil,tp) and ct:GetClassCount(Card.GetCode)>=#sg
-			end
+	return function(sg,tp)
+    --local codes=sg:GetClass(Card.GetCode)
+    return aux.ChkfMMZ(#sg)(sg,nil,tp) and ct:GetClassCount(Card.GetCode)>=#sg
+	end
 end
 	--Activation legality
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ct=Duel.GetMatchingGroupCount(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
+  local cg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
+  local ct=#cg
 	if chk==0 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return false end
-		return ct>0 and Duel.CheckReleaseGroupCost(tp,Card.IsSetCard,1,99,false,s.check(ct),nil,0x2f)
+		return ct>0 and Duel.CheckReleaseGroupCost(tp,Card.IsSetCard,1,99,false,s.check(cg),nil,0x2f)
 	end
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ct=1 end
-	local g=Duel.SelectReleaseGroupCost(tp,Card.IsSetCard,1,ct,false,s.check(ct),nil,0x2f)
+	local g=Duel.SelectReleaseGroupCost(tp,Card.IsSetCard,1,ct,false,s.check(cg),nil,0x2f)
 	Duel.Release(g,REASON_COST)
 	e:SetLabel(#g)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,#g,tp,LOCATION_DECK)
