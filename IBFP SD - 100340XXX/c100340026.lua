@@ -37,14 +37,14 @@ end
 	--Tribute up to the number of cards in s.spfilter
 function s.check(ct)
 	return function(sg,tp)
-    --local codes=sg:GetClass(Card.GetCode)
-    return aux.ChkfMMZ(#sg)(sg,nil,tp) and ct:GetClassCount(Card.GetCode)>=#sg
+		--local codes=sg:GetClass(Card.GetCode)
+		return aux.ChkfMMZ(#sg)(sg,nil,tp) and ct:GetClassCount(Card.GetCode)>=#sg
 	end
 end
 	--Activation legality
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-  local cg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
-  local ct=#cg
+	local cg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
+	local ct=#cg
 	if chk==0 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return false end
 		return ct>0 and Duel.CheckReleaseGroupCost(tp,Card.IsSetCard,1,99,false,s.check(cg),nil,0x2f)
