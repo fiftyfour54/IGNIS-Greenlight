@@ -1,11 +1,13 @@
 --ラヴァルバル・サラマンダー
 --Lavalval Salamander
+
 local s,id=GetID()
 function s.initial_effect(c)
-	--synchro summon
-	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTunerEx(Card.IsAttribute,ATTRIBUTE_FIRE),1,99)
+	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
-	--draw
+	--Synchro summon procedure
+	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTunerEx(Card.IsAttribute,ATTRIBUTE_FIRE),1,99)
+	--If synchro summoned, draw 2
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DRAW)
@@ -17,9 +19,9 @@ function s.initial_effect(c)
 	e1:SetTarget(s.drtg)
 	e1:SetOperation(s.drop)
 	c:RegisterEffect(e1)
-	--position
+	--Change opponent's monsters to face-down defense position
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_POSITION)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
@@ -29,6 +31,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.posop)
 	c:RegisterEffect(e2)
 end
+s.listed_series={0x39}
+
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO)
 end
@@ -39,7 +43,7 @@ function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 end
 function s.rescon(sg,e,tp,mg)
-	return sg:IsExists(Card.IsSetCard,1,nil,0x39) 
+	return sg:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_FIRE) 
 end
 function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
@@ -47,12 +51,12 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ShuffleHand(p)
 	Duel.BreakEffect()
 	local cg=Duel.GetFieldGroup(p,LOCATION_HAND,0)
-		local og=aux.SelectUnselectGroup(cg,e,tp,2,2,s.rescon,1,tp,HINTMSG_DISCARD,s.rescon)
-	if og and #og<2 then
+	local og=aux.SelectUnselectGroup(cg,e,tp,2,2,s.rescon,1,tp,HINTMSG_DISCARD,s.rescon)
+	if og and #og>=2 then
 		local ct=Duel.SendtoGrave(og,REASON_EFFECT+REASON_DISCARD)
 	else
 		Duel.ConfirmCards(1-p,cg)
-		Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+		Duel.SendtoDeck(cg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 		Duel.ShuffleDeck(p)
 	end
 end
