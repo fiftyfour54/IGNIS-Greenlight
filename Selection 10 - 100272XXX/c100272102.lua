@@ -1,5 +1,6 @@
 --影依の炎核 ヴォイド
 --Hellshaddoll Void
+--Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
 	--tohand
@@ -55,13 +56,13 @@ function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_EFFECT)
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local att=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil):GetClassCount(Card.GetOriginalAttribute)
-	if chk==0 then return att>0 and Duel.IsPlayerCanDiscardDeck(tp,att) end
-	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,att)
+	local attct=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil):GetClassCount(Card.GetOriginalAttribute)
+	if chk==0 then return attct>0 and Duel.IsPlayerCanDiscardDeck(tp,attct) end
+	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,attct)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
-	local att=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil):GetClassCount(Card.GetOriginalAttribute)
-	if att>0 and Duel.IsPlayerCanDiscardDeck(tp,att) then
-		Duel.DiscardDeck(tp,att,REASON_EFFECT)
+	local attct=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil):GetClassCount(Card.GetOriginalAttribute)
+	if attct>0 and Duel.IsPlayerCanDiscardDeck(tp,attct) then
+		Duel.DiscardDeck(tp,attct,REASON_EFFECT)
 	end
 end
