@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
-	--Fusion procedure
+	--Fusion summon procedure
 	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0x142),s.matfilter)
 	--Name becomes "Eldlich the Golden Lord" while in monster zones
 	local e1=Effect.CreateEffect(c)
@@ -50,15 +50,15 @@ function s.filter(c,e)
 	return c:IsFaceup() and c:IsAbleToChangeControler() and (not e or c:IsCanBeEffectTarget(e))
 end
 function s.cfilter(c,ft,tp)
-	return c:IsRace(RACE_ZOMBIE)
-		and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5))-- and (c:IsControler(tp) or c:IsFaceup())
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_CONTROL)
+	if c:IsControler(tp) and c:GetSequence()<5 then ft=ft+1 end
+	return c:IsRace(RACE_ZOMBIE) and ft>0 and Duel.IsExistingTarget(s.filter,tp,0,LOCATION_MZONE,1,c)
 end
 function s.ctcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local dg=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil,e)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,nil,nil,dg,ft,tp) end
-	local sg=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,false,nil,dg,ft,tp)
-	Duel.Release(sg,REASON_COST)
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,nil,nil,dg) end
+	local g=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,nil,nil,dg)
+	Duel.Release(g,REASON_COST)
 end
 function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.filter(chkc) end
