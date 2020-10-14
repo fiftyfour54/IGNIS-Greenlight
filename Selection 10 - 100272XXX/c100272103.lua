@@ -13,7 +13,6 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id)
-	e2:SetCondition(s.spcon)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
@@ -30,6 +29,7 @@ end
 function s.filter(c,e,tp)
 	return c:IsRankBelow(9) and c:IsRace(RACE_DRAGON) and e:GetHandler():IsCanBeXyzMaterial(c,tp)
 	and Duel.GetLocationCountFromEx(tp,tp,e:GetHandler(),c)>0
+	and Duel.GetLocationCountFromEx(tp,tp,e:GetHandler(),TYPE_XYZ)>0
 	and s.lizardcheck(c,tp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
