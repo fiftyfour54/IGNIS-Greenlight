@@ -61,5 +61,7 @@ function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local att=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil):GetClassCount(Card.GetOriginalAttribute)
-	Duel.DiscardDeck(tp,att,REASON_EFFECT)
+	if att>0 and Duel.IsPlayerCanDiscardDeck(tp,att) then
+		Duel.DiscardDeck(tp,att,REASON_EFFECT)
+	end
 end
