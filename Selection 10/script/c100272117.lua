@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	e2:SetTargetRange(1,0)
 	e2:SetTarget(s.sumlimit)
 	c:RegisterEffect(e2)
-	aux.addContinuousLizardCheck(c,LOCATION_SZONE,s.lizfilter)
+	-- aux.addContinuousLizardCheck(c,LOCATION_SZONE,s.lizfilter)
 	--spsummon
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(53274132,1))
