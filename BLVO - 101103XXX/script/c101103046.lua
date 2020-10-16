@@ -89,6 +89,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local zone=Duel.SelectFieldZone(tp,1,0,LOCATION_ONFIELD,~filter<<16)
 	Duel.Hint(HINT_ZONE,tp,zone)
+	Duel.Hint(HINT_ZONE,1-tp,zone>>16)
 	local sg=s.groupfrombit(zone>>16,1-tp):Select(tp,1,c:GetOverlayCount(),false)
 	local sgc=#sg
 	if c:RemoveOverlayCard(tp,sgc,sgc,REASON_EFFECT) then
