@@ -1,5 +1,6 @@
 --スプリガンズ・キャプテン サルガス
 --Sprigguns Captain Sargus
+--Logical Nonsense
 
 --Substitute ID
 local s,id=GetID()

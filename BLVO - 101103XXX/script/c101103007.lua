@@ -1,5 +1,6 @@
 --スプリガンズ・ピード
 --Sprigguns Pede
+--Logical Nonsense
 
 --Substitute ID
 local s,id=GetID()

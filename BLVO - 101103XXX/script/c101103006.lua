@@ -1,5 +1,6 @@
 --スプリガンズ・ロッキー
 --Sprigguns Rocky
+--Logical Nonsense
 
 --Substitute ID
 local s,id=GetID()

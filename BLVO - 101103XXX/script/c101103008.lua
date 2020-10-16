@@ -1,5 +1,6 @@
 --スプリガンズ・バンガー
 --Sprigguns Banger
+--Logical Nonsense
 
 --Substitute ID
 local s,id=GetID()
