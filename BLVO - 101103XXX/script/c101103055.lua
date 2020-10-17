@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x258))
+	e2:SetTarget(s.attg)
 	e2:SetValue(1000)
 	c:RegisterEffect(e2)
 	--special summon
@@ -24,6 +24,7 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetCountLimit(1,id)
 	e3:SetRange(LOCATION_FZONE)
+	e3:SetCondition(s.spcon)
 	e3:SetCost(s.spcost)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
@@ -42,6 +43,15 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 s.listed_series={0x258}
+function s.attg(e,c)
+	return c:IsSetCard(0x258) and c:IsType(TYPE_XYZ)
+end
+function s.isfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x258) and c:IsType(TYPE_XYZ)
+end
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return not Duel.IsExistingMatchingCard(s.isfilter,tp,LOCATION_MZONE,0,1,nil)
+end
 function s.cfilter(c)
 	return c:IsSetCard(0x258) and c:IsDiscardable()
 end
