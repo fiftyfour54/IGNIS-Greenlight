@@ -75,11 +75,11 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function s.cfilter(c,tp,rp)
+function s.atrfilter(c,tp,rp)
 	return c:IsPreviousPosition(POS_FACEUP) and c:IsType(TYPE_XYZ) and c:GetPreviousControler()==tp and c:IsReason(REASON_EFFECT)
 end
 function s.cacon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,tp,rp)
+	return eg:IsExists(s.atrfilter,1,nil,tp,rp)
 end
 function s.catg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
