@@ -24,25 +24,27 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.filter(c,e)
-	return c:IsFaceup() and c:IsRace(RACES_BEAST_BWARRIOR_WINGB) and c:IsCanBeEffectTarget(e)
+	return c:IsFaceup() and c:IsRace(RACES_BEAST_BWARRIOR_WINGB)
+		and c:IsCanBeEffectTarget(e) and c:IsLinked()
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil,e) end
 	local n=Duel.GetMatchingGroupCount(s.filter,tp,LOCATION_MZONE,0,nil,e)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,n,nil)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SELECT)
+	Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,n,nil,e)
 end
-function s.repop(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	for tc in aux.Next(g) do
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e1:SetValue(1000)
-		tc:RegisterEffect(e1)
-	end
+	if #g>0 then g:ForEach(s.op,e:GetHandler()) end
+end
+function s.op(tc,c)	
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	e1:SetValue(700)
+	tc:RegisterEffect(e1)
 end
 function s.repfilter(c,tp)
 	return c:IsFaceup() and c:IsRace(RACES_BEAST_BWARRIOR_WINGB) and c:IsLinked() and c:IsLocation(LOCATION_MZONE) 
