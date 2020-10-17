@@ -9,19 +9,26 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x258}
 s.listed_names={CARD_ALBAZ}
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x258),tp,LOCATION_MZONE,0,1,nil)
+end
+function s.bonusfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_FUSION) and aux.IsMaterialListCode(c,CARD_ALBAZ)
+end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	local seq2=0
 	local zone1=Duel.SelectFieldZone(tp,1,0,LOCATION_MZONE,0x60<<16)
 	local seq1=math.log(zone1,2)-16
 	Duel.Hint(HINT_ZONE,tp,zone1)
-	if Duel.SelectYesNo(tp,0) then
+	if Duel.IsExistingMatchingCard(s.bonusfilter,tp,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(tp,0) then
 		zone2=Duel.SelectFieldZone(tp,1,0,LOCATION_MZONE,(0x60<<16)|zone1)
 		seq2=math.log(zone2,2)-16
 		Duel.Hint(HINT_ZONE,tp,zone2)
