@@ -33,7 +33,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(s.filter1,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g1=Duel.SelectTarget(tp,s.filter1,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,1,nil,tp)
-	local typ=g1:GetFirst():GetType()&TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK
+	local typ=g1:GetFirst():GetType()&(TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g2=Duel.SelectTarget(tp,s.filter2,tp,0,LOCATION_MZONE,1,1,nil,typ)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g1,1,0,LOCATION_REMOVED)
