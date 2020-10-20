@@ -62,8 +62,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if tc and tc:IsFaceup() and Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)~=0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-		local g=Group.FromCards(c,tc)
+	if Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)~=0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		local g=Group.FromCards(c,tc):Filter(Card.IsFaceup,nil,nil)
 		--This card and the normal summoned monster becomes level 5 or 7
 		local lv=Duel.AnnounceLevel(tp,5,7,6)
 		for oc in aux.Next(g) do
