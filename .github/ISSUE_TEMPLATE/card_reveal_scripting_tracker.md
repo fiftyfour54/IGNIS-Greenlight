@@ -1,6 +1,6 @@
 ---
 name: Card reveal scripting tracker
-about: Reveal template that includes 3 checkboxes per card
+about: Reveal template that includes 4 checkboxes per card
 title: VJump MONTH PACK
 labels: ''
 assignees: ''
@@ -12,8 +12,10 @@ assignees: ''
 ### BETA ID - CARD NAME - JP NAME
 - [ ] Claimed
 - [ ] Scripted
-- [ ] Tested
+- [ ] Testing
+- [ ] Ready
 ### BETA ID - CARD NAME - JP NAME
 - [ ] Claimed
 - [ ] Scripted
-- [ ] Tested
+- [ ] Testing
+- [ ] Ready
