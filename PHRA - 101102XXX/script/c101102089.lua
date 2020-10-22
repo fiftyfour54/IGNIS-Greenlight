@@ -52,7 +52,7 @@ s.listed_series={0x259}
 
 	--Must special summoned by a "Myutant" effect
 function s.splimit(e,se,sp,st)
-	return se:GetHandler():IsSetCard(0x258)
+	return se:GetHandler():IsSetCard(0x259)
 end
 	--Cannot be targeted by opponent's trap effects
 function s.tgval(e,re,rp)
