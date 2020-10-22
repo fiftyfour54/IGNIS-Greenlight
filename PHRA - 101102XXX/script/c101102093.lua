@@ -26,6 +26,6 @@ function s.extrafil(e,tp,mg)
 	if not Duel.IsPlayerAffectedByEffect(tp,69832741) then
 		loc=loc|LOCATION_GRAVE
 	end
-	local g=Duel.GetMatchingGroup(Fusion.IsMonsterFilter(Card.IsAbleToRemove),tp,LOCATION_DECK+LOCATION_GRAVE,0,mg)
+	local g=Duel.GetMatchingGroup(Fusion.IsMonsterFilter(Card.IsAbleToRemove),tp,loc,0,mg)
 	return g,s.check(g:Split(Card.IsLocation,nil,LOCATION_GRAVE))
 end
