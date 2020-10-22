@@ -78,7 +78,8 @@ end
 	--Unaffected by same card type as the activated card/effect
 function s.immop(e,tp,eg,ep,ev,re,r,rp)
 	local rtype=re:GetActiveType()
-	if rtype:IsActiveType(TYPE_MONSTER) then
+	local c=e:GetHandler()
+	if rtype&TYPE_MONSTER~=0 then
 		--Unaffected by opponent's monster effects
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3111)
@@ -89,7 +90,7 @@ function s.immop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(s.imfilter1)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
-	elseif rtype:IsActiveType(TYPE_SPELL) then
+	elseif rtype&TYPE_SPELL~=0 then
 		--Unaffected by opponent's spell effects
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3112)
@@ -100,7 +101,7 @@ function s.immop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(s.imfilter2)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
-	elseif rtype:IsActiveType(TYPE_TRAP) then
+	elseif rtype&TYPE_TRAP~=0 then
 		--Unaffected by opponent's trap effects
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3113)
@@ -114,13 +115,13 @@ function s.immop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 	--Unaffected by the respective card types
-function s.efilter(e,te)
+function s.imfilter1(e,te)
 	return te:IsActiveType(TYPE_MONSTER) and te:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
-function s.efilter(e,te)
+function s.imfilter2(e,te)
 	return te:IsActiveType(TYPE_SPELL) and te:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
-function s.efilter(e,te)
+function s.imfilter3(e,te)
 	return te:IsActiveType(TYPE_TRAP) and te:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
 	--If this fusion summoned card was destroyed by opponent's card
