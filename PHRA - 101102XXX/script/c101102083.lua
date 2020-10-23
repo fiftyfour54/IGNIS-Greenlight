@@ -8,12 +8,12 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--atk up
 	local e1=Effect.CreateEffect(c)
-    e1:SetType(EFFECT_TYPE_SINGLE)
-    e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-    e1:SetCode(EFFECT_UPDATE_ATTACK)
-    e1:SetRange(LOCATION_MZONE)
-    e1:SetValue(s.atkval)
-    c:RegisterEffect(e1)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetValue(s.atkval)
+	c:RegisterEffect(e1)
 	--sp summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -25,7 +25,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.atkval(e,c)
-    return Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsRace,RACE_PLANT),c:GetControler(),LOCATION_MZONE,0,e:GetHandler())*400
+	return Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsRace,RACE_PLANT),c:GetControler(),LOCATION_MZONE,0,e:GetHandler())*400
 end
 function s.filter(c,e,tp)
 	return c:IsRace(RACE_PLANT) and c:GetLevel()>=5
