@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	e3:SetCode(EFFECT_IMMUNE_EFFECT)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetValue(function(_,re)return not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET)end)
+	e3:SetValue(s.immval)
 	c:RegisterEffect(e3)
 	--Negate cards&effects that would Special Summon from GY
 	local e4=Effect.CreateEffect(c)
@@ -86,10 +86,13 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 	end
 end
+function s.immval(e,re)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK) and not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET)
+end
 function s.spdiscon(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) or not Duel.IsChainNegatable(ev) then return false end
 	if not re:IsActiveType(TYPE_MONSTER) and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
-	if not re:IsHasCategory(CATEGORY_SPECIAL_SUMMON) then return false end
+	if not re:IsHasCategory(CATEGORY_SPECIAL_SUMMON) or re:GetHandlerPlayer()==tp then return false end
 	local ex,tg,ct,p,l=Duel.GetOperationInfo(ev,CATEGORY_SPECIAL_SUMMON)
 	return (l&LOCATION_GRAVE)~=0 or tg:IsExists(Card.IsLocation,1,nil,LOCATION_GRAVE)
 end
