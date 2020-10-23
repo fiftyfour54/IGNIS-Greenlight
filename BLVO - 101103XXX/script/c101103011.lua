@@ -30,11 +30,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x260}
+s.listed_names={id}
 function s.atlimit(e,c)
 	return not e:GetHandler():GetColumnGroup():IsContains(c)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x260) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x260) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
