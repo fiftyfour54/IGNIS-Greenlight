@@ -5,7 +5,9 @@ git:
   depth: 5
 install:
 - git clone --depth=1 --no-checkout https://github.com/ProjectIgnis/CardScripts.git BaseUtils
-- git -C BaseUtils checkout master -- *.lua
+- cd BaseUtils
+- git checkout master -- *.lua
+- cd ..
 - curl --retry 5 --connect-timeout 30 --location --remote-header-name --output ignis-test-bin.tar.gz https://github.com/ProjectIgnis/Checker/releases/download/1.1.0/ignis-test-bin.tar.gz
 - tar xf ignis-test-bin.tar.gz
 - cp ignis-test/script_syntax_check ignis-test/libocgcore.so .
