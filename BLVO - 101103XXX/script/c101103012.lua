@@ -43,6 +43,3 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 	end
 end
-function aux.SecurityTarget(e,_c)
-	return _c:GetColumnGroup():IsExists(function(c,tp)return c:IsControler(tp) and c:IsFaceup() and c:IsSetCard(0x260) end,1,nil,e:GetHandlerPlayer())
-end
