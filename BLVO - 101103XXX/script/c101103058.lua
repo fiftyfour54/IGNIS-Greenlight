@@ -4,24 +4,40 @@
 
 local s,id=GetID()
 function s.initial_effect(c)
-	--Special Summon
+	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(s.sptg)
-	e1:SetOperation(s.spop)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetTarget(s.target)
 	c:RegisterEffect(e1)
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return s.thtg(e,tp,eg,ep,ev,re,r,rp,0,chkc) end
+	--Special Summon
+	local b1=s.sptg(e,tp,eg,ep,ev,re,r,rp,0)
 	--Add from GY
-	local e2=e1:Clone()
-	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.thop)
-	c:RegisterEffect(e2)
+	local b2=s.thtg(e,tp,eg,ep,ev,re,r,rp,0)
+	if chk==0 then return b1 or b2 end
+	local op=0
+	if b1 and b2 then
+		op=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
+	elseif b1 then
+		op=Duel.SelectOption(tp,aux.Stringid(id,0))
+	else
+		op=Duel.SelectOption(tp,aux.Stringid(id,1))+1
+	end
+	if op==0 then
+		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
+		e:SetProperty(0)
+		e:SetOperation(s.spop)
+		s.sptg(e,tp,eg,ep,ev,re,r,rp,1)
+	else
+		e:SetCategory(CATEGORY_TOHAND)
+		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
+		e:SetOperation(s.thop)
+		s.thtg(e,tp,eg,ep,ev,re,r,rp,1)
+	end
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x0260) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
