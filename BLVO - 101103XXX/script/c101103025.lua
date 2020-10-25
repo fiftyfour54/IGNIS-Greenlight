@@ -51,9 +51,8 @@ s.listed_series={0x137}
 function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsSetCard,0x137),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	local gc=g:GetMaxGroup(Card.GetAttack):GetFirst()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and gc and gc:IsControler(tp)
+	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsSetCard,0x137),tp,LOCATION_MZONE,LOCATION_MZONE,nil):GetMaxGroup(Card.GetAttack)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and g:IsExists(Card.IsControler,1,nil,tp)
 end
 function s.chainfilter(re,tp,cid)
 	return not re:IsActiveType(TYPE_MONSTER) or re:GetHandler():IsSetCard(0x137)
