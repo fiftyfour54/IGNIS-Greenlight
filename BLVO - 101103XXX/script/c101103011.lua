@@ -11,6 +11,7 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetHintTiming(0,TIMING_MAIN_END+TIMING_SUMMON+TIMING_SPSUMMON)
 	e1:SetCountLimit(1,id)
+	e1:SetCost(s.thcost)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
@@ -33,6 +34,15 @@ s.listed_series={0x260}
 s.listed_names={id}
 function s.atlimit(e,c)
 	return not e:GetHandler():GetColumnGroup():IsContains(c)
+end
+function s.rmfilter(c)
+	return c:IsSetCard(0x260) and c:IsAbleToRemoveAsCost()
+end
+function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.rmfilter,tp,LOCATION_HAND,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectMatchingCard(tp,s.rmfilter,tp,LOCATION_HAND,0,1,1,nil)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x260) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
