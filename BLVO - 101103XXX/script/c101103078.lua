@@ -22,7 +22,7 @@ end
 function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,s.costfilter,1,nil) end
 	local g=Duel.SelectReleaseGroupCost(tp,s.costfilter,1,1,false,nil,nil)
-	local mtgc=math.floor(g:GetFirst():GetBaseAttack()/1000)
+	local mtgc=g:GetFirst():GetBaseAttack()//1000
 	Duel.Release(g,REASON_COST)
 	e:SetLabel(mtgc)
 end
