@@ -38,17 +38,20 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		local ct=(tc:GetLevel()*dc)+Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
 		if ct==Duel.GetFieldGroupCount(tp,LOCATION_GRAVE,0) and Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,1,nil) then
-			local tbl={}
-			for i=dc,1,-1 do
-				if Duel.IsPlayerCanDiscardDeck(tp,i) then table.insert(tbl,i) end
+			local ac=dc
+			if ac>1 then
+				local tbl={}
+				for i=dc,1,-1 do
+					if Duel.IsPlayerCanDiscardDeck(tp,i) then table.insert(tbl,i) end
+				end
+				ac=Duel.AnnounceNumber(tp,table.unpack(tbl))
 			end
-			local ac=Duel.AnnounceNumber(tp,table.unpack(tbl))
 			Duel.DiscardDeck(tp,ac,REASON_EFFECT)
 			gc=Duel.GetOperatedGroup():FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)
 			if gc>0 then
 				local g=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,1,gc,nil)
 				if #g>0 then
-					Duel.SendtoDeck(g,nil,-2,REASON_EFFECT)
+					Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 				end
 			end
 		end
