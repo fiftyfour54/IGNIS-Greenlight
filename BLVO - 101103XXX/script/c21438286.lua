@@ -53,13 +53,10 @@ function s.retcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end
-	e:GetHandler():CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
 end
 function s.retop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SendtoHand(c,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,c)
-	end
+	Duel.SendtoHand(c,nil,REASON_EFFECT)
+	Duel.ConfirmCards(1-tp,c)
 end
