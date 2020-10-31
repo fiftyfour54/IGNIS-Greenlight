@@ -29,7 +29,6 @@ function s.initial_effect(c)
 end
 function s.actop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
 	local ec=c:GetEquipTarget()
 	if not ec then return end
 	local v=(ec:GetAttack()//2)*-1
