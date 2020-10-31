@@ -42,15 +42,15 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local t3=(#g>=3 and dg>=3 and Duel.GetDecktopGroup(tp,3):FilterCount(Card.IsAbleToHand,nil)>0)
 	local t6=(#g>=6 and dg>=6 and Duel.GetDecktopGroup(tp,6):FilterCount(Card.IsAbleToHand,nil)>0)
 	if chk==0 then return t3 or t6 end
-	local op=0
-	if t3 and t6 then
-		op=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
-	elseif t3 then
-		op=Duel.SelectOption(tp,aux.Stringid(id,0))
-	else 
-		op=Duel.SelectOption(tp,aux.Stringid(id,1))
+	local ann={}
+	if t3 then
+		table.insert(ann,3)
+	end 
+	if t6 then
+		table.insert(ann,6)
 	end
-	local d=3+op*3
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,0))
+	local d=Duel.AnnounceNumber(tp,table.unpack(ann))
 	local rg=g:Select(tp,d,d,nil)
 	Duel.Remove(rg,POS_FACEDOWN,REASON_COST)
 	e:SetLabel(d)
