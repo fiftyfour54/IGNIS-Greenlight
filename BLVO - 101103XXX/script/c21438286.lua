@@ -29,13 +29,13 @@ function s.initial_effect(c)
 end
 function s.actop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not e:GetHandler():IsRelateToEffect(e) then return end
+	if not c:IsRelateToEffect(e) then return end
 	local ec=c:GetEquipTarget()
 	if not ec then return end
 	local v=(ec:GetAttack()//2)*-1
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
 	for tc in aux.Next(g) do
-		local e=Effect.CreateEffect(e:GetHandler())
+		local e=Effect.CreateEffect(c)
 		e:SetType(EFFECT_TYPE_SINGLE)
 		e:SetCode(EFFECT_UPDATE_ATTACK)
 		e:SetValue(v)
@@ -52,8 +52,9 @@ function s.retcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,1000)
 end
 function s.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToHand() end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToHand() end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,c,1,0,0)
 end
 function s.retop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
