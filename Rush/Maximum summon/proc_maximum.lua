@@ -8,7 +8,7 @@ end
 --Maximum Summon
 Maximum.AddProcedure = aux.FunctionWithNamedArgs(
 function(c,desc,...)
-	c.MaximumSet={...}
+	c:GetMetatable().MaximumSet={...}
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	if desc then
