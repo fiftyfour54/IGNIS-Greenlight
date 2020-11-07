@@ -7,7 +7,8 @@ if not Maximum then
 end
 --Maximum Summon
 Maximum.AddProcedure = aux.FunctionWithNamedArgs(
-function(c,reg,desc)
+function(c,desc,...)
+	c.MaximumSet={...}
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	if desc then
@@ -22,25 +23,51 @@ function(c,reg,desc)
 	e1:SetOperation(Maximum.Operation())
 	e1:SetValue(SUMMON_TYPE_MAXIMUM)
 	c:RegisterEffect(e1)
-	
-end,"handler","register","desc")
+end,"handler","desc")
+
 --that function check if you can maximum summon the monster and its other part(s)
 function Maximum.Condition()
-	return	function(e,c,og)
-			
+	return  function(e,c,og)
+		if c==nil then return true end
+		local filters=c.MaximumSet
+		local ct=#filters
+		if (ct+1)>Duel.GetLocationCount(tp,LOCATION_MZONE) then return false end
+		local tp=c:GetControler()
+		local g=nil
+		if og then
+			g=og:Filter(Card.IsLocation,nil,LOCATION_HAND)
+		else
+			g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 		end
+		return aux.SelectUnselectGroup(g,e,tp,ct,ct,Maximum.spcheck(table.unpack(filters)),0)
+	end
+end
+function Maximum.spcheck(...)
+	local filters={...}
+	return function(sg,e,tp,mg)
+		local ct=#filters
+		for i=1,ct do
+			if not sg:IsExists(filters[i],1,nil) then return false end
+		end
+		return #sg==ct
+	end
 end
 --operation that do the maximum summon
-function Maximum.Operation()
-	return	function(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
-			local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-		
-		
-		
-		
-		
-		
-		
+function Maximum.Operation(...)
+	return  function(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
+		if c==nil then return true end
+		local filters=c.MaximumSet
+		local ct=#filters
+		if (ct+1)>Duel.GetLocationCount(tp,LOCATION_MZONE) then return false end
+		local tp=c:GetControler()
+		local g=nil
+		if og then
+			g=og:Filter(Card.IsLocation,nil,LOCATION_HAND)
+		else
+			g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
+		end
+		local tg=aux.SelectUnselectGroup(g,e,tp,ct,ct,Maximum.spcheck(table.unpack(filters)),1,tp,HINTMSG_SPSUMMON)+c
+		sg:Merge(tg)
 	end
 end
 

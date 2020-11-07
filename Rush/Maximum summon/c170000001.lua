@@ -1,6 +1,7 @@
 --Yggdrago the Heavenly Emperor Dragon Tree
 local s,id=GetID()
 function s.initial_effect(c)
+	Maximum.AddProcedure(c,nil,s.filter1,s.filter2)
 	--Cannot be destroyed
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -12,6 +13,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.MaximumAttack=4000
+function s.filter1(c)
+	return c:IsCode(170000002)
+end
+function s.filter2(c)
+	return c:IsCode(170000003)
+end
 function s.indcon(e)
 	--maximum mode check to do
 	return true
