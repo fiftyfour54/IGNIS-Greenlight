@@ -1,3 +1,4 @@
+SUMMON_TYPE_MAXIMUM = 0x4e000000 --to check if it is correct
 if not aux.MaximumProcedure then
 	aux.MaximumProcedure = {}
 	Maximum = aux.MaximumProcedure
@@ -24,7 +25,6 @@ function(c,desc,...)
 	e1:SetValue(SUMMON_TYPE_MAXIMUM)
 	c:RegisterEffect(e1)
 end,"handler","desc")
-
 --that function check if you can maximum summon the monster and its other part(s)
 function Maximum.Condition()
 	return  function(e,c,og)
@@ -72,6 +72,28 @@ function Maximum.Operation(...)
 end
 
 --function that return if the card is in Maximum Mode or not, atm it just return true as we are lacking info on how Maximum mode work
-function Auxiliary.IsMaximumMode()
+function Card.IsMaximumMode(c)
 	return true
+end
+--I used Gemini as a reference for that function, while waiting for more information
+function Auxiliary.IsMaximumMode(effect)
+	local c=effect:GetHandler()
+	return not c:IsDisabled() and c:IsMaximumMode()
+end
+--that function add the effect that change the Original atk of the Maximum monster
+function Maximum.AddMaximumAtkHandler(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCondition(aux.IsMaximumMode)--supposition, to be checked when we get more information
+	e1:SetCode(EFFECT_SET_BASE_ATTACK)
+	e1:SetValue(c:GetMaximumAttack())
+	c:RegisterEffect(e1)
+end
+--function that return the value of the "maximum atk" of the monster
+function Card.GetMaximumAttack(c)
+	local m=c:GetMetatable(true)
+	if not m then return false end
+	return m.MaximumAttack
 end
