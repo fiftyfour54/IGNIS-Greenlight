@@ -11,6 +11,7 @@ function s.initial_effect(c)
 	e2:SetCondition(s.indcon)
 	e2:SetValue(s.indval)
 	c:RegisterEffect(e2)
+	c:AddMaximumAtkHandler()
 end
 s.MaximumAttack=4000
 function s.filter1(c)
