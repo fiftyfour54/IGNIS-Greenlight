@@ -1,6 +1,7 @@
 --氷結界の晶壁
 --Clear Wall of the Ice Barrier
 --Scripted by Hel
+
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate and Special Summon from GY
@@ -22,6 +23,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x2f}
+
 function s.filter(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsSetCard(0x2f) and c:IsLevelBelow(4)
 end
@@ -45,7 +47,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
