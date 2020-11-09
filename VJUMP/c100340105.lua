@@ -38,11 +38,14 @@ end
 function s.bantg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.smfilter,tp,LOCATION_MZONE,0,nil)
 	local dnc=g:GetClassCount(Card.GetCode)
-	local afc=0
-	if dnc>0 and s.bancheck(tp,LOCATION_ONFIELD) then afc=afc+1 end
-	if dnc>1 and s.bancheck(tp,LOCATION_GRAVE) then afc=afc+1 end
-	if dnc>2 and s.bancheck(tp,LOCATION_HAND) then afc=afc+1 end
-	if chk==0 then return dnc==afc end
+	if chk==0 then
+		if dnc==0 then return false end
+		local afc=0
+		if dnc>0 and s.bancheck(tp,LOCATION_ONFIELD) then afc=afc+1 end
+		if dnc>1 and s.bancheck(tp,LOCATION_GRAVE) then afc=afc+1 end
+		if dnc>2 and s.bancheck(tp,LOCATION_HAND) then afc=afc+1 end
+		return dnc==afc
+	end
 	local locs=LOCATION_ONFIELD
 	if dnc>1 then locs = locs | LOCATION_GRAVE end
 	if dnc>2 then locs = locs | LOCATION_HAND end
