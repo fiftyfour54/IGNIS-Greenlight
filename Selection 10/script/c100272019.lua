@@ -21,15 +21,19 @@ function s.initial_effect(c)
 	e2:SetTarget(s.nstg)
 	e2:SetOperation(s.nsop)
 	c:RegisterEffect(e2)
-	--Reduce battle or effect damage to 0 the first time, each turn.
+	--Each turn, reduce battle or effect damage to 0 the first time.
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_CHANGE_DAMAGE)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetCode(EFFECT_CHANGE_DAMAGE)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetTargetRange(1,0)
 	e3:SetValue(s.damval)
 	c:RegisterEffect(e3)
+	local e4=e3:Clone()
+	e4:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	e4:SetCondition(function(e)return e:GetHandler():GetFlagEffect(id)==0 end)
+	c:RegisterEffect(e4)
 end
 	--Check for a spellcaster with 1850 ATK with different name to Normal Summon
 function s.nsfilter(c,tp)
@@ -75,8 +79,9 @@ end
 	--Check if change was made already once this turn and if not change to 0
 function s.damval(e,re,val,r,rp,rc)
 	local tp=e:GetHandlerPlayer()
-	if Duel.GetFlagEffect(tp,id)==0 and r&(REASON_EFFECT|REASON_BATTLE)~=0 and s.damcon(tp) then
-		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
+	local c=e:GetHandler()
+	if r&(REASON_BATTLE|REASON_EFFECT)~=0 and c:GetFlagEffect(id)==0 and s.damcon(tp) then
+		c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 		Duel.Hint(HINT_CARD,0,id)
 		return 0
 	end
