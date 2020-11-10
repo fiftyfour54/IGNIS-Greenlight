@@ -4,12 +4,12 @@
 
 local s,id=GetID()
 function s.initial_effect(c)
-	--Excavate your deck and make opponent choose to add to your hand
+	--Opponent looks at top 3 cards of your deck, choose 1 to add to your hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_POSITION)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_RECOVER)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetTarget(s.exctg)
 	e1:SetOperation(s.excop)
@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	--When battling, send itself to the GY
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
+	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_BATTLE_CONFIRM)
 	e2:SetCountLimit(1,id)
