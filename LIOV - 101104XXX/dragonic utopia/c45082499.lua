@@ -1,5 +1,6 @@
 --ZW－雷神猛虎剣
 --ZW - Lightning Blade
+Duel.LoadScript("zwProc.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
