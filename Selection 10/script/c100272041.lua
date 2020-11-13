@@ -2,7 +2,6 @@
 --Radiant Seiyaryu
 --scripted by edo9300
 
->>>>>>> Stashed changes
 local s,id=GetID()
 function s.initial_effect(c)
 	--If normal or special summoned from hand, destroy 1
