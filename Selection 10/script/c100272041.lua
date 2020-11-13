@@ -1,16 +1,16 @@
 --聖夜に煌めく竜
 --Radiant Seiyaryu
---scripted by edo9300
+--Scripted by edo9300
 
 local s,id=GetID()
 function s.initial_effect(c)
-	--If normal or special summoned from hand, destroy 1
+	--If Normal or Special Summoned from hand, destroy 1
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e1:SetCondition(s.descon)
 	e1:SetTarget(s.destg)
 	e1:SetOperation(s.desop)
@@ -22,11 +22,13 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e3:SetValue(s.tglimit)
+	e3:SetValue(function(_,c)return c and c:IsAttribute(ATTRIBUTE_DARK)end)
 	c:RegisterEffect(e3)
 	--Cannot be destroyed by DARKs' effects
-	local e4=e3:Clone()
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e4:SetValue(function(_,re)return re:GetHandler():IsAttribute(ATTRIBUTE_DARK)end)
 	c:RegisterEffect(e4)
 	--Banish attacked monster until EP and chain attack
 	local e5=Effect.CreateEffect(c)
@@ -50,14 +52,10 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
-end
-function s.tglimit(e,c)
-	return c and c:IsAttribute(ATTRIBUTE_DARK)
 end
 function s.bancon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -68,8 +66,9 @@ function s.banop(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttacker():GetBattleTarget()
 	if not d or not d:IsRelateToBattle() or not d:IsFaceup() then return end
 	if Duel.Remove(d,0,REASON_EFFECT+REASON_TEMPORARY)==0 then return end
+	local c=e:GetHandler()
 	d:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-	local e1=Effect.CreateEffect(e:GetHandler())
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetReset(RESET_PHASE+PHASE_END)
