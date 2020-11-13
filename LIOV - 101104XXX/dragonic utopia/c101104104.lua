@@ -1,5 +1,6 @@
 --竜装合体 ドラゴニック・ホープレイ
 --Dragonic Utopia Ray
+Duel.LoadScript("zwProc.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
