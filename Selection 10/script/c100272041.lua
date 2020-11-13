@@ -1,6 +1,8 @@
 --聖夜に煌めく竜
 --Radiant Seiyaryu
 --scripted by edo9300
+
+>>>>>>> Stashed changes
 local s,id=GetID()
 function s.initial_effect(c)
 	--If normal or special summoned from hand, destroy 1
@@ -27,7 +29,7 @@ function s.initial_effect(c)
 	local e4=e3:Clone()
 	e4:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	c:RegisterEffect(e4)
-	--banish until ep and chain attack
+	--Banish attacked monster until EP and chain attack
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,1))
 	e5:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
@@ -65,23 +67,19 @@ function s.bancon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.banop(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttacker():GetBattleTarget()
-	if d and d:IsRelateToBattle() and d:IsFaceup() then
-		if Duel.Remove(d,0,REASON_EFFECT+REASON_TEMPORARY)~=0 then
-			d:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-			e1:SetCode(EVENT_PHASE+PHASE_END)
-			e1:SetReset(RESET_PHASE+PHASE_END)
-			e1:SetLabelObject(d)
-			e1:SetCountLimit(1)
-			e1:SetCondition(s.retcon)
-			e1:SetOperation(s.retop)
-			Duel.RegisterEffect(e1,tp)
-			if c:CanChainAttack() then
-				Duel.ChainAttack()
-			end
-		end
-	end
+	if not d or not d:IsRelateToBattle() or not d:IsFaceup() then return end
+	if Duel.Remove(d,0,REASON_EFFECT+REASON_TEMPORARY)==0 then return end
+	d:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetLabelObject(d)
+	e1:SetCountLimit(1)
+	e1:SetCondition(s.retcon)
+	e1:SetOperation(s.retop)
+	Duel.RegisterEffect(e1,tp)
+	if c:CanChainAttack() then Duel.ChainAttack() end
 end
 function s.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetLabelObject():GetFlagEffect(id)~=0
