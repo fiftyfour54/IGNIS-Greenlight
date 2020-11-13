@@ -30,6 +30,9 @@ function s.initial_effect(c)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
+function s.ldlv7filter(c)
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_DRAGON) and c:IsLevel(7)
+end
 function s.sscon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp)
 end
@@ -39,8 +42,7 @@ function s.sscost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(c,REASON_COST)
 end
 function s.ssfilter(c,e,tp)
-	return c:IsRace(RACE_DRAGON) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsLevel(7) and
-	       c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return s.ldlv7filter(c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -57,7 +59,7 @@ function s.ssop(e,tp,eg,ep,ev,re,r,rp)
 end
 -- Check for Level 7 LIGHT Dragon, making sure that its face-up if on MZONE
 function s.thfilter(c)
-	return c:IsRace(RACE_DRAGON) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsLevel(7) and c:IsAbleToHand() and
+	return s.ldlv7filter(c) and c:IsAbleToHand() and
 	       ((c:IsLocation(LOCATION_MZONE) and c:IsFaceup()) or c:IsLocation(LOCATION_GRAVE))
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
