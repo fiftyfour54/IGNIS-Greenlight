@@ -31,13 +31,13 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 	--Lists "Utopia", "ZW -", "ZS -", and "ZEXAL" archetypes
-s.listed_series={0x107f,0x7e,SetCode_ZS,SetCode_ZEXAL}
+s.listed_series={0x107f,0x7e,0x107e,0x207e}
 	--Specifically lists itself
 s.listed_names={id}
 
 	--Check for a "Utopia", "ZW -", or "ZS -" monster
 function s.ssfilter(c,ft,e,tp)
-	return (c:IsSetCard(0x107f) or c:IsSetCard(0x7e) or c:IsSetCard(SetCode_ZS)) and c:IsType(TYPE_MONSTER) and ((ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)) or c:IsAbleToHand())
+	return (c:IsSetCard(0x107f) or c:IsSetCard(0x107e) or c:IsSetCard(0x207e)) and c:IsType(TYPE_MONSTER) and ((ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)) or c:IsAbleToHand())
 end
 	--Activation legality
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -72,7 +72,7 @@ function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 end
 	--Check for "ZEXAL" spell/trap, except "ZEXAL Entrust"
 function s.thfilter(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSetCard(SetCode_ZEXAL) and not c:IsCode(id) and c:IsAbleToHand()
+	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSetCard(0x7e) and not c:IsCode(id) and c:IsAbleToHand()
 end
 	--Activation legality
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

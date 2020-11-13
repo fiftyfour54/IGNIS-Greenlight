@@ -28,7 +28,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 	--Lists "Utopia" and "ZW -" archetype
-s.listed_series={0x107f,0x7e}
+s.listed_series={0x107f,0x107e}
 
 	--Check for exactly 1 level 4 monster
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
@@ -70,7 +70,7 @@ function s.xyzcon(e,tp,eg,ep,ev,re,r,rp)
 end
 	--Check for "ZW -" monster
 function s.filter(c)
-	return c:IsSetCard(0x7e) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0x107e) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 	--Activation legality
 function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk)

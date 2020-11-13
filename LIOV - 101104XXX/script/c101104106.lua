@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 	--Lists "Utopia", "ZW -", and "ZS -" archetypes
-s.listed_series={0x107f,0x7e,SetCode_ZS}
+s.listed_series={0x107f,0x107e,0x207e}
 
 	--Check for an Xyz monster to use as material
 function s.filter1(c,e,tp)
@@ -42,7 +42,7 @@ end
 	--Check for "Utopia" or "ZW -" Xyz monster
 function s.filter2(c,e,tp,mc,rk)
 	if c.rum_limit and not c.rum_limit(mc,e) then return false end
-	return mc:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and c:IsRank(rk) and (c:IsSetCard(0x107f) or c:IsSetCard(0x7e)) and mc:IsCanBeXyzMaterial(c,tp)
+	return mc:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and c:IsRank(rk) and (c:IsSetCard(0x107f) or c:IsSetCard(0x107e)) and mc:IsCanBeXyzMaterial(c,tp)
 		and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0 and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 	--Activation legality
@@ -57,7 +57,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 	--Check for "ZW -" or "ZS -" monster
 function s.topfilter(c)
-	return (c:IsSetCard(0x7e) or c:IsSetCard(SetCode_ZS)) and c:IsType(TYPE_MONSTER)
+	return (c:IsSetCard(0x107e) or c:IsSetCard(0x207e)) and c:IsType(TYPE_MONSTER)
 end
 	--Xyz summon 1 "Utopia" or "ZW -" monster, that is 1 rank higher than targeted Xyz
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
