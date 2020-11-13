@@ -4,7 +4,7 @@
 
 local s,id=GetID()
 function s.initial_effect(c)
-	--Special Summon
+	--Tribute 1 LIGHT monster; Special Summon from hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--Gains ATK
+	--Banish from GY; Give 1000 attack
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_ATKCHANGE)
 	e2:SetDescription(aux.Stringid(id,1))
@@ -30,12 +30,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x259}
-function s.releasefilter(c) 
+function s.ldlv7filter(c)
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_DRAGON) and c:IsLevel(7)
+end
+function s.releasefilter(c)
 	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsReleasableByEffect()
 end
 function s.spfilter(c,e,tp)
-	return c:IsLevel(7) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_DRAGON)
-		and c:IsCanBeSpecialSummoned(e,0,tp,true,true,POS_FACEUP)
+	return s.ldlv7filter(c) and c:IsCanBeSpecialSummoned(e,0,tp,true,true,POS_FACEUP)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.releasefilter(chkc) end
@@ -43,7 +45,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,s.releasefilter,tp,LOCATION_MZONE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_RELEASE,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_RELEASE,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -51,19 +53,14 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if tc and tc:IsRelateToEffect(e) and Duel.Release(tc,REASON_EFFECT)~=0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
-		if #g>0 then
-			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-		end
+		if #g>0 then Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) end
 	end
 end
-function s.atkfilter(c)
-	return c:IsLevel(7) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_DRAGON)
-end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.atkfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.atkfilter,tp,LOCATION_MZONE,0,1,nil) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.ldlv7filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.ldlv7filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,s.ldlv7filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -72,7 +69,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(1000)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,2)
 		tc:RegisterEffect(e1)
 	end
 end
