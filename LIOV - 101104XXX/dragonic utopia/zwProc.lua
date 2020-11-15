@@ -1,3 +1,5 @@
+-- Description: Checks for whether the equip card still has the equip effect once it reaches SZONE
+-- This is used to correct the interaction between Phantom of Chaos (or alike) and any monsters that equip themselves to another
 function Auxiliary.EquipLimit(tc,te)
 	return function(e,c)
 		if c~=tc then return false end
@@ -8,13 +10,13 @@ function Auxiliary.EquipLimit(tc,te)
 		return false
 	end
 end
---Operation of equipping a card to another by its own effect and registering equip limit, used with aux.AddZWEquipLimit
---c - equip card
---e - usually linkedeffect
---tp - trigger player
---tc - equip target
---code - used if a flag effect needs to be registered
---previousPos - boolean, determine whether the equip card will use its Position from the previous location, default to true
+-- Description: Operation of equipping a card to another by its own effect and registering equip limit, used with aux.AddZWEquipLimit
+-- c - equip card
+-- e - usually linkedeffect
+-- tp - trigger player
+-- tc - equip target
+-- code - used if a flag effect needs to be registered
+-- previousPos - boolean, determine whether the equip card will use its Position from the previous location, default to true
 function Auxiliary.EquipAndLimitRegister(c,e,tp,tc,code,previousPos)
 	if not Duel.Equip(tp,c,tc,previousPos==nil and true or previousPos) then return false end
 	--Add Equip limit
@@ -29,7 +31,7 @@ function Auxiliary.EquipAndLimitRegister(c,e,tp,tc,code,previousPos)
 	c:RegisterEffect(e1)
 	return true
 end
--- Equip Limit for cards that equip themselves to another card
+-- Description: Equip Limit Proc for cards that equip themselves to another card
 -- con - condition for when the card can equip to another
 -- equipval - filter for the equip target
 -- equipop - what happens when the card is equipped to the target
