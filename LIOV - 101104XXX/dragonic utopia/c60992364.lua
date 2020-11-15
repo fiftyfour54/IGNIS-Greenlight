@@ -77,8 +77,8 @@ function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
 	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
+	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) or tc:IsFacedown() or tc:GetControler()~=tp then
 		Duel.SendtoGrave(c,REASON_EFFECT)
 		return
