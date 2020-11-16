@@ -24,6 +24,15 @@ function(c,desc,...)
 	e1:SetOperation(Maximum.Operation())
 	e1:SetValue(SUMMON_TYPE_MAXIMUM)
 	c:RegisterEffect(e1)
+	--cannot be changed to def
+	local e1=Effect.CreateEffect(c)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_CANNOT_CHANGE_POS)
+	e1:SetCondition(Maximum.centerCon)
+	tc:RegisterEffect(e1)
+	
+	
 end,"handler","desc","filter1","filter2","filter3","filter4")
 --that function check if you can maximum summon the monster and its other part(s)
 function Maximum.Condition()
@@ -70,10 +79,20 @@ function Maximum.Operation(...)
 		sg:Merge(tg)
 	end
 end
-
+function Maximum.centerCon(e)
+	return e:GetHandler():IsMaximumModeCenter()
+end
+FLAG_MAXIMUM_CENTER=170000000 --flag for center card maximum mode
+FLAG_MAXIMUM_SIDE=170000001 --flag for Left/right maximum card
 --function that return if the card is in Maximum Mode or not, atm it just return true as we are lacking info on how Maximum mode work
 function Card.IsMaximumMode(c)
-	return true
+	return c:IsMaximumModeCenter() or c:IsMaximumModeSide()
+end
+function Card.IsMaximumModeCenter()
+	return c:GetFlagEffect(FLAG_MAXIMUM_CENTER)>0
+end
+function Card.IsMaximumModeSide(c)
+	return c:GetFlagEffect(FLAG_MAXIMUM_SIDE)>0
 end
 --I used Gemini as a reference for that function, while waiting for more information
 function Auxiliary.IsMaximumMode(effect)
@@ -86,7 +105,7 @@ function Card.AddMaximumAtkHandler(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCondition(aux.IsMaximumMode)--supposition, to be checked when we get more information
+	e1:SetCondition(aux.IsMaximumMode)
 	e1:SetCode(EFFECT_SET_BASE_ATTACK)
 	e1:SetValue(c:GetMaximumAttack())
 	c:RegisterEffect(e1)
@@ -96,4 +115,75 @@ function Card.GetMaximumAttack(c)
 	local m=c:GetMetatable(true)
 	if not m then return false end
 	return m.MaximumAttack
+end
+--function to add everything related to Left/Right Maximum Monster behaviour
+--c=card to register
+--tc=center maximum card
+function Card.AddSideMaximumHandler(c,tc,eff)
+	--change atk
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCondition(Maximum.sideCon)
+	e1:SetCode(EFFECT_SET_BASE_ATTACK)
+	e1:SetValue(tc:GetMaximumAttack())
+	c:RegisterEffect(e1)
+	--change level
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCondition(Maximum.sideCon)
+	e2:SetCode(EFFECT_CHANGE_LEVEL)
+	e2:SetValue(tc:GetLevel())
+	c:RegisterEffect(e2)
+	--change name
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e3:SetCode(EFFECT_CHANGE_CODE)
+	e3:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
+	e3:SetValue(tc:GetCode())
+	c:RegisterEffect(e3)
+	
+	
+	--change type
+	
+	--change attribute
+	
+	--grant effect to center
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
+	e6:SetRange(LOCATION_MZONE)
+	e6:SetTargetRange(LOCATION_MZONE,0)
+	e6:SetCondition(Maximum.sideCon)
+	e6:SetTarget(s.eftg)
+	e6:SetLabelObject(eff)
+	c:RegisterEffect(e6)
+	
+	--cannot be battle target
+	local e7=Effect.CreateEffect(c)
+	e7:SetType(EFFECT_TYPE_SINGLE)
+	e7:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e7:SetRange(LOCATION_MZONE)
+	e7:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
+	e7:SetCondition(Maximum.sideCon)
+	e7:SetValue(aux.imval1)
+	c:RegisterEffect(e7)
+	--tribute 1 = tribute all handler
+	
+	--cannot be changed to def
+	local e8=Effect.CreateEffect(c)
+	e8:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e8:SetType(EFFECT_TYPE_SINGLE)
+	e8:SetCode(EFFECT_CANNOT_CHANGE_POS)
+	e8:SetCondition(Maximum.sideCon)
+	tc:RegisterEffect(e8)
+end
+function s.eftg(e,c)
+	return c:IsType(TYPE_EFFECT) and c:IsMaximumModeCenter()
+end
+function Maximum.sideCon(e)
+	return e:GetHandler():IsMaximumModeSide()
 end
