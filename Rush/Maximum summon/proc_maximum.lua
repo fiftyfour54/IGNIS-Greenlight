@@ -77,7 +77,7 @@ function Maximum.Operation(...)
 		end
 		local tg=aux.SelectUnselectGroup(g,e,tp,ct,ct,Maximum.spcheck(table.unpack(filters)),1,tp,HINTMSG_SPSUMMON)+c
 		--adding the flag
-		sg:GetFirst()::RegisterFlagEffect(FLAG_MAXIMUM_CENTER,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
+		sg:GetFirst():RegisterFlagEffect(FLAG_MAXIMUM_CENTER,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
 		local tc=tg:GetFirst()
 		for tc in aux.Next(tg) do
 			tc:RegisterFlagEffect(FLAG_MAXIMUM_SIDE,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
@@ -144,7 +144,7 @@ end
 --c=card to register
 --tc=center maximum card
 function Card.AddSideMaximumHandler(c,eff)
-	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,tp,LOCATION_MZONE,0,nil):GetFirst()
+	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,c:GetControler(),LOCATION_MZONE,0,nil):GetFirst()
 	--change atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
