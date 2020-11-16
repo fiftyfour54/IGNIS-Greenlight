@@ -16,7 +16,7 @@ function s.initial_effect(c)
 end
 function s.maxCon(e)
 	--maximum mode check to do
-	return e:GetHandler():IsMaximumMode() and not c:HasUsedIgnition(id)
+	return e:GetHandler():IsMaximumMode() and not e:GetHandler():HasUsedIgnition(id)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,3) end

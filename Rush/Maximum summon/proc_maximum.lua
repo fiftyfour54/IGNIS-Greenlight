@@ -274,9 +274,13 @@ function Maximum.maxCenterVal(e,c)
 	end	
 end
 function Maximum.eftgMax(e,c)
-	return c:IsType(TYPE_EFFECT) and c:IsMaximumMode()
+	return c:IsType(TYPE_EFFECT) and c:IsMaximumMode() and c~=e:GetHandler()
 end
 function Maximum.sideCon(e)
+	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil):GetFirst()
+	return e:GetHandler():IsMaximumModeSide() and tc~=nil
+end
+function Maximum.sideConGrant(e)
 	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil):GetFirst()
 	return e:GetHandler():IsMaximumModeSide() and tc~=nil
 end
@@ -291,8 +295,8 @@ function Card.HasDefense(c)
 end
 function Duel.RegisterMaxIgnition(tp,effid)
 	local g=Duel.GetMatchingGroup(Card.IsMaximumMode,tp,LOCATION_MZONE,0,nil)
-	local tc=tg:GetFirst()
-	for tc in aux.Next(tg) do
-		tc:RegisterFlagEffect(effid,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
+	local tc=g:GetFirst()
+	for tc in aux.Next(g) do
+		tc:RegisterFlagEffect(effid,RESET_EVENT+RESETS_STANDARD,0,1)
 	end
 end
