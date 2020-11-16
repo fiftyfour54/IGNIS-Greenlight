@@ -158,7 +158,7 @@ function Card.AddSideMaximumHandler(c,tc,eff)
 	e6:SetRange(LOCATION_MZONE)
 	e6:SetTargetRange(LOCATION_MZONE,0)
 	e6:SetCondition(Maximum.sideCon)
-	e6:SetTarget(s.eftg)
+	e6:SetTarget(Maximum.eftg)
 	e6:SetLabelObject(eff)
 	c:RegisterEffect(e6)
 	
@@ -181,7 +181,7 @@ function Card.AddSideMaximumHandler(c,tc,eff)
 	e8:SetCondition(Maximum.sideCon)
 	tc:RegisterEffect(e8)
 end
-function s.eftg(e,c)
+function Maximum.eftg(e,c)
 	return c:IsType(TYPE_EFFECT) and c:IsMaximumModeCenter()
 end
 function Maximum.sideCon(e)
