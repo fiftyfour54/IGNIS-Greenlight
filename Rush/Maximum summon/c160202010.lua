@@ -11,7 +11,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	c:AddSideMaximumHandler(e1)
 end
 function s.maxCon(e)
 	--maximum mode check to do
