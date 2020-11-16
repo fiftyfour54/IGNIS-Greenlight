@@ -30,7 +30,7 @@ function(c,desc,...)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CANNOT_CHANGE_POS)
 	e1:SetCondition(Maximum.centerCon)
-	tc:RegisterEffect(e1)
+	c:RegisterEffect(e1)
 	
 	
 end,"handler","desc","filter1","filter2","filter3","filter4")
