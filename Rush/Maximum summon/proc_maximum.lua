@@ -76,6 +76,12 @@ function Maximum.Operation(...)
 			g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 		end
 		local tg=aux.SelectUnselectGroup(g,e,tp,ct,ct,Maximum.spcheck(table.unpack(filters)),1,tp,HINTMSG_SPSUMMON)+c
+		--adding the flag
+		sg:GetFirst()::RegisterFlagEffect(FLAG_MAXIMUM_CENTER,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
+		local tc=tg:GetFirst()
+		for tc in aux.Next(tg) do
+			tc:RegisterFlagEffect(FLAG_MAXIMUM_SIDE,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
+		end
 		sg:Merge(tg)
 	end
 end
@@ -137,7 +143,8 @@ end
 --function to add everything related to Left/Right Maximum Monster behaviour
 --c=card to register
 --tc=center maximum card
-function Card.AddSideMaximumHandler(c,tc,eff)
+function Card.AddSideMaximumHandler(c,eff)
+	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,tp,LOCATION_MZONE,0,nil):GetFirst()
 	--change atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -161,15 +168,28 @@ function Card.AddSideMaximumHandler(c,tc,eff)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetCode(EFFECT_CHANGE_CODE)
-	e3:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCondition(Maximum.sideCon)
 	e3:SetValue(tc:GetCode())
 	c:RegisterEffect(e3)
-	
-	
-	--change type
-	
+	--change Race
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e4:SetCode(EFFECT_CHANGE_RACE)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCondition(Maximum.sideCon)
+	e4:SetValue(tc:GetRace())
+	c:RegisterEffect(e4)
 	--change attribute
-	
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e5:SetCode(EFFECT_CHANGE_ATTRIBUTE)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCondition(Maximum.sideCon)
+	e5:SetValue(tc:GetAttribute())
+	c:RegisterEffect(e5)
 	--grant effect to center
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
@@ -189,7 +209,6 @@ function Card.AddSideMaximumHandler(c,tc,eff)
 	e7:SetCondition(Maximum.sideCon)
 	e7:SetValue(aux.imval1)
 	c:RegisterEffect(e7)
-	--tribute 1 = tribute all handler
 	
 	--cannot be changed to def
 	local e8=Effect.CreateEffect(c)
@@ -198,6 +217,10 @@ function Card.AddSideMaximumHandler(c,tc,eff)
 	e8:SetCode(EFFECT_CANNOT_CHANGE_POS)
 	e8:SetCondition(Maximum.sideCon)
 	tc:RegisterEffect(e8)
+	
+	--tribute 1 = tribute all handler
+	
+	
 end
 function Maximum.eftgCenter(e,c)
 	return c:IsType(TYPE_EFFECT) and c:IsMaximumModeCenter()

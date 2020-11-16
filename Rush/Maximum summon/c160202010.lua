@@ -1,7 +1,6 @@
 --Yggdrago the Heavenly Emperor Dragon Tree (Left)
 local s,id=GetID()
 function s.initial_effect(c)
-	
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -12,6 +11,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
+	c:AddSideMaximumHandler(e1)
 end
 function s.maxCon(e)
 	--maximum mode check to do
