@@ -12,7 +12,6 @@ function s.initial_effect(c)
 	e1:SetValue(s.indval)
 	c:RegisterEffect(e1)
 	c:AddMaximumAtkHandler()
-	c:AddCenterToSideEffectHandler(e1)
 end
 s.MaximumAttack=3500
 function s.filter1(c)
