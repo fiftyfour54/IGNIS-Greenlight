@@ -15,14 +15,14 @@ function s.initial_effect(c)
 end
 s.MaximumAttack=4000
 function s.filter1(c)
-	return c:IsCode(170000002)
+	return c:IsCode(160202010)
 end
 function s.filter2(c)
-	return c:IsCode(170000003)
+	return c:IsCode(160202012)
 end
 function s.indcon(e)
 	--maximum mode check to do
-	return true
+	return e:GetHandler():IsMaximumModeCenter()
 end
 function s.indval(e,re,rp)
 	return re:IsActiveType(TYPE_TRAP)
