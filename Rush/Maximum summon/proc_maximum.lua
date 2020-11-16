@@ -116,6 +116,24 @@ function Card.GetMaximumAttack(c)
 	if not m then return false end
 	return m.MaximumAttack
 end
+--function that provide effects of the center piece to the side (mainly used for protection effects)
+function Card.AddCenterToSideEffectHandler(c,eff)
+	--grant effect to center
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetCondition(Maximum.centerCon)
+	e1:SetTarget(Maximum.eftg)
+	e1:SetLabelObject(eff)
+	c:RegisterEffect(e1)
+end
+function Maximum.eftg(e,c)
+	return c:IsType(TYPE_EFFECT) and c:IsMaximumModeSide()
+end
+function Maximum.centerCon(e)
+	return e:GetHandler():IsMaximumModeCenter()
+end
 --function to add everything related to Left/Right Maximum Monster behaviour
 --c=card to register
 --tc=center maximum card
@@ -158,7 +176,7 @@ function Card.AddSideMaximumHandler(c,tc,eff)
 	e6:SetRange(LOCATION_MZONE)
 	e6:SetTargetRange(LOCATION_MZONE,0)
 	e6:SetCondition(Maximum.sideCon)
-	e6:SetTarget(Maximum.eftg)
+	e6:SetTarget(Maximum.eftgCenter)
 	e6:SetLabelObject(eff)
 	c:RegisterEffect(e6)
 	
@@ -181,9 +199,12 @@ function Card.AddSideMaximumHandler(c,tc,eff)
 	e8:SetCondition(Maximum.sideCon)
 	tc:RegisterEffect(e8)
 end
-function Maximum.eftg(e,c)
+function Maximum.eftgCenter(e,c)
 	return c:IsType(TYPE_EFFECT) and c:IsMaximumModeCenter()
 end
 function Maximum.sideCon(e)
 	return e:GetHandler():IsMaximumModeSide()
 end
+function Card.HasDefense(c)
+	return not (c:IsType(TYPE_LINK) or (c:IsType(TYPE_MAXIMUM) and c:IsMaximumMode()))
+end 

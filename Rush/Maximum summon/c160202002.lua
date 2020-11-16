@@ -22,7 +22,7 @@ function s.filter2(c)
 end
 function s.indcon(e)
 	--maximum mode check to do
-	return e:GetHandler():IsMaximumModeCenter()
+	return e:GetHandler():IsMaximumMode()
 end
 function s.indval(e,re,rp)
 	return re:IsActiveType(TYPE_TRAP)
