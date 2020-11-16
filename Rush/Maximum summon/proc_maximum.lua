@@ -77,7 +77,7 @@ function Maximum.Operation(...)
 		end
 		local tg=aux.SelectUnselectGroup(g,e,tp,ct,ct,Maximum.spcheck(table.unpack(filters)),1,tp,HINTMSG_SPSUMMON)+c
 		--adding the flag
-		sg:GetFirst():RegisterFlagEffect(FLAG_MAXIMUM_CENTER,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
+		e:GetHandler():RegisterFlagEffect(FLAG_MAXIMUM_CENTER,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
 		local tc=tg:GetFirst()
 		for tc in aux.Next(tg) do
 			tc:RegisterFlagEffect(FLAG_MAXIMUM_SIDE,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
@@ -94,7 +94,7 @@ FLAG_MAXIMUM_SIDE=170000001 --flag for Left/right maximum card
 function Card.IsMaximumMode(c)
 	return c:IsMaximumModeCenter() or c:IsMaximumModeSide()
 end
-function Card.IsMaximumModeCenter()
+function Card.IsMaximumModeCenter(c)
 	return c:GetFlagEffect(FLAG_MAXIMUM_CENTER)>0
 end
 function Card.IsMaximumModeSide(c)
