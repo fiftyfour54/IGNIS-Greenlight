@@ -26,5 +26,6 @@ function s.indcon(e)
 	return e:GetHandler():IsMaximumMode()
 end
 function s.indval(e,re,rp)
-	return re:IsActiveType(TYPE_TRAP)
+	-- return re:IsActiveType(TYPE_TRAP)
+	return true
 end

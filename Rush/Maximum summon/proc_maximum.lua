@@ -15,7 +15,7 @@ function(c,desc,...)
 	if desc then
 		e1:SetDescription(desc)
 	else
-		e1:SetDescription(1074) --to update, it is the pendulum value
+		e1:SetDescription(1074) --to update, it is the pendulum value. 179 seem free?
 	end
 	e1:SetCode(EFFECT_SPSUMMON_PROC_G)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
@@ -31,7 +31,25 @@ function(c,desc,...)
 	e1:SetCode(EFFECT_CANNOT_CHANGE_POS)
 	e1:SetCondition(Maximum.centerCon)
 	c:RegisterEffect(e1)
-	
+	--only 1 attack/BP
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e2:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetTargetRange(LOCATION_MZONE,0)
+	e2:SetCondition(Maximum.atkcon)
+	e2:SetTarget(Maximum.atktg)
+	c:RegisterEffect(e2)
+	--check
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetOperation(Maximum.checkop)
+	e3:SetLabelObject(e2)
+	c:RegisterEffect(e3)
 	
 end,"handler","desc","filter1","filter2","filter3","filter4")
 --that function check if you can maximum summon the monster and its other part(s)
@@ -76,18 +94,33 @@ function Maximum.Operation(...)
 			g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 		end
 		local tg=aux.SelectUnselectGroup(g,e,tp,ct,ct,Maximum.spcheck(table.unpack(filters)),1,tp,HINTMSG_SPSUMMON)+c
-		--adding the flag
+		--adding the "maximum mode" flag
 		e:GetHandler():RegisterFlagEffect(FLAG_MAXIMUM_CENTER,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
 		local tc=tg:GetFirst()
 		for tc in aux.Next(tg) do
 			tc:RegisterFlagEffect(FLAG_MAXIMUM_SIDE,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
 		end
 		sg:Merge(tg)
+		
 	end
 end
 function Maximum.centerCon(e)
 	return e:GetHandler():IsMaximumModeCenter()
 end
+function Maximum.atkcon(e)
+	return e:GetHandler():GetFlagEffect(160202000)~=0
+end
+function Maximum.atktg(e,c)
+	return c:GetFieldID()~=e:GetLabel()
+end
+function Maximum.checkop(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():GetFlagEffect(160202000)~=0 then return end
+	local fid=eg:GetFirst():GetFieldID()
+	e:GetHandler():RegisterFlagEffect(160202000,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+	e:GetLabelObject():SetLabel(fid)
+end
+
+
 FLAG_MAXIMUM_CENTER=170000000 --flag for center card maximum mode
 FLAG_MAXIMUM_SIDE=170000001 --flag for Left/right maximum card
 --function that return if the card is in Maximum Mode or not, atm it just return true as we are lacking info on how Maximum mode work
@@ -144,24 +177,26 @@ end
 --c=card to register
 --tc=center maximum card
 function Card.AddSideMaximumHandler(c,eff)
-	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,c:GetControler(),LOCATION_MZONE,0,nil):GetFirst()
 	--change atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetLabel(1)
 	e1:SetCondition(Maximum.sideCon)
 	e1:SetCode(EFFECT_SET_BASE_ATTACK)
-	e1:SetValue(tc:GetMaximumAttack())
+	e1:SetValue(Maximum.maxCenterVal)
 	c:RegisterEffect(e1)
+	
 	--change level
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetLabel(2)
 	e2:SetCondition(Maximum.sideCon)
 	e2:SetCode(EFFECT_CHANGE_LEVEL)
-	e2:SetValue(tc:GetLevel())
+	e2:SetValue(Maximum.maxCenterVal)
 	c:RegisterEffect(e2)
 	--change name
 	local e3=Effect.CreateEffect(c)
@@ -169,8 +204,9 @@ function Card.AddSideMaximumHandler(c,eff)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetCode(EFFECT_CHANGE_CODE)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetLabel(3)
 	e3:SetCondition(Maximum.sideCon)
-	e3:SetValue(tc:GetCode())
+	e3:SetValue(Maximum.maxCenterVal)
 	c:RegisterEffect(e3)
 	--change Race
 	local e4=Effect.CreateEffect(c)
@@ -178,8 +214,9 @@ function Card.AddSideMaximumHandler(c,eff)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e4:SetCode(EFFECT_CHANGE_RACE)
 	e4:SetRange(LOCATION_MZONE)
+	e4:SetLabel(4)
 	e4:SetCondition(Maximum.sideCon)
-	e4:SetValue(tc:GetRace())
+	e4:SetValue(Maximum.maxCenterVal)
 	c:RegisterEffect(e4)
 	--change attribute
 	local e5=Effect.CreateEffect(c)
@@ -187,8 +224,9 @@ function Card.AddSideMaximumHandler(c,eff)
 	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e5:SetCode(EFFECT_CHANGE_ATTRIBUTE)
 	e5:SetRange(LOCATION_MZONE)
+	e5:SetLabel(5)
 	e5:SetCondition(Maximum.sideCon)
-	e5:SetValue(tc:GetAttribute())
+	e5:SetValue(Maximum.maxCenterVal)
 	c:RegisterEffect(e5)
 	--grant effect to center
 	local e6=Effect.CreateEffect(c)
@@ -196,7 +234,7 @@ function Card.AddSideMaximumHandler(c,eff)
 	e6:SetRange(LOCATION_MZONE)
 	e6:SetTargetRange(LOCATION_MZONE,0)
 	e6:SetCondition(Maximum.sideCon)
-	e6:SetTarget(Maximum.eftgCenter)
+	e6:SetTarget(Maximum.eftgMax)
 	e6:SetLabelObject(eff)
 	c:RegisterEffect(e6)
 	
@@ -216,18 +254,45 @@ function Card.AddSideMaximumHandler(c,eff)
 	e8:SetType(EFFECT_TYPE_SINGLE)
 	e8:SetCode(EFFECT_CANNOT_CHANGE_POS)
 	e8:SetCondition(Maximum.sideCon)
-	tc:RegisterEffect(e8)
+	c:RegisterEffect(e8)
 	
 	--tribute 1 = tribute all handler
 	
 	
 end
-function Maximum.eftgCenter(e,c)
-	return c:IsType(TYPE_EFFECT) and c:IsMaximumModeCenter()
+function Maximum.GetMaximumCenter(tp)
+	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,tp,LOCATION_MZONE,0,nil):GetFirst()
+	return tc
+end
+function Maximum.maxCenterVal(e,c)
+	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,tp,LOCATION_MZONE,0,nil):GetFirst()
+	if e:GetLabel()==1 then return tc:GetMaximumAttack()
+	elseif e:GetLabel()==2 then return tc:GetLevel()
+	elseif e:GetLabel()==3 then return tc:GetCode()
+	elseif e:GetLabel()==4 then return tc:GetRace()
+	elseif e:GetLabel()==5 then return tc:GetAttribute()
+	end	
+end
+function Maximum.eftgMax(e,c)
+	return c:IsType(TYPE_EFFECT) and c:IsMaximumMode()
 end
 function Maximum.sideCon(e)
-	return e:GetHandler():IsMaximumModeSide()
+	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil):GetFirst()
+	return e:GetHandler():IsMaximumModeSide() and tc~=nil
 end
+--function that return if the max monster used an effect 
+function Card.HasUsedIgnition(c,effID)
+	return c:GetFlagEffect(effID)>0
+end 
+--function that return false if the monster don't have defense stats
+--wait for ruling
 function Card.HasDefense(c)
 	return not (c:IsType(TYPE_LINK) or (c:IsType(TYPE_MAXIMUM) and c:IsMaximumMode()))
-end 
+end
+function Duel.RegisterMaxIgnition(tp,effid)
+	local g=Duel.GetMatchingGroup(Card.IsMaximumMode,tp,LOCATION_MZONE,0,nil)
+	local tc=tg:GetFirst()
+	for tc in aux.Next(tg) do
+		tc:RegisterFlagEffect(effid,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
+	end
+end

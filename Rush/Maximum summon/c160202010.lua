@@ -11,13 +11,14 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
+	c:AddSideMaximumHandler(e1)
 end
 function s.maxCon(e)
-	--maximum mode check to do
-	return e:GetHandler():IsMaximumModeCenter()
+	return e:GetHandler():IsMaximumMode() and not c:HasUsedIgnition(id)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,3) end
+	Duel.RegisterMaxIgnition(tp,id)
 end
 function s.desfilter(c)
 	return c:IsFaceup() and c:IsLevelBelow(8)
