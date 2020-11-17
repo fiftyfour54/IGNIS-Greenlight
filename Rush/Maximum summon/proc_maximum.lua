@@ -300,3 +300,16 @@ function Duel.RegisterMaxIgnition(tp,effid)
 		tc:RegisterFlagEffect(effid,RESET_EVENT+RESETS_STANDARD,0,1)
 	end
 end
+
+
+--functions to handle counting monsters but without the side Maximum monsters (the L/R max monsters are subtracted from the count)
+function Duel.GetMatchingGroupCountRush(f,tp,LOCP1,LOCP2,exclude)
+	local maxi=Duel.GetMatchingGroupCount(aux.FilterMaximumSideFunction(f),tp,LOCATION_MZONE,0,exclude)
+	return Duel.GetMatchingGroupCount(f,tp,LOCATION_MZONE,0,exclude)-maxi
+end
+function Auxiliary.FilterMaximumSideFunction(f,...)
+	local params={...}
+	return 	function(target)
+				return target:IsMaximumModeSide() and f(target,table.unpack(params))
+			end
+end
