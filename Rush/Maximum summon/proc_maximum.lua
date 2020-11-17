@@ -55,7 +55,7 @@ function(c,desc,...)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_ATTACK_COST)
-	e2:SetCost(s.atcost)
+	e2:SetCost(s.atop)
 	c:RegisterEffect(e2)
 	
 end,"handler","desc","filter1","filter2","filter3","filter4")
