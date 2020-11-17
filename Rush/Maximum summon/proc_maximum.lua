@@ -53,7 +53,7 @@ function(c,desc,...)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_ATTACK_COST)
-	e2:SetCost(Maximum.atop)
+	e2:SetOperation(Maximum.atop)
 	c:RegisterEffect(e2)
 	
 end,"handler","desc","filter1","filter2","filter3","filter4")
@@ -125,6 +125,7 @@ end
 	-- e:GetHandler():RegisterFlagEffect(160202000,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	-- e:GetLabelObject():SetLabel(fid)
 -- end
+
 function Maximum.atop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsAttackCostPaid()~=2 and e:GetHandler():IsLocation(LOCATION_MZONE) then
 		local c=e:GetHandler()
@@ -134,6 +135,7 @@ function Maximum.atop(e,tp,eg,ep,ev,re,r,rp)
 		e8:SetRange(LOCATION_MZONE)
 		e8:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
 		e8:SetTargetRange(LOCATION_MZONE,0)
+		e8:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		e8:SetTarget(Maximum.antarget)
 		c:RegisterEffect(e8)
 		Duel.AttackCostPaid()
@@ -280,7 +282,14 @@ function Card.AddSideMaximumHandler(c,eff)
 	
 	--tribute 1 = tribute all handler
 	
-	
+	--cannot be tributed for a tribute summon
+	local e10=Effect.CreateEffect(c)
+	e10:SetType(EFFECT_TYPE_SINGLE)
+	e10:SetCode(EFFECT_UNRELEASABLE_SUM)
+	e10:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e10:SetCondition(Maximum.sideCon)
+	e10:SetValue(1)
+	c:RegisterEffect(e10)
 end
 function Maximum.GetMaximumCenter(tp)
 	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,tp,LOCATION_MZONE,0,nil):GetFirst()
