@@ -50,8 +50,6 @@ function(c,desc,...)
 	-- e3:SetOperation(Maximum.checkop)
 	-- e3:SetLabelObject(e2)
 	-- c:RegisterEffect(e3)
-	
-	--attack cost
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_ATTACK_COST)
@@ -136,12 +134,12 @@ function Maximum.atop(e,tp,eg,ep,ev,re,r,rp)
 		e8:SetRange(LOCATION_MZONE)
 		e8:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
 		e8:SetTargetRange(LOCATION_MZONE,0)
-		e8:SetTarget(s.antarget)
+		e8:SetTarget(Maximum.antarget)
 		c:RegisterEffect(e8)
 		Duel.AttackCostPaid()
 	end
 end
-function s.antarget(e,c)
+function Maximum.antarget(e,c)
 	return c~=e:GetHandler()
 end
 
