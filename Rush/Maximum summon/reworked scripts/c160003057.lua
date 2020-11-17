@@ -37,10 +37,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(-atk)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		if tc:IsMaximumMode() then
 		tc:RegisterEffectRush(e1)
-		else
-			tc:RegisterEffect(e1)
-		end
+		
 	end
 end

@@ -357,9 +357,13 @@ end
 
 --function used to register an effect on all part of a Maximum monster instead of just a part (for ex, if you want to update the atk, you use that effect to register the EFFECT_UPDATE_ATTACK to the 3 part of the monster)
 function Card.RegisterEffectRush(c,eff)
-	local g=Duel.GetMatchingGroup(Card.IsMaximumMode,c:GetControler(),LOCATION_MZONE,0,nil)
-	local tc=g:GetFirst()
-	for tc in aux.Next(g) do
-		tc:RegisterEffect(eff)
+	if tc:IsMaximumMode() then
+		local g=Duel.GetMatchingGroup(Card.IsMaximumMode,c:GetControler(),LOCATION_MZONE,0,nil)
+		local tc=g:GetFirst()
+		for tc in aux.Next(g) do
+			tc:RegisterEffect(eff)
+		end
+	else
+		tc:RegisterEffect(e1)
 	end
 end

@@ -41,11 +41,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		e1:SetValue(-100*lvl)
-		if bc:IsMaximumMode() then
-			bc:RegisterEffectRush(e1)
-		else
-			tc:RegisterEffect(e1)
-		end
+		tc:RegisterEffectRush(e1)
+		
 		Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	end
 end
