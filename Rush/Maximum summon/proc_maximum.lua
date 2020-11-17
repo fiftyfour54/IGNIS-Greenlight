@@ -55,7 +55,7 @@ function(c,desc,...)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_ATTACK_COST)
-	e2:SetCost(s.atop)
+	e2:SetCost(Maximum.atop)
 	c:RegisterEffect(e2)
 	
 end,"handler","desc","filter1","filter2","filter3","filter4")
@@ -127,7 +127,7 @@ end
 	-- e:GetHandler():RegisterFlagEffect(160202000,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	-- e:GetLabelObject():SetLabel(fid)
 -- end
-function s.atop(e,tp,eg,ep,ev,re,r,rp)
+function Maximum.atop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsAttackCostPaid()~=2 and e:GetHandler():IsLocation(LOCATION_MZONE) then
 		local c=e:GetHandler()
 		--Your other monsters cannot attack
