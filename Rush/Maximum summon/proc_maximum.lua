@@ -32,27 +32,35 @@ function(c,desc,...)
 	e1:SetCondition(Maximum.centerCon)
 	c:RegisterEffect(e1)
 	--only 1 attack/BP
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e2:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetCondition(Maximum.atkcon)
-	e2:SetTarget(Maximum.atktg)
-	c:RegisterEffect(e2)
+	-- local e2=Effect.CreateEffect(c)
+	-- e2:SetType(EFFECT_TYPE_FIELD)
+	-- e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	-- e2:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	-- e2:SetRange(LOCATION_MZONE)
+	-- e2:SetTargetRange(LOCATION_MZONE,0)
+	-- e2:SetCondition(Maximum.atkcon)
+	-- e2:SetTarget(Maximum.atktg)
+	-- c:RegisterEffect(e2)
 	--check
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetOperation(Maximum.checkop)
-	e3:SetLabelObject(e2)
-	c:RegisterEffect(e3)
+	-- local e3=Effect.CreateEffect(c)
+	-- e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	-- e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	-- e3:SetCode(EVENT_ATTACK_ANNOUNCE)
+	-- e3:SetRange(LOCATION_MZONE)
+	-- e3:SetOperation(Maximum.checkop)
+	-- e3:SetLabelObject(e2)
+	-- c:RegisterEffect(e3)
+	
+	--attack cost
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_ATTACK_COST)
+	e2:SetCost(s.atcost)
+	c:RegisterEffect(e2)
 	
 end,"handler","desc","filter1","filter2","filter3","filter4")
 --that function check if you can maximum summon the monster and its other part(s)
+
 function Maximum.Condition()
 	return  function(e,c,og)
 		if c==nil then return true end
@@ -107,19 +115,35 @@ end
 function Maximum.centerCon(e)
 	return e:GetHandler():IsMaximumModeCenter()
 end
-function Maximum.atkcon(e)
-	return e:GetHandler():GetFlagEffect(160202000)~=0
+-- function Maximum.atkcon(e)
+	-- return e:GetHandler():GetFlagEffect(160202000)~=0
+-- end
+-- function Maximum.atktg(e,c)
+	-- return c:GetFieldID()~=e:GetLabel()
+-- end
+-- function Maximum.checkop(e,tp,eg,ep,ev,re,r,rp)
+	-- if e:GetHandler():GetFlagEffect(160202000)~=0 then return end
+	-- local fid=eg:GetFirst():GetFieldID()
+	-- e:GetHandler():RegisterFlagEffect(160202000,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+	-- e:GetLabelObject():SetLabel(fid)
+-- end
+function s.atop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.IsAttackCostPaid()~=2 and e:GetHandler():IsLocation(LOCATION_MZONE) then
+		local c=e:GetHandler()
+		--Your other monsters cannot attack
+		local e8=Effect.CreateEffect(c)
+		e8:SetType(EFFECT_TYPE_FIELD)
+		e8:SetRange(LOCATION_MZONE)
+		e8:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+		e8:SetTargetRange(LOCATION_MZONE,0)
+		e8:SetTarget(s.antarget)
+		c:RegisterEffect(e8)
+		Duel.AttackCostPaid()
+	end
 end
-function Maximum.atktg(e,c)
-	return c:GetFieldID()~=e:GetLabel()
+function s.antarget(e,c)
+	return c~=e:GetHandler()
 end
-function Maximum.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():GetFlagEffect(160202000)~=0 then return end
-	local fid=eg:GetFirst():GetFieldID()
-	e:GetHandler():RegisterFlagEffect(160202000,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-	e:GetLabelObject():SetLabel(fid)
-end
-
 
 FLAG_MAXIMUM_CENTER=170000000 --flag for center card maximum mode
 FLAG_MAXIMUM_SIDE=170000001 --flag for Left/right maximum card

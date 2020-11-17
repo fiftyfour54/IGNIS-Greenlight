@@ -40,7 +40,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		e1:SetValue(-ct*100)
 		if tc:IsMaximumMode() then
-		tc:RegisterEffectRush(e1)
+			tc:RegisterEffectRush(e1)
 		else
 			tc:RegisterEffect(e1)
 		end
