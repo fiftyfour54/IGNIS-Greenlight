@@ -32,7 +32,7 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
-	if Duel.SendtoGrave(c,REASON_COST)>0 then
+	if Duel.SendtoGrave(c,REASON_EFFECT)>0 then
 		--effect
 		if Duel.Draw(tp,2,REASON_EFFECT)>0 then
 			Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
