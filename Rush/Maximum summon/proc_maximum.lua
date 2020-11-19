@@ -367,3 +367,16 @@ function Card.RegisterEffectRush(c,eff)
 		tc:RegisterEffect(e1)
 	end
 end
+
+--maximum summon only in attack
+local function initial_effect()
+    local e1=Effect.GlobalEffect()
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_FORCE_SPSUMMON_POSITION)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(1,1)
+    e1:SetTarget(function(e,c) return c:IsSummonType(SUMMON_TYPE_MAXIMUM) end)
+    e1:SetValue(POS_FACEUP_ATTACK)
+    Duel.RegisterEffect(e1,0)
+end
+initial_effect()
