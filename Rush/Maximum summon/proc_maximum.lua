@@ -64,7 +64,7 @@ function Maximum.Condition()
 		if c==nil then return true end
 		local filters=c.MaximumSet
 		local ct=#filters
-		if (ct+1)>Duel.GetLocationCount(tp,LOCATION_MZONE) then return false end
+		-- if (ct+1)>Duel.GetLocationCount(tp,LOCATION_MZONE) then return false end
 		local tp=c:GetControler()
 		local g=nil
 		if og then
@@ -88,10 +88,11 @@ end
 --operation that do the maximum summon
 function Maximum.Operation(...)
 	return  function(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
+		
 		if c==nil then return true end
 		local filters=c.MaximumSet
 		local ct=#filters
-		if (ct+1)>Duel.GetLocationCount(tp,LOCATION_MZONE) then return false end
+		-- if (ct+1)>Duel.GetLocationCount(tp,LOCATION_MZONE) then return false end
 		local tp=c:GetControler()
 		local g=nil
 		if og then
@@ -107,7 +108,8 @@ function Maximum.Operation(...)
 			tc:RegisterFlagEffect(FLAG_MAXIMUM_SIDE,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
 		end
 		sg:Merge(tg)
-		
+		g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
+		Duel.SendtoGrave(g,nil,REASON_RULE)
 	end
 end
 function Maximum.centerCon(e)
@@ -367,7 +369,6 @@ function Card.RegisterEffectRush(c,eff)
 		tc:RegisterEffect(e1)
 	end
 end
-
 --maximum summon only in attack
 local function initial_effect()
     local e1=Effect.GlobalEffect()
