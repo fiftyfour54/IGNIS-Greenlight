@@ -31,16 +31,77 @@ function(c,desc,...)
 	e1:SetCode(EFFECT_CANNOT_CHANGE_POS)
 	e1:SetCondition(Maximum.centerCon)
 	c:RegisterEffect(e1)
+	--only 1 attack/BP
+	-- local e2=Effect.CreateEffect(c)
+	-- e2:SetType(EFFECT_TYPE_FIELD)
+	-- e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	-- e2:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	-- e2:SetRange(LOCATION_MZONE)
+	-- e2:SetTargetRange(LOCATION_MZONE,0)
+	-- e2:SetCondition(Maximum.atkcon)
+	-- e2:SetTarget(Maximum.atktg)
+	-- c:RegisterEffect(e2)
+	--check
+	-- local e3=Effect.CreateEffect(c)
+	-- e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	-- e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	-- e3:SetCode(EVENT_ATTACK_ANNOUNCE)
+	-- e3:SetRange(LOCATION_MZONE)
+	-- e3:SetOperation(Maximum.checkop)
+	-- e3:SetLabelObject(e2)
+	-- c:RegisterEffect(e3)
+	-- local e2=Effect.CreateEffect(c)
+	-- e2:SetType(EFFECT_TYPE_SINGLE)
+	-- e2:SetCode(EFFECT_ATTACK_COST)
+	-- e2:SetOperation(Maximum.atop)
+	-- c:RegisterEffect(e2)
 	
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_ATTACK_COST)
-	e2:SetOperation(Maximum.atop)
-	c:RegisterEffect(e2)
-	
+	-- local e2=Effect.GlobalEffect()
+    -- e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+    -- e2:SetCode(EFFECT_SEND_REPLACE)
+    -- e2:SetTarget(Maximum.reptg)
+    -- e2:SetValue(Maximum.repval)
+    -- Duel.RegisterEffect(e2,0)
+	--draw
+    local e4=Effect.CreateEffect(c)
+    e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+    e4:SetRange(0xff)
+    e4:SetCode(EVENT_RELEASE)
+    e4:SetProperty(EFFECT_FLAG_DELAY)
+    e4:SetCountLimit(1)
+	e4:SetCondition(Maximum.drcon)
+    e4:SetOperation(Maximum.drop)
+    c:RegisterEffect(e4)
 	
 end,"handler","desc","filter1","filter2","filter3","filter4")
 --that function check if you can maximum summon the monster and its other part(s)
+function Maximum.cfilter(c,tp)
+    return c:IsReason(REASON_SUMMON) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
+end
+function Maximum.drcon(e,tp,eg,ep,ev,re,r,rp)
+    return eg:IsExists(Maximum.cfilter,1,nil,tp)
+end
+function Maximum.drop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(Card.IsMaximumMode,tp,LOCATION_MZONE,0,nil)
+	Duel.Sendto(g,eg:GetFirst():GetDestination(),eg:GetFirst():GetReason())
+end
+function Maximum.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
+    if chk==0 then return eg:IsExists(Card.IsMaximumMode,1,nil) end
+    local mg=eg:Filter(Card.IsMaximumMode,nil)
+    local g=Group.CreateGroup()
+    for mc in aux.Next(mg) do
+        g=g+Duel.GetMatchingGroup(Card.IsMaximumMode,mc:GetControler(),LOCATION_MZONE,0,mg)
+    end
+    Duel.Sendto(g,mg:GetFirst():GetDestination(),nil)
+	local tc=g:GetFirst()
+		for tc in aux.Next(tg) do tc:SetReason(mg:GetFirst():GetReason())
+	end
+    return false
+end
+function Maximum.repval(e,c)
+    return false
+end
+
 
 function Maximum.Condition()
 	return  function(e,c,og)
@@ -98,6 +159,19 @@ end
 function Maximum.centerCon(e)
 	return e:GetHandler():IsMaximumModeCenter()
 end
+-- function Maximum.atkcon(e)
+	-- return e:GetHandler():GetFlagEffect(160202000)~=0
+-- end
+-- function Maximum.atktg(e,c)
+	-- return c:GetFieldID()~=e:GetLabel()
+-- end
+-- function Maximum.checkop(e,tp,eg,ep,ev,re,r,rp)
+	-- if e:GetHandler():GetFlagEffect(160202000)~=0 then return end
+	-- local fid=eg:GetFirst():GetFieldID()
+	-- e:GetHandler():RegisterFlagEffect(160202000,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+	-- e:GetLabelObject():SetLabel(fid)
+-- end
+
 function Maximum.atop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsAttackCostPaid()~=2 and e:GetHandler():IsLocation(LOCATION_MZONE) then
 		local c=e:GetHandler()
@@ -262,7 +336,6 @@ function Card.AddSideMaximumHandler(c,eff)
 	e10:SetCondition(Maximum.sideCon)
 	e10:SetValue(1)
 	c:RegisterEffect(e10)
-	
 	--cannot declare attack
 	local e11=Effect.CreateEffect(c)
 	e11:SetType(EFFECT_TYPE_SINGLE)
@@ -275,7 +348,7 @@ function Maximum.GetMaximumCenter(tp)
 	return tc
 end
 function Maximum.maxCenterVal(e,c)
-	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,tp,LOCATION_MZONE,0,nil):GetFirst()
+	local tc=Duel.GetMatchingGroup(Card.IsMaximumModeCenter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil):GetFirst()
 	if e:GetLabel()==1 then return tc:GetMaximumAttack()
 	elseif e:GetLabel()==2 then return tc:GetLevel()
 	elseif e:GetLabel()==3 then return tc:GetCode()
