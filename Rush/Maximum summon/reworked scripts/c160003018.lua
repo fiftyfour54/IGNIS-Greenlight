@@ -27,7 +27,7 @@ function s.tgfilter(c)
 	return c:GetAttack()>0 or c:GetDefense()>0
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(s.tgfilter),tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(FilterMaximumSideFunctionEx(aux.FilterFaceupFunction(s.tgfilter)),tp,0,LOCATION_MZONE,1,nil) end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -38,7 +38,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		--effect
 		if c:IsRelateToEffect(e) and c:IsFaceup() then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-			local g=Duel.SelectMatchingCard(tp,aux.FilterFaceupFunction(s.tgfilter),tp,0,LOCATION_MZONE,1,1,nil)
+			local g=Duel.SelectMatchingCard(tp,FilterMaximumSideFunctionEx(aux.FilterFaceupFunction(s.tgfilter)),tp,0,LOCATION_MZONE,1,1,nil)
 			if #g>0 then
 				Duel.HintSelection(g)
 				local e1=Effect.CreateEffect(c)
@@ -50,7 +50,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 				local e2=e1:Clone()
 				e2:SetCode(EFFECT_UPDATE_DEFENSE)
 				g:GetFirst():RegisterEffectRush(e2)
-		
 			end
 		end
 	end
