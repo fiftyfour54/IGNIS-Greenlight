@@ -62,47 +62,29 @@ function(c,desc,...)
     -- e2:SetTarget(Maximum.reptg)
     -- e2:SetValue(Maximum.repval)
     -- Duel.RegisterEffect(e2,0)
-	--draw
+	--tribute handler
     local e4=Effect.CreateEffect(c)
     e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
     e4:SetRange(0xff)
     e4:SetCode(EVENT_RELEASE)
     e4:SetProperty(EFFECT_FLAG_DELAY)
     e4:SetCountLimit(1)
-	e4:SetCondition(Maximum.drcon)
-    e4:SetOperation(Maximum.drop)
+	e4:SetCondition(Maximum.tribcon)
+    e4:SetOperation(Maximum.tribop)
+    c:RegisterEffect(e4)
+	--leave
+	local e4=Effect.CreateEffect(c)
+    e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+    e4:SetRange(0xff)
+    e4:SetCode(EVENT_BATTLE_DESTROYED)
+    e4:SetProperty(EFFECT_FLAG_DELAY)
+    e4:SetCountLimit(1)
+	e4:SetCondition(Maximum.con)
+    e4:SetOperation(Maximum.op)
     c:RegisterEffect(e4)
 	
 end,"handler","desc","filter1","filter2","filter3","filter4")
 --that function check if you can maximum summon the monster and its other part(s)
-function Maximum.cfilter(c,tp)
-    return c:IsReason(REASON_SUMMON) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
-end
-function Maximum.drcon(e,tp,eg,ep,ev,re,r,rp)
-    return eg:IsExists(Maximum.cfilter,1,nil,tp)
-end
-function Maximum.drop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsMaximumMode,tp,LOCATION_MZONE,0,nil)
-	Duel.Sendto(g,eg:GetFirst():GetDestination(),eg:GetFirst():GetReason())
-end
-function Maximum.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return eg:IsExists(Card.IsMaximumMode,1,nil) end
-    local mg=eg:Filter(Card.IsMaximumMode,nil)
-    local g=Group.CreateGroup()
-    for mc in aux.Next(mg) do
-        g=g+Duel.GetMatchingGroup(Card.IsMaximumMode,mc:GetControler(),LOCATION_MZONE,0,mg)
-    end
-    Duel.Sendto(g,mg:GetFirst():GetDestination(),nil)
-	local tc=g:GetFirst()
-		for tc in aux.Next(tg) do tc:SetReason(mg:GetFirst():GetReason())
-	end
-    return false
-end
-function Maximum.repval(e,c)
-    return false
-end
-
-
 function Maximum.Condition()
 	return  function(e,c,og)
 		if c==nil then return true end
@@ -431,3 +413,49 @@ local function initial_effect()
     Duel.RegisterEffect(e1,0)
 end
 initial_effect()
+
+
+
+
+function Maximum.cfilter(c,tp)
+    return c:IsReason(REASON_SUMMON) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
+end
+function Maximum.tribcon(e,tp,eg,ep,ev,re,r,rp)
+    return eg:IsExists(Maximum.cfilter,1,nil,tp)
+end
+function Maximum.tribop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(Card.IsMaximumMode,tp,LOCATION_MZONE,0,nil)
+	Duel.Sendto(g,eg:GetFirst():GetDestination(),nil)
+	local tc=g:GetFirst()
+	for tc in aux.Next(g) do
+		tc:SetReason(eg:GetFirst():GetReason())
+	end
+end
+-- function Maximum.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
+    -- if chk==0 then return eg:IsExists(Card.IsMaximumMode,1,nil) end
+    -- local mg=eg:Filter(Card.IsMaximumMode,nil)
+    -- local g=Group.CreateGroup()
+    -- for mc in aux.Next(mg) do
+        -- g=g+Duel.GetMatchingGroup(Card.IsMaximumMode,mc:GetControler(),LOCATION_MZONE,0,mg)
+    -- end
+    -- Duel.Sendto(g,mg:GetFirst():GetDestination(),nil)
+	-- local tc=g:GetFirst()
+		-- for tc in aux.Next(tg) do tc:SetReason(mg:GetFirst():GetReason())
+	-- end
+    -- return false
+-- end
+-- function Maximum.repval(e,c)
+    -- return false
+-- end
+function Maximum.con(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsReason(REASON_BATTLE)
+end
+function Maximum.op(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(Card.IsMaximumMode,tp,LOCATION_MZONE,0,nil)
+	Duel.Sendto(g,eg:GetFirst():GetDestination(),nil)
+	local tc=g:GetFirst()
+	for tc in aux.Next(g) do
+		tc:SetReason(eg:GetFirst():GetReason())
+	end
+end
