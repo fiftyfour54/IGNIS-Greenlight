@@ -25,7 +25,7 @@ end
 	--Activation legality
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tg=Duel.GetAttacker()
-	if chk==0 then return Duel.IsExistingMatchingCard(FilterMaximumSideFunctionEx(s.recfilter),tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterMaximumSideFunctionEx(s.recfilter),tp,LOCATION_MZONE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,0)
 	Duel.SetChainLimit(s.chlimit)
 end
@@ -36,7 +36,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	--Effect
-	local g=Duel.SelectMatchingCard(tp,FilterMaximumSideFunctionEx(s.recfilter),tp,0,recfilter,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,aux.FilterMaximumSideFunctionEx(s.recfilter),tp,0,recfilter,1,1,nil)
 	if #g>0 then
 		g=g:CreateMaximumGroup()
 		Duel.HintSelection(g)

@@ -27,9 +27,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g1=Duel.SelectMatchingCard(tp,FilterMaximumSideFunctionEx(s.filter1),tp,LOCATION_MZONE,0,2,2,nil,e)
+	local g1=Duel.SelectMatchingCard(tp,aux.FilterMaximumSideFunctionEx(s.filter1),tp,LOCATION_MZONE,0,2,2,nil,e)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g2=Duel.SelectMatchingCard(tp,FilterMaximumSideFunctionEx(s.filter2),tp,0,LOCATION_MZONE,1,1,nil,e)
+	local g2=Duel.SelectMatchingCard(tp,aux.FilterMaximumSideFunctionEx(s.filter2),tp,0,LOCATION_MZONE,1,1,nil,e)
 	g1:Merge(g2)
 	if #g1==3 then
 		g1=g1:CreateMaximumGroup()

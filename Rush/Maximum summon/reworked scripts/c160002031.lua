@@ -47,7 +47,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-		local g=Duel.SelectMatchingCard(tp,FilterMaximumSideFunctionEx(s.filter),tp,0,LOCATION_MZONE,1,1,nil,tp)
+		local g=Duel.SelectMatchingCard(tp,aux.FilterMaximumSideFunctionEx(s.filter),tp,0,LOCATION_MZONE,1,1,nil,tp)
 		g=g:CreateMaximumGroup()
 		if #g>0 then
 			Duel.HintSelection(g)
