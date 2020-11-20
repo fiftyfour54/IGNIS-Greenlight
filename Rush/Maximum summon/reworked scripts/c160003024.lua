@@ -40,11 +40,13 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		local cg=aux.SelectUnselectGroup(sg,1,tp,2,2,s.rescon,1,tp)
 		local sg2=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil)
 		if Duel.SendtoDeck(cg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)==2 and #sg2>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-			local tg=Duel.SelectMatchingCard(tp,s.desfilter,tp,0,LOCATION_MZONE,1,1,nil)
-			if #tg>0 then Duel.Destroy(tg,REASON_EFFECT) end
+			local tg=Duel.SelectMatchingCard(tp,aux.FilterMaximumSideFunctionEx(s.desfilter),tp,0,LOCATION_MZONE,1,1,nil)
+			if #tg>0 then 
+				tg=tg:CreateMaximumGroup()
+				Duel.Destroy(tg,REASON_EFFECT) end
 		end
 	end
 end
 function s.desfilter(c)
-	return c:IsDefenseBelow(1500) and c:HasDefense() and c:IsFaceup()
+	return c:IsDefenseBelow(1500) and c:IsFaceup()
 end
