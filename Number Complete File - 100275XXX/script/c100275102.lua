@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e2)
 	--atk restriction
-	local e3=Effect.CreateEffect(e:GetHandler())
+	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_MUST_ATTACK)
 	e3:SetTargetRange(0,LOCATION_MZONE)
