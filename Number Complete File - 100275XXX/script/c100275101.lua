@@ -62,22 +62,22 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.bptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local sg=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
+	local sg=Duel.GetMatchingGroup(nil,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,#sg,0,0)
 end
 function s.filter(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
 end
 function s.bpop(e,tp,eg,ep,ev,re,r,rp)
-	local dg=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
+	local dg=Duel.GetMatchingGroup(nil,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
 	Duel.Destroy(dg,REASON_EFFECT)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
-	local g=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_GRAVE,nil)
+	local g=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_GRAVE,nil,e,tp)
 	if g:GetFirst() and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		g=g:Select(tp,ft,ft,nil)
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
@@ -86,7 +86,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
 end
 function s.spfilter(c,e,tp)
-	return c:IsCode(100275102) and c:IsCanBeSpecialSummoned(e,100275102,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
+	return c:IsCode(100275102) and c:IsCanBeSpecialSummoned(e,0x53b,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
@@ -95,7 +95,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
-	if tc and Duel.SpecialSummon(tc,100275102,tp,tp,false,false,POS_FACEUP)>0 and e:GetHandler():IsRelateToEffect(e) then
+	if tc and Duel.SpecialSummon(tc,0x53b,tp,tp,false,false,POS_FACEUP)>0 and e:GetHandler():IsRelateToEffect(e) then
 		Duel.Overlay(tc,e:GetHandler())
 	end
 end

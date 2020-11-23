@@ -44,7 +44,9 @@ function s.matfilter(c)
 	return c:IsSetCard(0x48) and c:IsType(TYPE_XYZ)
 end
 function s.rmgchk(f,id)
-	return (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and f(c,id)
+	return function(c)
+		return (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and f(c,id)
+	end
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return false end
@@ -59,10 +61,11 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,sg,1,tp,LOCATION_EXTRA)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
 	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
-		local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
