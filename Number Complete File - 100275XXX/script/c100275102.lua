@@ -60,7 +60,7 @@ function s.adcon(e)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL+0x53b) and not Duel.IsTurnPlayer(e:GetHandlerPlayer())
 end
 function s.atcon(e)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL) and Duel.GetTurnCount()>e:GetHandler():GetTurnID()
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL+0x53b) and Duel.GetTurnCount()>e:GetHandler():GetTurnID()
 end
 function s.attg(e,c)
 	return c==e:GetHandler()
