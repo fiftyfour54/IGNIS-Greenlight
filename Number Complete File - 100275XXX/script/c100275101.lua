@@ -84,6 +84,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsReason(REASON_DESTROY) and rp~=tp and c:IsReason(REASON_EFFECT) 
 		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
+		and c:GetOverlayCount()>0
 end
 function s.spfilter(c,e,tp)
 	return c:IsCode(100275102) and c:IsCanBeSpecialSummoned(e,0x53b,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
