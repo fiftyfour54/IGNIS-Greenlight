@@ -27,20 +27,43 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_FAIRY) and c:IsAttribute(ATTRIBUTE_EARTH) and c:GetCode()~=id
+	return c:IsFaceup() and c:IsRace(RACE_FAIRY) and c:IsAttribute(ATTRIBUTE_EARTH) and not c:IsCode(id)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	if c==nil then return true end
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
-		local g=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
-		local ct=1
-		if #g>=5 then ct=Duel.AnnounceNumber(tp,1,2,3,4,5) end
-		Duel.ConfirmDecktop(tp,ct)
+		local g1=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+		local g2=Duel.GetFieldGroup(1-tp,LOCATION_DECK,0)
+		local ct1=1
+		local ct2=1
+		if #g1==1 then 
+			ct1=1
+		elseif #g1==2 then 
+			ct1=Duel.AnnounceNumber(tp,1,2)
+		elseif #g1==3 then 
+			ct1=Duel.AnnounceNumber(tp,1,2,3)
+		elseif #g1==4 then 
+			ct1=Duel.AnnounceNumber(tp,1,2,3,4)
+		else
+			ct1=Duel.AnnounceNumber(tp,1,2,3,4,5)
+		end
+		if #g2==1 then 
+			ct2=1
+		elseif #g2==2 then 
+			ct2=Duel.AnnounceNumber(tp,1,2)
+		elseif #g2==3 then 
+			ct2=Duel.AnnounceNumber(tp,1,2,3)
+		elseif #g2==4 then 
+			ct2=Duel.AnnounceNumber(tp,1,2,3,4)
+		else
+			ct2=Duel.AnnounceNumber(tp,1,2,3,4,5)
+		end
+		Duel.ConfirmDecktop(tp,ct1)
+		Duel.ConfirmDecktop(1-tp,ct2)
 	end
 end
 function s.con(e,tp,eg,ev,ep,re,r,rp)
@@ -54,7 +77,7 @@ function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local at=Duel.GetAttacker()
 	local tc=e:GetHandler():GetReasonCard()
 	if (e:GetHandler():IsReason(REASON_RELEASE) and not e:GetHandler():IsReason(REASON_EFFECT)) and tc:IsType(TYPE_MONSTER) and at==tc then
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,at,1,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
 		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,2000)
 	end
 end
