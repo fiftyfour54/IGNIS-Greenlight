@@ -32,12 +32,19 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	--Global check
 	aux.GlobalCheck(s,function()
-		--s['mat_chk']=nil
+		s[0]=nil
+		s[1]=Group.CreateGroup()
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_DETACH_MATERIAL)
 		ge1:SetOperation(s.checkop)
 		Duel.RegisterEffect(ge1,0)
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+		ge2:SetCode(EFFECT_OVERLAY_REMOVE_REPLACE)
+		ge2:SetLabelObject(ge1)
+		ge2:SetCondition(s.rcon)
+		Duel.RegisterEffect(ge2,0)
 	end)
 end
 	--Specifically lists "Princess Cologne"
@@ -100,31 +107,30 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 	
+function s.rcon(e,tp,eg,ep,ev,re,r,rp)
+	e:GetLabelObject():SetLabelObject(re:GetHandler():GetOverlayGroup())
+	return false
+end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local cid=Duel.GetCurrentChain()
-	if cid>0 and r&REASON_COST==REASON_COST then 
-		s['mat_chk']=Duel.GetChainInfo(cid,CHAININFO_CHAIN_ID)
-		--local ct=eg:GetFirst()
-		--e:SetLabelObject(ct)
+	if cid>0 and e:GetLabelObject() then 
+		s[0]=Duel.GetChainInfo(cid,CHAININFO_CHAIN_ID)
+		s[1]=e:GetLabelObject()-eg:GetFirst():GetOverlayGroup()
+		s[1]:KeepAlive()
 	end
 end
 	
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetChainInfo(ev,CHAININFO_CHAIN_ID)==s['mat_chk']-- and e:GetLabel()==1
-		and re:GetHandler():IsCanBeEffectTarget(e) and re:GetHandler():GetControler()==tp
-		and re:IsActiveType(TYPE_XYZ)-- and e:GetLabelObject() and e:GetLabelObject():IsType(TYPE_NORMAL)
+	return Duel.GetChainInfo(0,CHAININFO_CHAIN_ID)==s[0]
+		and re:GetHandler():IsCanBeEffectTarget(e) and re:GetHandler():IsControler(tp)
+		and re:IsActiveType(TYPE_XYZ) and s[1] and s[1]:IsExists(Card.IsType,1,nil,TYPE_NORMAL)
 end
-
---[[function s.matfilter(c)
-	return c:GetPreviousLocation()&LOCATION_OVERLAY~=0 and (c:IsType(TYPE_NORMAL) and not c:IsType(TYPE_GEMINI))
-end]]
 	--Activation legality
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) end
+	if chkc then return false end
 	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_MZONE,1,nil) end
-		--and Duel.IsExistingMatchingCard(s.matfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	Duel.SetTargetCard(re:GetHandler())
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
@@ -135,7 +141,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local ex,g=Duel.GetOperationInfo(0,CATEGORY_DESTROY)
 	if g:GetFirst():IsRelateToEffect(e) then
 		if Duel.Destroy(g,REASON_EFFECT) then
-			local tc=Duel.GetFirstTarget()
+			local tc=(Duel.GetTargetCards(e)-g):GetFirst()
 			if not (tc and tc:IsRelateToEffect(e) and tc:IsFaceup()) then return end
 			local dam=tc:GetRank()*300
 			Duel.Damage(1-tp,dam,REASON_EFFECT)
