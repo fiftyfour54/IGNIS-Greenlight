@@ -14,9 +14,9 @@ function s.initial_effect(c)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)	
 end
-s.listed_series={SET_AMAZEMENT }
+s.listed_series={0x25d}
 function s.thfilter(c,tp,e)
-	return c:IsFaceup() and c:IsSetCard(SET_AMAZEMENT) and c:IsLocation(LOCATION_MZONE) 
+	return c:IsFaceup() and c:IsSetCard(0x25d) and c:IsLocation(LOCATION_MZONE) 
 		and c:IsControler(tp) and (not e or c:IsCanBeEffectTarget(e)) and c:IsAbleToHand()
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
@@ -33,7 +33,7 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_AMAZEMENT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x25d) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

@@ -1,4 +1,4 @@
---A・Ɐ・HH
+--Ａ・Ɐ・ＨＨ
 --Amaze Attraction Horror House
 --Scripted by Eerie Code
 local s,id=GetID()
@@ -23,9 +23,9 @@ function s.initial_effect(c)
 	e2:SetTarget(s.tg)
 	c:RegisterEffect(e2)
 end
-s.listed_series={SET_AMAZEMENT }
+s.listed_series={0x25d}
 function s.filter(c,tp)
-	return c:IsFaceup() and (c:IsSetCard(SET_AMAZEMENT) or not c:IsControler(tp))
+	return c:IsFaceup() and (c:IsSetCard(0x25d) or not c:IsControler(tp))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc,tp) end

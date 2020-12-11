@@ -1,4 +1,4 @@
---A・Ɐ・MM
+--Ａ・Ɐ・ＭＭ
 --Amaze Attraction Majestic Menage
 --Scripted by Eerie Code
 local s,id=GetID()
@@ -27,9 +27,9 @@ function s.initial_effect(c)
 	e3:SetTarget(s.desreptg)
 	c:RegisterEffect(e3)
 end
-s.listed_series={SET_AMAZEMENT,SET_ATTRACTION }
+s.listed_series={0x25d,0x25e}
 function s.filter(c,tp)
-	return c:IsFaceup() and (c:IsSetCard(SET_AMAZEMENT) or not c:IsControler(tp))
+	return c:IsFaceup() and (c:IsSetCard(0x25d) or not c:IsControler(tp))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc,tp) end
@@ -60,7 +60,7 @@ function s.eqlimit(e,c)
 	return c:GetControler()==e:GetHandlerPlayer() or e:GetHandler():GetEquipTarget()==c
 end
 function s.atkfilter(c)
-	return c:IsType(TYPE_TRAP) and c:IsSetCard(SET_ATTRACTION) and c:GetEquipTarget()
+	return c:IsType(TYPE_TRAP) and c:IsSetCard(0x25e) and c:GetEquipTarget()
 end
 function s.atkval(e,c)
 	if e:GetHandler():GetEquipTarget():GetControler()==e:GetHandlerPlayer() then

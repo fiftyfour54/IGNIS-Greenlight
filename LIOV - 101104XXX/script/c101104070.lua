@@ -22,16 +22,16 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_EQUIP)
 	e3:SetCode(EFFECT_ADD_SETCODE)
-	e3:SetValue(SET_AMAZEMENT)
+	e3:SetValue(0x25d)
 	e3:SetCondition(s.condition)
 	c:RegisterEffect(e3)
 end
-s.listed_series={SET_AMAZEMENT,SET_ATTRACTION }
+s.listed_series={0x25d,0x25e}
 function s.eqfilter(c,e,tp)
 	return aux.CheckStealEquip(c) and c:GetEquipGroup():IsExists(s.eqcfilter,1,nil,tp)
 end
 function s.eqcfilter(c,tp)
-	return c:IsSetCard(SET_ATTRACTION) and c:IsType(TYPE_TRAP) and c:IsControler(tp)
+	return c:IsSetCard(0x25e) and c:IsType(TYPE_TRAP) and c:IsControler(tp)
 end
 function s.eqlimit(e,c)
 	return e:GetHandlerPlayer()~=c:GetControler() or e:GetHandler():GetEquipTarget()==c

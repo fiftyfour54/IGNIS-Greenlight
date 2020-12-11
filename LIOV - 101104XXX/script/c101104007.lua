@@ -24,9 +24,9 @@ function s.initial_effect(c)
 	e2:SetOperation(s.eqop2)
 	c:RegisterEffect(e2)
 end
-s.listed_series={SET_ATTRACTION,SET_AMAZEMENT }
+s.listed_series={0x25e,0x25d}
 function s.eqfilter1(c)
-	return c:IsSetCard(SET_ATTRACTION) and c:IsType(TYPE_TRAP) and c:GetEquipTarget()
+	return c:IsSetCard(0x25e) and c:IsType(TYPE_TRAP) and c:GetEquipTarget()
 		and Duel.IsExistingTarget(s.eqfilter2,0,0,LOCATION_MZONE,1,c:GetEquipTarget(),c)
 end
 function s.eqfilter2(c,ec)
@@ -54,11 +54,11 @@ function s.eqop1(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.eqfilter3(c)
-	return c:IsSetCard(SET_ATTRACTION) and c:IsType(TYPE_TRAP) and c:GetEquipTarget()
+	return c:IsSetCard(0x25e) and c:IsType(TYPE_TRAP) and c:GetEquipTarget()
 		and Duel.IsExistingTarget(s.eqfilter4,0,LOCATION_MZONE,LOCATION_MZONE,1,c:GetEquipTarget(),c,tp)
 end
 function s.eqfilter4(c,ec,tp)
-	return c:IsFaceup() and (c:IsSetCard(SET_AMAZEMENT) or not c:IsControler(tp)) and ec:CheckEquipTarget(c)
+	return c:IsFaceup() and (c:IsSetCard(0x25d) or not c:IsControler(tp)) and ec:CheckEquipTarget(c)
 end
 function s.eqtg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
