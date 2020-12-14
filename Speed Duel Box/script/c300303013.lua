@@ -23,5 +23,6 @@ function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		if Duel.SpecialSummon(g,0,tp,tp,true,false,POS_FACEUP_DEFENSE)>0 then
 			Duel.Recover(tp,tc:GetBaseDefense(),REASON_EFFECT)
+		end
 	end
 end
