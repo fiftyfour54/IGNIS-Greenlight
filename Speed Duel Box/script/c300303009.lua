@@ -29,19 +29,19 @@ function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 	
 	if opt==0 then
 	--Add 1 "Dark Magician" from your Deck to your hand, then shuffle 1 card from your hand into the Deck.
-		local g1=Duel.GetMatchingGroup(Card.IsCode,p,LOCATION_DECK,0,nil,CARD_DARK_MAGICIAN)
-		local sg=g:Select(p,1,1,nil)
+		local g=Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_DECK,0,nil,CARD_DARK_MAGICIAN)
+		local sg=g:Select(tp,1,1,nil)
 		Duel.SendtoHand(sg,nil,REASON_EFFECT)
-		local g2=Duel.GetFieldGroup(tp,LOCATION_HAND,0):Select(tp,1,1,nil)
-		Duel.SendtoDeck(g2,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+		local tdg=Duel.GetFieldGroup(tp,LOCATION_HAND,0):Select(tp,1,1,nil)
+		Duel.SendtoDeck(tdg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	else
 	--Shuffle 1 "Dark Magician" from your hand into the Deck, then draw 1 card.
-		local g=Duel.GetMatchingGroup(Card.IsCode,p,LOCATION_HAND,0,nil,CARD_DARK_MAGICIAN)
-		Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
-		local sg=g:Select(p,1,1,nil)
-		Duel.ConfirmCards(1-p,sg)
+		local g=Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_HAND,0,nil,CARD_DARK_MAGICIAN)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.ConfirmCards(1-tp,sg)
 		Duel.SendtoDeck(sg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
-		Duel.ShuffleDeck(p)
+		Duel.ShuffleDeck(tp)
 		Duel.BreakEffect()
 		Duel.Draw(tp,1,REASON_EFFECT)
 	end
