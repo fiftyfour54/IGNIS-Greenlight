@@ -3,6 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
 	aux.AddPreDrawSkillProcedure(c,1,false,s.flipcon,s.flipop)
+	aux.AddSkillProcedure(c,1,false,s.flipcon2,s.flipop2)
 end
 function s.flipcon(e,tp,eg,ep,ev,re,r,rp)
 	--condition
@@ -44,4 +45,26 @@ function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.Draw(tp,1,REASON_EFFECT)
 	end
+end
+--tribute 1 DM to draw 2
+function s.flipconfilter(c)
+	return c:IsFaceup() and c:IsOriginalCode(CARD_DARK_MAGICIAN)
+end
+function s.flipcon2(e,tp,eg,ep,ev,re,r,rp)
+	--opd check
+	if Duel.GetFlagEffect(ep,id+1)>0 then return end
+	--condition
+	return aux.CanActivateSkill(tp) and Duel.IsExistingMatchingCard(s.flipconfilter,tp,LOCATION_ONFIELD,0,1,nil)
+	and Duel.IsPlayerCanDraw(tp,2)
+end
+function s.flipop2(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SKILL_FLIP,tp,id|(1<<32))
+	Duel.Hint(HINT_CARD,tp,id)
+	--opd register
+	Duel.RegisterFlagEffect(ep,id+1,0,0,0)
+	local c=e:GetHandler()
+	local g=Duel.SelectReleaseGroupCost(tp,s.flipconfilter,1,1,false,aux.ReleaseCheckMMZ,nil,ft,tp)
+	Duel.DiscardHand(tp,aux.TRUE,2,2,REASON_COST+REASON_DISCARD)
+	Duel.Release(g,REASON_COST)
+	Duel.Draw(tp,2,REASON_EFFECT)
 end
