@@ -45,6 +45,9 @@ function s.initial_effect(c)
 end
 s.listed_names={CARD_ALBAZ }
 s.listed_series={SET_STIGMATA }
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)
+end
 function s.fusfilter(c)
 	return c:IsLevelBelow(8) and not c:IsCode(id)
 end
