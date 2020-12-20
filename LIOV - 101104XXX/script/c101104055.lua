@@ -12,6 +12,8 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetCode(EVENT_TO_GRAVE)
+	e2:SetCountLimit(1,id+100)
+	e2:SetCondition(s.regcon)
 	e2:SetOperation(s.regop)
 	c:RegisterEffect(e2)
 end
@@ -19,7 +21,7 @@ function s.filterchk(c)
 	return c:IsCode(CARD_ALBAZ) and c:IsLocation(LOCATION_HAND+LOCATION_MZONE)
 end
 function s.fcheck(tp,sg,fc)
-	if not sg:IsContains(Card.IsRace,1,nil,RACE_DRAGON) then
+	if not sg:IsExists(Card.IsRace,1,nil,RACE_DRAGON) then
 		return false
 	end
 	if sg:IsExists(Card.IsLocation,1,nil,LOCATION_GRAVE) then
