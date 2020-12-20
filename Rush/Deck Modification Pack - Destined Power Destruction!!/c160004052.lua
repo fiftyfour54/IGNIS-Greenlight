@@ -1,3 +1,4 @@
+-- 左手に剣を右手に盾を
 -- Sword & Shield
 local s,id=GetID()
 function s.initial_effect(c)
