@@ -1,8 +1,9 @@
--- 烙印の裁き
+--烙印の裁き
 --Judgment of Stigmata
+
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Destroy all of opponent's monsters, that has ATK >= than the targeted monster's ATK
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -11,7 +12,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--set
+	--Set itself from GY
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
