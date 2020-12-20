@@ -7,11 +7,12 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_DAMAGE+CATEGORY_DESTROY)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(s.damcon)
 	e1:SetTarget(s.damtg)
 	e1:SetOperation(s.damop)
 	c:RegisterEffect(e1)
 end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
+function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_PYRO),tp,LOCATION_MZONE,0,2,nil)
 end
 function s.filter(c)
@@ -27,7 +28,7 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	if Duel.Damage(p,d,REASON_EFFECT)~=300 then return end
 	local dg=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_ONFIELD,nil)
-	if #dg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0) then
+	if #dg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		local sg=dg:Select(tp,1,1,nil)
 		Duel.HintSelection(sg)
 		Duel.Destroy(sg,REASON_EFFECT)
