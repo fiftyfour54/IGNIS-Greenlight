@@ -13,13 +13,13 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.costfilter(c)
-	return c:IsRace(RACE_MACHINE) and c:IsType(TYPE_NORMAL) and c:IsFaceup() and c:IsAbleToGraveAsCost()
+	return c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsType(TYPE_NORMAL) and c:IsFaceup() and c:IsAbleToGraveAsCost()
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.filter(c,e,tp)
-	return c:IsRace(RACE_MACHINE) and c:IsType(TYPE_EFFECT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsType(TYPE_EFFECT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
