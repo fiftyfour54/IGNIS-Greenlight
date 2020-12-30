@@ -1,5 +1,5 @@
 --天魔神 シドヘルズ
---Sky Scourge Sidhelz
+--Sky Scourge Sidherz
 --Logical Nonsense
 
 --Substitute ID
@@ -69,7 +69,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 	elseif var==2 then
 		e:SetOperation(s.tgop)
-		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,nil,tp,LOCATION_DECK)
+		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 	end
 end
 	--Add 1 LIGHT fairy or 1 DARK fiend from deck
