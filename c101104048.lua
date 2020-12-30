@@ -50,16 +50,13 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	end
 end
-function s.rescon(sg,e,tp,mg)
-	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:GetSum(Card.GetLink)>=4
-end
 function s.rmfilter(c)
 	return c:IsLinkMonster() and c:IsAbleToRemoveAsCost()
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_GRAVE,0,e:GetHandler())
-	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,2,99,s.rescon,0) end
-	local g=aux.SelectUnselectGroup(g,e,tp,2,99,s.rescon,1,tp,HINTMSG_REMOVE,nil,nil)
+	if chk==0 then return g:CheckWithSumEqual(Card.GetLink,4,2,4) end
+	local rg=g:SelectWithSumEqual(tp,Card.GetLink,4,2,4)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
