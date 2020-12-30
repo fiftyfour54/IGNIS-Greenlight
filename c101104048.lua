@@ -57,7 +57,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_GRAVE,0,e:GetHandler())
 	if chk==0 then return g:CheckWithSumEqual(Card.GetLink,4,2,4) end
 	local rg=g:SelectWithSumEqual(tp,Card.GetLink,4,2,4)
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
+	Duel.Remove(rg,POS_FACEUP,REASON_COST)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
