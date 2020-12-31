@@ -27,6 +27,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.disop)
 	c:RegisterEffect(e2)
 end
+s.listed_series={0x152}
 function s.xyzcheck(g,tp,xyz)
 	return g:GetClassCount(Card.GetAttribute)==#g
 end
@@ -35,7 +36,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x152) and c:IsType(TYPE_TUNER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x152) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
