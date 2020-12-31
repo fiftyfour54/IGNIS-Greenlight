@@ -66,7 +66,7 @@ function s.splimit(e,c,tp,sumtp,sumpos)
 	return not c:IsSetCard(0x152) and c:IsLocation(LOCATION_EXTRA)
 end
 function s.filter(c,e)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and (not e or c:IsCanBeEffectTarget(e))
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and (not e or c:IsCanBeEffectTarget(e)) and not c:IsDisabled()
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() end
