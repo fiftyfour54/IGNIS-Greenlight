@@ -36,7 +36,7 @@ function s.cfilter(c,tp)
 	return c:GetPreviousControler()==1-tp and c:IsType(TYPE_MONSTER) and c:IsPreviousLocation(LOCATION_MZONE)
 end
 function s.tkcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,1-tp)
+	return eg:IsExists(s.cfilter,1,nil,tp)
 end
 function s.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsCanAddCounter(0x59,1) end
