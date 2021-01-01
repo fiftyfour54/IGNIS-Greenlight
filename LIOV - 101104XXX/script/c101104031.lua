@@ -30,7 +30,7 @@ function s.atkfilter(c)
 	return c:IsFaceup() and not c:IsType(TYPE_TUNER)
 end
 function s.atklm(e)
-	return Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(s.atkfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 function s.cfilter(c,tp)
 	return c:GetPreviousControler()==1-tp and c:IsType(TYPE_MONSTER) and c:IsPreviousLocation(LOCATION_MZONE)
