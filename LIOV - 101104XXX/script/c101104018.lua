@@ -1,4 +1,4 @@
---
+--海造賊－黒翼の水先人
 --Ravenwing, the Plunder Patroll Pilot
 --Scripted by The Razgriz
 local s,id=GetID()
@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCountLimit(1,id+100)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCondition(s.spcon2)
 	e2:SetTarget(s.sptg2)
 	e2:SetOperation(s.spop2)
