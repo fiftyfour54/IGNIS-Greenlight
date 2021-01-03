@@ -46,10 +46,12 @@ function s.tkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if e:GetHandler():AddCounter(0x59,1)~=0
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,101104100,0,TYPES_TOKEN,0,0,1,RACE_BEAST,ATTRIBUTE_EARTH) then
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0,TYPES_TOKEN,0,0,1,RACE_BEAST,ATTRIBUTE_EARTH) then
+		if Duel.IsPlayerAffectedByEffect(tp,59822133) then ft=1 end
+		if ct>ft then ct=ft end
 		local ct=c:GetCounter(0x59)
 		while ct>0 do
-			local token=Duel.CreateToken(tp,101104100)
+			local token=Duel.CreateToken(tp,id+1)
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_UPDATE_LEVEL)
@@ -68,8 +70,10 @@ function s.tkop(e,tp,eg,ep,ev,re,r,rp)
 			e3:SetValue(c:GetCounter(0x59)*500)
 			e3:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
 			token:RegisterEffect(e3)
-			Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
+			Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 			ct=ct-1
+			if ct>0 and not Duel.SelectYesNo(tp,aux.Stringid(id,1)) then ct=0 end
 		end
+		Duel.SpecialSummonComplete()
 	end
 end
