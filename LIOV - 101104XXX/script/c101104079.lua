@@ -42,10 +42,11 @@ function s.ndmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.ssfilter(c)
-	return c:IsFacedown() and c:GetType()==0x4 and c:IsSSetable()
+	return c:GetType()==0x4 and c:IsSSetable() and not c:IsCode(id)
 end
 function s.sscon(e,tp,eg,ep,ev,re,r,rp)
-	return rp==1-tp and c:IsReason(REASON_EFFECT)
+	local c=e:GetHandler()
+	return c:IsFacedown() and c:IsReason(REASON_EFFECT) and rp==1-tp
 end
 function s.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.ssfilter,tp,LOCATION_GRAVE,0,2,nil) end
