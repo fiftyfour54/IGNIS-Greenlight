@@ -42,7 +42,7 @@ function s.ndmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.ssfilter(c)
-	return c:GetType()==0x4 and c:IsSSetable()
+	return c:IsFacedown() and c:GetType()==0x4 and c:IsSSetable()
 end
 function s.sscon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and c:IsReason(REASON_EFFECT)
