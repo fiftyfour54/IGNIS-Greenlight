@@ -62,7 +62,7 @@ function s.ssop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local tc=g:GetFirst()
 	for tc in aux.Next(g) do
-		Duel.SSet(tp,tc)
+		Duel.SSet(tp,g)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
