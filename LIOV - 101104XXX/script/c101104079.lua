@@ -46,17 +46,24 @@ function s.ssfilter(c)
 end
 function s.sscon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsFacedown() and c:IsReason(REASON_EFFECT) and rp==1-tp
+	return c:IsReason(REASON_EFFECT) and rp==1-tp
 end
 function s.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.ssfilter(chkc) end
 	if chk==0 then return Duel.IsExistingMatchingCard(s.ssfilter,tp,LOCATION_GRAVE,0,2,nil) end
+	local g=Duel.SelectTarget(tp,s.ssfilter,tp,LOCATION_GRAVE,0,1,2,nil)
 end
 function s.ssop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local tc=Duel.SelectMatchingCard(tp,s.ssfilter,tp,LOCATION_GRAVE,0,1,2,nil):GetFirst()
-	if tc and Duel.SSet(tp,tc)~=0 then
-		local e1=Effect.CreateEffect(c)
+	local g=Duel.GetTargetCards(e)
+	if #g==0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		g=g:Select(tp,1,1,nil) 
+	end
+	local tc=g:GetFirst()
+	for tc in aux.Next(g) do
+		Duel.SSet(tp,tc)
+		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
 		e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
