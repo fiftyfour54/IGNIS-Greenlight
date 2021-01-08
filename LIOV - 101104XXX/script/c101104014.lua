@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
 	--cannot trigger
-	local e3a=Effect.CreateEffect(e:GetHandler())
+	local e3a=Effect.CreateEffect(c)
 	e3a:SetType(EFFECT_TYPE_SINGLE)
 	e3a:SetCode(EFFECT_CANNOT_TRIGGER)
 	e3a:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
