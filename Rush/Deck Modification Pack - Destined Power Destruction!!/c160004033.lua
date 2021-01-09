@@ -20,14 +20,14 @@ function s.filter(c)
 	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsRace(RACE_INSECT) and c:IsAttackBelow(100)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterMaximumSideFunction(s.filter),tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterMaximumSideFunctionEx(s.filter),tp,LOCATION_MZONE,0,1,nil) end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	--requirement
 	Duel.PayLPCost(tp,100)
 	--effect
 	local atkboost=Duel.GetFieldGroupCountRush(tp,LOCATION_MZONE,0)*800
-	local g=Duel.GetMatchingGroup(aux.FilterMaximumSideFunction(s.filter),tp,LOCATION_MZONE,0,nil)
+	local g=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.filter),tp,LOCATION_MZONE,0,nil)
 	for tc in g:Iter() do
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
