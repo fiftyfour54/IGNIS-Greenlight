@@ -1,1 +1,1 @@
-Duel.LoadScript("proc_maximum.lua")
+Duel.LoadScript("bear_proc.lua")
