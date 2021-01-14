@@ -1,5 +1,5 @@
--- ベアルクティ－セプテン＝トリオン
--- Bearcti - Septen Trion
+-- ベアルクティ－ポラリィ
+--  Bearcti - Polari 
 local s,id=GetID()
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
@@ -20,26 +20,15 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sprtg)
 	e2:SetOperation(s.sprop)
 	c:RegisterEffect(e2)
-	--disable
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_DISABLE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e3:SetTarget(s.distg)
-	c:RegisterEffect(e3)
-	--search
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,1))
-	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCondition(s.thcon)
-	e4:SetTarget(s.thtg)
-	e4:SetOperation(s.thop)
-	c:RegisterEffect(e4)
+	--activate Big Dipper from deck
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetCountLimit(1,id)
+	e2:SetCondition(s.accon)
+	e2:SetOperation(s.acop)
+	c:RegisterEffect(e2)
 end
 function s.sprfilter(c)
 	return c:IsFaceup() and c:IsAbleToGraveAsCost()
@@ -47,11 +36,11 @@ end
 function s.sprfilter1(c,tp,g,sc)
 	local lv=c:GetLevel()
 	local g=Duel.GetMatchingGroup(s.sprfilter,tp,LOCATION_MZONE,0,nil)
-	return c:IsType(TYPE_TUNER) and c:IsLevelAbove(8) and g:IsExists(s.sprfilter2,1,c,tp,c,sc,lv)
+	return c:IsType(TYPE_TUNER) and c:IsLevelAbove(2) and g:IsExists(s.sprfilter2,1,c,tp,c,sc,lv)
 end
 function s.sprfilter2(c,tp,mc,sc,lv)
 	local sg=Group.FromCards(c,mc)
-	return (lv-c:GetLevel())==7 and c:IsType(TYPE_SYCHRO) and not c:IsType(TYPE_TUNER) and Duel.GetLocationCountFromEx(tp,tp,sg,sc)>0
+	return (lv-c:GetLevel())==1 and not c:IsType(TYPE_TUNER) and Duel.GetLocationCountFromEx(tp,tp,sg,sc)>0
 end
 function s.sprcon(e,c)
 	if c==nil then return true end
@@ -82,26 +71,16 @@ function s.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 	if not g then return end
 	Duel.SendtoGrave(g,REASON_COST)
 end
-function s.distg(e,c)
-	return c:IsSummonLocation(LOCATION_EXTRA) and not c:HasLevel()
+--activate Bearcti Big Dipper
+function s.accon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,tp)
 end
---to hand
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not eg:IsContains(e:GetHandler()) and eg:IsExists(Card.IsSummonPlayer,1,nil,1-tp)
+function s.filter(c,tp)
+	return c:IsCode(100416038 ) and c:GetActivateEffect() and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
-function s.thfilter(c)
-	return c:IsSetCard(0x25b) and c:IsAbleToHand()
-end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.acop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if #g>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
-	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
+	aux.PlayFieldSpell(tc,e,tp,eg,ep,ev,re,r,rp)
 end
