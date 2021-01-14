@@ -47,8 +47,9 @@ function Auxiliary.BearctiSummonTarget(e,tp,eg,ep,ev,re,r,rp,c)
 	end
 	return false
 end
-function s.sprop(e,tp,eg,ep,ev,re,r,rp,c)
+function Auxiliary.BearctiSummonOperation(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
 	if not g then return end
 	Duel.SendtoGrave(g,REASON_COST)
+	g:DeleteGroup()
 end
