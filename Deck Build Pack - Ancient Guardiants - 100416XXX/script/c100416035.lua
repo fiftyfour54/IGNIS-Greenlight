@@ -2,7 +2,7 @@
 -- Bearcti – Grand Chariot
 local s,id=GetID()
 function s.initial_effect(c)
-	aux.AddBearctiSummonProcedure(c)
+	aux.AddBearctiSummonProcedure(c,aux.FilterBoolFunction(Card.IsLevelAbove,8),aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO))
 	--Destroy when flipped
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
