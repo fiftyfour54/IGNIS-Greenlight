@@ -1,5 +1,5 @@
 -- ベアルクティ－ポラリィ
---  Bearcti - Polari 
+-- Bearcti - Polari 
 local s,id=GetID()
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
@@ -30,17 +30,19 @@ function s.initial_effect(c)
 	e2:SetOperation(s.acop)
 	c:RegisterEffect(e2)
 end
+s.listed_series={0x25b}
+s.listed_names={100416038}
 function s.sprfilter(c)
 	return c:IsFaceup() and c:IsAbleToGraveAsCost()
 end
 function s.sprfilter1(c,tp,g,sc)
 	local lv=c:GetLevel()
 	local g=Duel.GetMatchingGroup(s.sprfilter,tp,LOCATION_MZONE,0,nil)
-	return c:IsType(TYPE_TUNER) and c:IsLevelAbove(2) and g:IsExists(s.sprfilter2,1,c,tp,c,sc,lv)
+	return c:IsType(TYPE_TUNER) and c:IsLevelAbove(2) and g:IsExists(s.sprfilter2,1,c,tp,c,sc,c)
 end
-function s.sprfilter2(c,tp,mc,sc,lv)
+function s.sprfilter2(c,tp,mc,sc,tc)
 	local sg=Group.FromCards(c,mc)
-	return (lv-c:GetLevel())==1 and not c:IsType(TYPE_TUNER) and Duel.GetLocationCountFromEx(tp,tp,sg,sc)>0
+	return c:DifferLevel(tc,1) and not c:IsType(TYPE_TUNER) and Duel.GetLocationCountFromEx(tp,tp,sg,sc)>0
 end
 function s.sprcon(e,c)
 	if c==nil then return true end
@@ -76,11 +78,15 @@ function s.accon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,tp)
 end
 function s.filter(c,tp)
-	return c:IsCode(100416038 ) and c:GetActivateEffect() and c:GetActivateEffect():IsActivatable(tp,true,true)
+	return c:IsCode(100416038) and c:GetActivateEffect() and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
 function s.acop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
 	aux.PlayFieldSpell(tc,e,tp,eg,ep,ev,re,r,rp)
+end
+--to delete later, part of the proc
+function Card.DifferLevel(c,compc,val)
+	return (c:GetLevel()-comc:GetLevel())==val or (comc:GetLevel()-c:GetLevel())==val
 end

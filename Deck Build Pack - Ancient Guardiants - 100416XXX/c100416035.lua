@@ -1,5 +1,5 @@
--- ベアルクティ－セプテン＝トリオン
--- Bearcti - Septen Trion
+-- ベアルクティ－グラン＝シャリオ
+-- Bearcti – Grand Chariot
 local s,id=GetID()
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
@@ -20,26 +20,16 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sprtg)
 	e2:SetOperation(s.sprop)
 	c:RegisterEffect(e2)
-	--disable
+	--Destroy when flipped
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_DISABLE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e3:SetTarget(s.distg)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_DESTROY)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
+	e3:SetTarget(s.destg)
+	e3:SetOperation(s.desop)
 	c:RegisterEffect(e3)
-	--search
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,1))
-	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCondition(s.thcon)
-	e4:SetTarget(s.thtg)
-	e4:SetOperation(s.thop)
-	c:RegisterEffect(e4)
 end
 s.listed_series={0x25b}
 function s.sprfilter(c)
@@ -52,7 +42,7 @@ function s.sprfilter1(c,tp,g,sc)
 end
 function s.sprfilter2(c,tp,mc,sc,tc)
 	local sg=Group.FromCards(c,mc)
-	return c:DifferLevel(tc,7) and c:IsType(TYPE_SYCHRO) and not c:IsType(TYPE_TUNER) and Duel.GetLocationCountFromEx(tp,tp,sg,sc)>0
+	return c:DifferLevel(tc,7) and not c:IsType(TYPE_TUNER) and Duel.GetLocationCountFromEx(tp,tp,sg,sc)>0
 end
 function s.sprcon(e,c)
 	if c==nil then return true end
@@ -83,29 +73,25 @@ function s.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 	if not g then return end
 	Duel.SendtoGrave(g,REASON_COST)
 end
-function s.distg(e,c)
-	return c:IsSummonLocation(LOCATION_EXTRA) and not c:HasLevel()
+--destroy
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local c=e:GetHandler()
+	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) end
+	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,2,c)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
---to hand
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not eg:IsContains(e:GetHandler()) and eg:IsExists(Card.IsSummonPlayer,1,nil,1-tp)
-end
-function s.thfilter(c)
-	return c:IsSetCard(0x25b) and c:IsAbleToHand()
-end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetTargetCards(e)
 	if #g>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+		Duel.Destroy(g,REASON_EFFECT)
 	end
 end
+
+
+
+
 --to delete later, part of the proc
 function Card.DifferLevel(c,compc,val)
 	return (c:GetLevel()-comc:GetLevel())==val or (comc:GetLevel()-c:GetLevel())==val
