@@ -1,7 +1,7 @@
 -- ベアルクティ－セプテン＝トリオン
 -- Bearcti - Septen Trion
 local s,id=GetID()
-function s.initial_effect(c
+function s.initial_effect(c)
 	aux.AddBearctiSummonProcedure(c)
 	--disable
 	local e3=Effect.CreateEffect(c)
