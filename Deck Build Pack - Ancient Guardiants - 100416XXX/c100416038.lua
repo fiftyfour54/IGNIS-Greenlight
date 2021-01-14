@@ -3,7 +3,7 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	c:EnableCounterPermit(COUNTER_BEARCTI)
+	c:EnableCounterPermit(0x204)
 	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -40,29 +40,29 @@ function s.initial_effect(c)
 	e4:SetOperation(s.ctop)
 	c:RegisterEffect(e4)
 end
-s.listed_series={SET_BEARCTI }
-s.counter_place_list={COUNTER_BEARCTI }
+s.listed_series={0x25b }
+s.counter_place_list={0x204 }
 function s.reltg(e,c)
-	return c:IsSetCard(SET_BEARCTI) and c:IsLevelAbove(7)
+	return c:IsSetCard(0x25b) and c:IsLevelAbove(7)
 end
 function s.relval(e,re,r,rp)
 	local rc=re:GetHandler()
 	return re:IsActivated() and re:IsActiveType(TYPE_MONSTER) 
-		and rc and rc:IsSetCard(SET_BEARCTI) and (r&REASON_COST)~=0
+		and rc and rc:IsSetCard(0x25b) and (r&REASON_COST)~=0
 end
 function s.countop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():AddCounter(COUNTER_BEARCTI,1)
+	e:GetHandler():AddCounter(0x204,1)
 end
 function s.ctcfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) and c:IsSetCard(SET_BEARCTI)
+	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) and c:IsSetCard(0x25b)
 end
 function s.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.ctcfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function s.ctcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsCanRemoveCounter(tp,COUNTER_BEARCTI,7,REASON_COST) end
-	c:RemoveCounter(tp,COUNTER_BEARCTI,c:GetCounter(COUNTER_BEARCTI),REASON_COST)
+	if chk==0 then return c:IsCanRemoveCounter(tp,0x204,7,REASON_COST) end
+	c:RemoveCounter(tp,0x204,c:GetCounter(0x204),REASON_COST)
 end
 function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsControlerCanBeChanged() end
