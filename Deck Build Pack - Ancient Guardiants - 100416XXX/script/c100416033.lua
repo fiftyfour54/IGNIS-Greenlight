@@ -39,10 +39,7 @@ function s.acop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
 	aux.PlayFieldSpell(tc,e,tp,eg,ep,ev,re,r,rp)
 end
-function s.spcfilter(c)
-	return c:IsLevelAbove(7)
-end
-function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsLevelAbove,1,false,nil,nil,7) end
 	local sg=Duel.SelectReleaseGroupCost(tp,Card.IsLevelAbove,1,1,false,nil,nil,7)
 	Duel.Release(sg,REASON_COST)
