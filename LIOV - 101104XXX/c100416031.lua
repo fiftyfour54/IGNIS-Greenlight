@@ -89,12 +89,12 @@ end
 function s.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return s.pfilter(chkc) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) end
 	if chk==0 then return Duel.IsExistingTarget(s.pfilter,tp,0,LOCATION_MZONE,1,nil) end
-	local tc=Duel.SelectMatchingCard(tp,s.pfilter,tp,0,LOCATION_MZONE,1,1,nil)
-	Duel.SetTargetCard(tc)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
+	local tc=Duel.SelectTarget(tp,s.pfilter,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,tc,1,tp,LOCATION_MZONE)
 end
 function s.posop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetTargetCards(e)
+	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
 		Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)
 	end
