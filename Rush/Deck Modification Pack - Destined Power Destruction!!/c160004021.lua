@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	c:AddSideMaximumHandler(e1)
 end
 function s.maxCon(e)
-	return e:GetHandler():IsMaximumModeCenter()
+	return e:GetHandler():IsMaximumMode()
 end
 function s.val(e,c)
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_HAND,0)*300
