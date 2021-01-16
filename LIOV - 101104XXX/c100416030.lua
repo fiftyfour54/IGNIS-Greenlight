@@ -86,7 +86,7 @@ end
 function s.popcon(e,tp,eg,ep,ev,re,r,rp)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
 end
-function s.poptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.poptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return s.pfilter(chkc) and chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(1-tp) end
 	if chk==0 then return Duel.IsExistingTarget(s.pfilter,tp,0,LOCATION_SZONE,1,nil) end
 	local tc=Duel.SelectMatchingCard(tp,s.pfilter,tp,0,LOCATION_SZONE,1,1,nil)
