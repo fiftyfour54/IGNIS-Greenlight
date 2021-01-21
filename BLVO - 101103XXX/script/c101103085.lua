@@ -62,7 +62,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		if Duel.Destroy(tc,REASON_EFFECT)~=0 and e:GetHandler():GetFlagEffect(id)~=0 then
 			Duel.BreakEffect()
-			local atk=tc:GetBaseAttack()
+			local atk=tc:GetBaseAttack()/2
 			if atk<0 then atk=0 end
 			Duel.Damage(1-tp,atk,REASON_EFFECT)
 		end
