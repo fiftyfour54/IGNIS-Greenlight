@@ -8,14 +8,13 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetRange(LOCATION_SZONE)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.atcon)
-	e1:SetCost(aux.bfgcost)
-	e1:SetTarget(s.atg)
-	e1:SetOperation(s.atop)
+	e1:SetCondition(s.spcon)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 end
 
-function s.atcon(e,tp,eg,ep,ev,re,r,rp)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()
 	if tc:IsControler(1-tp) then tc=Duel.GetAttackTarget() end
 	return tc and tc:IsFaceup() and tc:IsControler(tp) and not tc:IsRace(RACE_WARRIOR)
