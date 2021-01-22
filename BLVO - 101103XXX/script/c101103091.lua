@@ -26,8 +26,5 @@ function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA+LOCATION_HAND)
 end
 function s.penop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsPendulumSummonable,tp,LOCATION_EXTRA+LOCATION_HAND,0,nil,nil)
-	if #g>0 then
-		Duel.PendulumSummon(tp)
-	end
+	Duel.PendulumSummon(tp)
 end
