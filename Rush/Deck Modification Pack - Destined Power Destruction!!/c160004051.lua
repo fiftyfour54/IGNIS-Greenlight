@@ -16,16 +16,23 @@ function s.filter(c,e,tp)
 	return c:IsSummonPlayer(1-tp) and c:IsLocation(LOCATION_MZONE) and c:IsLevelAbove(5)
 end
 function s.cfilter(c)
-	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.cfilter2,tp,LOCATION_GRAVE,0,2,cc:GetRace())
+	return c:IsFaceup() and c:IsAbleToDeck() and Duel.IsExistingMatchingCard(s.cfilter2,tp,LOCATION_GRAVE,0,2,cc:GetRace())
 end
 function s.cfilter2(c,race)
-	return c:IsFaceup() and c:IsRace(race)
+	return c:IsFaceup() and c:IsAbleToDeck() and c:IsRace(race)
 end
 
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.filter,1,nil,e,tp) and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil)
 end
-
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,0,LOCATION_GRAVE,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,3,tp,LOCATION_GRAVE)
+	Duel.SetChainLimit(s.chlimit)
+end
+function s.chlimit(e,ep,tp)
+	return not e:IsHasType(EFFECT_TYPE_ACTIVATE)
+end
 function s.filter(c,e,sp)
 	return (c:IsRace(RACE_SPELLCASTER) or c:IsRace(RACE_WARRIOR)) and c:IsLevelBelow(7) and c:IsCanBeSpecialSummoned(e,0,sp,false,false)
 end
