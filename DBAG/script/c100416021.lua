@@ -138,12 +138,10 @@ function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
 	local p1=Duel.GetFieldCard(tp,LOCATION_PZONE,0)
 	local p2=Duel.GetFieldCard(tp,LOCATION_PZONE,1)
-	local s1=0
-	local s2=0
-	if p1 then s1=p1:GetLeftScale() end
-	if p2 then s2=p2:GetRightScale() end
-	local atk=math.max(s1,s2)*300
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and re:IsActiveType(TYPE_MONSTER) and rc:IsAttackBelow(atk)
+	local s1=p1 and p1:GetLeftScale() or -1
+	local s2=p2 and p2:GetRightScale() or -1
+	local atk=math.max(s1,s2)
+	return atk>0 and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and re:IsActiveType(TYPE_MONSTER) and rc:IsAttackBelow(atk*300)
 		and rc:IsOnField() and rc:IsDestructable()
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
