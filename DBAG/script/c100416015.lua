@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	-- pendulum summon
 	Pendulum.AddProcedure(c)
-  -- cannot disable pendulum summon
+	-- cannot disable pendulum summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_DISABLE_SPSUMMON)
@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(s.target)
 	c:RegisterEffect(e1)
-  -- spsummon from hand
+	-- spsummon from hand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -25,12 +25,12 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-  -- destroy replace
+	-- destroy replace
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EFFECT_DESTROY_REPLACE)
 	e3:SetRange(LOCATION_MZONE)
-  e3:SetCondition(s.repcon)
+	e3:SetCondition(s.repcon)
 	e3:SetTarget(s.reptg)
 	e3:SetValue(s.repval)
 	e3:SetOperation(s.repop)
@@ -58,14 +58,14 @@ function s.repcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsOddScale),e:GetHandlerPlayer(),LOCATION_PZONE,0,1,nil)
 end
 function s.repfilter(c,tp)
-  return c:IsSetCard(0x261) and c:IsType(TYPE_PENDULUM) and c:IsLocation(LOCATION_MZONE) and c:IsControler(tp)
-    and c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()==1-tp and not c:IsReason(REASON_REPLACE)
+	return c:IsSetCard(0x261) and c:IsType(TYPE_PENDULUM) and c:IsLocation(LOCATION_MZONE) and c:IsControler(tp)
+		and c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()==1-tp and not c:IsReason(REASON_REPLACE)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
-    return c:IsDestructable(e) and not c:IsStatus(STATUS_DESTROY_CONFIRMED+STATUS_BATTLE_DESTROYED) and eg:IsExists(s.repfilter,1,nil,tp)
-  end
+		return c:IsDestructable(e) and not c:IsStatus(STATUS_DESTROY_CONFIRMED+STATUS_BATTLE_DESTROYED) and eg:IsExists(s.repfilter,1,nil,tp)
+	end
 	if Duel.SelectEffectYesNo(tp,c,aux.Stringid(id,1)) then
 		local g=eg:Filter(s.repfilter,nil,tp)
 		if #g==1 then

@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	-- pendulum summon
 	Pendulum.AddProcedure(c)
-  -- cannot disable pendulum summon
+	-- cannot disable pendulum summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_DISABLE_SPSUMMON)
@@ -14,16 +14,16 @@ function s.initial_effect(c)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(s.target)
 	c:RegisterEffect(e1)
-  -- to extra
+	-- to extra
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-  e2:SetCountLimit(1,id)
+	e2:SetCountLimit(1,id)
 	e2:SetTarget(s.tetg)
 	e2:SetOperation(s.teop)
 	c:RegisterEffect(e2)
-  -- destroy replace
+	-- destroy replace
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_DESTROY_REPLACE)

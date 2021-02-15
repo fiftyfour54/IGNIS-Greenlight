@@ -68,19 +68,19 @@ function s.spfilter(c,e,tp,f)
 	return s.cfilter(c,f) and c:IsCanBeSpecialSummoned(e,0,tp,false,true)
 end
 function s.sptg(f)
-	return  function(e,tp,eg,ep,ev,re,r,rp,chk)
-				if chk==0 then return Duel.GetLocationCountFromEx(tp)>0
-					and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,f) end
-				Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-			end
+	return function(e,tp,eg,ep,ev,re,r,rp,chk)
+		if chk==0 then return Duel.GetLocationCountFromEx(tp)>0
+			and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,f) end
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+	end
 end
 function s.spop(f)
-	return  function(e,tp,eg,ep,ev,re,r,rp)
-				if Duel.GetLocationCountFromEx(tp)<=0 then return end
-				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-				local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,f)
-				if #g>0 then Duel.SpecialSummon(g,0,tp,tp,false,true,POS_FACEUP) end
-			end
+	return function(e,tp,eg,ep,ev,re,r,rp)
+		if Duel.GetLocationCountFromEx(tp)<=0 then return end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,f)
+		if #g>0 then Duel.SpecialSummon(g,0,tp,tp,false,true,POS_FACEUP) end
+	end
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() end
