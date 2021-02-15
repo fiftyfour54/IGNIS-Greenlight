@@ -23,7 +23,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return b1 or b2 or b3 end
 	local ops={}
 	local opval={}
-	off=1
+	local off=1
 	if b1 then
 		ops[off]=aux.Stringid(id,1)
 		opval[off-1]=1
