@@ -58,10 +58,10 @@ function s.filter(c,e,st)
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local st=Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsEvenScale),tp,LOCATION_PZONE,0,1,nil)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc,e,st) end
-	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil,e,st) end
+	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_ONFIELD) and s.filter(chkc,e,st) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,0,LOCATION_ONFIELD,1,nil,e,st) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil,e,st)
+	Duel.SelectTarget(tp,s.filter,tp,0,LOCATION_ONFIELD,1,1,nil,e,st)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -78,12 +78,12 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tc=c:GetBattleTarget()
-	if tc==e:GetHandler() then tc=Duel.GetAttacker() end
+	local tc=Duel.GetAttacker()
+	if tc==e:GetHandler() then tc=Duel.GetAttackTarget() end
 	if chk==0 then
 		local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsType,TYPE_PENDULUM),tp,LOCATION_PZONE,0,nil)
 		local _,sc=g:GetMinGroup(function(c) return c:GetScale() end)
-		return tc and tc:IsControler(1-tp) and tc:IsAttackAbove(sc*300)
+		return sc and tc and tc:IsControler(1-tp) and tc:IsAttackAbove(sc*300)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
 end
