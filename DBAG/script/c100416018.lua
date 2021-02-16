@@ -1,5 +1,5 @@
 -- ソドレミコード・グレーシア
--- Sodoremichord Gracia
+-- Sodoremichord Gracea
 -- scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -8,54 +8,47 @@ function s.initial_effect(c)
 	-- cannot activate s/t on pendulum summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetRange(LOCATION_SZONE)
+	e1:SetRange(LOCATION_PZONE)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetOperation(s.sucop)
 	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EVENT_CHAIN_END)
-	e2:SetOperation(s.cedop)
-	e2:SetLabelObject(e1)
-	c:RegisterEffect(e2)
 	-- search
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SUMMON_SUCCESS)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e3:SetCountLimit(1,id)
-	e3:SetTarget(s.thtg)
-	e3:SetOperation(s.thop)
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_SUMMON_SUCCESS)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetCountLimit(1,id)
+	e2:SetTarget(s.thtg)
+	e2:SetOperation(s.thop)
+	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-	local e4=e3:Clone()
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e4)
 	-- cannot activate monster effects on attack
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e5:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetCondition(s.btcon)
-	e5:SetOperation(s.btop)
-	c:RegisterEffect(e5)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCondition(s.btcon)
+	e4:SetOperation(s.btop)
+	c:RegisterEffect(e4)
 end
 s.listed_series={0x261}
-function s.chainlm(e,rp,tp)
-	return tp==rp
-end
 function s.sucfilter(c,tp)
 	return c:IsSetCard(0x261) and c:IsType(TYPE_PENDULUM) and c:IsControler(tp) and c:IsSummonType(SUMMON_TYPE_PENDULUM)
 end
 function s.sucop(e,tp,eg,ep,ev,re,r,rp)
 	if eg:IsExists(s.sucfilter,1,nil,tp) then
-		e:SetLabel(1)
-	else e:SetLabel(0) end
+		Duel.SetChainLimitTillChainEnd(s.chainlm)
+	end
+end
+function s.chainlm(e,rp,tp)
+	return tp==rp
 end
 function s.thfilter(c)
-	return c:IsSetCard(0x261) and c:IsType(TYPE_SPELL|TYPE_TRAP) and c:IsAbleToHand()
+	return c:IsSetCard(0x261) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

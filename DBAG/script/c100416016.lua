@@ -1,5 +1,5 @@
 -- ミドレミコード・エリーティア
--- Midoremichord Elitia
+-- Midoremichord Elitea
 -- scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -44,11 +44,14 @@ s.listed_series={0x261}
 function s.target(e,c)
 	return c:IsSummonType(SUMMON_TYPE_PENDULUM) and c:IsSetCard(0x261) and c:IsType(TYPE_PENDULUM)
 end
+function s.thfilter(c)
+	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsAbleToHand() and chkc:IsController(1-tp) end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,0,LOCATION_SZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsType(TYPE_SPELL+TYPE_TRAP) and chkc:IsAbleToHand() and chkc:IsController(1-tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.thfilter,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,0,LOCATION_SZONE,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.thfilter,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,#g,0,0)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)

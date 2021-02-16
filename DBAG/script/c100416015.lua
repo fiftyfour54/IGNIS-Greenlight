@@ -1,5 +1,5 @@
 -- レドレミコード・ドリーミア
--- Redoremichord Dreamia
+-- Redoremichord Dreamea
 -- scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -58,7 +58,7 @@ function s.repcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsOddScale),e:GetHandlerPlayer(),LOCATION_PZONE,0,1,nil)
 end
 function s.repfilter(c,tp)
-	return c:IsSetCard(0x261) and c:IsType(TYPE_PENDULUM) and c:IsLocation(LOCATION_MZONE) and c:IsControler(tp)
+	return c:IsSetCard(0x261) and c:IsType(TYPE_PENDULUM) and c:IsOriginalType(TYPE_MONSTER) and c:IsControler(tp)
 		and c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()==1-tp and not c:IsReason(REASON_REPLACE)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)

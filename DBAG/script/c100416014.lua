@@ -1,5 +1,5 @@
 -- ドドレミコード・キューティア
--- Dodoremichord Kyutia
+-- Dodoremichord Cutea
 -- scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCountLimit(1,id)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
@@ -44,7 +44,7 @@ function s.target(e,c)
 	return c:IsSummonType(SUMMON_TYPE_PENDULUM) and c:IsSetCard(0x261) and c:IsType(TYPE_PENDULUM)
 end
 function s.thfilter(c)
-	return c:IsSetCard(0x261) and c:IsType(TYPE_PENDULUM) and not c:IsCode(id) and c:IsAbleToHand()
+	return c:IsSetCard(0x261) and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_PENDULUM) and not c:IsCode(id) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
