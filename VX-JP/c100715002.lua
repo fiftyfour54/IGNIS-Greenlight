@@ -76,7 +76,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(e:GetLabel())
 		e1:SetReset(RESET_PHASE+RESETS_STANDARD)
-		c:RegisterEffect(e1)
+		tc:RegisterEffect(e1)
 	end
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,2))
