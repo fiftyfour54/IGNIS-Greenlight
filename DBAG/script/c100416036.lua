@@ -9,7 +9,6 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.condition)
 	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
@@ -29,9 +28,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0xa3}
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsAbleToEnterBP() or (Duel.GetCurrentPhase()>=PHASE_BATTLE_START and Duel.GetCurrentPhase()<=PHASE_BATTLE)
-end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
