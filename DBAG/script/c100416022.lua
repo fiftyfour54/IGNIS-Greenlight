@@ -1,5 +1,5 @@
---Doremichord Elegance
 --ドレミコード・エレガンス
+--Doremichord Elegance
 --Scripted by Hel
 local s,id=GetID()
 function s.initial_effect(c)
