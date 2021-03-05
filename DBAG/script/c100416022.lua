@@ -6,20 +6,16 @@ function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(s.target)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x261}
-function s.filter(c)
-	return c:IsSetCard(0x261) and c:IsType(TYPE_PENDULUM) and not c:IsForbidden() 
-end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local b1 = s.tgdtop(e,tp,eg,ep,ev,re,r,rp,0)
-	local b2 = s.tghtoe(e,tp,eg,ep,ev,re,r,rp,0)
-	local b3 = s.tgdraw(e,tp,eg,ep,ev,re,r,rp,0)
+	local b1 = s.dtoptg(e,tp,eg,ep,ev,re,r,rp,0)
+	local b2 = s.htoetg(e,tp,eg,ep,ev,re,r,rp,0)
+	local b3 = s.drawtg(e,tp,eg,ep,ev,re,r,rp,0)
 	if chk==0 then return b1 or b2 or b3 end
 	local ops={}
 	local opval={}
@@ -42,23 +38,26 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local op=Duel.SelectOption(tp,table.unpack(ops))
 	local sel=opval[op]
 	if sel==1 then
-		e:SetOperation(s.opdtop)
+		e:SetOperation(s.dtopop)
 	elseif sel==2 then
-		e:SetOperation(s.ophtoe)
+		e:SetOperation(s.htoeop)
 	elseif sel==3 then
 		e:SetCategory(CATEGORY_DRAW)
-		e:SetOperation(s.opdraw)
-		s.tgdraw(e,tp,eg,ep,ev,re,r,rp,1)
+		e:SetOperation(s.drawop)
+		s.drawtg(e,tp,eg,ep,ev,re,r,rp,1)
 	else
 		e:SetCategory(0)
 		e:SetOperation(nil)
 	end
 end
-function s.tgdtop(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
-                        and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
+function s.filter(c)
+	return c:IsSetCard(0x261) and c:IsType(TYPE_PENDULUM) and not c:IsForbidden() 
 end
-function s.opdtop(e,tp,eg,ep,ev,re,r,rp)
+function s.dtoptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
+end
+function s.dtopop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
@@ -66,42 +65,45 @@ function s.opdtop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.MoveToField(g:GetFirst(),tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	end
 end
-function s.tghtoe(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.check(sg,e,tp,mg)
+	return sg:IsExists(Card.IsEvenScale,1,nil) and sg:IsExists(Card.IsOddScale,1,nil)
+end
+function s.htoetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_DECK,0,nil)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) 
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND,0,1,nil) 
 		and aux.SelectUnselectGroup(g,e,tp,2,2,s.check,0,tp,nil) 
 		and (Duel.CheckLocation(tp,LOCATION_PZONE,0) and Duel.CheckLocation(tp,LOCATION_PZONE,1))
 	end
 end
-function s.check(sg,e,tp,mg)
-	return sg:IsExists(Card.IsEvenScale,1,nil,sg) and sg:IsExists(Card.IsOddScale,1,nil,sg)
-end
 function s.move_to_pendulum_zone(c,tp,e)
-	if not c or not (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
-		then return end
+	if not c or not (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)) then return end
 	Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 end
-function s.ophtoe(e,tp,eg,ep,ev,re,r,rp)
+function s.htoeop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,3))
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND,0,1,1,nil)
 	local g2=Duel.GetMatchingGroup(s.filter,tp,LOCATION_DECK,0,nil)
 	if #g>0 and Duel.SendtoExtraP(g,tp,REASON_EFFECT)>0 then
-		Duel.BreakEffect()
-		sg=aux.SelectUnselectGroup(g2,e,tp,2,2,s.check,1,tp,HINTMSG_TOFIELD)
+		local sg=aux.SelectUnselectGroup(g2,e,tp,2,2,s.check,1,tp,HINTMSG_TOFIELD)
 		if #sg==2 then
+			Duel.BreakEffect()
 			s.move_to_pendulum_zone(sg:GetFirst(),tp,e)
 			s.move_to_pendulum_zone(sg:GetNext(),tp,e)
 		end
 	end
 end
-function s.tgdraw(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_PZONE,0,nil)
+function s.drawtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=Duel.GetMatchingGroup(aux.NOT(Card.IsForbidden),tp,LOCATION_PZONE,0,nil)
 	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,2,2,s.check,0,tp,nil) and Duel.IsPlayerCanDraw(tp,2) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(2)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 end
-function s.opdraw(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_PZONE,0,nil)
-	if aux.SelectUnselectGroup(g,e,tp,2,2,s.check,0,tp,nil) and Duel.SendtoExtraP(g,tp,REASON_EFFECT)>0 then
-		Duel.Draw(tp,2,REASON_EFFECT)
+function s.drawop(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	local g=Duel.GetMatchingGroup(aux.NOT(Card.IsForbidden),tp,LOCATION_PZONE,0,nil)
+	if aux.SelectUnselectGroup(g,e,tp,2,2,s.check,0,tp,nil) and Duel.SendtoExtraP(g,tp,REASON_EFFECT)>0
+		and Duel.GetOperatedGroup():FilterCount(Card.IsLocation,nil,LOCATION_EXTRA)==2 then
+		Duel.Draw(p,d,REASON_EFFECT)
 	end
 end
