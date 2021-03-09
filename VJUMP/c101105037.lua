@@ -47,7 +47,7 @@ s.listed_series={0x166}
 function s.matfilter1(fc)
 	Debug.Message(fc:GetCode())
 	return function(c)
-		return c:IsSetCard(0x166) and c:IsType(TYPE_EFFECT) and c:IsCanBeFusionMaterial(fc)
+		return c:IsSetCard(SET_MAGIKEY) and c:IsType(TYPE_EFFECT) and c:IsCanBeFusionMaterial(fc)
 	end
 end
 function s.matfilter2(fc)
@@ -87,7 +87,7 @@ function s.chainlm(e,rp,tp)
 end
 --Destroy
 function s.attfilter(c,tp)
-	return ((c:IsSetCard(0x166) and c:IsType(TYPE_MONSTER)) or c:IsType(TYPE_NORMAL)) and Duel.IsExistingMatchingCard(s.desfilter,tp,0,LOCATION_MZONE,1,nil,c:GetAttribute())
+	return ((c:IsSetCard(SET_MAGIKEY) and c:IsType(TYPE_MONSTER)) or c:IsType(TYPE_NORMAL)) and Duel.IsExistingMatchingCard(s.desfilter,tp,0,LOCATION_MZONE,1,nil,c:GetAttribute())
 end
 function s.desfilter(c,att)
 	return c:IsAttribute(att) and c:IsType(TYPE_MONSTER) and c:IsFaceup()
