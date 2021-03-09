@@ -16,7 +16,7 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_MAGIKEY}
 function s.cfilter(c) 
-	return c:IsFaceup() and (c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and (c:IsSetCard(SET_MAGIKEY) and c:IsType(TYPE_RITUAL)
 		or c:IsSetCard(SET_MAGIKEY) and c:IsType(TYPE_MONSTER) and c:IsSummonLocation(LOCATION_EXTRA))
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
