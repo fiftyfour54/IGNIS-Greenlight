@@ -36,7 +36,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_names={id,101105056}
-s.listed_series={0x166}
+s.listed_series={SET_MAGIKEY}
 --ATK Up
 function s.atkval(e,c)
 	local g=Duel.GetMatchingGroup(Card.IsType,e:GetHandlerPlayer(),LOCATION_GRAVE,0,nil,TYPE_MONSTER)
@@ -71,7 +71,7 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 end
 --Search
 function s.filter(c)
-	return c:IsSetCard(0x166) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(SET_MAGIKEY) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
