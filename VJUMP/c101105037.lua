@@ -45,7 +45,6 @@ function s.initial_effect(c)
 end
 s.listed_series={0x166}
 function s.matfilter1(fc)
-	Debug.Message(fc:GetCode())
 	return function(c)
 		return c:IsSetCard(SET_MAGIKEY) and c:IsType(TYPE_EFFECT) and c:IsCanBeFusionMaterial(fc)
 	end
@@ -116,6 +115,7 @@ function s.drcon(e,tp,eg,ep,ev,re,r,rp)
 		att=att|tc:GetAttribute()
 	end
 	return att>0 and eg:IsExists(s.drfilter,1,nil,tp,att) and e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) and mat:GetClassCount(Card.GetAttribute)>1
+		and r&REASON_COST==0
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
