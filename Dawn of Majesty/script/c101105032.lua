@@ -71,12 +71,12 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=c:GetBattleTarget()
 	local att=0
+	local hg=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
 	for gc in aux.Next(Duel.GetMatchingGroup(s.atkfilter,tp,LOCATION_GRAVE,0,nil)) do
 		att=att|gc:GetAttribute()
 	end
-	if att==0 then return end
+	if att==0 or hg==0 then return end
 	if tc and tc:IsRelateToBattle() and tc:GetBattleTarget()==c and tc:IsFaceup() and tc:IsControler(1-tp) and not tc:IsImmuneToEffect(e) and not tc:IsStatus(STATUS_DISABLED) and tc:GetAttribute()&att~=0 then
-		local hg=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_HAND,0,1,hg,nil)
 		if Duel.SendtoDeck(g,tp,SEQ_DECKBOTTOM,REASON_EFFECT)>0 and Duel.IsPlayerCanDraw(tp,#g) then
