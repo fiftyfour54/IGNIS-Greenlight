@@ -4,7 +4,7 @@ on:
     branches:
       - master
 jobs:
-  commit:
+  check-scripts:
     runs-on: ubuntu-latest
     if: >-
       !(
