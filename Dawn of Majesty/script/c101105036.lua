@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Fusion Proc
 	Fusion.AddProcFunRep(c,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_MAGIKEY),aux.FilterBoolFunctionEx(Card.IsType,TYPE_NORMAL),
-		aux.Not(aux.FilterBoolFunctionEx(Card.IsType,TYPE_TOKEN)))
+		aux.NOT(aux.FilterBoolFunctionEx(Card.IsType,TYPE_TOKEN)))
 	--Return fusion spell
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
