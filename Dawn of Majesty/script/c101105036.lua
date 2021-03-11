@@ -5,8 +5,7 @@ function s.initial_effect(c)
 	--Fusion summoned properly if to be revivied by effect
 	c:EnableReviveLimit()
 	--Fusion Proc
-	Fusion.AddProcFunRep(c,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_MAGIKEY),aux.FilterBoolFunctionEx(Card.IsType,TYPE_NORMAL),
-		aux.NOT(aux.FilterBoolFunctionEx(Card.IsType,TYPE_TOKEN)))
+	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_MAGIKEY),s.matfilter)
 	--Return fusion spell
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -38,6 +37,9 @@ function s.initial_effect(c)
 end
 s.listed_names={CARD_MAGIKEY_MAPHTEAH}
 s.listedSeries={SET_MAGIKEY}
+function s.matfilter(c,fc,sumtype,tp)
+	return c:IsType(TYPE_NORMAL,fc,sumtype,tp) and not c:IsType(TYPE_TOKEN,fc,sumtype,tp)
+end
 function s.thfilter(c)
 	return c:IsCode(CARD_MAGIKEY_MAPHTEAH) and c:IsAbleToHand()
 end
