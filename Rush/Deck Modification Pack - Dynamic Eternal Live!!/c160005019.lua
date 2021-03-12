@@ -18,6 +18,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil) end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil)
 	if #g>0 then
@@ -30,7 +31,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_CANNOT_SUMMON)
 		e1:SetTarget(s.sumlimit)
 		e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
-		e1:SetTargetRange(1,1)
+		e1:SetTargetRange(1,0)
+		c:RegisterEffect(e1)
 	end
 end
 function s.sumlimit(e,c,tp,sumtp)
