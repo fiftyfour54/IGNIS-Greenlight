@@ -42,7 +42,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=dg:GetFirst()
 	local dam=0
 	for tc in aux.Next(dg) do
-		if not tc:IsMaximumSide() then
+		if not tc:WasMaximumModeSide() then
 			local lvl=tc:GetLevel()
 			if lvl<0 then lvl=0 end
 			dam=dam+(lvl*100)
