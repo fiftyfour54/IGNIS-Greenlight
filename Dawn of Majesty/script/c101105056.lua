@@ -4,17 +4,13 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--Fusion
-	local e1=Fusion.CreateSummonEff({handler=c,desc=aux.Stringid(id,0),fusfilter=aux.FilterBoolFunction(Card.IsSetCard,SET_MAGIKEY),extrafil=s.fextra})
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCost(s.costhint)
+	local e1=Fusion.CreateSummonEff({handler=c,desc=aux.Stringid(id,0),fusfilter=aux.FilterBoolFunction(Card.IsSetCard,0x262),extrafil=s.fextra})
 	c:RegisterEffect(e1)
 	--Ritual
-	local e2=Ritual.CreateProc({handler=c,lvtype=RITPROC_GREATER,desc=aux.Stringid(id,1),filter=aux.FilterBoolFunction(Card.IsSetCard,SET_MAGIKEY),extrafil=s.rextra,extraop=s.extraop,forcedselection=s.fcheck})
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCost(s.costhint)
+	local e2=Ritual.CreateProc({handler=c,lvtype=RITPROC_GREATER,desc=aux.Stringid(id,1),filter=aux.FilterBoolFunction(Card.IsSetCard,0x262),extrafil=s.rextra,extraop=s.extraop,forcedselection=s.rcheck})
 	c:RegisterEffect(e2)
 end
-s.listed_series={SET_MAGIKEY }
+s.listed_series={0x262}
 function s.costhint(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
@@ -32,6 +28,9 @@ function s.fexfilter(c)
 	return c:IsType(TYPE_NORMAL) and c:IsAbleToGrave()
 end
 function s.fcheck(tp,sg,fc)
+	return sg:FilterCount(Card.IsLocation,nil,LOCATION_DECK)<=1
+end
+function s.rcheck(e,tp,sg,fc)
 	return sg:FilterCount(Card.IsLocation,nil,LOCATION_DECK)<=1
 end
 function s.rextra(e,tp,mg)

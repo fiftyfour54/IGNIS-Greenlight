@@ -1,27 +1,23 @@
 --繋がれし魔鍵
 --Connected Magikey
 --Scripted by edo9300
-
---string 1: "do nothing"
---string 2: "fusion summon"
---string 3: "ritual summon"
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
-	local fparams={fusfilter=aux.FilterBoolFunction(Card.IsSetCard,SET_MAGIKEY),sumpos=POS_FACEUP_DEFENSE}
-	local rparams={filter=aux.FilterBoolFunction(Card.IsSetCard,SET_MAGIKEY),lvtype=RITPROC_GREATER,sumpos=POS_FACEUP_DEFENSE}
+	local fparams={fusfilter=aux.FilterBoolFunction(Card.IsSetCard,0x262),sumpos=POS_FACEUP_DEFENSE}
+	local rparams={filter=aux.FilterBoolFunction(Card.IsSetCard,0x262),lvtype=RITPROC_GREATER,sumpos=POS_FACEUP_DEFENSE}
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetOperation(s.operation(Fusion.SummonEffTG(fparams),Fusion.SummonEffOP(fparams),Ritual.Target(rparams),Ritual.Operation(rparams)))
 	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation(Fusion.SummonEffTG(fparams),Fusion.SummonEffOP(fparams),Ritual.Target(rparams),Ritual.Operation(rparams)))
 	c:RegisterEffect(e1)
 end
-s.listed_series={SET_MAGIKEY}
+s.listed_series={0x262}
 function s.filter(c)
-	return (c:IsSetCard(SET_MAGIKEY) or c:IsType(TYPE_NORMAL)) and c:IsAbleToHand()
+	return (c:IsSetCard(0x262) or c:IsType(TYPE_NORMAL)) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc) end

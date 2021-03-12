@@ -1,5 +1,5 @@
 --魔鍵疑—羅一
-
+--Magikey Lock - Unlock
 --scripted by XyleN5967
 local s,id=GetID()
 function s.initial_effect(c)
@@ -14,10 +14,9 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-s.listed_series={SET_MAGIKEY}
+s.listed_series={0x262}
 function s.cfilter(c) 
-	return c:IsFaceup() and (c:IsSetCard(SET_MAGIKEY) and c:IsType(TYPE_RITUAL)
-		or c:IsSetCard(SET_MAGIKEY) and c:IsType(TYPE_MONSTER) and c:IsSummonLocation(LOCATION_EXTRA))
+	return c:IsFaceup() and c:IsSetCard(0x262) and (c:IsType(TYPE_RITUAL) or c:IsSummonLocation(LOCATION_EXTRA))
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil) then return false end
@@ -30,25 +29,31 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
+function s.attfilter(c)
+	return c:IsFaceup() and c:GetAttribute()~=0x7f
+end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	local g=Duel.GetMatchingGroup(s.attfilter,tp,0,LOCATION_MZONE,nil)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re)
-		and Duel.Destroy(eg,REASON_EFFECT)~=0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		and Duel.Destroy(eg,REASON_EFFECT)~=0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		Duel.BreakEffect()
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTRIBUTE)
-		local att=Duel.AnnounceAttribute(tp,1,0xffff)
-		e:SetLabel(att)
-		local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsType,TYPE_MONSTER),tp,0,LOCATION_MZONE,nil)
-		local tc=g:GetFirst() 
-		if tc then
-			for tc in aux.Next(g) do
-				local e1=Effect.CreateEffect(c)
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-				e1:SetValue(e:GetLabel())
-				e1:SetReset(RESET_PHASE+PHASE_END)
-				tc:RegisterEffect(e1) 
+		local share=0
+		for tc in aux.Next(g) do
+			if g:IsExists(function(c,tc) return c:GetAttribute()&tc:GetAttribute()>0 end,#g-1,tc,tc) then
+				if tc:GetAttribute()&share==0 then share=share+(share~tc:GetAttribute()) end
 			end
+		end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTRIBUTE)
+		local val=Duel.AnnounceAttribute(tp,1,~share)
+		for tc in aux.Next(g) do
+			--Change Attribute
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
+			e1:SetValue(val)
+			e1:SetReset(RESET_PHASE+PHASE_END)
+			tc:RegisterEffect(e1) 
 		end
 	end
 end

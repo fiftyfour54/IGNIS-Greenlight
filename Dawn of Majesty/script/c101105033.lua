@@ -30,13 +30,14 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCountLimit(1,id+100)
 	e3:SetCondition(s.thcon)
 	e3:SetTarget(s.thtg)
 	e3:SetOperation(s.thop)
 	c:RegisterEffect(e3)
 end
-s.listed_names={id,101105056}
-s.listed_series={SET_MAGIKEY}
+s.listed_names={101105056}
+s.listed_series={0x262}
 --ATK Up
 function s.atkval(e,c)
 	local g=Duel.GetMatchingGroup(Card.IsType,e:GetHandlerPlayer(),LOCATION_GRAVE,0,nil,TYPE_MONSTER)
@@ -46,12 +47,13 @@ end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local c,rc,att=e:GetHandler(),re:GetHandler(),0
 	local mat=c:GetMaterial()
-	for tc in ~Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER) do
-		att=att|tc:GetAttribute()
+	if re:IsActiveType(TYPE_MONSTER) and rp==1-tp and not c:IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
+		and c:IsSummonType(SUMMON_TYPE_RITUAL) and mat:GetClassCount(Card.GetAttribute)>1 then
+		for tc in ~Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER) do
+			att=att|tc:GetAttribute()
+		end
+		return rc:GetAttribute()&att>0
 	end
-	return re:IsActiveType(TYPE_MONSTER) and rc~=c  and rp==1-tp and not c:IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev) and att>0 and rc:GetAttribute()&att>0
-		and c:IsSummonType(SUMMON_TYPE_RITUAL) and
-		mat:GetClassCount(Card.GetAttribute)>1
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -62,28 +64,25 @@ function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local rc=re:GetHandler()
-	Duel.NegateActivation(ev)
-	if rc:IsRelateToEffect(re) and c:IsRelateToEffect(e) then
-		Duel.Destroy(rc,REASON_EFFECT)
+	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end
 --Search
-function s.filter(c)
-	return c:IsSetCard(SET_MAGIKEY) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+function s.thfilter(c)
+	return c:IsSetCard(0x262) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsSummonType(SUMMON_TYPE_RITUAL)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
+	local tc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if #tc>0 then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)

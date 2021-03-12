@@ -1,11 +1,12 @@
+--
 --Magikey Summon Beast - Ansyalabolas
 --script by V.J.Wilson
 local s,id=GetID()
 function s.initial_effect(c)
-	--Fusion summoned properly if to be revivied by effect
+	--Fusion summoned properly if to be revived by effect
 	c:EnableReviveLimit()
 	--Fusion Proc
-	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_MAGIKEY),s.matfilter)
+	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0x262),s.matfilter)
 	--Return fusion spell
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -23,8 +24,9 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_POSITION+CATEGORY_DEFCHANGE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1)
+	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
 	e2:SetTarget(s.postg)
 	e2:SetOperation(s.posop)
 	c:RegisterEffect(e2)
@@ -35,42 +37,51 @@ function s.initial_effect(c)
 	e3:SetValue(LOCATION_REMOVED)
 	c:RegisterEffect(e3)
 end
-s.listed_names={CARD_MAGIKEY_MAPHTEAH}
-s.listedSeries={SET_MAGIKEY}
+s.listed_names={101105056}
+s.listedSeries={0x262}
 function s.matfilter(c,fc,sumtype,tp)
 	return c:IsType(TYPE_NORMAL,fc,sumtype,tp) and not c:IsType(TYPE_TOKEN,fc,sumtype,tp)
 end
-function s.thfilter(c)
-	return c:IsCode(CARD_MAGIKEY_MAPHTEAH) and c:IsAbleToHand()
-end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)
+end
+function s.thfilter(c)
+	return c:IsCode(101105056) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	if #g>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
 end
 --check for attack pos monster
-function s.posfilter(c)
-	return c:IsAttackPos() and c:IsCanChangePosition()
+function s.atkfilter(c)
+	return c:IsType(TYPE_MONSTER) and (c:IsType(TYPE_NORMAL) or c:IsSetCard(0x262))
+end
+function s.posfilter(c,tp)
+	if c:IsFaceup() and c:IsAttackPos() and c:IsCanChangePosition() then
+		local att=0
+		for gc in aux.Next(Duel.GetMatchingGroup(s.atkfilter,tp,LOCATION_GRAVE,0,nil)) do
+			att=att|gc:GetAttribute()
+		end
+		return c:GetAttribute()&att~=0
+	end
 end
 function s.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsAttackPos() end
-	if chk==0 then return Duel.IsExistingTarget(s.posfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.posfilter(chkc,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.posfilter,tp,0,LOCATION_MZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-	local g=Duel.SelectTarget(tp,s.posfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.posfilter,tp,0,LOCATION_MZONE,1,1,nil,tp)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,#g,0,0)
 end
 function s.posop(e,tp,ev,eg,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsAttackPos() and tc:IsRelateToEffect(e) then
+	if tc and tc:IsAttackPos() and tc:IsRelateToEffect(e) then
 		Duel.ChangePosition(tc,POS_FACEUP_DEFENSE)
 		if tc:IsPosition(POS_FACEUP_DEFENSE) then
 			local e1=Effect.CreateEffect(e:GetHandler())

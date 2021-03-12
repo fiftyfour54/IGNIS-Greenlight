@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e2:SetRange(LOCATION_FZONE)
-	e2:SetTargetRange(LOCATION_ONFIELD,0)
+	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetCountLimit(1)
 	e2:SetTarget(s.indtg)
 	e2:SetValue(s.indval)
@@ -31,10 +31,10 @@ function s.initial_effect(c)
 	e3:SetOperation(s.thop)
 	c:RegisterEffect(e3)
 end
-s.listed_names={CARD_MAGIKEY_MAPHTEAH }
-s.listed_series={SET_MAGIKEY }
+s.listed_names={101105056}
+s.listed_series={0x262}
 function s.thfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(SET_MAGIKEY) and c:IsAbleToHand()
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x262) and c:IsAbleToHand()
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
@@ -55,7 +55,7 @@ function s.indval(e,re,r,rp)
 	else return 0 end
 end
 function s.thfilter2(c)
-	return c:IsCode(CARD_MAGIKEY_MAPHTEAH) and c:IsAbleToHand()
+	return c:IsCode(101105056) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter2,tp,LOCATION_DECK,0,1,nil) end
@@ -67,6 +67,9 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local tc=Duel.SelectMatchingCard(tp,s.thfilter2,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
 	if not (tc and Duel.SendtoHand(tc,nil,REASON_EFFECT)~=0) then return end
+	Duel.ConfirmCards(1-tp,tc)
+	Duel.ShuffleDeck(tp)
+	Duel.DisableShuffleCheck()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_HAND,0,1,1,nil)
 	if #g>0 then
