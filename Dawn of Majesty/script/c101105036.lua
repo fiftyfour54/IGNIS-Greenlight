@@ -1,4 +1,4 @@
---
+--魔鍵召獣－アンシャラボラス
 --Magikey Summon Beast - Ansyalabolas
 --script by V.J.Wilson
 local s,id=GetID()
@@ -38,7 +38,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_names={101105056}
-s.listedSeries={0x262}
+s.listed_series={0x262}
 function s.matfilter(c,fc,sumtype,tp)
 	return c:IsType(TYPE_NORMAL,fc,sumtype,tp) and not c:IsType(TYPE_TOKEN,fc,sumtype,tp)
 end
