@@ -42,9 +42,11 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=dg:GetFirst()
 	local dam=0
 	for tc in aux.Next(dg) do
-		local lvl=tc:GetLevel()
-		if lvl<0 then lvl=0 end
-		dam=dam+(lvl*100)
+		if not tc:IsMaximumSide() then
+			local lvl=tc:GetLevel()
+			if lvl<0 then lvl=0 end
+			dam=dam+(lvl*100)
+		end
 	end
 	Duel.Damage(1-tp,dam,REASON_EFFECT)
 end
