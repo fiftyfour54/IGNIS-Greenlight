@@ -71,7 +71,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_EXTRA_ATTACK)
 		e1:SetValue(1)
 		c:RegisterEffect(e1)
-	elseif e:GetLabel()==3 and Duel.IsPlayerCanDraw(tp,1) and Duel.SelectYesNo(tp,aux.Stringid(id,3))
+	elseif e:GetLabel()==3 and Duel.IsPlayerCanDraw(tp,1) and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 		--Draw/Extra Attack
 		if Duel.IsPlayerCanDraw(tp,1) then
 			Duel.Draw(tp,1,REASON_EFFECT)
