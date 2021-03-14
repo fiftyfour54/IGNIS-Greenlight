@@ -1,5 +1,5 @@
 --弩級軍貫－いくら型一番艦
---Dreadnought Suship – Roe-class First Wardish
+--Dreadnought Suship - Roe-class First Wardish
 --Scripted by The Razgriz
 local s,id=GetID()
 function s.initial_effect(c)
@@ -21,10 +21,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	--Gains effects based on material
 	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCountLimit(1,id)
+	e2:SetLabel(0)
 	e2:SetCondition(s.regcon)
+	e2:SetTarget(s.regtg)
 	e2:SetOperation(s.regop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
@@ -34,18 +38,18 @@ function s.initial_effect(c)
 	e3:SetLabelObject(e2)
 	c:RegisterEffect(e3)  
 end
-s.listed_series={SET_SUSHIP}
-s.listed_names={CARD_RICE_SUSHIP,CARD_ROE_SUSHIP}
+s.listed_series={0x263}
+s.listed_names={101105011,101105012}
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	if ep==tp then return false end
 	local rc=eg:GetFirst()
-	return rc:IsControler(tp) and rc:IsSetCard(SET_SUSHIP) and rc:IsSummonLocation(LOCATION_EXTRA)
+	return rc:IsControler(tp) and rc:IsSetCard(0x263) and rc:IsSummonLocation(LOCATION_EXTRA)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
-	if chk==0 then return Duel.IsExistingTarget(nil,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,nil,tp,0,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
@@ -55,14 +59,17 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ) and e:GetLabel()~=0
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ) and e:GetLabel()>0
+end
+function s.regtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local label=e:GetLabel()
+	if chk==0 then return label>1 or (label==1 and Duel.IsPlayerCanDraw(tp,1)) end
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if e:GetLabel()==0 then return end
-	if e:GetLabel()==1 and Duel.IsPlayerCanDraw(tp,1) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then 
+	if e:GetLabel()==1 and Duel.IsPlayerCanDraw(tp,1) then 
 		Duel.Draw(tp,1,REASON_EFFECT)
-	elseif e:GetLabel()==2 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+	elseif e:GetLabel()==2 then
 		--Extra Attack
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3201)
@@ -71,11 +78,9 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_EXTRA_ATTACK)
 		e1:SetValue(1)
 		c:RegisterEffect(e1)
-	elseif e:GetLabel()==3 and Duel.IsPlayerCanDraw(tp,1) and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
+	elseif e:GetLabel()==3 then
 		--Draw/Extra Attack
-		if Duel.IsPlayerCanDraw(tp,1) then
-			Duel.Draw(tp,1,REASON_EFFECT)
-		end
+		Duel.Draw(tp,1,REASON_EFFECT)
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3201)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -88,16 +93,16 @@ end
 function s.valcheck(e,c)
 	local g=c:GetMaterial()
 	--Only draw effect if Rice Suship is used
-	if g:IsExists(Card.IsCode,1,nil,CARD_RICE_SUSHIP) and not g:IsExists(Card.IsCode,1,nil,CARD_ROE_SUSHIP) then
+	if g:IsExists(Card.IsCode,1,nil,101105011) and not g:IsExists(Card.IsCode,1,nil,101105012) then
 		e:GetLabelObject():SetLabel(1)
 	--Only second attack effect if Roe Suship is used
-	elseif not g:IsExists(Card.IsCode,1,nil,CARD_RICE_SUSHIP) and g:IsExists(Card.IsCode,1,nil,CARD_ROE_SUSHIP) then
+	elseif not g:IsExists(Card.IsCode,1,nil,101105011) and g:IsExists(Card.IsCode,1,nil,101105012) then
 		e:GetLabelObject():SetLabel(2)
 	--Both Effects if Rice Suship and Roe Suship are used
-	elseif g:IsExists(Card.IsCode,1,nil,CARD_RICE_SUSHIP) and g:IsExists(Card.IsCode,1,nil,CARD_ROE_SUSHIP) then
+	elseif g:IsExists(Card.IsCode,1,nil,101105011) and g:IsExists(Card.IsCode,1,nil,101105012) then
 		e:GetLabelObject():SetLabel(3)
+	--Neither effect
 	else
-		--Neither effect
 		e:GetLabelObject():SetLabel(0)
 	end
 end
