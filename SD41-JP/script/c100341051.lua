@@ -69,7 +69,7 @@ function s.hsptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	if g then
 		g:KeepAlive()
 		e:SetLabelObject(g)
-	return true
+		return true
 	end
 	return false
 end
@@ -111,5 +111,5 @@ function s.atkcon(e)
 	return e:GetHandler():GetEquipCount()>0
 end
 function s.atkval(e)
-	return e:GetHandler():GetEquipCount()
+	return e:GetHandler():GetEquipCount()-1
 end
