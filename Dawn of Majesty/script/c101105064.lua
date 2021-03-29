@@ -3,7 +3,7 @@
 -- scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
-	-- add to hand
+	-- Add to hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -12,8 +12,9 @@ function s.initial_effect(c)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-	-- change atk
+	-- Change ATK
 	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_GRAVE)
@@ -40,9 +41,9 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EFFECT)
 		e:SetLabel(Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1)))
 	elseif f1 and not f2 then
-		e:SetLabel(Duel.SelectOption(tp,aux.Stringid(id,0))) -- always 0, but shows effect as reminder
+		e:SetLabel(Duel.SelectOption(tp,aux.Stringid(id,0)))
 	elseif f2 and not f1 then
-		e:SetLabel(Duel.SelectOption(tp,aux.Stringid(id,1))+1) -- always 1, but shows effect as reminder
+		e:SetLabel(Duel.SelectOption(tp,aux.Stringid(id,1))+1)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,e:GetLabel()+1,tp,LOCATION_DECK)
 end
@@ -69,33 +70,37 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.rescon(sg,e,tp,mg)
-	return sg:IsExists(Card.IsGeminiState,1,nil)
+	return sg:IsExists(Card.IsGeminiState,1,nil) and sg:IsExists(Card.IsAttackAbove,1,nil,1)
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsCanBeEffectTarget,e),tp,LOCATION_MZONE,0,nil)
-	if chk==0 then return #g>1 and g:IsExists(Card.IsGeminiState,1,nil) end
-	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,1,tp,aux.Stringid(id,2))
+	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,0,tp) end
+	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,1,tp,HINTMSG_TARGET)
 	Duel.SetTargetCard(sg)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,sg,#sg,0,0)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local sg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(aux.FilterFaceupFunction(Card.IsCanBeEffectTarget,e),nil)
-	if #sg==2 then
-		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,3))
-		local tc1=sg:Select(tp,1,1,nil):GetFirst()
-		local tc2=(sg-tc1):GetFirst()
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e1:SetValue(tc1:GetBaseAttack())
-		tc2:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e2:SetValue(0)
-		tc1:RegisterEffect(e2)
-	end
+	local sg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(aux.FilterFaceupFunction(Card.IsRelateToEffect,e),nil)
+	if #sg~=2 then return end
+	local c=e:GetHandler()
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
+	local g=sg:FilterSelect(tp,Card.IsAttackAbove,1,1,nil,1)
+	if #g==0 then return end
+	local tc1=g:GetFirst()
+	local tc2=(sg-tc1):GetFirst()
+	if tc1:IsImmuneToEffect(e) then return end
+	--Change ATK to 0
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	e1:SetValue(0)
+	tc1:RegisterEffect(e1)
+	--Increase ATK
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	e2:SetValue(tc1:GetBaseAttack())
+	tc2:RegisterEffect(e2)
 end
