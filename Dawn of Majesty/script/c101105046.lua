@@ -21,39 +21,41 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	--Special Summon Level 5 or lower monster from GY
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetCountLimit(1,id)
+	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1,id)
 	e3:SetCost(s.spcost)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3,false,REGISTER_FLAG_DETACH_XMAT)
 end
+s.listed_names={id}
 	--Filter for cards summoned from GY
 function s.indesfil(c)
-	return c:IsSummonLocation(LOCATION_GRAVE) and c:IsMonster() and c:IsFaceup()
+	return c:IsSummonLocation(LOCATION_GRAVE) and c:IsFaceup() and not c:IsCode(id)
 end
 	--Condition check to see if monsters besides itself are on the field
 function s.indescon(e)
-	return Duel.IsExistingMatchingCard(s.indesfil,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())
-end
-	--filter for Level 5 or lower monsters
-function s.spfilter(c,e,tp)
-	return c:IsLevelBelow(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return Duel.IsExistingMatchingCard(s.indesfil,0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 	--Detach 1 material as cost
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
+	--filter for Level 5 or lower monsters
+function s.spfilter(c,e,tp)
+	return c:IsLevelBelow(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 	--Activation legality
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
