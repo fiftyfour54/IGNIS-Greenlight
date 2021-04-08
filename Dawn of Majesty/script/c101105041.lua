@@ -18,7 +18,6 @@ function s.initial_effect(c)
 	e0:SetOperation(s.regop)
 	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_CHAIN_SOLVED)
 	e1:SetRange(LOCATION_MZONE)
@@ -38,11 +37,13 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	if not re:IsActiveType(TYPE_MONSTER) then return end
-	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_CHAIN,0,1)
+	local c=e:GetHandler()
+	if not re:IsActiveType(TYPE_MONSTER) or re:GetHandler()==c then return end
+	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_CHAIN,0,1)
 end
 function s.atkcon(e)
-	return e:GetHandler():GetFlagEffect(id)~=0 and e:GetHandler():IsAttackBelow(4000)
+	local c=e:GetHandler()
+	return c:GetFlagEffect(id)>0 and c:GetAttack()<4000
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
@@ -52,20 +53,23 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
 	e1:SetValue(300)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
 	c:RegisterEffect(e1)
 end
 function s.tdcon(e)
-	return e:GetHandler():IsAttackAbove(4000) and e:GetHandler():IsAbleToDeck()
+	local c=e:GetHandler()
+	return c:IsAttackAbove(4000) and c:IsAbleToDeck()
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,0,LOCATION_MZONE,1,nil) end
 	local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_MZONE,nil)
+	g:AddCard(e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,LOCATION_MZONE)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_MZONE,nil)
+	if not c:IsRelateToEffect(e) or #g==0 then return end
 	g:AddCard(c)
 	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 end
