@@ -55,7 +55,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		opt=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
 	elseif b1 then
 		opt=Duel.SelectOption(tp,aux.Stringid(id,0))
-	elseif b2
+	elseif b2 then
 		opt=Duel.SelectOption(tp,aux.Stringid(id,1))+1
 	else
 		return
