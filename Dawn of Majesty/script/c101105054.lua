@@ -37,11 +37,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,ft,e,tp)
 	local sc=g:GetFirst()
 	if sc then
-		aux.ToHandOrElse(sc,tp,function(c)
-									return c:IsCanBeSpecialSummoned(e,0,tp,true,false) and ft>0
-								end,function(c)
-										return Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
-									end,aux.Stringid(id,0))
+		aux.ToHandOrElse(sc,tp,s.spcheck(ft,e,tp),s.spop(tp),aux.Stringid(id,0))
 	end
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
 		local e1=Effect.CreateEffect(e:GetHandler())
@@ -54,6 +50,16 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e1,tp)
 	end
+end
+function s.spcheck(ft,e,tp)
+	return function(c)
+			return c:IsCanBeSpecialSummoned(e,0,tp,true,false) and ft>0
+		end
+end
+function s.spop(tp)
+	return function(c)
+			return Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
+		end
 end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:IsLocation(LOCATION_EXTRA) and not c:IsType(TYPE_FUSION)
