@@ -81,17 +81,22 @@ end
 function s.filter2(c)
 	return c:IsAttackPos() and c:IsCanChangePosition()
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingTarget(s.filter1,tp,0,LOCATION_ONFIELD,1,nil) and Duel.IsExistingTarget(s.filter2,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,0,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,0,1,0,0)
-end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return false end
+	if chk==0 then return Duel.IsExistingTarget(s.filter1,tp,0,LOCATION_ONFIELD,1,nil) 
+		and Duel.IsExistingTarget(s.filter2,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g1=Duel.SelectTarget(tp,s.filter1,tp,0,LOCATION_ONFIELD,1,1,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSITION)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g1,1,0,0)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
 	local g2=Duel.SelectTarget(tp,s.filter2,tp,LOCATION_MZONE,0,1,1,nil)
-	if Duel.Remove(g1,POS_FACEUP,REASON_EFFECT)>0 then
-		Duel.ChangePosition(g2,POS_FACEUP_DEFENSE)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,g2,1,0,0)
+end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local ex1,tg1=Duel.GetOperationInfo(0,CATEGORY_REMOVE)
+	local ex2,tg2=Duel.GetOperationInfo(0,CATEGORY_POSITION)
+	if tg1:GetFirst() and tg1:GetFirst():IsRelateToEffect(e) and Duel.Remove(tg1,POS_FACEUP,REASON_EFFECT)~=0
+		and tg2:GetFirst() and tg2:GetFirst():IsRelateToEffect(e) then
+		Duel.ChangePosition(tg2,POS_FACEUP_DEFENSE)
 	end
 end
