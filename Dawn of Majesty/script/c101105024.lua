@@ -21,7 +21,6 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetCountLimit(1,id)
 	e2:SetCost(s.spcost)
 	e2:SetTarget(s.sptg)
@@ -29,7 +28,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	--to grave
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_SUMMON_SUCCESS)
 	e3:SetRange(LOCATION_MZONE)
@@ -41,12 +40,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function s.rmtarget(e,c)
-	return not c:IsType(TYPE_MONSTER)
+	return not c:IsOriginalType(TYPE_MONSTER)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return not c:IsPublic() and c:GetFlagEffect(id)==0 end
-	c:RegisterFlagEffect(id,RESET_CHAIN,0,1)
+	if chk==0 then return not e:GetHandler():IsPublic() end
 end
 function s.cfilter(c)
 	return c:IsType(TYPE_PENDULUM) and not c:IsForbidden()
@@ -72,9 +69,9 @@ function s.gycon(e,tp,eg,ep,ev,re,r,rp)
 	return not eg:IsContains(e:GetHandler())
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=g:GetFirst()
-	for tc in aux.Next(g) do
+	for tc in aux.Next(eg) do
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+		--Send to GY
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
@@ -83,14 +80,12 @@ function s.gyop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetOperation(s.op)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		e1:SetCountLimit(1)
-		e1:SetLabel(Duel.GetTurnCount())
 		e1:SetLabelObject(tc)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
 function s.con(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	return Duel.GetTurnCount()~=e:GetLabel() and tc:GetFlagEffect(id)~=0
+	return e:GetLabelObject():GetFlagEffect(id)~=0
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
