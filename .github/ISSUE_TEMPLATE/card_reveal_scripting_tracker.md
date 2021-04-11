@@ -12,10 +12,10 @@ assignees: ''
 ### BETA ID - CARD NAME - JP NAME
 - [ ] Claimed
 - [ ] Scripted
-- [ ] Testing
+- [ ] Tested
 - [ ] Ready
 ### BETA ID - CARD NAME - JP NAME
 - [ ] Claimed
 - [ ] Scripted
-- [ ] Testing
+- [ ] Tested
 - [ ] Ready
