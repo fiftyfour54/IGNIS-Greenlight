@@ -4,13 +4,13 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	aux.AddEquipProcedure(c,nil,aux.FilterBoolFunction(Card.IsSetCard,0x10))
-	--effect indestructable
+	--Cannot be destroyed by the opponent's card effects
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_EQUIP)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e1:SetValue(aux.indoval)
 	c:RegisterEffect(e1)
-	--search
+	--Search 1 "Gusto" Spell/Trap
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_IGNITION)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
-	--special summon
+	--Special Summon based on the equipped monster's Level/Rank
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_IGNITION)
@@ -32,7 +32,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x10}
 function s.thcfilter(c)
-	return c:IsSetCard(0x10) and c:IsType(TYPE_MONSTER) and c:IsDiscardable()
+	return c:IsAttribute(ATTRIBUTE_WIND) and c:IsType(TYPE_MONSTER) and c:IsDiscardable()
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost()
@@ -52,20 +52,20 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
 	if tc then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,tc)
 	end
 end
 function s.spfilter1(c,e,tp,ec)
 	return c:IsSetCard(0x10) and not c:IsRace(ec:GetRace()) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spfilter2(c,e,tp)
-	return c:GetLevel()==1 and c:IsType(TYPE_TUNER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsLevel(1) and c:IsType(TYPE_TUNER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local ec=e:GetHandler():GetEquipTarget()
-		if not ec or Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then return false end
+		if not ec or Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return false end
 		local lv=math.max(ec:GetLevel(),ec:GetRank())
-		if lv==0 then return false end
 		if lv<=4 then
 			return Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp,ec)
 		else
@@ -75,10 +75,10 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local ec=e:GetHandler():GetEquipTarget()
-	if not ec or Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then return false end
+	if not ec or Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return false end
 	local lv=math.max(ec:GetLevel(),ec:GetRank())
-	if lv==0 then return false end
 	local f=s.spfilter1
 	if lv>=5 then f=s.spfilter2 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
