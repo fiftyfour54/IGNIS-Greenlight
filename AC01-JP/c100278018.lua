@@ -2,7 +2,7 @@
 -- Horse of the Floral Knights
 local s,id=GetID()
 function s.initial_effect(c)
-	--Add 1 "Smile" spell/trap if normal summoned
+	--Add 1 NK light monster if normal summoned
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
