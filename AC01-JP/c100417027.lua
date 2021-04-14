@@ -1,7 +1,7 @@
 --獣装合体 ライオ・ホープレイ
 --Leo Utopia Ray
 --Scripted by Eerie Code
---Duel.LoadCardScript("c56840427.lua")
+Duel.LoadCardScript("c56840427.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--Xyz summon
