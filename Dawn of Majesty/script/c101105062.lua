@@ -1,4 +1,5 @@
---Live☆Twin トラブルサン
+--Ｌｉｖｅ☆Ｔｗｉｎ トラブルサン
+--Live☆Twin Trouble-Sun
 --Script by XyLeN
 local s,id=GetID()
 function s.initial_effect(c)
