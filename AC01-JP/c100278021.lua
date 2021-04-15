@@ -1,4 +1,5 @@
 --エコール・ド・ゾーン
+--Ecole de Zone
 --Script by XyLeN
 local s,id=GetID()
 function s.initial_effect(c)
