@@ -48,8 +48,17 @@ function s.tgfilter(c)
 	return c:IsMonster() and c:IsAbleToGrave()
 end
 function s.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ctm,ctst=Duel.GetMatchingGroupCount(Card.IsMonster,tp,0,LOCATION_GRAVE,nil),Duel.GetMatchingGroupCount(Card.IsType,tp,0,LOCATION_GRAVE,nil,TYPE_SPELL+TYPE_TRAP)
-	if chk==0 then return ctm~=ctst end
+	local c,ctm,ctst=e:GetHandler(),Duel.GetMatchingGroupCount(Card.IsMonster,tp,0,LOCATION_GRAVE,nil),Duel.GetMatchingGroupCount(Card.IsType,tp,0,LOCATION_GRAVE,nil,TYPE_SPELL+TYPE_TRAP)
+	local tg=ctm<ctst and Duel.IsExistingMatchingCard(s.tgfilter,tp,0,LOCATION_MZONE,1,nil) and c:IsAbleToGrave()
+	local rem=ctm>ctst and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.remfilter),tp,0,LOCATION_GRAVE,1,nil) and c:IsAbleToRemove()
+	if chk==0 then return tg or rem end
+	if tg then
+		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,c,1,tp,LOCATION_MZONE)
+		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,1-tp,LOCATION_MZONE)
+	else
+		Duel.SetOperationInfo(0,CATEGORY_REMOVE,c,1,tp,LOCATION_MZONE)
+		Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_GRAVE)
+	end
 end
 function s.ssop(e,tp,eg,ep,ev,re,r,rp)
 	local c,ctm,ctst=e:GetHandler(),Duel.GetMatchingGroupCount(Card.IsMonster,tp,0,LOCATION_GRAVE,nil),Duel.GetMatchingGroupCount(Card.IsType,tp,0,LOCATION_GRAVE,nil,TYPE_SPELL+TYPE_TRAP)
