@@ -22,12 +22,11 @@ function s.initial_effect(c)
 end
 function s.cfilter(c,tp)
 	return c:IsFaceup() and c:HasLevel() 
-		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsLevel),tp,LOCATION_MZONE,LOCATION_MZONE,1,c,c:GetLevel())
+		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsLevel,c:GetLevel()),tp,LOCATION_MZONE,LOCATION_MZONE,1,c)
 end
 function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp)
 end
