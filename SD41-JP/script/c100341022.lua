@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--destroy replace
+	--Destroy replace
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EFFECT_DESTROY_REPLACE)
@@ -28,24 +28,25 @@ s.listed_series={0x93}
 function s.cybfilter(c)
 	return c:IsType(TYPE_FUSION) and c:IsMonster() and c:IsRace(RACE_MACHINE) and c:IsSetCard(0x93)
 end
-function s.filter(c,e,tp)
-	return s.cybfilter(c) and (c:IsAbleToDeck() or c:IsCanBeSpecialSummoned(e,0,tp,true,false))
+function s.filter(c,e,tp,ft)
+	return s.cybfilter(c) and (c:IsAbleToExtra() or (ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,true,false)))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.filter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.filter(chkc,e,tp,ft) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp,ft) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,ft)
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if tc and tc:IsRelateToEffect(e) then
-		local op=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
-		if tc:IsAbleToDeck() and (not tc:IsCanBeSpecialSummoned(e,0,tp,true,false) or ft<=0 or op==0) then
-			Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
-		elseif ft>0 and tc:IsCanBeSpecialSummoned(e,0,tp,true,false) and (not tc:IsAbleToDeck() or op==1) then
+		if ft>0 and tc:IsCanBeSpecialSummoned(e,0,tp,true,false) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
+		else
+			Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 		end
 	end
 end
