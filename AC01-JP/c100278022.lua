@@ -3,7 +3,7 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -16,7 +16,7 @@ function s.initial_effect(c)
 		ge1:SetOperation(s.checkop)
 		Duel.RegisterEffect(ge1,0)
 	end)
-	--destroy
+	--Destroy
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
 	e2:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_FIELD)
@@ -26,12 +26,15 @@ function s.initial_effect(c)
 	e2:SetTarget(s.destg)
 	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	c:RegisterEffect(e3)
+	local e4=e2:Clone()
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e4)
 end
 s.listed_names={62499965}
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	local p1=false
-	local p2=false
 	for tc in aux.Next(eg) do
 		if tc:GetPreviousTypeOnField() & (TYPE_SPELL+TYPE_TRAP)~=0 and tc:IsPreviousPosition(POS_FACEDOWN) 
 			and tc:IsPreviousControler(tp) and tc:IsReason(REASON_EFFECT) then
@@ -40,10 +43,11 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,id)
+	return Duel.GetFlagEffect(tp,id)>0 and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return #eg==1 and eg:GetFirst():IsFaceup() and eg:GetFirst():IsAttackBelow(Duel.GetLP(tp))
+	local tc=eg:GetFirst()
+	return Duel.IsMainPhase() and #eg==1 and tc:IsFaceup() and tc:GetAttack()<Duel.GetLP(tp)
 		and Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,62499965)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -52,11 +56,10 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,800)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.Destroy(eg,REASON_EFFECT)~=0 then
-		local val=Duel.Damage(tp,800,REASON_EFFECT)
-		if val>0 and Duel.GetLP(tp)>0 then
-			Duel.BreakEffect()
-			Duel.Damage(1-tp,800,REASON_EFFECT)
-		end
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	if Duel.Destroy(eg,REASON_EFFECT)>0 and Duel.Damage(tp,800,REASON_EFFECT)>0
+		and Duel.GetLP(tp)>0 then
+		Duel.BreakEffect()
+		Duel.Damage(1-tp,800,REASON_EFFECT)
 	end
 end

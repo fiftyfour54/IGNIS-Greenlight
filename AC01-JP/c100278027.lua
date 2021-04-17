@@ -4,7 +4,7 @@
 Duel.LoadCardScript("c56840427.lua")
 local s,id=GetID()
 function s.initial_effect(c)
-	--Xyz summon
+	--Xyz Summon
 	Xyz.AddProcedure(c,nil,5,3)
 	c:EnableReviveLimit()
 	--Equip
@@ -19,25 +19,26 @@ function s.initial_effect(c)
 	e1:SetTarget(s.eqtg)
 	e1:SetOperation(s.eqop)
 	c:RegisterEffect(e1,false,REGISTER_FLAG_DETACH_XMAT)
-	--negate
+	--Negate
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DISABLE+CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
 	e2:SetCondition(s.discon)
 	e2:SetTarget(s.distg)
 	e2:SetOperation(s.disop)
 	c:RegisterEffect(e2)
 end
+s.listed_names={56840427}
 s.listed_series={0x107e}
 s.xyz_number=39
 function s.filter(c,tc,tp)
 	if not (c:IsSetCard(0x107e) and not c:IsForbidden()) then return false end
-	local effs={c:GetCardEffect(id)}
+	local effs={c:GetCardEffect(75402014)}
 	for _,te in ipairs(effs) do
 		if te:GetValue()(tc,c,tp) then return true end
 	end
@@ -59,7 +60,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK+LOCATION_EXTRA,0,1,1,nil,c,tp)
 	local tc=g:GetFirst()
 	if tc then
-		local eff=tc:GetCardEffect(id)
+		local eff=tc:GetCardEffect(75402014)
 		eff:GetOperation()(tc,eff:GetLabelObject(),tp,c)
 	end
 end
@@ -83,6 +84,7 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local c=e:GetHandler()
 	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) and not tc:IsDisabled() then
+		--Negate its effects
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
@@ -93,14 +95,15 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e2)
-		if tc:IsImmuneToEffect(e1) or tc:IsImmuneToEffect(e2) or not c:IsRelateToEffect(e) or c:IsFacedown() then return end
+		if tc:IsImmuneToEffect(e1) or tc:IsImmuneToEffect(e2) then return end
 		Duel.AdjustInstantly(tc)
 		local atk=tc:GetAttack()/2
+		--Halve its ATK
 		local e3=Effect.CreateEffect(c)
 		e3:SetType(EFFECT_TYPE_SINGLE)
 		e3:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e3:SetValue(atk)
-		e3:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e3)
 	end
 end

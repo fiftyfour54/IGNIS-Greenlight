@@ -1,5 +1,5 @@
 --花騎士団の駿馬
--- Horse of the Floral Knights
+--Horse of the Floral Knights
 local s,id=GetID()
 function s.initial_effect(c)
 	--Add 1 NK light monster if normal summoned
@@ -7,7 +7,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
@@ -16,8 +16,8 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
-	--fusion summon
-	local params = {aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),nil,nil,nil,Fusion.ForcedHandler}
+	--Fusion Summon
+	local params = {nil,nil,nil,nil,Fusion.ForcedHandler}
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
 	e3:SetType(EFFECT_TYPE_IGNITION)

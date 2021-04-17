@@ -3,7 +3,7 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--special summon
+	--Special Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -30,6 +30,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	--Only 1 attack
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e0:SetCode(EVENT_ATTACK_ANNOUNCE)
@@ -41,6 +42,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
 	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+		--Negate its effects
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
@@ -52,7 +54,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e2)
 		if Duel.GetLocationCount(tp,LOCATION_SZONE)<2 and not c:IsRelateToEffect(e) then return end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 		local uc=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
 		if uc then
 			s.equipop(uc,e,tp,tc)
@@ -60,30 +62,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	Duel.SpecialSummonComplete()	
-end
-function s.equipop(c,e,tp,tc)
-	if not aux.EquipAndLimitRegister(c,e,tp,tc) then return end
-	--atkup
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_EQUIP)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetValue(1700)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-	c:RegisterEffect(e1)
-end
-function s.equipop2(c,e,tp,tc)
-	s.equipop(c,e,tp,tc)
-	--double atk
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,2))
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e1:SetCategory(CATEGORY_ATKCHANGE)
-	e1:SetRange(LOCATION_SZONE)
-	e1:SetCondition(s.atkcon)
-	e1:SetOperation(s.atkop)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-	c:RegisterEffect(e1)
 end
 function s.limitcon(e)
 	return Duel.GetTurnPlayer()==e:GetHandlerPlayer()
@@ -97,16 +75,50 @@ function s.limitop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTargetRange(1,0)
 	Duel.RegisterEffect(e1,tp)
 end
+function s.equipop(c,e,tp,tc)
+	if not aux.EquipAndLimitRegister(c,e,tp,tc) then return end
+	--Increase ATK
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_EQUIP)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetValue(1700)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_EQUIP_LIMIT)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetValue(true)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(e2)
+end
+function s.equipop2(c,e,tp,tc)
+	s.equipop(c,e,tp,tc)
+	--Double atk
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCategory(CATEGORY_ATKCHANGE)
+	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e1:SetRange(LOCATION_SZONE)
+	e1:SetCondition(s.atkcon)
+	e1:SetOperation(s.atkop)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(e1)
+end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetAttacker()==e:GetHandler():GetEquipTarget()
+	local bc=Duel.GetAttackTarget()
+	return Duel.GetAttacker()==e:GetHandler():GetEquipTarget() and bc and bc:IsControler(1-tp)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	local tc=c:GetEquipTarget()
+	--Double ATK
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	e1:SetValue(tc:GetAttack()*2)
 	tc:RegisterEffect(e1)
 	local fid=e:GetHandler():GetFieldID()
