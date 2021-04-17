@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCountLimit(1,id+100)
-	e2:SetCondition(s.atchcon)
+	e2:SetTarget(s.atchtg)
 	e2:SetOperation(s.atchop)
 	c:RegisterEffect(e2)
 end
@@ -42,17 +42,18 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.filter(c)
-	return c:IsSetCard(0xf7) and c:IsType(TYPE_XYZ)
+	return c:IsFaceup() and c:IsSetCard(0xf7) and c:IsType(TYPE_XYZ)
 end
-function s.atchcon(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	return Duel.IsExistingTarget(aux.FilterFaceupFunction(s.filter),tp,LOCATION_MZONE,0,1,nil)
+function s.atchtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
 end
 function s.atchop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local tc=Duel.SelectTarget(tp,aux.FilterFaceupFunction(s.filter),tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
-	if tc and tc:IsControler(tp) and not tc:IsFacedown() then
-		Duel.Overlay(tc,c)
+	local tc=Duel.GetFirstTarget()
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
+		Duel.Overlay(tc,Group.FromCards(c))
 	end
 end

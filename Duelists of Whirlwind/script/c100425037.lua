@@ -48,21 +48,25 @@ function s.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return s.filter(chkc) and chkc:IsControler(1-tp) end
-	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,0,LOCATION_SZONE,1,nil) end
+	if chkc then return s.filter(chkc) and chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsControler(1-tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local tc=Duel.SelectTarget(tp,s.filter,tp,0,LOCATION_SZONE,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,tc,1,1-tp,LOCATION_SZONE)
+	local tc=Duel.SelectTarget(tp,s.filter,tp,0,LOCATION_ONFIELD,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,tc,1,1-tp,tc:GetFirst():GetLocation())
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
-		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
+		Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	end
 end
 --ATK gain on battle
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp,chk)
-	return not e:GetHandler():IsRelateToBattle() and (Duel.GetAttacker():IsControler(tp) or Duel.GetAttackTarget():IsControler(tp))
+	local tc=Duel.GetAttacker()
+	if Duel.GetAttackTarget() and Duel.GetAttackTarget():IsControler(tp) then
+		tc=Duel.GetAttackTarget()
+	end
+	return not e:GetHandler():IsRelateToBattle() and tc:IsFaceup()
 end
 function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -70,10 +74,11 @@ function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(#Duel.GetOperatedGroup())
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc
-	if Duel.GetAttacker():IsControler(tp) then tc=Duel.GetAttacker()
-	else tc=Duel.GetAttackTarget() end
-	if tc then
+	local tc=Duel.GetAttackTarget()
+	if Duel.GetAttacker():IsControler(tp) then
+		tc=Duel.GetAttacker()
+	end
+	if tc and tc:IsFaceup() and tc:IsRelateToBattle() then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)

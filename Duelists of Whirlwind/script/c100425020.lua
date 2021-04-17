@@ -21,36 +21,45 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1,id+1)
+	e2:SetCountLimit(1,id+100)
+	e2:SetCondition(s.tdcon)
 	e2:SetTarget(s.tdtg)
 	e2:SetOperation(s.tdop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={id}
 --Special Summon
+function s.tgfilter(c,tp)
+	return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
+end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_MZONE,0,1,nil) and Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-	and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetMatchingGroupCount(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)>1 end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_MZONE,0,1,nil,tp)
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g1=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g2=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,g1)
 	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g1,2,PLAYER_ALL,LOCATION_ONFIELD)
+	local p=0
+	if g2:GetFirst():IsControler(1-tp) then p=2 end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g1,2,tp+p,LOCATION_ONFIELD)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	local g=Duel.GetTargetCards(e)
 	local tg=g:Filter(Card.IsRelateToEffect,nil,e)
-	if #tg>0 then
-		if Duel.Destroy(tg,REASON_EFFECT)==2 then
-			Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
-		end
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 and #tg>0 then
+		Duel.Destroy(tg,REASON_EFFECT)
 	end
 end
 --To Deck Search
+function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+end
 function s.tdfilter(c,tp)
-	return c:IsAbleToDeck() and c:IsMonster() and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil)
+	return c:IsAbleToDeck() and c:IsMonster() and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,c)
 end
 function s.thfilter(c)
 	return c:IsAbleToHand() and c:IsRace(RACE_PLANT) and c:IsLevel(1)
@@ -67,13 +76,14 @@ end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
-		Duel.SendtoDeck(tc,tp,2,REASON_EFFECT)
-		Duel.BreakEffect()
+		if Duel.SendtoDeck(tc,tp,SEQ_DECKSHUFFLE,REASON_EFFECT)==0 then return end
+		if not Duel.GetOperatedGroup():GetFirst():IsLocation(LOCATION_DECK) then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		tc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
-		if #tc>0 then
-			Duel.SendtoHand(tc,tp,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,tc)
+		sc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
+		if #sc>0 then
+			Duel.BreakEffect()
+			Duel.SendtoHand(sc,tp,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,sc)
 		end
 	end
 end

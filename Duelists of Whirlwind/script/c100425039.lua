@@ -3,7 +3,7 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function s.xyzfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsRace(RACE_WINDBEAST)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsRace(RACE_WINGEDBEAST)
 end
 function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

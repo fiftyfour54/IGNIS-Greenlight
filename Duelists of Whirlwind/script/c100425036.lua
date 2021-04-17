@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(s.condition)
 	e2:SetCost(s.cost)
@@ -44,11 +44,11 @@ s.listed_series={0xf7}
 function s.atkval(e,c)
 	return c:GetOverlayCount()*500
 end
-function s.cfilter(c,tp)
-	return c:IsSummonPlayer(1-tp) and c:IsAbleToHand()
+function s.cfilter(c,e,tp)
+	return c:IsSummonPlayer(1-tp) and c:IsAbleToHand() and c:IsCanBeEffectTarget(e)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,tp)
+	return eg:IsExists(s.cfilter,1,nil,e,tp)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -57,13 +57,12 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=eg:FilterSelect(tp,s.cfilter,1,1,nil,tp)
+	local g=eg:FilterSelect(tp,s.cfilter,1,1,nil,e,tp)
 	local tc=g:GetFirst()
 	Duel.SetTargetCard(tc)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,tc,1,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
@@ -71,15 +70,17 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return rp==1-tp and c:GetPreviousControler()==c:GetOwner() and r&(REASON_BATTLE+REASON_EFFECT)>0
+	return rp==1-tp and c:GetPreviousControler()==c:GetOwner()
 end
 function s.thfilter(c)
 	return c:IsSetCard(0xf7) and c:IsMonster() and c:IsAbleToHand()
 end
-function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingTarget(s.thfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
+function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local c=e:GetHandler()
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.thfilter(chkc) and chkc~=c end
+	if chk==0 then return Duel.IsExistingTarget(s.thfilter,tp,LOCATION_GRAVE,0,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local tc=Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
+	local tc=Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,1,c)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,tc,1,0,0)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
