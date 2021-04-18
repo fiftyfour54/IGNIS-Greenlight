@@ -33,7 +33,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 		
 		local g=Duel.GetMatchingGroup(s.thfilter,tp,0,LOCATION_MZONE,nil)
-		if Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_HAND)==0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		if Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_HAND)==0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 			local sg=g:Select(tp,1,1,nil)
 			sg=sg:AddMaximumCheck()
