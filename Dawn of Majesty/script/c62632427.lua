@@ -1,7 +1,8 @@
 --信用取引
 --Margin Trade
 --Scripted by Eerie Code
-local e1=Effect.CreateEffect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
