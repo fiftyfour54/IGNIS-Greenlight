@@ -7,7 +7,6 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	--To hand
 	local e2=Effect.CreateEffect(c)
@@ -29,7 +28,7 @@ function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	if not bc then return false end
 	if tc:IsControler(1-tp) then tc,bc=bc,tc end
 	local cg=tc:GetColumnGroup()
-	if cg:IsContains(bc) and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,cg) then
+	if cg:IsContains(bc) and Duel.IsExistingMatchingCard(s.thfilter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,cg) then
 		e:SetLabelObject(tc)
 		return true
 	else
@@ -45,7 +44,7 @@ function s.thfilter(c,g)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,e:GetLabelObject():GetColumnGroup())
+	local g=Duel.GetMatchingGroup(s.thfilter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,e:GetLabelObject():GetColumnGroup())
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,#g,0,0)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
@@ -53,10 +52,9 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	if c:IsRelateToEffect(e) and tc:IsRelateToBattle() then
 		local cg=tc:GetColumnGroup()
-		local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,cg)
+		local g=tc+Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,cg)
 		if #g>0 then
 			Duel.SendtoHand(g,nil,REASON_EFFECT)
 		end
 	end
 end
-

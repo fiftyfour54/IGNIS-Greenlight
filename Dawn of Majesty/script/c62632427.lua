@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetMatchingGroup(tp,0,LOCATION_DECK)>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK)>0 end
+	if chk==0 then return Duel.GetFieldGroupCount(1-tp,LOCATION_DECK,0)>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,PLAYER_ALL,LOCATION_DECK)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)

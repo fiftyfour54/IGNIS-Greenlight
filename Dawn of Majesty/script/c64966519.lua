@@ -21,9 +21,8 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_RECOVER)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_DESTROYED)
-	e2:SetCountLimit(1,id+100)
+	e2:SetCountLimit(1,id+1)
 	e2:SetCondition(s.descon)
 	e2:SetTarget(s.destg)
 	e2:SetOperation(s.desop)
@@ -45,7 +44,7 @@ end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_MZONE)
-		and c:IsReason(REASON_BATTLE) and Duel.GetAttacker():IsControler(1-tp)and rp==1-tp
+		and c:IsReason(REASON_BATTLE) and c:GetBattleTarget():IsControler(1-tp) and rp==1-tp
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -56,5 +55,5 @@ end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetBattleTarget()
 	if Duel.Destroy(tc,REASON_EFFECT)==0 then return end
-	Duel.Recover(1-tp,tc:GetBaseAttack()/2,REASON_EFFECT)
+	Duel.Recover(tp,tc:GetBaseAttack()/2,REASON_EFFECT)
 end
