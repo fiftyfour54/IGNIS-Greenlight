@@ -77,7 +77,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.immval(e,te)
 	return te:GetOwner()~=e:GetHandler() and te:IsActiveType(TYPE_MONSTER) and te:IsActivated()
-		and te:GetOwner():GetControler()~=e:GetHandler():GetControler
+		and te:GetOwner():GetControler()~=e:GetHandler():GetControler()
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
