@@ -25,7 +25,7 @@ function s.thfilter(c)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	--Requirement
-	local td=Duel.SelectMatchingCard(tp,s.tdfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
+	local td=Duel.SelectMatchingCard(tp,s.rtdfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
 	Duel.HintSelection(td)
 	if Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)~=0then
 		if tc:IsLocation(LOCATION_DECK) then
