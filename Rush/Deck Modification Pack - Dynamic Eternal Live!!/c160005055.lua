@@ -13,10 +13,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--Same as above, but for setting
-	local e2=e1:Clone()
-	e2:SetCode(EVENT_MSET)
-	c:RegisterEffect(e2)
 end
 function s.filter(c)
 	return c:IsAbleToDeck() and c:IsType(TYPE_MONSTER)
