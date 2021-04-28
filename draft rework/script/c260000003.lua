@@ -1,78 +1,87 @@
--- Deck Modification Pack - Hyperspeed Rush Road!!
-if not DeckModificationPack_HyperspeedRushRoad then
-	DeckModificationPack_HyperspeedRushRoad={}
-	DeckModificationPack_HyperspeedRushRoad.size=5
-	local s=DeckModificationPack_HyperspeedRushRoad
+-- Deck Modification Pack - Fantastrike Mirage Impact
+if not DeckModificationPack_FantastrikeMirageImpact then
+	DeckModificationPack_FantastrikeMirageImpact={}
+	DeckModificationPack_FantastrikeMirageImpact.size=5
+	local s=DeckModificationPack_FantastrikeMirageImpact
 	s.RushRare = {}
 	s.RushRare={
-	160001000,160301001,160302001
+	160003000,160003018,160003025
 	}
 	s.RushRare.Ratio=(12)
 
 	s.UltraRare = {}	
 	s.UltraRare={
-	160001021,
-	160001026,
-	160001028,
-	160001029
+	160003024,
+	160003031,
+	160003033,
+	160003040,
+	160003041
 	}
 	s.UltraRare.Ratio=(10)
 
 	s.SuperRare = {}
 	s.SuperRare={
-	160001018,
-	160001022,
-	160001030,
-	160001036,
-	160001041,
-	160001049
+	160003014,
+	160003016,
+	160003022,
+	160003023,
+	160003032,
+	160003042,
+	160003054
 	}
 	s.SuperRare.Ratio=(6)
 	
 	s.Rare = {}
 	s.Rare={
-	160001011,
-	160001012,
-	160001013,
-	160001014,
-	160001015,
-	160001016,
-	160001017,
-	160001024,
-	160001025,
-	160001031,
-	160001033,
-	160001034,
-	160001039,
-	160001045,
-	160001046,
-	160001047
+	160003001,
+	160003009,
+	160003010,
+	160003011,
+	160003013,
+	160003019,
+	160003021,
+	160003029,
+	160003034,
+	160003035,
+	160003037,
+	160003038,
+	160003047,
+	160003052,
+	160003053,
+	160003056,
+	160003058
 	}
 	
 	s.Common = {}
 	s.Common={
-	160001001,
-	160001002,
-	160001003,
-	160001004,
-	160001005,
-	160001006,
-	160001007,
-	160001008,
-	160001009,
-	160001010,
-	160001019,
-	160001020,
-	160001032,
-	160001035,
-	160001037,
-	160001038,
-	160001040,
-	160001042,
-	160001043,
-	160001044,
-	160001048,
-	160001050
+	160003002,
+	160003003,
+	160003004,
+	160003005,
+	160003006,
+	160003007,
+	160003008,
+	160003012,
+	160003015,
+	160003017,
+	160003020,
+	160003026,
+	160003027,
+	160003030,
+	160003036,
+	160003039,
+	160003043,
+	160003044,
+	160003045,
+	160003046,
+	160003048,
+	160003049,
+	160003050,
+	160003051,
+	160003055,
+	160003057,
+	160003059,
+	160003060
 	}
 	s.CommonNumber=3
 	--function to generate the 4th card of the set that can be a Super or just a common
@@ -105,7 +114,7 @@ if not DeckModificationPack_HyperspeedRushRoad then
 	end
 	--function to generate the pac
 	-- function s.PackGen(e,tp,eg,ep,ev,re,r,rp)
-	DeckModificationPack_HyperspeedRushRoad.export=function(p)
+	DeckModificationPack_FantastrikeMirageImpact.export=function(p)
 		local g=Group.CreateGroup()
 		--generate the common cards
 		for i = s.CommonNumber,1,-1 do 
@@ -165,5 +174,5 @@ if not DeckModificationPack_HyperspeedRushRoad then
 	end
 end
 
-edopro_exports={DeckModificationPack_HyperspeedRushRoad.export,DeckModificationPack_HyperspeedRushRoad.size}
+edopro_exports={DeckModificationPack_FantastrikeMirageImpact.export,DeckModificationPack_FantastrikeMirageImpact.size}
 

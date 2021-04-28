@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.op)
 	Duel.RegisterEffect(e1,0)
 end
-
+s.boostertable={260000001,260000002,260000003,260000004,260000005}
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local GetPackExports=function(code)
 		local res,export=Duel.LoadScript("c"..code..".lua",false)
@@ -25,10 +25,16 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	--declare kind of pack
 	--the list of packs might be loaded from another file as well
 	local pack={}
-	for i=1,packnum do
-		local ac=Duel.SelectCardsFromCodes(tp,1,1,false,false,260000001,260000002)
-		table.insert(pack,ac)
+	while packnum>0 do
+		-- local ac=Duel.SelectCardsFromCodes(tp,1,1,false,false,260000001,260000002,260000003,260000004,260000005)
+		local ac=Duel.SelectCardsFromCodes(tp,1,1,false,false,table.unpack(s.boostertable))
+		local packadd=Duel.AnnounceLevel(tp,1,packnum)
+		for i=1,packadd do
+			table.insert(pack,ac)
+			packnum=packnum-1
+		end
 	end
+	
 	local packopp={table.unpack(pack)}
 	--variable for later
 	local pick=Group.CreateGroup()
@@ -43,7 +49,6 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	end
 	
 	--pack opening
-	Debug.Message(#pack)
 	for i=1,#pack do
 		--each player pick their pack
 		local packpick=Duel.SelectCardsFromCodes(tp,1,1,false,true,table.unpack(pack))

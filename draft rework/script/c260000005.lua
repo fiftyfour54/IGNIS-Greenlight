@@ -1,78 +1,93 @@
--- Deck Modification Pack - Hyperspeed Rush Road!!
-if not DeckModificationPack_HyperspeedRushRoad then
-	DeckModificationPack_HyperspeedRushRoad={}
-	DeckModificationPack_HyperspeedRushRoad.size=5
-	local s=DeckModificationPack_HyperspeedRushRoad
+-- Deck Modification Pack - Dynamic Eternal Live!!
+if not DeckModificationPack_DynamicEternalLive then
+	DeckModificationPack_DynamicEternalLive={}
+	DeckModificationPack_DynamicEternalLive.size=5
+	local s=DeckModificationPack_DynamicEternalLive
 	s.RushRare = {}
 	s.RushRare={
-	160001000,160301001,160302001
+	160005000,160005013,160005019,160005024
 	}
-	s.RushRare.Ratio=(12)
+	s.RushRare.Ratio=(2)
 
 	s.UltraRare = {}	
 	s.UltraRare={
-	160001021,
-	160001026,
-	160001028,
-	160001029
+	160005013,
+	160005014,
+	160005015,
+	160005016,
+	160005019,
+	160005024,
+	160005031
 	}
 	s.UltraRare.Ratio=(10)
 
 	s.SuperRare = {}
 	s.SuperRare={
-	160001018,
-	160001022,
-	160001030,
-	160001036,
-	160001041,
-	160001049
+	160005002,
+	160005026,
+	160005029,
+	160005035,
+	160005038,
+	160005044,
+	160005052,
+	160005061,
+	160005065
 	}
-	s.SuperRare.Ratio=(6)
+	s.SuperRare.Ratio=(16)
 	
 	s.Rare = {}
 	s.Rare={
-	160001011,
-	160001012,
-	160001013,
-	160001014,
-	160001015,
-	160001016,
-	160001017,
-	160001024,
-	160001025,
-	160001031,
-	160001033,
-	160001034,
-	160001039,
-	160001045,
-	160001046,
-	160001047
+	160005001,
+	160005005,
+	160005011,
+	160005017,
+	160005020,
+	160005022,
+	160005025,
+	160005030,
+	160005034,
+	160005039,
+	160005042,
+	160005046,
+	160005047,
+	160005053,
+	160005054,
+	160005057,
+	160005062
 	}
 	
 	s.Common = {}
 	s.Common={
-	160001001,
-	160001002,
-	160001003,
-	160001004,
-	160001005,
-	160001006,
-	160001007,
-	160001008,
-	160001009,
-	160001010,
-	160001019,
-	160001020,
-	160001032,
-	160001035,
-	160001037,
-	160001038,
-	160001040,
-	160001042,
-	160001043,
-	160001044,
-	160001048,
-	160001050
+	160005003,
+	160005004,
+	160005006,
+	160005007,
+	160005008,
+	160005009,
+	160005010,
+	160005012,
+	160005018,
+	160005021,
+	160005023,
+	160005027,
+	160005028,
+	160005033,
+	160005036,
+	160005037,
+	160005040,
+	160005043,
+	160005045,
+	160005048,
+	160005049,
+	160005050,
+	160005051,
+	160005055,
+	160005056,
+	160005058,
+	160005059,
+	160005060,
+	160005063,
+	160005064
 	}
 	s.CommonNumber=3
 	--function to generate the 4th card of the set that can be a Super or just a common
@@ -105,7 +120,7 @@ if not DeckModificationPack_HyperspeedRushRoad then
 	end
 	--function to generate the pac
 	-- function s.PackGen(e,tp,eg,ep,ev,re,r,rp)
-	DeckModificationPack_HyperspeedRushRoad.export=function(p)
+	DeckModificationPack_DynamicEternalLive.export=function(p)
 		local g=Group.CreateGroup()
 		--generate the common cards
 		for i = s.CommonNumber,1,-1 do 
@@ -165,5 +180,5 @@ if not DeckModificationPack_HyperspeedRushRoad then
 	end
 end
 
-edopro_exports={DeckModificationPack_HyperspeedRushRoad.export,DeckModificationPack_HyperspeedRushRoad.size}
+edopro_exports={DeckModificationPack_DynamicEternalLive.export,DeckModificationPack_DynamicEternalLive.size}
 

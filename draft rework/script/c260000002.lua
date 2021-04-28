@@ -1,11 +1,12 @@
 if not DeckModificationPack_ShockingLightningAttack then
 	DeckModificationPack_ShockingLightningAttack={}
+	DeckModificationPack_ShockingLightningAttack.size=5
 	local s=DeckModificationPack_ShockingLightningAttack
 	s.RushRare = {}
 	s.RushRare={
 	160002000,160002017,160002031
 	}
-	s.RushRare.Ratio=(12)
+	s.RushRare.Ratio=(3)
 
 	s.UltraRare = {}	
 	s.UltraRare={
@@ -25,7 +26,7 @@ if not DeckModificationPack_ShockingLightningAttack then
 	160002030,
 	160002047
 	}
-	s.SuperRare.Ratio=(6)
+	s.SuperRare.Ratio=(15)
 	
 	s.Rare = {}
 	s.Rare={
@@ -162,5 +163,5 @@ if not DeckModificationPack_ShockingLightningAttack then
 	end
 end
 
-edopro_exports={DeckModificationPack_ShockingLightningAttack.export,5}
+edopro_exports={DeckModificationPack_ShockingLightningAttack.export,DeckModificationPack_ShockingLightningAttack.size}
 
