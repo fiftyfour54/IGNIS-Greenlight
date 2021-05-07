@@ -29,27 +29,28 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.DiscardDeck(tp,2,REASON_COST)>0 then
 		--Effect
 		if c:IsRelateToEffect(e) and c:IsFaceup() then
-		c:UpdateAttack(-1000)
-		--cannot direct attack
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		c:RegisterEffectRush(e1)
-		--Attack all
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetValue(1)
-		e2:SetCode(EFFECT_ATTACK_ALL)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		c:RegisterEffectRush(e2)
-		--piercing
-		local e3=Effect.CreateEffect(c)
-		e3:SetDescription(3208)
-		e3:SetProperty(EFFECT_FLAG_CLIENT_HINT)
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetCode(EFFECT_PIERCE)
-		e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		c:RegisterEffectRush(e3)
+			c:UpdateAttack(-1000)
+			--cannot direct attack
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			c:RegisterEffectRush(e1)
+			--Attack all
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetValue(1)
+			e2:SetCode(EFFECT_ATTACK_ALL)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			c:RegisterEffectRush(e2)
+			--piercing
+			local e3=Effect.CreateEffect(c)
+			e3:SetDescription(3208)
+			e3:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+			e3:SetType(EFFECT_TYPE_SINGLE)
+			e3:SetCode(EFFECT_PIERCE)
+			e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			c:RegisterEffectRush(e3)
+		end
 	end
 end
