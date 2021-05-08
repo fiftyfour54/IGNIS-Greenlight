@@ -37,7 +37,7 @@ function s.select(e,tp,b1,b2)
 		op=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))+1
 	elseif b1 then
 		op=Duel.SelectOption(tp,aux.Stringid(id,0))+1
-	else op=Duel.SelectOption(tp,aux.Stringid(id,1))+2 end
+	elseif b2 then op=Duel.SelectOption(tp,aux.Stringid(id,1))+2 end
 	if op==1 then
 		--Equip 1 Dragon or Machine to your "Cyberdark"
 		e:SetCategory(CATEGORY_EQUIP)
