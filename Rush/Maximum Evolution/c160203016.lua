@@ -40,7 +40,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		if #g2>0 then
 			Duel.SpecialSummon(g2,0,tp,tp,false,false,POS_FACEUP)
 			if g:GetFirst():GetOriginalLevel()>0 then
-				local atk=:GetFirst():GetOriginalLevel()*100
+				local atk=g:GetFirst():GetOriginalLevel()*100
 				local tc=g2:GetFirst()
 				local e1=Effect.CreateEffect(e:GetHandler())
 				e1:SetType(EFFECT_TYPE_SINGLE)
