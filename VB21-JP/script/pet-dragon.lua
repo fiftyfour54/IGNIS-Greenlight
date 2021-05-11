@@ -35,6 +35,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.gyop)
 	c:RegisterEffect(e3)
 end
+s.listed_series={0x64}
 function s.atlimit(e,c)
 	return c:IsFaceup() and c:IsLevelBelow(6) and c:IsSetCard(0x64)
 end
