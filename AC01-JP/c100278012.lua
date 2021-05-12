@@ -40,7 +40,7 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	--id chk
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(id)
+	e2:SetCode(4064256)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(1,1)
