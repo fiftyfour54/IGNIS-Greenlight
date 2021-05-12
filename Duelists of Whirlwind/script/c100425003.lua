@@ -15,6 +15,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.syncon)
+	e1:SetCost(s.syncost)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
@@ -27,6 +28,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.spcon)
+	e2:SetCost(s.syncost)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
@@ -45,8 +47,22 @@ function s.counterfilter(c)
 	return c:IsAttribute(ATTRIBUTE_WIND)
 end
 function s.syncon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:GetSummonType()==SUMMON_TYPE_SYNCHRO
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO)
+end
+function s.syncost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(s.splimit)
+	Duel.RegisterEffect(e1,tp)
+end
+function s.splimit(e,c)
+	return not c:IsAttribute(ATTRIBUTE_WIND)
 end
 function s.thfilter(c)
 	return c:IsSetCard(0x2016) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
@@ -62,19 +78,9 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH+EFFECT_FLAG_CLIENT_HINT)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(s.splimit)
-	Duel.RegisterEffect(e1,tp)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:GetSummonType()==SUMMON_TYPE_SYNCHRO and e:GetLabel()==2
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO) and e:GetLabel()==2
 end
 function s.spfilter(c,e,tp,sync)
 	return c:IsControler(tp) and c:IsLocation(LOCATION_GRAVE)
@@ -84,27 +90,18 @@ end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local mg=e:GetHandler():GetMaterial()
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
-	if chk==0 then return #mg>0 and ft>=#mg 
+	if chk==0 then return #mg>0 and ft>=#mg
+		and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
 		and mg:FilterCount(s.spfilter,nil,e,tp,e:GetHandler())==#mg end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,mg,#mg,tp,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,mg,#mg,tp,LOCATION_GRAVE)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local mg=e:GetHandler():GetMaterial()
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return end
 	if #mg<=ft and mg:FilterCount(aux.NecroValleyFilter(s.spfilter),nil,e,tp,e:GetHandler())==#mg then
 		Duel.SpecialSummon(mg,0,tp,tp,false,false,POS_FACEUP)
 	end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH+EFFECT_FLAG_CLIENT_HINT)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(s.splimit)
-	Duel.RegisterEffect(e1,tp)
 end
 function s.valcheck(e,c)
 	local g=c:GetMaterial()
@@ -115,7 +112,4 @@ function s.valcheck(e,c)
 	else
 		e:GetLabelObject():SetLabel(1)
 	end
-end
-function s.splimit(e,c)
-	return not c:IsAttribute(ATTRIBUTE_WIND)
 end
