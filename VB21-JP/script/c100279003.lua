@@ -53,6 +53,10 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 end
+function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
+	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
+end
 function s.thfilter(c)
 	if not (c:IsAbleToHand() and c:IsType(TYPE_MONSTER)) then return false end
 	local lv=c:GetLevel()
@@ -63,10 +67,6 @@ function s.thfilter(c)
 	elseif lv==5 then
 		return c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_WATER)
 	else return false end
-end
-function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
-	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
