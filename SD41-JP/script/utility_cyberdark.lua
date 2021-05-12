@@ -53,7 +53,6 @@ function Cyberdark.EquipOperation_TG(f)
 		if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 		local tc=Duel.GetFirstTarget()
 		if tc and tc:IsRelateToEffect(e) then
-			if not aux.EquipByEffectAndLimitRegister(c,e,tp,tc) then return end
 			op(c,e,tp,tc)
 		end
 	end
@@ -64,13 +63,12 @@ function Cyberdark.EquipOperation_NTG(f)
 		local c=e:GetHandler()
 		if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 		local wc=Duel.IsPlayerAffectedByEffect(tp,EFFECT_CYBERDARK_WORLD)
-		local op=0
-		if wc then op=LOCATION_GRAVE end
+		local loc=0
+		if wc then loc=LOCATION_GRAVE end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(f),tp,LOCATION_GRAVE,op,1,1,nil,tp)
+		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(f),tp,LOCATION_GRAVE,loc,1,1,nil,tp)
 		local tc=g:GetFirst()
 		if tc then
-			if not aux.EquipByEffectAndLimitRegister(c,e,tp,tc) then return end
 			op(c,e,tp,tc)
 		end
 	end
