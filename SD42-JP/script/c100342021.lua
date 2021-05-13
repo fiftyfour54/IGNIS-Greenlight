@@ -45,7 +45,6 @@ function s.initial_effect(c)
 	e5:SetCode(EVENT_PREDRAW)
 	e5:SetRange(LOCATION_FZONE)
 	e5:SetCondition(s.condition)
-	e5:SetTarget(s.target)
 	e5:SetOperation(s.operation)
 	c:RegisterEffect(e5)
 end
