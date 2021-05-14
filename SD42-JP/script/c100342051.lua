@@ -42,7 +42,7 @@ end
 s.listed_series={0x48}
 s.xyz_number=99
 function s.counterfilter(c)
-	return c:IsType(TYPE_XYZ) or not c:IsLocation(LOCATION_EXTRA)
+	return c:IsType(TYPE_XYZ) or c:GetSummonLocation()~=LOCATION_EXTRA
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
@@ -68,6 +68,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(ge1,tp)
 	--lizard check
 	aux.addTempLizardCheck(c,tp,s.lizfilter)
+	--cannot attack directly with other cards
 	local ge2=Effect.CreateEffect(c)
 	ge2:SetType(EFFECT_TYPE_FIELD)
 	ge2:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
@@ -104,7 +105,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.GetAttacker():IsControler(tp)
+	return Duel.GetAttacker():IsControler(1-tp)
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local at=Duel.GetAttacker()

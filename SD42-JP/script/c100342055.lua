@@ -76,11 +76,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.mcfilter(c,e,tp)
-	local rc=c:GetReasonCard()
-	return c:IsType(TYPE_XYZ) and c:IsReason(REASON_EFFECT) and rc and rc:IsType(TYPE_XYZ) and rc:IsSetCard(0x7f) and rc:IsRankAbove(10)
+	return c:IsType(TYPE_XYZ)
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	local tg=eg:Filter(s.mcfilter,nil,e,tp)
+	local rc=re:GetHandler()
+	if not (re:IsActivated() and rc and rc:IsType(TYPE_XYZ) and rc:IsSetCard(0x7f) and rc:IsRankAbove(10)) then return end
+	local tg=eg:Filter(aux.FilterFaceupFunction(Card.IsType,TYPE_XYZ),nil,e,tp)
 	if #tg>0 then
 		for tc in aux.Next(tg) do
 			tc:RegisterFlagEffect(id,RESET_CHAIN,0,1)
@@ -94,8 +95,8 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.mtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local g=e:GetLabelObject():Filter(s.mcfilter,nil,e,tp)
-	if chkc then return g:IsContains(chkc) and s.mcfilter(chkc,e,tp) end
+	local g=e:GetLabelObject():Filter(aux.FilterFaceupFunction(Card.IsType,TYPE_XYZ),nil,e,tp)
+	if chkc then return g:IsContains(chkc) and chkc:IsType(TYPE_XYZ) and chkc:IsFaceup() end
 	if chk==0 then return #g>0 and Duel.GetFlagEffect(tp,id)==0 end
 	Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
 	if #g==1 then
