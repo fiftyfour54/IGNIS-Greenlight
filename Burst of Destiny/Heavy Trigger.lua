@@ -27,7 +27,7 @@ function s.extraop(mg,e,tp,eg,ep,ev,re,r,rp)
 	Duel.ReleaseRitualMaterial(mg)
 	Duel.Destroy(mat2,REASON_EFFECT)
 end
-function s.stage2(e,tc,tp,sg,chk)
+function s.stage2(mat,e,tp,eg,ep,ev,re,r,rp,tc)
 	if chk==0 then
 		--immune
 		local e1=Effect.CreateEffect(e:GetHandler())
