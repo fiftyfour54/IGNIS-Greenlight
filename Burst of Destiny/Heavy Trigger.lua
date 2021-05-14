@@ -3,7 +3,7 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	Ritual.AddProcGreater({handler=c,filter=s.ritualfil,lv=8,extrafil=s.extrafil,extraop=s.extraop,stage2=s.stage2})
+	Ritual.AddProcGreater{handler=c,filter=s.ritualfil,lv=8,extrafil=s.extrafil,extraop=s.extraop,stage2=s.stage2}
 end
 s.listed_names={CARD_BORREL_RIOT}
 s.fit_monster={CARD_BORREL_RIOT} --should be removed in hardcode overhaul
@@ -28,24 +28,22 @@ function s.extraop(mg,e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(mat2,REASON_EFFECT)
 end
 function s.stage2(mat,e,tp,eg,ep,ev,re,r,rp,tc)
-	if chk==0 then
-		--immune
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetDescription(aux.Stringid(id,1))
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetCode(EFFECT_IMMUNE_EFFECT)
-		e1:SetValue(s.efilter)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e1,true)
-		--Cannot be destroyed by battle
-		local e2=e1:Clone()
-		e2:SetDescription(aux.Stringid(id,2))
-		e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-		e2:SetValue(s.indval)
-		tc:RegisterEffect(e2,true)
-	end
+	--immune
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EFFECT_IMMUNE_EFFECT)
+	e1:SetValue(s.efilter)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	tc:RegisterEffect(e1,true)
+	--Cannot be destroyed by battle
+	local e2=e1:Clone()
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e2:SetValue(s.indval)
+	tc:RegisterEffect(e2,true)
 end
 function s.efilter(e,te)
 	return te:IsActiveType(TYPE_MONSTER) and te:IsActivated()
