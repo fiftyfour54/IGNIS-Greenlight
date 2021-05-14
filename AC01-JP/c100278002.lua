@@ -3,7 +3,6 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	c:AddSetcodesRule(0xa4)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -18,7 +17,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(s.thcon)
 	c:RegisterEffect(e2)
-	--special summon (kuribabylon)
+	--Change ATK to 0
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_ATKCHANGE)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -32,7 +31,7 @@ end
 s.listed_names={CARD_KURIBOH}
 s.listed_series={0xa4}
 function s.thcfilter(c,tp)
-	return c:IsSetCard(0xa4) and c:IsPreviousControler(tp)
+	return c:IsPreviousSetCard(0xa4) and c:IsPreviousControler(tp)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.thcfilter,1,nil,tp)
@@ -60,14 +59,18 @@ end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsAttackAbove,1),tp,LOCATION_MZONE,0,c)
-	if #g>0 and Duel.NegateAttack() then
+	if #g>0 then
+		local flag=0
 		for tc in aux.Next(g) do
+			--Change ATK to 0
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 			e1:SetValue(0)
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 			tc:RegisterEffect(e1)
+			if not tc:IsImmuneToEffect(e) then flag=1 end
 		end
+		if flag==1 then Duel.NegateAttack() end
 	end
 end

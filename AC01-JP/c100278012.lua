@@ -1,5 +1,5 @@
 --輪廻独断
---Declaration of Rebirth
+--Rebirth Judgment
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)

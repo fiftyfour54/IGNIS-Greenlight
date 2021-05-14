@@ -3,7 +3,6 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	c:AddSetcodesRule(0xa4)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -31,7 +30,7 @@ end
 s.listed_names={100278002,100278003,100278004,100278005,CARD_KURIBOH}
 s.listed_series={0xa4}
 function s.spcfilter1(c,tp)
-	return c:IsSetCard(0xa4) and c:IsPreviousControler(tp)
+	return c:IsPreviousSetCard(0xa4) and c:IsPreviousControler(tp)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.spcfilter1,1,nil,tp)
@@ -41,44 +40,44 @@ function s.spfilter1(c,e,tp)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function s.spop1(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter1,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	if #g>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	end
 end
-function s.spcfilter2(c)
+function s.spcfilter2(c,tp)
 	return c:IsCode(100278002,100278003,100278004,CARD_KURIBOH) and c:IsReleasable()
-		and (not c:IsLocation(LOCATION_MZONE) or c:IsFaceup())
+		and (c:IsControler(tp) or c:IsFaceup())
+end
+function s.rescon(sg,tp,mg)
+	return sg:GetClassCount(Card.GetCode)==#sg
+end
+function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and c:IsReleasable() 
+		and Duel.CheckReleaseGroupCost(tp,s.spcfilter2,4,true,s.rescon,c,tp) end
+	local sg=Duel.SelectReleaseGroupCost(tp,s.spcfilter2,4,4,true,s.rescon,c,tp)+c
+	Duel.Release(sg,REASON_COST)
 end
 function s.spfilter2(c,e,tp)
 	return c:IsCode(100278005) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.rescon(checkfunc)
-	return function(sg,e,tp,mg)
-		if not sg:CheckDifferentProperty(checkfunc) then return false,true end
-		return Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,sg,e,tp)
-	end
-end
-function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	local mg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,c)
-	local checkfunc=aux.PropertyTableFilter(Card.GetCode,100278002,100278003,100278004,CARD_KURIBOH)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and c:IsReleasable() 
-		and Duel.CheckReleaseGroupCost(tp,s.spcfilter2,4,true,s.rescon(checkfunc),c) end
-	local sg=Duel.SelectReleaseGroupCost(tp,s.spcfilter2,4,4,true,s.rescon(checkfunc),c)+c
-	Duel.Release(sg,REASON_COST)
-end
 function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE)
 end
 function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter2,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
-	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter2),tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
+	if #g>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	end
 end

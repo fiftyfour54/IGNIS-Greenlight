@@ -26,19 +26,19 @@ function s.initial_effect(c)
 	e3:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e3)
 	--SP Summon Kuribohs
-	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_QUICK_O)
-	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,id)
-	e3:SetCondition(s.spcon)
-	e3:SetTarget(s.sptg)
-	e3:SetOperation(s.spop)
-	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
+	e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetCode(EVENT_FREE_CHAIN)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,id)
+	e4:SetCondition(s.spcon)
+	e4:SetTarget(s.sptg)
+	e4:SetOperation(s.spop)
+	c:RegisterEffect(e4)
 end
 s.listed_series={0xa4}
-s.listed_names={40640057}
+s.listed_names={CARD_KURIBOH}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetMatchingGroupCount(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)>Duel.GetMatchingGroupCount(Card.IsType,1-tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
 end
@@ -52,11 +52,11 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) then return end
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 end
-function s.val(e,c)
-	return Duel.GetMatchingGroupCount(s.filter,c:GetControler(),LOCATION_MZONE+LOCATION_GRAVE,0,nil)*300
-end
 function s.filter(c)
 	return c:IsCode(0xa4) and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup())
+end
+function s.val(e,c)
+	return Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsSetCard,0xa4),c:GetControler(),LOCATION_MZONE+LOCATION_GRAVE,0,nil)*300
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsTurnPlayer(tp) and (Duel.IsBattlePhase() or Duel.IsMainPhase())
@@ -70,11 +70,11 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return c:IsAbleToHand() and Duel.GetMZoneCount(tp,c)>=5
 			and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
-			and Duel.IsExistingMatchingCard(s.filter,tp,locs,0,1,nil,e,tp,40640057)
-			and Duel.IsExistingMatchingCard(s.filter,tp,locs,0,1,nil,e,tp,511000153)
-			and Duel.IsExistingMatchingCard(s.filter,tp,locs,0,1,nil,e,tp,511000151)
-			and Duel.IsExistingMatchingCard(s.filter,tp,locs,0,1,nil,e,tp,511000152)
-			and Duel.IsExistingMatchingCard(s.filter,tp,locs,0,1,nil,e,tp,511000154)
+			and Duel.IsExistingMatchingCard(s.spfilter,tp,locs,0,1,nil,e,tp,CARD_KURIBOH)
+			and Duel.IsExistingMatchingCard(s.spfilter,tp,locs,0,1,nil,e,tp,100278001)
+			and Duel.IsExistingMatchingCard(s.spfilter,tp,locs,0,1,nil,e,tp,100278002)
+			and Duel.IsExistingMatchingCard(s.spfilter,tp,locs,0,1,nil,e,tp,100278003)
+			and Duel.IsExistingMatchingCard(s.spfilter,tp,locs,0,1,nil,e,tp,100278004)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,c,1,tp,LOCATION_MZONE)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,5,tp,locs)
@@ -84,11 +84,11 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) and Duel.SendtoHand(c,nil,REASON_EFFECT)>0 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<5 or Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return end
 		local locs=LOCATION_GRAVE+LOCATION_HAND
-		local g1=Duel.GetMatchingGroup(s.filter,tp,locs,0,nil,e,tp,40640057)
-		local g2=Duel.GetMatchingGroup(s.filter,tp,locs,0,nil,e,tp,511000153)
-		local g3=Duel.GetMatchingGroup(s.filter,tp,locs,0,nil,e,tp,511000151)
-		local g4=Duel.GetMatchingGroup(s.filter,tp,locs,0,nil,e,tp,511000152)
-		local g5=Duel.GetMatchingGroup(s.filter,tp,locs,0,nil,e,tp,511000154)
+		local g1=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.spfilter),tp,locs,0,nil,e,tp,CARD_KURIBOH)
+		local g2=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.spfilter),tp,locs,0,nil,e,tp,100278001)
+		local g3=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.spfilter),tp,locs,0,nil,e,tp,100278002)
+		local g4=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.spfilter),tp,locs,0,nil,e,tp,100278003)
+		local g5=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.spfilter),tp,locs,0,nil,e,tp,100278004)
 		if #g1>0 and #g2>0 and #g3>0 and #g4>0 and #g5>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local sg1=g1:Select(tp,1,1,nil)

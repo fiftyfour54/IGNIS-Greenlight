@@ -3,15 +3,15 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	c:AddSetcodesRule(0xa4)
 	--atk up
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_ATKCHANGE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetHintTiming(TIMING_DAMAGE_STEP)
 	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
@@ -53,23 +53,18 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 	end
 end
-function s.thcfilter(c)
-	return c:IsCode(100278002,100278003,100278001,CARD_KURIBOH) and c:IsReleasable()
-		and (not c:IsLocation(LOCATION_MZONE) or c:IsFaceup())
+function s.thcfilter(c,tp)
+	return c:IsCode(100278001,100278002,100278003,CARD_KURIBOH) and c:IsReleasable()
+		and (c:IsControler(tp) or c:IsFaceup())
 end
-function s.rescon(checkfunc)
-	return function(sg,e,tp,mg)
-		if not sg:CheckDifferentProperty(checkfunc) then return false,true end
-		return true
-	end
+function s.rescon(sg,tp,mg)
+	return sg:GetClassCount(Card.GetCode)==#sg
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local mg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,c)
-	local checkfunc=aux.PropertyTableFilter(Card.GetCode,100278002,100278003,100278001,CARD_KURIBOH)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and c:IsReleasable() 
-		and Duel.CheckReleaseGroupCost(tp,s.thcfilter,4,true,s.rescon(checkfunc),c) end
-	local sg=Duel.SelectReleaseGroupCost(tp,s.thcfilter,4,4,true,s.rescon(checkfunc),c)+c
+	if chk==0 then return c:IsReleasable() 
+		and Duel.CheckReleaseGroupCost(tp,s.thcfilter,4,true,s.rescon,c,tp) end
+	local sg=Duel.SelectReleaseGroupCost(tp,s.thcfilter,4,4,true,s.rescon,c,tp)+c
 	Duel.Release(sg,REASON_COST)
 end
 function s.thfilter(c)
@@ -88,7 +83,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if tc and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND) then
 		Duel.ConfirmCards(1-tp,tc)
 		local g=Duel.GetMatchingGroup(s.sumfilter,tp,LOCATION_HAND,0,nil)
-		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
 			local sg=g:Select(tp,1,1,nil):GetFirst()

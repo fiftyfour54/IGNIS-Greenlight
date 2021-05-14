@@ -5,8 +5,8 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
@@ -18,7 +18,7 @@ function s.filter(c)
 	return c:IsSetCard(0x135) and c:IsLinkAbove(3) and c:IsFaceup() and c:GetSequence()>4
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.GetAttacker():IsControler(tp)
+	return Duel.GetAttacker():IsControler(1-tp)
 		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil) 
 end
 function s.spfilter(c,e,tp)
@@ -29,6 +29,7 @@ function s.rescon(sg,e,tp,mg)
 	return sg:GetSum(Card.GetAttack)<=e:GetLabel()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local tg=Duel.GetAttacker()
 	if chk==0 then return tg:IsOnField() and tg:IsAttackAbove(2300)
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
