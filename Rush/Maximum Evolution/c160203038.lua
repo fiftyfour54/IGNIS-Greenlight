@@ -20,7 +20,7 @@ function s.filter1(c,e,tp)
 	return c:IsSummonPlayer(1-tp) and c:IsLocation(LOCATION_MZONE)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.filter1,1,nil,e,tp) Duel.GetFieldGroupCountRush(tp,0,LOCATION_MZONE)==3
+	return eg:IsExists(s.filter1,1,nil,e,tp) and Duel.GetFieldGroupCountRush(tp,0,LOCATION_MZONE)==3
 end
 
 function s.filter(c)
