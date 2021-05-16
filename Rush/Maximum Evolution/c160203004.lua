@@ -31,7 +31,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.HintSelection(g)
 	g=g:AddMaximumCheck()
-	if #g>0 andDuel.SendtoHand(g,nil,REASON_EFFECT)>0 then
+	if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
 		--Effect
 		Duel.NegateAttack()
 	end
