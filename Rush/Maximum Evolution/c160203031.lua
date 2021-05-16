@@ -14,7 +14,7 @@ end
 function s.filter(c)
 	return c:IsType(TYPE_NORMAL) and c:IsLevelAbove(7) and c:IsRace(RACE_WYRM) and c:IsFaceup()
 end
-function s.filter(c)
+function s.filter2(c)
 	return c:IsFaceup() and c:IsAttackAbove(3000)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
