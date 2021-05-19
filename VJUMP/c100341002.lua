@@ -15,7 +15,19 @@ function s.initial_effect(c)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
+	--To Grave
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_TOGRAVE)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_TO_GRAVE)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e2:SetCountLimit(1,id+100)
+	e2:SetTarget(s.tgtg)
+	e2:SetOperation(s.tgop)
+	c:RegisterEffect(e2)
 end
+s.listed_names={37630732}
 --Search + Extra Fusion Material
 function s.dcfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDiscardable() and c:IsAbleToGraveAsCost()
@@ -44,7 +56,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_EXTRA_FUSION_MATERIAL)
 	e1:SetTargetRange(LOCATION_GRAVE,0)
 	e1:SetValue(1)
-	e1:SetCountLimit(1,id+100)
+	e1:SetCountLimit(1,id+101)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetOperation(Fusion.BanishMaterial)
 	Duel.RegisterEffect(e1,tp)
@@ -60,9 +72,23 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e2,tp)
 end
 function s.fuslimit(e,c)
-	if not c then return false end
 	return c:IsControler(e:GetHandlerPlayer())
 end
 function s.fustg(e,c)
 	return not (c:IsSetCard(0x93) and (c:IsRace(RACE_DRAGON) or c:IsRace(RACE_MACHINE)))
+end
+--To Grave
+function s.tgfilter(c,tp)
+	return c:IsSetCard(0x4093) and c:IsMonster() and c:IsAbleToGrave() and not Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,c:GetCode())
+end
+function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+end
+function s.tgop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil,tp)
+	if #g>0 then
+		Duel.SendtoGrave(g,REASON_EFFECT)
+	end
 end
