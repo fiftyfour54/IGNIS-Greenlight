@@ -1,5 +1,5 @@
---幻刃奥義－突陥攻事 
---Mythic Sword Secret Technique – High Speed Demolition
+--幻刃奥義－突陥攻事
+--Mythic Sword Secret Technique - High Speed Demolition
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
@@ -21,10 +21,13 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterMaximumSideFunctionEx(s.filter),tp,LOCATION_MZONE,0,1,nil) end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	--effect
+	--Effect
+	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.filter),tp,LOCATION_MZONE,0,nil)
+	if #g==0 then return end
 	for tc in g:Iter() do
-		local e1=Effect.CreateEffect(e:GetHandler())
+		--Increase ATK
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(600)
@@ -32,14 +35,14 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffectRush(e1)
 	end
 	local g2=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.filter2),tp,0,LOCATION_MZONE,nil)
-	if #g2>0 then
-	for tc in g:Iter() do
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(-1200)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		tc:RegisterEffectRush(e1)
+	if #g2==0 then return end
+	for tc in g2:Iter() do
+		--Decrease ATK
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_UPDATE_ATTACK)
+		e2:SetValue(-1200)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffectRush(e2)
 	end
-	
 end
