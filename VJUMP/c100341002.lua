@@ -27,7 +27,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.tgop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={37630732}
+s.listed_names={37630732,id}
+s.listed_series={0x93,0x4093}
 --Search + Extra Fusion Material
 function s.dcfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDiscardable() and c:IsAbleToGraveAsCost()
