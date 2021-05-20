@@ -1,7 +1,7 @@
 --サイバー・ダーク・キメラ
 --Cyberdark Chimera
 --Scripted by Rundas
---Necessary changes to the Fusion Proc made by pyrQ
+--Necessary changes to the Fusion Proc made by pyrQ and edo9300
 local s,id=GetID()
 function s.initial_effect(c)
 	--Search + Extra Fusion Material
