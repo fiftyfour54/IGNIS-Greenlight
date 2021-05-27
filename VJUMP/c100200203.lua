@@ -1,6 +1,6 @@
 --モーターシェル
 --Motor Shell
---Sctipt By JSY1728
+--Sctipted By JSY1728
 local s,id=GetID()
 function s.initial_effect(c)
 	--"Motor Token" Summon
