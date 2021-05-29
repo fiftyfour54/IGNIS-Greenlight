@@ -28,7 +28,7 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_ONFIELD,aux.ExceptThisCard(e))
-	if Duel.Destroy(sg,REASON_EFFECT)~=0 then
+	if Duel.Destroy(sg,REASON_EFFECT)>0 then
 		Duel.Damage(1-tp,1000,REASON_EFFECT)
 	end
 end
