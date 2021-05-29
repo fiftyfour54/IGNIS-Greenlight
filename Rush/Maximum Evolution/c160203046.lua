@@ -45,6 +45,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 		local rec=tc:GetAttack()
-		Duel.Recover(tp,rec,REASON_EFFECT)
+		Duel.Recover(1-tp,rec,REASON_EFFECT)
 	end
 end
