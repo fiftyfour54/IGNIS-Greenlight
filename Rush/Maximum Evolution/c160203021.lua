@@ -37,6 +37,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.HintSelection(g)
 			if #g>0 then
 				Duel.SendtoHand(g,nil,REASON_EFFECT)
+				Duel.ConfirmCards(1-tp,g)
 			end
 		end
 	end
