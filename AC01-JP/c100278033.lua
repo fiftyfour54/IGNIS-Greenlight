@@ -32,48 +32,49 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_names={75574498,44190146}
-function s.spfilter(c,code,e,tp)
-	return c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.tgfilter(c,e)
+	return c:IsType(TYPE_NORMAL) and (c:IsAttack(0) or c:IsDefense(0)) and c:IsCanBeEffectTarget(e)
 end
-function s.tgfilter(c,e,tp)
-	return c:IsType(TYPE_NORMAL) and (c:IsAttack(0) or c:IsDefense(0))
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,c:GetCode(),e,tp)
+function s.resconfunc(cg)
+	-- Creates a rescon function to be used with Auxiliary.SelectUnselectGroup
+	-- that will ensure cards in sg will have at least one card in cg with the same name.
+	-- It also ensures that no two cards in sg can pair up with the same card in cg.
+	return function (sg,e,tp,mg)
+		if not cg:IsExists(Card.IsCode,1,nil,sg:GetFirst():GetCode()) then return end
+		if #sg>1 then return #cg>1 and cg:IsExists(Card.IsCode,1,nil,sg:GetNext():GetCode()) end
+		return true
+	end
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if chk==0 then return ft>0 and Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	local tg=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_GRAVE,0,nil,e)
+	local rescon=s.resconfunc(Duel.GetMatchingGroup(Card.IsCanBeSpecialSummoned,tp,LOCATION_DECK,0,nil,e,0,tp,false,false))
+	if chk==0 then return ft>0 and aux.SelectUnselectGroup(tg,e,tp,1,1,rescon,0) end
 	if Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,75574498),tp,LOCATION_MZONE,0,1,nil)
-		and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then
+		and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
+		and aux.SelectUnselectGroup(tg,e,tp,2,2,rescon,0) then
 		ft=math.min(2,ft)
 	else ft=1 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_GRAVE,0,1,ft,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,#g,0,0)
+	local g=aux.SelectUnselectGroup(tg,e,tp,ft,ft,rescon,1,tp)
+	Duel.SetTargetCard(g)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,ft,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetTargetCards(e)
-	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<#g 
-		or Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) 
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	local gc=#g
+	local rescon=s.resconfunc(g)
+	local sg=Duel.GetMatchingGroup(Card.IsCanBeSpecialSummoned,tp,LOCATION_DECK,0,nil,e,0,tp,false,false)
+	if not c:IsRelateToEffect(e)
+		or Duel.GetLocationCount(tp,LOCATION_MZONE)<gc
+		or gc~=g:FilterCount(Card.IsRelateToEffect,nil,e)
+		or (gc>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT))
+		or not aux.SelectUnselectGroup(sg,e,tp,gc,gc,rescon,0)
 	then return end
-	-- Ensure there will be a summonable card for each target
-	local tc=g:GetFirst()
-	local sg1=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,tc:GetCode(),e,tp)
-	if #sg1<1 then return end
-	local sg2
-	if #g==2 then
-		tc=g:GetNext()
-		sg2=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,tc:GetCode(),e,tp)
-		if #sg2<1 or #sg1+#sg2<=1 then return end
-	end
-	-- Select cards to summon; ensure no overlap
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local ssg=sg1:Select(tp,1,1,false)
-	if sg2 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		ssg=ssg+sg2:Select(tp,1,1,false,ssg)
-	end
+	local ssg=aux.SelectUnselectGroup(sg,e,tp,gc,gc,rescon,1,tp)
 	if #g==#ssg then
 		for sc in ~ssg do
 			-- Special summon as Level 6 DARK monster
@@ -85,7 +86,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetValue(ATTRIBUTE_DARK)
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 			sc:RegisterEffect(e1,true)
-			local e2=Effect.CreateEffect(e:GetHandler())
+			local e2=Effect.CreateEffect(c)
 			e2:SetType(EFFECT_TYPE_SINGLE)
 			e2:SetCode(EFFECT_CHANGE_LEVEL)
 			e2:SetValue(6)
