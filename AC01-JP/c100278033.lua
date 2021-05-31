@@ -38,10 +38,16 @@ end
 function s.resconfunc(cg)
 	-- Creates a rescon function to be used with Auxiliary.SelectUnselectGroup
 	-- that will ensure cards in sg will have at least one card in cg with the same name.
-	-- It also ensures that no two cards in sg can pair up with the same card in cg.
+	-- It also ensures that each card has one exclusive pair.
 	return function (sg,e,tp,mg)
-		if not cg:IsExists(Card.IsCode,1,nil,sg:GetFirst():GetCode()) then return end
-		if #sg>1 then return #cg>1 and cg:IsExists(Card.IsCode,1,nil,sg:GetNext():GetCode()) end
+		local code1=sg:GetFirst():GetCode()
+		local f1=cg:Filter(Card.IsCode,nil,code1)
+		if #f1<1 then return end
+		if #sg>1 then
+			local code2=sg:GetNext():GetCode()
+			return (code1==code2 and #f1>1)
+				or (cg-f1):IsExists(Card.IsCode,1,nil,code2)
+		end
 		return true
 	end
 end
