@@ -45,7 +45,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 			e1:SetValue(300)
 			tc:RegisterEffectRush(e1)
-			end
 		end
 	end
 end
