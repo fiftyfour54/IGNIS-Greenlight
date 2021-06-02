@@ -36,26 +36,26 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.HintSelection(g2)
 		for tc in aux.Next(g2) do
 			Duel.ChangePosition(tc,POS_FACEUP_DEFENSE)
-			
-			local e0=Effect.CreateEffect(c)
+		end
+			local e0=Effect.CreateEffect(e:GetHandler())
 			e0:SetType(EFFECT_TYPE_SINGLE)
 			e0:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 			e0:SetValue(s.vala)
 			
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
-			e1:SetCode(EFFECT_CANNOT_ATTACK)
 			e1:SetProperty(EFFECT_FLAG_OATH)
 			e1:SetTargetRange(0,LOCATION_MZONE)
+			e1:SetTarget(s.eftg)
 			e1:SetCondition(s.con)
+			e1:SetLabelObject(e0)
 			e1:SetReset(RESET_PHASE+PHASE_END)
 			Duel.RegisterEffect(e1,tp)
-		end
 	end
 	
 end
 function s.con(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(s.effilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(s.effilter,e:GetHandler():GetControler(),LOCATION_MZONE,0,1,nil)
 end
 function s.effilter(c)
 	return c:IsPosition(POS_DEFENSE)
@@ -64,5 +64,5 @@ function s.eftg(e,c)
 	return c:IsFaceup()
 end
 function s.vala(e,c)
-	return not c:IsAttackPos()
+	return not c:IsDefensePos()
 end
