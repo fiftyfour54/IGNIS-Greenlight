@@ -36,7 +36,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_HAND,0,1,1,nil)
 	if Duel.SendtoGrave(tg,REASON_COST)==1 then
 		--Effect
-		Duel.DiscardDeck(tp,3,REASON_EFFECT)
+		Duel.DiscardDeck(tp,2,REASON_EFFECT)
 		local g=Duel.GetOperatedGroup()
 		local ct=g:FilterCount(s.cfilter,nil)
 		if ct>0 then

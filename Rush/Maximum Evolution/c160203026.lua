@@ -35,6 +35,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	--Requirement
 	local g=Duel.GetMatchingGroup(s.tdfilter,tp,LOCATION_GRAVE,0,nil)
 	local td=aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,1,tp,HINTMSG_SELECT)
+
 		
 	Duel.HintSelection(td)
 	if Duel.SendtoDeck(td,nil,SEQ_DECKBOTTOM,REASON_COST)>0 then
@@ -44,10 +45,10 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.SelectMatchingCard(tp,s.spfilter2,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 		Duel.HintSelection(g)
 		if #g>0 then
-			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 		end
 	end
 end
 function s.rescon(sg,e,tp,mg)
-	return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE,0,1,sg,tp)
+	return  Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_GRAVE,0,1,sg,e,tp)
 end

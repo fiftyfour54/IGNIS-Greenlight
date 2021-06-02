@@ -20,7 +20,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
 end
 function s.thfilter(c)
-	return c:IsDefense(0) and c:IsRace(RACE_CYBERSE) and c:IsAbleToHand()
+	return c:IsRace(RACE_CYBERSE) and c:IsAbleToHand() 
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -29,7 +29,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local ct=g:GetFirst()
 	if ct then
 		--If it was a monster, return cyberse from gy to hand
-		local ct2=Duel.GetMatchingGroupCountRush(aux.TRUE,tp,0,LOCATION_MZONE,nil)
+		local ct2=Duel.GetMatchingGroupCountRush(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
 		if ct:IsType(TYPE_MONSTER) and ct:IsRace(RACE_CYBERSE) and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,nil) and ct2>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 			local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,ct2,nil)
