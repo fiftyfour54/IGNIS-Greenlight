@@ -47,7 +47,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 				Duel.SendtoHand(g,nil,REASON_EFFECT)
 				Duel.ConfirmCards(1-tp,g)
 				local rec=g:GetFirst():GetAttack()
-				Duel.Recover(tp,rec,REASON_EFFECT)
+				Duel.Recover(1-tp,rec,REASON_EFFECT)
 			end
 		end
 	end
