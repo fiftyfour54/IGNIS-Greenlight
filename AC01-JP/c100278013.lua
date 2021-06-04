@@ -1,3 +1,4 @@
+--氷結界
 --Ice Barrier
 --Scripted by fiftyfour
 local s,id=GetID()
@@ -8,7 +9,6 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetCondition(s.condition)
-	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	--to grave
@@ -26,24 +26,13 @@ function s.initial_effect(c)
 	table.insert(GhostBelleTable,e2)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
-	return a:IsControler(1-tp) or at:IsControler(1-tp)
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local a=Duel.GetAttacker()
-	local at=Duel.GetAttackTarget()
-	if chk==0 then return a:IsControler(1-tp) or at:IsControler(1-tp) end
+	return Duel.GetAttacker():IsControler(1-tp) or (at and at:IsControler(1-tp))
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local a=Duel.GetAttacker()
-	local at=Duel.GetAttackTarget()
-	if a:IsControler(1-tp) then
-		tc = a
-	else
-		tc = at
-	end
-	if tc:IsFaceup() and tc:CanAttack() then
+	local tc=Duel.GetAttacker()
+	if tc:IsControler(tp) then tc=Duel.GetAttackTarget() end
+	if tc and tc:IsFaceup() and tc:CanAttack() then
 		--change attack to 0
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -59,11 +48,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetReset(RESET_EVENT)
 		tc:RegisterEffect(e2)
 		--cannot change position
-		local e4=Effect.CreateEffect(e:GetHandler())
-		e4:SetType(EFFECT_TYPE_SINGLE)
-		e4:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
-		e4:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e4)
+		local e3=Effect.CreateEffect(e:GetHandler())
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e3)
 	end
 end
 function s.tgfilter(c)
