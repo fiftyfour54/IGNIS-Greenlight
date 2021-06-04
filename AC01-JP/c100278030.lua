@@ -107,13 +107,14 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			local sg=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.matfilter),tp,LOCATION_GRAVE,0,nil)
 			if #sg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 				Duel.BreakEffect()
-				local og=sg:Select(tp,count,count,nil)
-				for oc in aux.Next(og) do
-					local tc=g:FilterSelect(tp,Card.IsLocation,1,1,nil,LOCATION_MZONE):GetFirst()
-					if not tc then break end
-					Duel.Overlay(tc,oc)
-					g:RemoveCard(tc)
-				end
+				Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,3))
+				sg=sg:Select(tp,count,count,nil)
+			end
+			for oc in aux.Next(sg) do
+				local tc=g:FilterSelect(tp,Card.IsLocation,1,1,nil,LOCATION_MZONE):GetFirst()
+				if not tc then break end
+				Duel.Overlay(tc,oc)
+				g:RemoveCard(tc)
 			end
 		end
 	end
