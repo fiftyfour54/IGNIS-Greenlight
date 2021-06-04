@@ -83,7 +83,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		if #og>0 and #mg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 			local xg=mg:Select(tp,1,#mg,nil)
-			for xc in aux.Next(xg)
+			for xc in aux.Next(xg) do
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 				local tc=og:Select(tp,1,1,nil)
 				Duel.Overlay(tc,xc)
