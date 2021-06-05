@@ -27,10 +27,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x161}
-function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLPCost(tp,800) end
-	Duel.PayLPCost(tp,800)
-end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()
 	local bc=Duel.GetAttackTarget()
@@ -39,9 +35,14 @@ function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	e:SetLabelObject(bc)
 	return bc:IsFaceup() and bc:IsAttribute(ATTRIBUTE_EARTH) and bc:IsRace(RACE_WARRIOR) and Duel.GetCurrentPhase()==PHASE_DAMAGE_CAL
 end
+function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckLPCost(tp,800) end
+	Duel.PayLPCost(tp,800)
+end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	if tc:IsRelateToBattle() and tc:IsFaceup() and tc:IsControler(tp) then
+		--Increase ATK
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -52,7 +53,9 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return rp==1-tp and c:IsReason(REASON_EFFECT) and c:IsPreviousLocation(LOCATION_MZONE)
+	return rp==1-tp and c:IsReason(REASON_EFFECT)
+		and c:IsPreviousLocation(LOCATION_MZONE)
+		and c:IsPreviousControler(tp)
 end
 function s.spfilter(c,e,tp)
 	return c:IsLevelAbove(5) and c:IsSetCard(0x161) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)

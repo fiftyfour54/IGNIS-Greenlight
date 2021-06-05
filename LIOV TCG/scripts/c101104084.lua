@@ -1,9 +1,9 @@
--- Expendable Dai
+--Expendable Dai
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -17,7 +17,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
 	return true
 end
-function s.spcheck(sg,tp,exg,dg)
+function s.equipcheck(sg,tp,exg,dg)
 	local a=0
 	for c in aux.Next(sg) do
 		if dg:IsContains(c) then a=a+1 end
@@ -34,16 +34,16 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc~=e:GetHandler() end
 	local dg=Duel.GetMatchingGroup(Card.IsCanBeEffectTarget,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler(),e)
 	if chk==0 then
-		if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return false end
+		if not Duel.IsPlayerCanDraw(tp,1) then return false end
 		if e:GetLabel()==1 then
 			e:SetLabel(0)
-			return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,s.spcheck,nil,dg)
+			return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,s.equipcheck,nil,dg)
 		else
 			return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())
 		end
 	end
 	if e:GetLabel()==1 then
-		local sg=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,s.spcheck,nil,dg)
+		local sg=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,s.equipcheck,nil,dg)
 		Duel.Release(sg,REASON_COST)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
