@@ -48,7 +48,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetAbsoluteRange(tp,1,0)
+		e1:SetTarget(s.splimit)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		sg:RegisterEffect(e1,true)
 	end
+end
+	--Cannot special summon from extra deck
+function s.splimit(e,c)
+	return c:IsLocation(LOCATION_EXTRA)
 end
