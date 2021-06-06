@@ -39,6 +39,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(EVENT_SUMMON_SUCCESS)
 			e1:SetLabel(tc:GetCode())
 			e1:SetOperation(s.checkop)
+			e1:SetReset(RESET_PHASE+PHASE_END,2)
 			Duel.RegisterEffect(e1,tp)
 			-- Cannot activate effects of monsters with the same name
 			local e2=Effect.CreateEffect(c)
@@ -54,8 +55,10 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if eg:GetFirst():IsCode(e:GetLabel()) then e:SetLabel(-1) end
+	local sc=eg:GetFirst()
+	if sc:IsSummonPlayer(1-tp) then return end
+	if sc:IsCode(e:GetLabel()) then e:SetLabel(-1) end
 end
 function s.aclimit(e,re,tp)
-	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsCode(e:GetLabelObject():GetLabel())
+	return not re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsCode(e:GetLabelObject():GetLabel())
 end
