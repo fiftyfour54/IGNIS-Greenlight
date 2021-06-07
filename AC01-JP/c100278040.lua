@@ -11,8 +11,7 @@ function s.initial_effect(c)
 	--double level
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1,id)
@@ -47,17 +46,15 @@ end
 function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local g=tg:Filter(Card.IsRelateToEffect,nil,e)
-	local tc=g:GetFirst()
-	while tc do
+	local tg=Duel.GetTargetCards(e):Filter(Card.IsFaceup,nil)
+	for tc in aux.Next(tg) do
+		--Double their Levels
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CHANGE_LEVEL_FINAL)
 		e1:SetValue(tc:GetLevel()*2)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1)
-		tc=g:GetNext()
 	end
 end
 function s.nmfilter2(c,cd)
@@ -65,13 +62,13 @@ function s.nmfilter2(c,cd)
 end
 function s.nmfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xe5) 
-		and Duel.IsExistingMatchingCard(s.nmfilter2,0,LOCATION_MZONE,LOCATION_MZONE,1,c)
+		and Duel.IsExistingMatchingCard(s.nmfilter2,0,LOCATION_MZONE,LOCATION_MZONE,1,c,c:GetCode())
 end
 function s.nmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.nmfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.nmfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.nmfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.nmfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.nmfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,s.nmfilter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function s.nmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

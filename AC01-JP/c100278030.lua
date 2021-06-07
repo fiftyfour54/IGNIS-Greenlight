@@ -30,9 +30,9 @@ function s.initial_effect(c)
 	--Special Summon "Kragen Spawn" up to the number of materials of this card
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetCode(EVENT_DESTROYED)
 	e3:SetCondition(s.spcon)
 	e3:SetTarget(s.sptg)
@@ -52,23 +52,20 @@ s.xyz_number=4
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsMainPhase()
 end
-function s.desfilter(c)
-	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsFaceup() 
-end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.desfilter,tp,0,LOCATION_MZONE,1,nil) end
-	local g=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsAttribute,ATTRIBUTE_WATER),tp,0,LOCATION_MZONE,1,nil) end
+	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsAttribute,ATTRIBUTE_WATER),tp,0,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,s.desfilter,tp,0,LOCATION_MZONE,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,aux.FilterFaceupFunction(Card.IsAttribute,ATTRIBUTE_WATER),tp,0,LOCATION_MZONE,1,1,nil)
 	if #g>0 then
 		local atk=math.min(g:GetFirst():GetAttack()/2)
-		if atk<0 or g:GetFirst():IsFacedown() then atk=0 end
+		if atk<0 then atk=0 end
 		Duel.HintSelection(g)
-		if Duel.Destroy(g:GetFirst(),REASON_EFFECT)~=0 then
+		if Duel.Destroy(g:GetFirst(),REASON_EFFECT)>0 then
 			Duel.Damage(1-tp,atk,REASON_EFFECT)
 		end
 	end
@@ -83,38 +80,33 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsSummonType(SUMMON_TYPE_XYZ)
 end
 function s.spfilter(c,e,tp,rp)
-	return c:IsCode(100278031,511001337) and Duel.GetLocationCountFromEx(tp,rp,nil,c)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(100278031) and Duel.GetLocationCountFromEx(tp,rp,nil,c)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=e:GetLabelObject()
-	local ct=#g
-	if chk==0 then return ct>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,rp) end
+	if chk==0 then return #g>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,rp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function s.matfilter(c)
-	return c:IsAttribute(ATTRIBUTE_WATER)
-end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local g=e:GetLabelObject()
-	local ct=#g
+	local ct=#e:GetLabelObject()
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ct=1 end
 	ct=math.min(ct,aux.CheckSummonGate(tp) or ct)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,ct,ct,nil,e,tp,rp)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,ct,nil,e,tp,rp)
 	if #g>0 then
 		local count=Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		if count~=0 then
-			local sg=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.matfilter),tp,LOCATION_GRAVE,0,nil)
+			local sg=Duel.GetMatchingGroup(aux.NecroValleyFilter(Card.IsAttribute),tp,LOCATION_GRAVE,0,nil,ATTRIBUTE_WATER)
 			if #sg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 				Duel.BreakEffect()
 				Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,3))
-				sg=sg:Select(tp,count,count,nil)
-			end
-			for oc in aux.Next(sg) do
-				local tc=g:FilterSelect(tp,Card.IsLocation,1,1,nil,LOCATION_MZONE):GetFirst()
-				if not tc then break end
-				Duel.Overlay(tc,oc)
-				g:RemoveCard(tc)
+				sg=sg:Select(tp,1,count,nil)
+				for oc in aux.Next(sg) do
+					local tc=g:FilterSelect(tp,Card.IsLocation,1,1,nil,LOCATION_MZONE):GetFirst()
+					if not tc then break end
+					Duel.Overlay(tc,oc)
+					g:RemoveCard(tc)
+				end
 			end
 		end
 	end
