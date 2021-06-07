@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	--Venemy Counter
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e1:SetCode(EVENT_LEAVE_FIELD)
+	e1:SetCode(EVENT_TO_GRAVE)
 	e1:SetRange(LOCATION_PZONE)
 	e1:SetOperation(s.acop)
 	c:RegisterEffect(e1)
@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
-	e2:SetRange(LOCATION_PZONE+LOCATION_MZONE)
+	e2:SetRange(LOCATION_PZONE)
 	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e2:SetTarget(s.atktg)
 	e2:SetValue(s.atkval)
@@ -30,6 +30,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_PRE_BATTLE_DAMAGE)
 	e2:SetRange(LOCATION_PZONE)
+	e2:SetCountLimit(1)
 	e2:SetCondition(s.rdcon)
 	e2:SetOperation(s.rdop)
 	c:RegisterEffect(e2)
@@ -46,6 +47,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 	--place in pendulum zone
 	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(id,2))
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_DESTROYED)
 	e5:SetProperty(EFFECT_FLAG_DELAY)
@@ -56,7 +58,10 @@ function s.initial_effect(c)
 end
 s.counter_list={0x1149}
 function s.acop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():AddCounter(0x1149,#eg,REASON_EFFECT)
+	local ct=eg:FilterCount(Card.IsPreviousLocation,nil,LOCATION_ONFIELD)
+	if ct>0 then
+		e:GetHandler():AddCounter(0x1149,ct)
+	end
 end
 function s.atktg(e,c)
 	return not (c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_DRAGON))
@@ -65,13 +70,11 @@ function s.atkval(e,c)
 	return Duel.GetCounter(0,1,1,0x1149)*-200
 end
 function s.rdcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and ev>0
+	return ep==tp
 end
 function s.rdop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:GetFlagEffect(id)==0 and Duel.SelectEffectYesNo(tp,c) then
+	if Duel.SelectEffectYesNo(tp,e:GetHandler()) then
 		Duel.Hint(HINT_CARD,0,id)
-		c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 		Duel.ChangeBattleDamage(tp,0)
 	end
 end
@@ -97,30 +100,30 @@ function s.copyop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 		if not tc:IsType(TYPE_TRAPMONSTER) then
 			c:CopyEffect(code,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,1)
-		end
-		Duel.BreakEffect()
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_UPDATE_ATTACK)
-		e2:SetValue(-500)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e2)
-		local e3=e2:Clone()
-		e3:SetCode(EFFECT_UPDATE_DEFENSE)
-		tc:RegisterEffect(e3)
-		local e4=Effect.CreateEffect(c)
-		e4:SetType(EFFECT_TYPE_SINGLE)
-		e4:SetCode(EFFECT_DISABLE)
-		e4:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e4)
-		local e5=Effect.CreateEffect(c)
-		e5:SetType(EFFECT_TYPE_SINGLE)
-		e5:SetCode(EFFECT_DISABLE_EFFECT)
-		e5:SetValue(RESET_TURN_SET)
-		e5:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e5)
-		if not tc:IsImmuneToEffect(e) then
-			Duel.Damage(1-tp,500,REASON_EFFECT)
+			Duel.BreakEffect()
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetCode(EFFECT_UPDATE_ATTACK)
+			e2:SetValue(-500)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+			tc:RegisterEffect(e2)
+			local e3=e2:Clone()
+			e3:SetCode(EFFECT_UPDATE_DEFENSE)
+			tc:RegisterEffect(e3)
+			local e4=Effect.CreateEffect(c)
+			e4:SetType(EFFECT_TYPE_SINGLE)
+			e4:SetCode(EFFECT_DISABLE)
+			e4:SetReset(RESET_EVENT+RESETS_STANDARD)
+			tc:RegisterEffect(e4)
+			local e5=Effect.CreateEffect(c)
+			e5:SetType(EFFECT_TYPE_SINGLE)
+			e5:SetCode(EFFECT_DISABLE_EFFECT)
+			e5:SetValue(RESET_TURN_SET)
+			e5:SetReset(RESET_EVENT+RESETS_STANDARD)
+			tc:RegisterEffect(e5)
+			if not tc:IsImmuneToEffect(e) then
+				Duel.Damage(1-tp,500,REASON_EFFECT)
+			end
 		end
 	end
 end
