@@ -46,7 +46,7 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.setfilter(c,tp)
-	return c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_ONFIELD)
+	return c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_MZONE)
 		and c:IsSetCard(0x48) and c:IsType(TYPE_XYZ) and c:IsReason(REASON_BATTLE+REASON_EFFECT)
 end
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
