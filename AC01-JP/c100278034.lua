@@ -25,15 +25,15 @@ function s.initial_effect(c)
 	e2:SetValue(s.atkval)
 	c:RegisterEffect(e2)
 	--reduce
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-	e2:SetRange(LOCATION_PZONE)
-	e2:SetCountLimit(1)
-	e2:SetCondition(s.rdcon)
-	e2:SetOperation(s.rdop)
-	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_PRE_BATTLE_DAMAGE)
+	e3:SetRange(LOCATION_PZONE)
+	e3:SetCountLimit(1)
+	e3:SetCondition(s.rdcon)
+	e3:SetOperation(s.rdop)
+	c:RegisterEffect(e3)
 	--copy
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,1))
@@ -41,7 +41,7 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1)
+	e4:SetCountLimit(1,id)
 	e4:SetTarget(s.copytg)
 	e4:SetOperation(s.copyop)
 	c:RegisterEffect(e4)
@@ -50,7 +50,7 @@ function s.initial_effect(c)
 	e5:SetDescription(aux.Stringid(id,2))
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_DESTROYED)
-	e5:SetProperty(EFFECT_FLAG_DELAY)
+	e5:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e5:SetCondition(s.pencon)
 	e5:SetTarget(s.pentg)
 	e5:SetOperation(s.penop)
@@ -91,6 +91,7 @@ function s.copyop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsFaceup() and not tc:IsType(TYPE_TOKEN) then
 		local code=tc:GetOriginalCodeRule()
+		--Copy name + effect
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -98,9 +99,9 @@ function s.copyop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(code)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
-		if not tc:IsType(TYPE_TRAPMONSTER) then
-			c:CopyEffect(code,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,1)
+		if c:CopyEffect(code,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,1)>0 then
 			Duel.BreakEffect()
+			--Decrease ATK/DEF
 			local e2=Effect.CreateEffect(c)
 			e2:SetType(EFFECT_TYPE_SINGLE)
 			e2:SetCode(EFFECT_UPDATE_ATTACK)
@@ -110,6 +111,7 @@ function s.copyop(e,tp,eg,ep,ev,re,r,rp)
 			local e3=e2:Clone()
 			e3:SetCode(EFFECT_UPDATE_DEFENSE)
 			tc:RegisterEffect(e3)
+			--Negate its effects
 			local e4=Effect.CreateEffect(c)
 			e4:SetType(EFFECT_TYPE_SINGLE)
 			e4:SetCode(EFFECT_DISABLE)
@@ -121,9 +123,7 @@ function s.copyop(e,tp,eg,ep,ev,re,r,rp)
 			e5:SetValue(RESET_TURN_SET)
 			e5:SetReset(RESET_EVENT+RESETS_STANDARD)
 			tc:RegisterEffect(e5)
-			if not tc:IsImmuneToEffect(e) then
-				Duel.Damage(1-tp,500,REASON_EFFECT)
-			end
+			Duel.Damage(1-tp,500,REASON_EFFECT)
 		end
 	end
 end
@@ -135,7 +135,7 @@ function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1) end
 end
 function s.penop(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return false end
+	if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return end
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
 		Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
