@@ -3,8 +3,8 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	c:EnableCounterPermit(COUNTER_KEY)
-	c:SetCounterLimit(COUNTER_KEY,1)
+	c:EnableCounterPermit(0x207)
+	c:SetCounterLimit(0x207,1)
 	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -34,14 +34,14 @@ function s.initial_effect(c)
 end
 s.listed_names={27062594}
 s.listed_series={0x7f}
-s.counter_place_list={COUNTER_KEY }
+s.counter_place_list={0x207}
 function s.cfilter(c,tp)
 	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousControler(tp) and c:IsReason(REASON_BATTLE+REASON_EFFECT)
 end
 function s.counter(e,tp,eg,ep,ev,re,r,rp)
 	local ct=eg:FilterCount(s.cfilter,nil,tp)
 	if ct>0 then
-		e:GetHandler():AddCounter(COUNTER_KEY,1,true)
+		e:GetHandler():AddCounter(0x207,1,true)
 	end
 end
 function s.spcfilter(c,tp)
@@ -52,8 +52,8 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsCanRemoveCounter(tp,COUNTER_KEY,1,REASON_COST) end
-	c:RemoveCounter(tp,COUNTER_KEY,1,REASON_EFFECT)
+	if chk==0 then return c:IsCanRemoveCounter(tp,0x207,1,REASON_COST) end
+	c:RemoveCounter(tp,0x207,1,REASON_EFFECT)
 end
 function s.gyfilter(c,e,tp)
 	return c:IsCode(27062594) and (c:IsFaceup() or not c:IsOnField()) and c:IsAbleToGrave()
