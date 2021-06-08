@@ -50,7 +50,7 @@ function s.setfilter(c,tp)
 		and c:IsSetCard(0x48) and c:IsType(TYPE_XYZ) and c:IsReason(REASON_BATTLE+REASON_EFFECT)
 end
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.setfilter,1,nil,tp)
+	return eg:IsExists(s.setfilter,1,nil,tp) and not eg:IsContains(e:GetHandler())
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsSSetable() end
