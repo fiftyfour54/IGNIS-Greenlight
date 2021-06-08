@@ -1,7 +1,6 @@
 --ＬＬ－バード・ストライク
 --Lyrilusc – Bird Strike
 --Logical Nonsense
-
 --Substitute ID
 local s,id=GetID()
 function s.initial_effect(c)
@@ -18,12 +17,11 @@ function s.initial_effect(c)
 end
 	--Lists "Lyrilusc" archetype
 s.listed_series={0xf7}
-
 	--Negate all of opponent's current monsters
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.disfilter1,tp,0,LOCATION_MZONE,nil)
-	local c=e:GetHandler()
 	for tc in aux.Next(g) do
+		local c=e:GetHandler()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
