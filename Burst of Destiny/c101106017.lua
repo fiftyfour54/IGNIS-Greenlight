@@ -80,7 +80,6 @@ function s.adcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	c:RegisterFlagEffect(id,RESET_CHAIN,0,1)
 end
 function s.adcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	return e:GetHandler():GetBattleTarget()~=nil
 end
 function s.adop(e,tp,eg,ep,ev,re,r,rp)
