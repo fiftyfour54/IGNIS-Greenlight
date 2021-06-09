@@ -27,7 +27,7 @@ function s.initial_effect(c)
 	e3:SetCountLimit(1,id+100)
 	e3:SetCondition(s.nscon)
 	e3:SetTarget(s.nstg)
-	e3:SetOperation(s.nstg)
+	e3:SetOperation(s.nsop)
 	c:RegisterEffect(e3)
 end
 s.listed_series={0x268}
