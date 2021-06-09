@@ -27,8 +27,9 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_BATTLE_START)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_PRE_DAMAGE_CALCULATE) 
+	e3:SetRange(LOCATION_MZONE)
 	e3:SetCondition(s.adcon)
 	e3:SetCost(s.adcost)
 	e3:SetOperation(s.adop)
@@ -70,12 +71,16 @@ function s.actlmttg(e,c)
 	return c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:IsAttackPos()
 end
 function s.adcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,nil) end
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,nil)
+		and c:GetFlagEffect(id)==0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
+	c:RegisterFlagEffect(id,RESET_CHAIN,0,1)
 end
 function s.adcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	return e:GetHandler():GetBattleTarget()~=nil
 end
 function s.adop(e,tp,eg,ep,ev,re,r,rp)
