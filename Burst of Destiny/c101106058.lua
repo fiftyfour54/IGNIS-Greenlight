@@ -1,3 +1,4 @@
+--ふわんだりぃずと謎の地図
 --Flundereeze and the Mysterious Map
 --Scripted by Zefile
 local s,id=GetID()
@@ -13,8 +14,8 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetCountLimit(1,id)
-	e2:SetTarget(s.tg)
-	e2:SetOperation(s.op)
+	e2:SetTarget(s.rmtg)
+	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
 	--normal on normal
 	local e3=Effect.CreateEffect(c)
@@ -23,29 +24,29 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_SUMMON_SUCCESS)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetRange(LOCATION_FZONE)
-	e3:SetCountLimit(1,id+1)
-	e3:SetTarget(s.tg2)
-	e3:SetOperation(s.op2)
+	e3:SetCountLimit(1,id+100)
+	e3:SetCondition(s.nscon)
+	e3:SetTarget(s.nstg)
+	e3:SetOperation(s.nstg)
 	c:RegisterEffect(e3)
 end
 s.listed_series={0x268}
-function s.filter(c,e,tp)
-	return c:IsSetCard(0x268) and c:GetLevel()==1 and not c:IsPublic()
-		and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK,0,1,nil,c:GetCode(),e,tp,c)
+function s.filter(c,tp)
+	return c:IsSetCard(0x268) and c:GetLevel()==1 and c:IsSummonable(true,nil) and not c:IsPublic()
+		and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK,0,1,nil,c:GetCode())
 end
-function s.filter2(c,testid)
-	return c:IsSetCard(0x268) and c:IsAbleToRemove() and not c:IsCode(testid)
+function s.filter2(c,code)
+	return c:IsSetCard(0x268) and c:IsAbleToRemove() and not c:IsCode(code)
 end
-function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND,0,1,nil,e,tp) end
+function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND,0,1,nil,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,POS_FACEUP,1,tp,LOCATION_DECK)
 end
-function s.op(e,tp,eg,ep,ev,re,r,rp)
+function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g1=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 	if #g1>0 then
 		Duel.ConfirmCards(1-tp,g1)
-		e:SetLabel(g1:GetFirst():GetCode())
-		local g2=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_DECK,0,1,1,nil,e:GetLabel())
+		local g2=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_DECK,0,1,1,nil,g1:GetFirst():GetCode())
 		if #g1>0 and #g2>0 then
 			Duel.Remove(g2,POS_FACEUP,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,g2)
@@ -54,15 +55,18 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function s.filter3(c,e,tp)
-	return c:IsSetCard(0x268)
+function s.nsfilter(c)
+	return c:IsSetCard(0x268) and c:IsSummonable(true,nil)
 end
-function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if not eg then return false end
-	if chk==0 then return ep~=tp end
+function s.nscon(e,tp,eg,ep,ev,re,r,rp)
+	return eg and ep~=tp
 end
-function s.op2(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.SelectMatchingCard(tp,s.filter3,tp,LOCATION_HAND,0,1,1,nil,e,tp)
+function s.nstg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.nsfilter,tp,LOCATION_HAND,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,0,0)
+end
+function s.nsop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.SelectMatchingCard(tp,s.filter3,tp,LOCATION_HAND,0,1,1,nil)
 	if #g>0 then
 		Duel.ConfirmCards(1-tp,g)
 		local sg=g:GetFirst(tp,1,1,nil)
