@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	--Banish 1 card from either GY
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_REMOVE)
+	e1:SetCategory(CATEGORY_REMOVE+CATEGORY_SUMMON)
 	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
@@ -76,6 +76,7 @@ function s.nsop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
+		if not Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then return end
 		--Normal summon 1 winged beast monster
 		local sg1=Duel.GetMatchingGroup(s.sumfilter,tp,LOCATION_HAND,0,nil)
 		if #sg1>0 and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
