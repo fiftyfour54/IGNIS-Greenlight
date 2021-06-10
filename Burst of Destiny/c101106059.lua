@@ -66,7 +66,7 @@ function s.otop(e,tp,eg,ep,ev,re,r,rp,c)
 	sg:DeleteGroup()
 end
 function s.drfilter(c)
-	return c:IsRace(RACE_WINDBEAST) and not c:IsPublic() and c:IsAbleToDeck()
+	return c:IsRace(RACE_WINGEDBEAST) and not c:IsPublic() and c:IsAbleToDeck()
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1)
@@ -75,16 +75,16 @@ function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function s.drop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) or not Duel.IsPlayerCanDraw(tp) then return end
-	local ct=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
-	if ct==0 then return end
-	if ct>2 then ct=2 end
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,s.drfilter,tp,LOCATION_HAND,0,1,ct,nil)
+	local g=Duel.SelectMatchingCard(tp,s.drfilter,tp,LOCATION_HAND,0,1,2,nil)
 	if #g>0 then
 		Duel.ConfirmCards(1-tp,g)
-		Duel.SendtoDeck(g,nil,SEQ_DECKBOTTOM,REASON_EFFECT)
-		Duel.BreakEffect()
-		Duel.Draw(tp,#g,REASON_EFFECT)
+		local ct=Duel.SendtoDeck(g,nil,SEQ_DECKBOTTOM,REASON_EFFECT)
+		if ct>1 then Duel.SortDeckbottom(tp,tp,ct) end
+		if ct==#g then
+			Duel.BreakEffect()
+			Duel.Draw(tp,ct,REASON_EFFECT)
+		end
 	end
 end
