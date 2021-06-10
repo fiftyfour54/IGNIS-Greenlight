@@ -6,10 +6,10 @@ local ICEFISH_SUSHIP_CODE=101106023 --TODO: Update when released.
 
 local s,id=GetID()
 function s.initial_effect(c)
-	--Xyz Summon
+	--Xyz Summon.
 	Xyz.AddProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
-	--Protection agaisnt opp effects, Atk+=BaseDef
+	--Protection agaisnt opp effects, atk+=base_def.
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD)
 	e0:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)

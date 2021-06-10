@@ -6,7 +6,7 @@ local URCHIN_SUSHIP_CODE=101106022 --TODO: Update when released.
 
 local s,id=GetID()
 function s.initial_effect(c)
-	--Xyz Summon
+	--Xyz Summon.
 	Xyz.AddProcedure(c,nil,5,2)
 	c:EnableReviveLimit()
 	--Negate card effects.
