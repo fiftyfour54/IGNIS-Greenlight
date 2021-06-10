@@ -34,7 +34,7 @@ s.listed_names={id,24639891}
 
 	--Check for a "Rice Suship" you control (in MZ or as overlay material)
 function s.xyzfilter(c)
-	return c:IsFaceup() and (c:IsCode(24639891) or (c:GetOverlayCount()>0 and c:GetOverlayGroup():IsExists(c:IsCode(24639891),1,nil)))
+	return c:IsFaceup() and (c:IsCode(24639891) or (c:GetOverlayCount()>0 and c:GetOverlayGroup():IsExists(function(c)return c:IsCode(24639891)end,1,nil)))
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_MZONE,0,1,nil)
