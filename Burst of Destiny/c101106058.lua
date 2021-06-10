@@ -1,6 +1,6 @@
 --ふわんだりぃずと謎の地図
 --Flundereeze and the Mysterious Map
---Scripted by Zeflie
+--Scripted by Zefile
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
