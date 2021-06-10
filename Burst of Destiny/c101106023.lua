@@ -29,8 +29,8 @@ function s.initial_effect(c)
 end
 	--Lists "Suship" archetype
 s.listed_series={0x168}
-	--Specifically lists "Rice Suship"
-s.listed_names={24639891}
+	--Specifically lists itself and "Rice Suship"
+s.listed_names={id,24639891}
 
 	--Check for a "Rice Suship" you control (in MZ or as overlay material)
 function s.xyzfilter(c)
