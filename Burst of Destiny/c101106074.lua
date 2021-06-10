@@ -8,6 +8,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMING_MAIN_END)
 	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
@@ -34,19 +35,19 @@ function s.filter(c)
 	return c:IsLevelBelow(4) and c:IsRace(RACE_WINGEDBEAST) and c:IsSummonable(true,nil)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil)
 	if #g>0 then
 		Duel.Summon(tp,g:GetFirst(),true,nil)
 	end
 end
 function s.poscon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=eg:GetFirst()
-	return ec:IsPreviousControler(tp) and ec:IsSummonType(SUMMON_TYPE_TRIBUTE) and ec:IsLevelAbove(7)
+	return ec:IsFaceup() and ec:IsSummonPlayer(tp) and ec:IsSummonType(SUMMON_TYPE_TRIBUTE) and ec:IsLevelAbove(7)
 end
 function s.posfilter(c)
 	return c:IsFaceup() and c:IsCanTurnSet()

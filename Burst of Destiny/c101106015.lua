@@ -1,7 +1,6 @@
 --ジーナの蟲惑魔
 --Flundereeze x Strich
 --Logical Nonsense
-
 --Substitute ID
 local s,id=GetID()
 function s.initial_effect(c)
@@ -75,10 +74,9 @@ end
 function s.nsop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
-		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
-		if not Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then return end
+		if Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)<=0 then return end
 		--Normal summon 1 winged beast monster
-		local sg1=Duel.GetMatchingGroup(s.sumfilter,tp,LOCATION_HAND,0,nil)
+		local sg1=Duel.GetMatchingGroup(s.sumfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,nil)
 		if #sg1>0 and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)

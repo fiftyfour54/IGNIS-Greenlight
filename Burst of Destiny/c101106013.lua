@@ -1,7 +1,6 @@
 --ジーナの蟲惑魔
 --Flundereeze x Robina
 --Logical Nonsense
-
 --Substitute ID
 local s,id=GetID()
 function s.initial_effect(c)
@@ -75,9 +74,9 @@ function s.nsop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
-		if not Duel.SendtoHand(g,nil,REASON_EFFECT)~=0 then return end
+		if not g:GetFirst():IsLocation(LOCATION_HAND) then return end
 		--Normal summon 1 winged beast monster
-		local sg1=Duel.GetMatchingGroup(s.sumfilter,tp,LOCATION_HAND,0,nil)
+		local sg1=Duel.GetMatchingGroup(s.sumfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,nil)
 		if #sg1>0 and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
