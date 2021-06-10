@@ -46,7 +46,6 @@ end
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local mat=c:GetMaterial()
-	local att=s.getAttributes(tp)
 	return c:IsSummonType(SUMMON_TYPE_SYNCHRO) and mat:GetClassCount(Card.GetAttribute)>1
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
