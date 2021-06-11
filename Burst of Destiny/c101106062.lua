@@ -3,7 +3,7 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -16,7 +16,7 @@ end
 s.listed_names={99426088}
 s.listed_series={0x167}
 function s.filter(c)
-	return (c:IsType(TYPE_NORMAL) or (c:IsType(TYPE_MONSTER) and c:IsSetCard(0x167)) or c:IsCode(99426088)) and c:IsAbleToDeck()
+	return ((c:IsMonster() and (c:IsType(TYPE_NORMAL) or c:IsSetCard(0x167))) or c:IsCode(99426088)) and c:IsAbleToDeck()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc) end
@@ -29,7 +29,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	local ch=Duel.GetCurrentChain(true)-1
-	if tc:IsRelateToEffect(e) and Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)~=0 
+	if tc:IsRelateToEffect(e) and Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 
 		and ch>0 and Duel.GetChainInfo(ch,CHAININFO_TRIGGERING_PLAYER)~=tp then
 		--Unaffected
 		local e1=Effect.CreateEffect(c)

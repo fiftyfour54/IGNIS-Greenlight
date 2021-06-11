@@ -45,6 +45,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.ShuffleHand(tp)
 	g:KeepAlive()
 	e:SetLabelObject(g)
+	Duel.SetTargetCard(g)
 end
 	--Activation legality
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -56,9 +57,9 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and g:GetFirst():IsCode(24639891) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 
+		and g:GetFirst():IsRelateToEffect(e) then
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and g:GetFirst():IsCode(24639891) and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 			Duel.BreakEffect()
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		elseif not g:GetFirst():IsCode(24639891) then
@@ -86,9 +87,9 @@ end
 	--Change targeted "Suship" monster's level to 4 or 5
 function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		local lv=Duel.AnnounceLevel(tp,4,5,tc:GetLevel())
+		--Change Level
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CHANGE_LEVEL)
@@ -96,11 +97,13 @@ function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(lv)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1)
-		if not Duel.SelectYesNo(tp,aux.Stringid(id,3)) then return end
-		Duel.BreakEffect()
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local sg=g:Select(tp,1,1,nil)
-		Duel.SendtoHand(sg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,sg)
+		local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
+		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+			Duel.BreakEffect()
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+			local sg=g:Select(tp,1,1,nil)
+			Duel.SendtoHand(sg,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,sg)
+		end
 	end
 end

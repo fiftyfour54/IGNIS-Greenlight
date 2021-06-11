@@ -53,19 +53,22 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
+function s.gyfilter(c,att)
+	return c:IsMonster() and (c:IsType(TYPE_NORMAL) or c:IsSetCard(0x167)) and c:IsAttribute(att)
+end
 function s.gycon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	return c:GetOverlayGroup():IsExists(Card.IsType,1,nil,TYPE_NORMAL) 
 		and c:IsRelateToBattle() and bc and bc:IsFaceup() and bc:IsRelateToBattle()
-		and Duel.IsExistingMatchingCard(s.gyfilter,tp,LOCATION_GRAVE,0,1,nil,c:GetAttribute())
+		and Duel.IsExistingMatchingCard(s.gyfilter,tp,LOCATION_GRAVE,0,1,nil,bc:GetAttribute())
 end
 function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,e:GetHandler():GetBattleTarget(),1,0,0)
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
-	local bc=c:GetBattleTarget()
+	local bc=e:GetHandler():GetBattleTarget()
 	if bc:IsRelateToBattle() and bc:IsFaceup() then
 		Duel.SendtoGrave(bc,REASON_RULE)
 	end

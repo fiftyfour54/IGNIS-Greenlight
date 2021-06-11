@@ -50,20 +50,20 @@ function s.exfilter(c,sfunc)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetTargetCards(e)
-	if #g<0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<#g or (#g>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)) then return end
+	if #g<=0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<#g or (#g>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)) then return end
 	if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENSE)==#g then
 		local sg=Duel.GetMatchingGroup(s.exfilter,tp,LOCATION_EXTRA,0,nil,Card.IsSynchroSummonable)
 		local xg=Duel.GetMatchingGroup(s.exfilter,tp,LOCATION_EXTRA,0,nil,Card.IsXyzSummonable)
 		local opt1,opt2=#sg>0,#xg>0
-		if (opt1 or opt2) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		if (opt1 or opt2) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.BreakEffect()
 			local opt
 			if opt1 and opt2 then
-				opt=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
+				opt=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))
 			elseif opt1 and not opt2 then
-				opt=Duel.SelectOption(tp,aux.Stringid(id,1))
+				opt=Duel.SelectOption(tp,aux.Stringid(id,2))
 			elseif opt2 and not opt1 then
-				opt=Duel.SelectOption(tp,aux.Stringid(id,2))+1
+				opt=Duel.SelectOption(tp,aux.Stringid(id,3))+1
 			end
 			if opt==0 then
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

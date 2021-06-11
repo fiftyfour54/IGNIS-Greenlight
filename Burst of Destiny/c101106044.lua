@@ -4,6 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x167),1,1,Synchro.NonTunerEx(Card.IsType,TYPE_NORMAL),1,99)
+	c:EnableReviveLimit()
 	--Make up to 2 attacks on monsters each Battle Phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -40,13 +41,13 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 s.listed_series={0x167}
-function s.setfilter(c)
-	return c:IsSetCard(0x167) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable(true)
-end
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local mat=c:GetMaterial()
 	return c:IsSummonType(SUMMON_TYPE_SYNCHRO) and mat:GetClassCount(Card.GetAttribute)>1
+end
+function s.setfilter(c)
+	return c:IsSetCard(0x167) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable(true)
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
@@ -60,7 +61,7 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SSet(tp,tc)
 	end
 end
-function s.getAttributes(tp)
+function s.get_attr(tp)
 	local att=0
 	for tc in ~Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER) do
 		att=att|tc:GetAttribute()
@@ -68,20 +69,20 @@ function s.getAttributes(tp)
 	return att
 end
 function s.desfilter(c,tp,att)
-	local att=s.getAttributes(tp)
 	return c:IsSummonPlayer(1-tp) and c:GetAttribute()&att>0
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	local att=s.getAttributes(tp)
+	local att=s.get_attr(tp)
 	return eg:IsExists(s.desfilter,1,nil,tp,att)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=eg:Filter(s.desfilter,nil,tp,s.getAttributes(tp))
+	local g=eg:Filter(s.desfilter,nil,tp,s.get_attr(tp))
+	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=eg:Filter(s.desfilter,nil,tp,s.getAttributes(tp))
+	local g=eg:Filter(s.desfilter,nil,tp,s.get_attr(tp)):Filter(Card.IsRelateToEffect,nil,e)
 	if #g>0 then
 		Duel.Destroy(g,REASON_EFFECT)
 	end

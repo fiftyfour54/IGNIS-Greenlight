@@ -42,16 +42,18 @@ function s.matlimit(e,c)
 end
 function s.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsPlayerCanAdditionalSummon(tp)
+		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x167),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.sumcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not e:GetHandler():IsPublic() end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
-	Duel.ShuffleHand(tp)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 and not c:IsPublic() end
+	Duel.ConfirmCards(1-tp,c)
 end
 function s.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanSummon(tp) end
 end
 function s.sumop(e,tp,eg,ep,ev,re,r,rp)
+	--Extra Normal Summon
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetDescription(aux.Stringid(id,2))
@@ -60,6 +62,7 @@ function s.sumop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x167))
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 end
 function s.spfilter(c,e,tp)
 	return c:IsLevelBelow(4) and (c:IsType(TYPE_NORMAL) or c:IsSetCard(0x167)) 

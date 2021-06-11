@@ -34,7 +34,7 @@ s.listed_names={id,24639891}
 
 	--Check for a "Rice Suship" you control (in MZ or as overlay material)
 function s.xyzfilter(c)
-	return c:IsFaceup() and (c:IsCode(24639891) or (c:GetOverlayCount()>0 and c:GetOverlayGroup():IsExists(function(c)return c:IsCode(24639891)end,1,nil)))
+	return c:IsFaceup() and (c:IsCode(24639891) or (c:GetOverlayCount()>0 and c:GetOverlayGroup():IsExists(Card.IsCode,1,nil,24639891)))
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_MZONE,0,1,nil)
@@ -70,16 +70,15 @@ function s.ssop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.ssfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
-	if #g>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
 		local sg=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.tdfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
-		if #sg>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)~=0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		if #sg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			--Move any number of "Rice Suships" from deck/GY to top of deck
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 			local tg=sg:Select(tp,1,#sg,nil)
 			Duel.HintSelection(tg)
-			Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
+			Duel.SendtoDeck(tg,nil,SEQ_DECKTOP,REASON_EFFECT)
 			Duel.MoveToDeckTop(tg)
 			if #tg<=1 then return end
 			Duel.SortDecktop(tp,tp,#tg)

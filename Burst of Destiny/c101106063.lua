@@ -36,7 +36,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.lvfilter(c)
-	return c:IsSetCard(0x5a) and c:IsLevelAbove(1) and not (c:IsLocation(LOCATION_MZONE) and c:IsFacedown())
+	return c:IsSetCard(0x5a) and c:IsLevelAbove(2) and not (c:IsLocation(LOCATION_MZONE) and c:IsFacedown())
 end
 function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then 
@@ -47,7 +47,7 @@ function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,1))
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
 	local g=Duel.SelectMatchingCard(tp,s.lvfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil)
 	if #g>0 then
 		local tc=g:GetFirst()

@@ -15,13 +15,13 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_DISABLE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
-	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(TIMING_SPSUMMON,TIMING_BATTLE_START)
 	e1:SetCondition(s.discon)
 	e1:SetTarget(s.distg)
-	e1:SetOperation(s.desop)
+	e1:SetOperation(s.disop)
 	c:RegisterEffect(e1)
 	--Gains effects based on material.
 	local e2=Effect.CreateEffect(c)
@@ -49,7 +49,7 @@ function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	       (Duel.IsTurnPlayer(1-tp) and Duel.IsBattlePhase())
 end
 function s.cfilter(c)
-	return c:IsSummonLocation(LOCATION_EXTRA)
+	return c:IsSetCard(0x168) and c:IsSummonLocation(LOCATION_EXTRA)
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then
@@ -64,7 +64,7 @@ function s.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,aux.disfilter3,tp,0,LOCATION_ONFIELD,1,ct,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,1,0,0)
 end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetTargetCards(e)
 	local c=e:GetHandler()
 	for tc in aux.Next(g) do
@@ -112,7 +112,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 		e1:SetCode(EFFECT_DIRECT_ATTACK)
-		e1:SetReset(RESET_EVENT+RESET_LEAVE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		c:RegisterEffect(e1)
 	end
 end
