@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetValue(800)
 	c:RegisterEffect(e2)
-    --Return
+	--Return
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -20,14 +20,14 @@ function s.initial_effect(c)
 	e3:SetTarget(s.rettg)
 	e3:SetOperation(s.retop)
 	c:RegisterEffect(e3)
-    --Negate
+	--Negate
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e4:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e4:SetCode(EVENT_TO_HAND)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCountLimit(1,id)
-    e4:SetTarget(s.negtg)
+	e4:SetTarget(s.negtg)
 	e4:SetOperation(s.negop)
 	c:RegisterEffect(e4)
 	local e5=e4:Clone()
@@ -46,6 +46,7 @@ function s.retop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHand,tp,0,LOCATION_ONFIELD,1,1,nil)
 	if #g>0 then
+		Duel.HintSelection(g)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 	end
 end
@@ -60,7 +61,7 @@ function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetTargetCards(e)
-    local tc=g:GetFirst()
+	local tc=g:GetFirst()
 	for tc in aux.Next(g) do
 		local c=e:GetHandler()
 		local code=tc:GetOriginalCode()
@@ -95,4 +96,3 @@ end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)
 end
-    
