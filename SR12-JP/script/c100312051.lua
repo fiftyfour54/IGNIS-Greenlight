@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={CARD_SANCTUARY_SKY }
+s.listed_names={CARD_SANCTUARY_SKY}
 s.listed_series={0x44}
 function s.cpfilter(c)
 	return c:IsType(TYPE_MONSTER) and (c:IsSetCard(0x44) or aux.IsCodeListed(c,CARD_SANCTUARY_SKY)) and c:IsAbleToGraveAsCost()
@@ -56,7 +56,7 @@ function s.cpop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp
+	return rp==1-tp
 end
 function s.cfilter(c,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_FAIRY) and c:IsAbleToRemoveAsCost()
@@ -74,7 +74,7 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
