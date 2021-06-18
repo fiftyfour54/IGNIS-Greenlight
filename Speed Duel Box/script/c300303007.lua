@@ -1,78 +1,61 @@
 --Union Combination
 local s,id=GetID()
 function s.initial_effect(c)
-	aux.AddSkillProcedure(c,1,false,s.flipcon,s.flipop,1)
+	aux.AddSkillProcedure(c,1,false,s.flipcon,s.flipop)
 end
 function s.flipcon(e,tp,eg,ep,ev,re,r,rp)
-	--opd check
+	--opt check
 	if Duel.GetFlagEffect(ep,id)>0 then return end
 	--condition
-	return aux.CanActivateSkill(tp) and s.target(e,tp,eg,ep,ev,re,r,rp,0)
+	return aux.CanActivateSkill(tp)
+end
+function s.exfilter(c)
+	local se=c:GetCardEffect(EFFECT_SPSUMMON_PROC)
+	if not se then return false end
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_MACHINE)
+		and c:IsType(TYPE_FUSION) and c:IsMonster() 
 end
 function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SKILL_FLIP,tp,id|(1<<32))
 	Duel.Hint(HINT_CARD,tp,id)
+	--opd register
 	Duel.RegisterFlagEffect(ep,id,0,0,0)
-	local chkf=tp
-	local mg1=Duel.GetFusionMaterial(tp):Filter(s.filter1,nil,e)
-	local sg1=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
-	local mg2=nil
-	local sg2=nil
-	local ce=Duel.GetChainMaterial(tp)
-	if ce~=nil then
-		local fgroup=ce:GetTarget()
-		mg2=fgroup(ce,e,tp)
-		local mf=ce:GetValue()
-		sg2=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg2,mf,chkf)
-	end
-	if sg1:GetCount()>0 or (sg2~=nil and sg2:GetCount()>0) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		e1:SetOperation(function () Duel.SetChainLimitTillChainEnd(aux.FALSE) end)
-		local sg=sg1:Clone()
-		if sg2 then sg:Merge(sg2) end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local tg=sg:Select(tp,1,1,nil)
-		local tc=tg:GetFirst()
-		if sg1:IsContains(tc) and (sg2==nil or not sg2:IsContains(tc) or not Duel.SelectYesNo(tp,ce:GetDescription())) then
-			local mat1=Duel.SelectFusionMaterial(tp,tc,mg1,nil,chkf)
-			tc:SetMaterial(mat1)
-			Duel.SendtoGrave(mat1,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
-			Duel.BreakEffect()
-			tc:RegisterEffect(e1)
-			Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
-		else
-			local mat2=Duel.SelectFusionMaterial(tp,tc,mg2,nil,chkf)
-			local fop=ce:GetOperation()
-			fop(ce,e,tp,tc,mat2)
+	local g=Duel.GetMatchingGroup(s.exfilter,tp,0xff,0,nil)
+	for tc in aux.Next(g) do
+		local se=tc:GetCardEffect(EFFECT_SPSUMMON_PROC)
+		if se then
+			se:Reset()
+			Fusion.AddContactProc(tc,s.contactfil,s.contactop,s.splimit)
 		end
-		tc:CompleteProcedure()
-		e1:Reset()
 	end
 end
-function s.filter1(c,e)
-	return not c:IsImmuneToEffect(e)
-end
-function s.filter2(c,e,tp,m,f,chkf)
-	return c:IsType(TYPE_FUSION) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_MACHINE) and (not f or f(c))
-		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,true,false) and c:CheckFusionMaterial(m,nil,chkf)
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		local chkf=tp
-		local mg1=Duel.GetFusionMaterial(tp)
-		local res=Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
-		if not res then
-			local ce=Duel.GetChainMaterial(tp)
-			if ce~=nil then
-				local fgroup=ce:GetTarget()
-				local mg2=fgroup(ce,e,tp)
-				local mf=ce:GetValue()
-				res=Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2,mf,chkf)
-			end
-		end
-		return res
+function s.contactfil(tp)
+	local loc=LOCATION_ONFIELD
+	if Duel.GetFlagEffect(tp,id+100)==0 then
+		loc=LOCATION_ONFIELD+LOCATION_GRAVE
 	end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+	return Duel.GetMatchingGroup(Card.IsAbleToRemoveAsCost,tp,loc,0,nil)
+end
+function s.contactop(g,tp,c)
+	if g:IsExists(Card.IsLocation,1,nil,LOCATION_GRAVE) then
+		--Can only apply this effect OPT
+		Duel.RegisterFlagEffect(tp,id+100,RESET_PHASE+PHASE_END,0,1)
+		--Opponent takes no damage this turn
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD)
+		ge1:SetCode(EFFECT_CHANGE_DAMAGE)
+		ge1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		ge1:SetTargetRange(0,1)
+		ge1:SetValue(0)
+		ge1:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(ge1,tp)
+		local ge2=ge1:Clone()
+		ge2:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+		ge2:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(ge2,tp)
+	end
+	Duel.Remove(g,POS_FACEUP,REASON_COST+REASON_MATERIAL)
+end
+function s.splimit(e,se,sp,st)
+	return not e:GetHandler():IsLocation(LOCATION_EXTRA+LOCATION_GRAVE)
 end
