@@ -32,5 +32,4 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 			local dam=Duel.GetFieldGroupCount(1-tp,LOCATION_HAND,0)*100
 			Duel.Damage(p,dam,REASON_EFFECT)
 		end
-	end
 end
