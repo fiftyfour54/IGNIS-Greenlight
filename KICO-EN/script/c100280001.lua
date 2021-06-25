@@ -74,18 +74,18 @@ end
 function s.dfilter(c,tpe)
 	return c:IsFaceup() and c:IsType(tpe)
 end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.DiscardHand(tp,s.cfilter,1,1,REASON_COST+REASON_DISCARD,nil)
 	e:SetLabel(g:GetFirst():GetType())
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(s.dfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil,e:GetLabel())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.dfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil,e:GetLabel())
 	Duel.Destroy(g,REASON_EFFECT)
 end
