@@ -37,7 +37,7 @@ s.listed_names={CARD_QUEEN_KNIGHT ,CARD_KING_KNIGHT,CARD_JACK_KNIGHT}
 function s.cfilter(c,code)
 	return c:IsCode(code) and (c:IsLocation(LOCATION_HAND) or (c:IsLocation(LOCATION_MZONE) and c:IsFaceup())) and c:IsAbleToGraveAsCost()
 end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil,CARD_QUEEN_KNIGHT)
 		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil,CARD_KING_KNIGHT)
 		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil,CARD_JACK_KNIGHT) end
