@@ -60,9 +60,7 @@ function s.drcostfilter(c)
 end
 function s.rescon(sg,e,tp,mg)
 	return Duel.IsPlayerCanDraw(tp,#sg)
-		and sg:FilterCount(Card.IsCode,nil,CARD_JACK_KNIGHT)<=1
-		and sg:FilterCount(Card.IsCode,nil,CARD_QUEEN_KNIGHT)<=1
-		and sg:FilterCount(Card.IsCode,nil,CARD_KING_KNIGHT)<=1
+		and sg:GetClassCount(Card.GetCode)==#sg
 end
 function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local cg=Duel.GetMatchingGroup(s.drcostfilter,tp,LOCATION_HAND+LOCATION_MZONE+LOCATION_GRAVE,0,nil)

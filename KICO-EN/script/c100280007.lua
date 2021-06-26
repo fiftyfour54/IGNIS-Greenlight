@@ -8,6 +8,7 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMING_MAIN_END+TIMING_BATTLE_START)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.condition)
 	e1:SetCost(s.cost)
@@ -25,7 +26,8 @@ function s.initial_effect(c)
 	e2:SetCountLimit(1,id+100)
 	e2:SetTarget(s.tdtg)
 	e2:SetOperation(s.tdop)
-	c:RegisterEffect(e2)end
+	c:RegisterEffect(e2)
+end
 s.listed_names={id,CARD_JACK_KNIGHT,CARD_KING_KNIGHT,CARD_QUEEN_KNIGHT}
 
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
@@ -33,7 +35,7 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.copfilter(c)
 	return c:IsAbleToGraveAsCost() and aux.IsCodeListed(c,CARD_JACK_KNIGHT,CARD_KING_KNIGHT,CARD_QUEEN_KNIGHT) 
-	and c:IsType(TYPE_SPELL) and c:CheckActivateEffect(true,true,false)~=nil
+		and c:IsType(TYPE_SPELL) and c:CheckActivateEffect(true,true,false)~=nil
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.copfilter,tp,LOCATION_DECK,0,1,nil) end
