@@ -16,11 +16,12 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(s.btindes)
 	c:RegisterEffect(e2)
 	-- Cannot be destroyed by effects of monsters of the same type
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
+	local e3=e2:Clone()
 	e3:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e3:SetValue(s.efindes)
 	c:RegisterEffect(e3)
@@ -29,14 +30,15 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	local g=Duel.SelectTarget(tp,nil,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc or not tc:IsRelateToEffect(e) then return end
 	local c=e:GetHandler()
-	if Duel.Destroy(tc,REASON_EFFECT)>0 and c:IsRelateToEffect(e) and c:IsFaceup() then
+	if Duel.Destroy(tc,REASON_EFFECT)>0 and not c:IsStatus(STATUS_BATTLE_DESTROYED)
+		and c:IsRelateToEffect(e) and c:IsFaceup() then
 		-- Gain target's original attack
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -44,12 +46,13 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(tc:GetBaseAttack())
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
 		c:RegisterEffect(e1)
-		if Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		local tc_race=tc:GetOriginalRace()
+		if not c:IsRace(tc_race) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.BreakEffect()
 			-- Change race into target's original race
 			local e2=e1:Clone()
 			e2:SetCode(EFFECT_CHANGE_RACE)
-			e2:SetValue(tc:GetOriginalRace())
+			e2:SetValue(tc_race)
 			c:RegisterEffect(e2)
 		end
 	end
