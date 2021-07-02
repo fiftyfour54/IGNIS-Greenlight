@@ -1,5 +1,5 @@
 -- 卓越風のヴィエトル
--- Vietor of the Prevailing Wind
+-- Vietor the Prevailing Wind
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -26,7 +26,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local cg=Duel.SelectMatchingCard(tp,Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,1,nil)
 	if Duel.SendtoGrave(cg,REASON_COST)>0 then
-		--Effect
+		-- Effect
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		local g=Duel.SelectMatchingCard(tp,aux.FilterFaceupFunction(Card.IsAttribute,ATTRIBUTE_WIND),tp,LOCATION_MZONE,0,1,1,nil)
 		if #g>0 then
