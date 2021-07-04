@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 	--Lists "Sunseed" and "Sunavalon" archetypes
-s.listed_series={0x3157,0x1157}
+s.listed_series={0x4157,0x1157}
 	--Specifically lists "Sunseed Genius Loci"
 s.listed_names={27520594}
 
@@ -36,8 +36,8 @@ function s.linkchk(c)
 end
 	--Check for "Sunseed Genius Loci" or a "Sunseed" monster
 function s.spfilter(c,e,tp)
-	return (Duel.IsExistingMatchingCard(s.linkchk,tp,LOCATION_MZONE,0,1,nil) 
-		or c:IsCode(27520594)) and c:IsSetCard(0x3157) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
+	return c:IsSetCard(0x4157) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and (Duel.IsExistingMatchingCard(s.linkchk,tp,LOCATION_MZONE,0,1,nil) or c:IsCode(27520594))
 end
 	--Activation legality
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -48,12 +48,15 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 	--Special summon 1 "Sunseed" monster from Deck, take 1000 damage
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) then
-		Duel.Damage(tp,1000,REASON_EFFECT)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+		if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) then
+			Duel.Damage(tp,1000,REASON_EFFECT)
+		end
 	end
+	if not e:IsHasType(EFFECT_TYPE_ACTIVATE) then return end
+	--Cannot Special Summon from the Extra Deck, except Plants
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -63,6 +66,12 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(s.splimit)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	--Lizard check
+	aux.addTempLizardCheck(e:GetHandler(),tp,s.lizfilter)
+end
+	--Clock Lizard filter
+function s.lizfilter(e,c)
+	return not c:IsOriginalRace(RACE_PLANT)
 end
 	--Restricted to plant monsters for extra deck
 function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
@@ -71,7 +80,7 @@ end
 	--Substitute destruction for a plant link monster(s)
 function s.repfilter(c,tp)
 	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsControler(tp) and c:IsRace(RACE_PLANT) and c:IsLinkMonster()
-		and not c:IsReason(REASON_REPLACE) and (c:IsReason(REASON_BATTLE) or (c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()~=tp))
+		and not c:IsReason(REASON_REPLACE) and (c:IsReason(REASON_BATTLE) or (c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()==1-tp))
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(s.repfilter,1,nil,tp) end
