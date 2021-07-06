@@ -67,19 +67,19 @@ end
 function s.ctlcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and re:IsActiveType(TYPE_MONSTER)
 end
-function s.ctlfilter(c)
-	return c:IsFaceup() and c:IsControlerCanBeChanged() and c:IsAttack(0)
+function s.ctlfilter(c,ft)
+	return c:IsFaceup() and c:IsControlerCanBeChanged() and c:IsAttack(0) and (ft>0 or c:GetSequence()<5)
 end
 function s.ctltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.filter(chkc) end
+	local ft=Duel.GetMZoneCount(1-tp,g,tp)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.ctlfilter(chkc,ft) end
 	if chk==0 then
-		return Duel.IsExistingTarget(s.ctlfilter,tp,0,LOCATION_MZONE,1,nil)
-			and Duel.GetMZoneCount(1-tp,g,tp)>0
+		return Duel.IsExistingTarget(s.ctlfilter,tp,0,LOCATION_MZONE,1,nil,ft)
 			and Duel.IsPlayerCanSpecialSummonCount(tp,2)
 			and Duel.IsPlayerCanSpecialSummonMonster(tp,REPTILIANNE_TOKEN,0,TYPES_TOKEN,0,0,1,RACE_REPTILE,ATTRIBUTE_EARTH,POS_FACEUP,1-tp)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
-	local g=Duel.SelectTarget(tp,s.ctlfilter,tp,0,LOCATION_MZONE,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.ctlfilter,tp,0,LOCATION_MZONE,1,1,nil,ft)
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
 end
 function s.ctlop(e,tp,eg,ep,ev,re,r,rp)
