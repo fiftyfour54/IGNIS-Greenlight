@@ -3,9 +3,9 @@
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
-	--Activate
+	-- Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE+CATEGORY_TOHAND)
+	e1:SetType(EFFECT_TYPE_ACTIVATE+CATEGORY_TOHAND+CATEGORY_ATKCHANGE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(s.cost)
@@ -18,66 +18,51 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,Card.IsAbleToGraveAsCost,1,1,REASON_COST)
 end
- -- Lets a player choose n options
- -- Cannot be cancelled or finished early (no min-max)
-function aux.SelectMultipleOptions(tp,n,sort,descs,cons,funcs,...)
-	local excs={}
-	local opts
-	-- filter which options can be selected based on cons
-	if cons then
-		opts={}
-		for i,desc in ipairs(descs) do
-			if cons[i] then table.insert(opts,desc) else table.insert(excs,i-1) end
-		end
-	else opts={table.unpack(descs)} end
-	-- start selection
-	local sels={}
-	for i=1,n do
-		if #opts>0 then
-			local sel=Duel.SelectOption(tp,table.unpack(opts))
-			table.remove(opts,sel+1)
-			-- adjust the selection so it corresponds
-			-- to the index in the original table (descs)
-			for _,exc in ipairs(excs) do
-				if exc<=sel then sel=sel+1 end
-			end
-			table.insert(sels,sel)
-			table.insert(excs,sel)
-		end
-	end
-	-- execute optional functions for each selection
-	if funcs then
-		for _,sel in ipairs(sels) do
-			if funcs[sel] then funcs[sel](...) end
-		end
-	end
-	-- if sort is true, arrange according to position in original table
-	-- if not, arrange according to order of selection
-	return sort and table.sort(sels) or sels
-end
 function s.mfilter(c)
 	return c:IsMonster() and c:IsSetCard(0x3c) and c:IsAbleToHand()
+end
+function s.mthtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.mfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.stfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSetCard(0x3c) and not c:IsCode(id) and c:IsAbleToHand()
 end
+function s.stthtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.stfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsAttackAbove,1),tp,0,LOCATION_MZONE,1,nil) end
+end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local b0=Duel.IsExistingMatchingCard(s.mfilter,tp,LOCATION_DECK,0,1,nil)
-	local b1=Duel.IsExistingMatchingCard(s.stfilter,tp,LOCATION_DECK,0,1,nil)
-	local b2=Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsAttackAbove,1),tp,0,LOCATION_MZONE,1,nil)
+	local b0=s.mthtg(e,tp,eg,ep,ev,re,r,rp,0)
+	local b1=s.stthtg(e,tp,eg,ep,ev,re,r,rp,0)
+	local b2=s.atktg(e,tp,eg,ep,ev,re,r,rp,0)
 	if chk==0 then return b0 and (b1 or b2) or (b1 and b2) end
-	local tohand=0
-	local opts=aux.SelectMultipleOptions(tp,2,false,
-		{aux.Stringid(id,0),aux.Stringid(id,1),aux.Stringid(id,2)},
-		{b0,b1,b2},
-		{
-			function() tohand=tohand+1 end,
-			function() tohand=tohand+1 end,
-			function() e:SetCategory(e:GetCategory()+CATEGORY_ATKCHANGE) end
-		}
-	)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,tohand,tp,LOCATION_DECK)
-	e:SetLabelObject(opts)
+	local sel=0
+	for ct=1,2 do
+		local stable={}
+		local dtable={}
+		if b0 and (sel&0x1==0) then
+			table.insert(stable,0x1)
+			table.insert(dtable,aux.Stringid(id,0))
+		end
+		if b1 and (sel&0x2==0) then
+			table.insert(stable,0x2)
+			table.insert(dtable,aux.Stringid(id,1))
+		end
+		if b2 and (sel&0x4==0) then
+			table.insert(stable,0x4)
+			table.insert(dtable,aux.Stringid(id,2))
+		end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EFFECT)
+		local op=Duel.SelectOption(tp,table.unpack(dtable))+1
+		sel=sel+stable[op]
+	end
+	if (sel&0x1==0x1) then s.mthtg(e,tp,eg,ep,ev,re,r,rp,1) end
+	if (sel&0x2==0x2) then s.stthtg(e,tp,eg,ep,ev,re,r,rp,1) end
+	e:SetLabel(sel)
 end
 function s.mthop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
@@ -110,8 +95,8 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local ops={s.mthop,s.stthop,s.atkop}
-	for _,opt in ipairs(e:GetLabelObject()) do
-		ops[opt+1](e,tp,eg,ep,ev,re,r,rp)
-	end
+	local sel=e:GetLabel()
+	if (sel&0x1==0x1) then s.mthop(e,tp,eg,ep,ev,re,r,rp) end
+	if (sel&0x2==0x2) then s.stthop(e,tp,eg,ep,ev,re,r,rp) end
+	if (sel&0x4==0x4) then s.atkop(e,tp,eg,ep,ev,re,r,rp) end
 end
