@@ -42,11 +42,11 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)<1 then return end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local og=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsAttack,0),tp,0,LOCATION_MZONE,0,nil)
-	local ct=math.min(#og,Duel.GetLocationCount(tp,LOCATION_MZONE))
-	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then
-		ct=math.min(2,ct)
-	end
+	if ft==0 or #og==0 then return end
+	local ct=math.min(#og,ft)
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ct=1 end
 	local sg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_HAND,0,nil,e,tp)
 	if ct>0 and #sg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.BreakEffect()

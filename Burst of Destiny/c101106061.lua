@@ -36,7 +36,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x3c}
 function s.desfilter(c,ft)
-	return c:IsFaceup() and c:IsAttack(0) and (ft>0 or c:GetSequence()<5)
+	return c:IsFaceup() and c:IsAttack(0) and (ft>0 or c:IsInMainMZone())
 end
 function s.spfilter(c,e,tp)
 	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_REPTILE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -49,7 +49,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 			and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g1=Duel.SelectTarget(tp,s.desfilter,tp,LOCATION_ONFIELD,0,1,1,nil,ft)
+	local g1=Duel.SelectTarget(tp,s.desfilter,tp,LOCATION_MZONE,0,1,1,nil,ft)
 	e:SetLabelObject(g1:GetFirst())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g2=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
@@ -57,35 +57,38 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g2,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local tc1,tc2=Duel.GetFirstTarget()
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local tc1,tc2=Duel.GetFirstTarget(),e:GetLabelObject()
 	if tc1~=e:GetLabelObject() then tc1,tc2=tc2,tc1 end
-	if tc1:IsRelateToEffect(e) and Duel.Destroy(tc1,REASON_EFFECT)>0 and tc1:IsLocation(LOCATION_GRAVE) 
-		and tc2:IsRelateToEffect(e) and (aux.nvfilter(tc2) or not Duel.IsChainDisablable(0)) then
+	if tc1:IsRelateToEffect(e) and Duel.Destroy(tc1,REASON_EFFECT)>0
+		and tc2:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		Duel.SpecialSummon(tc2,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
 function s.ctlcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and re:IsActiveType(TYPE_MONSTER)
+	return rp==1-tp and re:IsActiveType(TYPE_MONSTER)
 end
 function s.ctlfilter(c,ft)
-	return c:IsFaceup() and c:IsControlerCanBeChanged() and c:IsAttack(0) and (ft>0 or c:GetSequence()<5)
+	return c:IsFaceup() and c:IsControlerCanBeChanged() and c:IsAttack(0) and (ft>0 or c:IsInMainMZone())
 end
 function s.ctltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local ft=Duel.GetMZoneCount(1-tp,g,tp)
+	local ft=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.ctlfilter(chkc,ft) end
 	if chk==0 then
 		return Duel.IsExistingTarget(s.ctlfilter,tp,0,LOCATION_MZONE,1,nil,ft)
-			and Duel.IsPlayerCanSpecialSummonCount(tp,2)
 			and Duel.IsPlayerCanSpecialSummonMonster(tp,REPTILIANNE_TOKEN,0,TYPES_TOKEN,0,0,1,RACE_REPTILE,ATTRIBUTE_EARTH,POS_FACEUP,1-tp)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g=Duel.SelectTarget(tp,s.ctlfilter,tp,0,LOCATION_MZONE,1,1,nil,ft)
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
 end
 function s.ctlop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
-	if not (tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsAttack(0)) then return end
-	if Duel.GetControl(tc,tp) and Duel.GetMZoneCount(1-tp,nil,tp)>0
+	if not tc:IsRelateToEffect(e) then return end
+	if Duel.GetControl(tc,tp) and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,REPTILIANNE_TOKEN,0,TYPES_TOKEN,0,0,1,RACE_REPTILE,ATTRIBUTE_EARTH,POS_FACEUP,1-tp) then
 		Duel.BreakEffect()
 		local token=Duel.CreateToken(tp,REPTILIANNE_TOKEN)
