@@ -5,7 +5,8 @@ local s,id=GetID()
 function s.initial_effect(c)
 	-- Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE+CATEGORY_TOHAND+CATEGORY_ATKCHANGE)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(s.cost)
@@ -34,6 +35,7 @@ function s.stthtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsAttackAbove,1),tp,0,LOCATION_MZONE,1,nil) end
+	e:SetCategory(e:GetCategory()+CATEGORY_ATKCHANGE)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b0=s.mthtg(e,tp,eg,ep,ev,re,r,rp,0)
@@ -62,6 +64,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	if (sel&0x1==0x1) then s.mthtg(e,tp,eg,ep,ev,re,r,rp,1) end
 	if (sel&0x2==0x2) then s.stthtg(e,tp,eg,ep,ev,re,r,rp,1) end
+	if (sel&0x4==0x4) then s.atktg(e,tp,eg,ep,ev,re,r,rp,1) end
 	e:SetLabel(sel)
 end
 function s.mthop(e,tp,eg,ep,ev,re,r,rp)
