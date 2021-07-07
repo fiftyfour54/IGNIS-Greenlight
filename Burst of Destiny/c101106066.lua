@@ -24,6 +24,9 @@ function s.initial_effect(c)
 	e2:SetValue(s.repval)
 	e2:SetOperation(s.repop)
 	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(CARD_URSARCTIC_DRYTRON)
+	c:RegisterEffect(e3)
 end
 s.listed_names={101106040,89264428,58793369,27693363,97148796}
 s.listed_series={SET_URSARCTIC,SET_DRYTRON }
@@ -65,7 +68,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		if tc then
 			Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
 		end
-	end	
+	end 
 end
 function s.repcon(e)
 	return e:GetHandler():IsAbleToRemoveAsCost()
