@@ -1,6 +1,7 @@
 --天斗輝巧極
 --Ursarctic Drytron
 --Scripted by Eerie Code
+local CARD_URSARCTIC_DRYTRON=101106066
 local s,id=GetID()
 function s.initial_effect(c)
 	--activate
