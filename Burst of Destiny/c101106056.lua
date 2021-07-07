@@ -1,4 +1,4 @@
--- 
+-- 氷水揺籃
 -- Icejade Cradel
 -- Scripted by Hatter
 local s,id=GetID()

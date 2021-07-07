@@ -1,4 +1,4 @@
--- 
+-- デスピアの凶劇
 -- Ad Libitum of Despia
 -- Scripted by Hatter
 local s,id=GetID()
@@ -47,7 +47,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.spfilter(c,e,tp)
 	return ((c:IsSetCard(0x166) and not c:IsCode(id)) or (c:IsLevelAbove(8) and c:IsType(TYPE_FUSION)))
-		and c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
+		and c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsControler(tp) and s.filter(chkc,e,tp) end

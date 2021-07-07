@@ -1,4 +1,4 @@
--- 
+-- 烙印の気炎
 -- Jubilation of the Branded
 -- Scripted by Hatter
 local s,id=GetID()
@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	-- Add to hand
+	-- Add self to hand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -49,7 +49,7 @@ function s.tgfilter(c,race)
 		and c:IsDefense(2500) and c:IsRace(race) and c:IsAbleToGrave()
 end
 function s.costfilter(c,tp)
-	return c:IsMonster() and c:IsDiscardable() and not c:IsPublic()
+	return c:IsMonster() and c:IsDiscardable(REASON_EFFECT) and not c:IsPublic()
 		and Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_EXTRA,0,1,nil,c:GetRace())
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
