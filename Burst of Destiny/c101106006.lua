@@ -43,16 +43,19 @@ end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local a,b=Duel.GetAttacker(),Duel.GetAttackTarget()
 	if a:IsControler(1-tp) then a,b=b,a end
-	if chk==0 then return a:IsRace(RACE_WYRM) and b and b:IsControler(1-tp) and b:IsSummonLocation(LOCATION_EXTRA) end
+	if chk==0 then return a and a:IsRace(RACE_WYRM) and b and b:IsControler(1-tp)
+		and b:IsSummonLocation(LOCATION_EXTRA) end
 	local g=Group.FromCards(e:GetHandler(),b)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,2,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	local a,b=Duel.GetAttacker(),Duel.GetAttackTarget()
 	if a:IsStatus(STATUS_ATTACK_CANCELED) then return end
 	if a:IsControler(1-tp) then a,b=b,a end
-	if a:IsRelateToBattle() and b:IsRelateToBattle() and b:IsControler(1-tp) then
-		local g=Group.FromCards(e:GetHandler(),b)
+	if a and a:IsRelateToBattle() and b and b:IsRelateToBattle() and b:IsControler(1-tp) then
+		local g=Group.FromCards(c,b)
 		if #g>0 then
 			Duel.Destroy(g,REASON_EFFECT)
 		end
@@ -63,6 +66,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroupCost(tp,nil,1,false,aux.ReleaseCheckMMZ,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 	local g=Duel.SelectReleaseGroupCost(tp,nil,1,1,false,aux.ReleaseCheckMMZ,nil)
 	Duel.Release(g,REASON_COST)
 end
@@ -80,10 +84,10 @@ function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) and chkc:IsAbleToRemove() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_ONFIELD+LOCATION_GRAVE) and chkc:IsAbleToRemove() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,LOCATION_ONFIELD+LOCATION_GRAVE,LOCATION_ONFIELD+LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,1,1,nil)
+	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,LOCATION_ONFIELD+LOCATION_GRAVE,LOCATION_ONFIELD+LOCATION_GRAVE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
