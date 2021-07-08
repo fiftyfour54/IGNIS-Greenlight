@@ -4,7 +4,6 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	c:AddSetcodesRule(SET_URSARCTIC,SET_DRYTRON)
 	--Special summon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -37,15 +36,15 @@ function s.initial_effect(c)
 	e3:SetOperation(s.thop2)
 	c:RegisterEffect(e3)
 end
-s.listed_series={SET_URSARCTIC,SET_DRYTRON }
+s.listed_series={0x165,0x151}
 function s.thcfilter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and c:IsControler(tp)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return sg:IsExists(s.thcfilter,1,nil,tp)
+	return eg:IsExists(s.thcfilter,1,e:GetHandler(),tp)
 end
 function s.thfilter(c)
-	return (c:IsSetCard(SET_URSARCTIC) or c:IsSetCard(SET_DRYTRON)) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return (c:IsSetCard(0x165) or c:IsSetCard(0x151)) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

@@ -1,7 +1,6 @@
 --天斗輝巧極
 --Ursarctic Drytron
 --Scripted by Eerie Code
-local CARD_URSARCTIC_DRYTRON=101106066
 local s,id=GetID()
 function s.initial_effect(c)
 	--activate
@@ -30,13 +29,13 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_names={101106040,89264428,58793369,27693363,97148796}
-s.listed_series={SET_URSARCTIC,SET_DRYTRON }
+s.listed_series={0x165,0x151}
 function s.rmfilter(c)
 	return c:IsCode(89264428,58793369) and c:IsAbleToRemove()
 		and (c:IsFaceup() or not c:IsOnField())
 end
 function s.excheck(tp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,27693363,97148796),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,27693363,97148796),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end
 function s.spfilter(c,e,tp,sg)
 	return c:IsCode(101106040) and Duel.GetLocationCountFromEx(tp,tp,sg,c)>0 
@@ -76,7 +75,7 @@ function s.repcon(e)
 end
 function s.repval(base,e,tp,eg,ep,ev,re,r,rp,chk,extracon)
 	local c=e:GetHandler()
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x165) and (not extracon or extracon(base,c,e,tp,eg,ep,ev,re,r,rp,chk))
+	return c:IsType(TYPE_MONSTER) and (c:IsSetCard(0x165) or c:IsSetCard(0x151)) and (not extracon or extracon(base,c,e,tp,eg,ep,ev,re,r,rp,chk))
 end
 function s.repop(base,e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
