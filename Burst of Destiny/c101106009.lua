@@ -41,14 +41,13 @@ function s.tgspfilter(c,e,tp)
 	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.spfilter(chkc,e,tp) end
-	if chk==0 then
-		return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and e:GetHandler():IsAbleToGrave()
-			and Duel.IsExistingTarget(s.tgspfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
-	end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.tgspfilter(chkc,e,tp) end
+	local c=e:GetHandler()
+	if chk==0 then return (Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or c:IsInMainMZone())
+			and Duel.IsExistingTarget(s.tgspfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,s.tgspfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,e:GetHandler(),1,tp,LOCATION_MZONE)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,c,1,tp,LOCATION_MZONE)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,tp,LOCATION_GRAVE)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
@@ -61,7 +60,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.spconfilter(c,tp)
-	return c:IsMonster() and c:IsReason(REASON_BATTLE+REASON_EFFECT) and (c:GetPreviousAttributeOnField()&ATTRIBUTE_WATER)==ATTRIBUTE_WATER
+	return c:IsReason(REASON_BATTLE+REASON_EFFECT) and (c:GetPreviousAttributeOnField()&ATTRIBUTE_WATER)==ATTRIBUTE_WATER
 		and c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
