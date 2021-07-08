@@ -46,7 +46,7 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
 	local tc=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
-	aux.ToHandOrElse(tc,tp,,function(c)
+	aux.ToHandOrElse(tc,tp,function(c)
 						return sc:IsAbleToRemove(),
 						function(c)
 						Duel.Remove(sc,POS_FACEUP,REASON_EFFECT),
