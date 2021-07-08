@@ -46,14 +46,10 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
 	local tc=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
-	aux.ToHandOrElse(tc,tp,function(c)
-						return sc:IsAbleToRemove(),
-						function(c)
-						Duel.Remove(sc,POS_FACEUP,REASON_EFFECT),
-						aux.Stringid(id,1)
-						)
-						end
-	end
+	aux.ToHandOrElse(tc,tp,function(c) return sc:IsAbleToRemove() end,
+				function(c) Duel.Remove(sc,POS_FACEUP,REASON_EFFECT) end,
+				aux.Stringid(id,1)
+	)
 end
 function s.costfilter(c)
 	return (c:IsSetCard(SET_SOUKEN) or c:IsRace(RACE_WYRM)) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
