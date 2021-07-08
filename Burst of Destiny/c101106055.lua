@@ -9,9 +9,8 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOGRAVE+CATEGORY_HANDES+CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e1:SetCountLimit(1,id)
-	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
@@ -22,7 +21,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCountLimit(1,id+100)
+	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.thcon)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
@@ -39,47 +38,46 @@ end
 s.listed_names={CARD_ALBAZ}
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	for tc in aux.Next(eg) do
-		if tc:IsType(TYPE_FUSION) then 
+		if tc:IsType(TYPE_FUSION) and tc:IsControler(tp) then 
 			Duel.RegisterFlagEffect(tc:GetControler(),id,RESET_PHASE+PHASE_END,0,1)
 		end
 	end
 end
-function s.tgfilter(c,race)
-	return c:IsLevel(8) and c:IsType(TYPE_FUSION) and c:IsAttack(2500)
-		and c:IsDefense(2500) and c:IsRace(race) and c:IsAbleToGrave()
-end
-function s.costfilter(c,tp)
-	return c:IsMonster() and c:IsDiscardable(REASON_EFFECT) and not c:IsPublic()
+function s.revfilter(c,tp)
+	return c:IsMonster() and not c:IsPublic()
 		and Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_EXTRA,0,1,nil,c:GetRace())
 end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_HAND,0,1,nil,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_HAND,0,1,1,nil,tp)
-	e:SetLabelObject(g:GetFirst())
-	Duel.ConfirmCards(1-tp,g)
-	Duel.ShuffleHand(tp)
+function s.tgfilter(c,race)
+	return c:IsLevel(8) and c:IsType(TYPE_FUSION) and (c:IsAttack(2500)
+		or c:IsDefense(2500)) and c:IsRace(race) and c:IsAbleToGrave()
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.revfilter,tp,LOCATION_HAND,0,1,nil,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_EXTRA)
 end
 function s.thfilter(c)
 	return (c:IsCode(CARD_ALBAZ) or (c:IsMonster() and aux.IsCodeListed(c,CARD_ALBAZ))) and c:IsAbleToHand()
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_EXTRA)
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,e:GetLabelObject(),0,tp,1)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local cc=e:GetLabelObject()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+	local rg=Duel.SelectMatchingCard(tp,s.revfilter,tp,LOCATION_HAND,0,1,1,nil,tp)
+	if #rg==0 then return end
+	Duel.ConfirmCards(1-tp,rg)
+	Duel.ShuffleHand(tp)
+	local cc=rg:GetFirst()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_EXTRA,0,1,1,nil,cc:GetRace())
-	if #g>0 and Duel.SendtoGrave(g,REASON_EFFECT)>0 and Duel.SendtoGrave(cc,REASON_EFFECT+REASON_DISCARD)>0 then
+	if #g>0 and Duel.SendtoGrave(g,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_GRAVE)
+		and cc:IsDiscardable(REASON_EFFECT) and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)
+		and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 		Duel.BreakEffect()
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local hg=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-		if #hg>0 then
-			Duel.SendtoHand(hg,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,hg)
+		if Duel.SendtoGrave(cc,REASON_EFFECT+REASON_DISCARD)>0 then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+			local hg=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+			if #hg>0 then
+				Duel.SendtoHand(hg,nil,REASON_EFFECT)
+				Duel.ConfirmCards(1-tp,hg)
+			end
 		end
 	end
 end

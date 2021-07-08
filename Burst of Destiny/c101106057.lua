@@ -15,8 +15,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop(Fusion.SummonEffTG(table.unpack(fparams)),Fusion.SummonEffOP(table.unpack(fparams))))
 	c:RegisterEffect(e1)
-	if not GhostBelleTable then GhostBelleTable={} end
-	table.insert(GhostBelleTable,e1)
 end
 s.listed_names={CARD_ALBAZ}
 s.listed_series={0x160}
@@ -38,9 +36,9 @@ function s.thop(fustg,fusop)
 	return function(e,tp,eg,ep,ev,re,r,rp)
 		local tc=Duel.GetFirstTarget()
 		if not tc or not tc:IsRelateToEffect(e) then return end 
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		if Duel.SendtoHand(tc,nil,REASON_EFFECT)==0 or not tc:IsLocation(LOCATION_HAND) then return end
 		Duel.ConfirmCards(1-tp,tc)
-		if tc:IsLocation(LOCATION_HAND) and fustg(e,tp,eg,ep,ev,re,r,rp,0) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		if fustg(e,tp,eg,ep,ev,re,r,rp,0) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.BreakEffect()
 			fusop(e,tp,eg,ep,ev,re,r,rp)
 		end

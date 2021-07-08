@@ -10,6 +10,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetCountLimit(1,id)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetTarget(s.atktg)
 	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
 	-- Special Summon
@@ -26,11 +27,15 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x166}
+function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.HasLevel),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.HasLevel),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if #tg>0 then
 		local c=e:GetHandler()
 		for sc in aux.Next(tg) do
+			--Increase ATK
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -46,11 +51,11 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 		and c:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and c:IsFaceup()
 end
 function s.spfilter(c,e,tp)
-	return ((c:IsSetCard(0x166) and not c:IsCode(id)) or (c:IsLevelAbove(8) and c:IsType(TYPE_FUSION)))
+	return not c:IsCode(id) and (c:IsSetCard(0x166) or (c:IsLevelAbove(8) and c:IsType(TYPE_FUSION)))
 		and c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsControler(tp) and s.filter(chkc,e,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

@@ -1,4 +1,5 @@
---Masquerade, the Crimsongleam Dragon - 赫灼竜マスカレイド
+--赫灼竜マスカレイド
+--Masquerade, the Crimsongleam Dragon
 local s,id=GetID()
 function s.initial_effect(c)
 	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0x166),s.matfilter)
@@ -28,7 +29,7 @@ function s.initial_effect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
+	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e3:SetRange(LOCATION_GRAVE)
 	e3:SetCountLimit(1,id)
 	e3:SetCondition(s.spcon)
@@ -46,13 +47,11 @@ function s.costcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.costchk(e,te_or_c,tp)
 	local ct=#{Duel.GetPlayerEffect(tp,id)}
-	return Duel.CheckLPCost(tp,ct*500)
+	return Duel.CheckLPCost(tp,ct*600)
 end
 function s.costop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.PayLPCost(tp,600)
 end
-
-
 function s.spcfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_RITUAL+TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK)
 end
@@ -67,6 +66,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+		--Banish it when it leaves the field
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3300)
 		e1:SetType(EFFECT_TYPE_SINGLE)
