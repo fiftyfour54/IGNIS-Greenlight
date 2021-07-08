@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	
 	--Target 1 monster to negate the effects
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetDescription(aux.Stringid(id,3))
 	e2:SetCategory(CATEGORY_DISABLE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
