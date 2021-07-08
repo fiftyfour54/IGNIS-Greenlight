@@ -32,11 +32,12 @@ function s.initial_effect(c)
 	e2:SetOperation(s.ngop)
 	c:RegisterEffect(e2)
 end
+s.listed_series={SET_XIANGJIAN}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO)
 end
 function s.cfilter(c)
-	return c:IsSetCard(SET_SOUKEN) and (c:IsAbleToHand() or c:IsAbleToRemove())
+	return c:IsSetCard(SET_XIANGJIAN) and (c:IsAbleToHand() or c:IsAbleToRemove())
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -52,7 +53,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	)
 end
 function s.costfilter(c)
-	return (c:IsSetCard(SET_SOUKEN) or c:IsRace(RACE_WYRM)) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
+	return (c:IsSetCard(SET_XIANGJIAN) or c:IsRace(RACE_WYRM)) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
 end
 function s.ngcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_GRAVE+LOCATION_HAND+LOCATION_MZONE,0,1,nil) end
