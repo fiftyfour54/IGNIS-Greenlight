@@ -1,7 +1,7 @@
 -- 相剣師－莫邪
 -- Mo Ye, the Xiangjian Swordmaster
 -- Scripted by Hatter
-local TOKEN_XIANGJIAN=101106103
+local TOKEN_XIANGJIAN=101106203
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Special Summon token
@@ -32,9 +32,9 @@ function s.initial_effect(c)
 	e3:SetOperation(s.drop)
 	c:RegisterEffect(e3)
 end
-s.listed_series={0x26b}
+s.listed_series={0x26c}
 function s.tkcostfilter(c)
-	return (c:IsSetCard(0x26b) or (c:IsMonster() and c:IsRace(RACE_WYRM))) and not c:IsPublic()
+	return (c:IsSetCard(0x26c) or (c:IsMonster() and c:IsRace(RACE_WYRM))) and not c:IsPublic()
 end
 function s.tkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tkcostfilter,tp,LOCATION_HAND,0,1,nil) end
@@ -46,7 +46,7 @@ end
 function s.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-			and Duel.IsPlayerCanSpecialSummonMonster(tp,TOKEN_XIANGJIAN,0x26b,TYPES_TOKEN+TYPE_TUNER,0,0,4,RACE_WYRM,ATTRIBUTE_WATER)
+			and Duel.IsPlayerCanSpecialSummonMonster(tp,TOKEN_XIANGJIAN,0x26c,TYPES_TOKEN+TYPE_TUNER,0,0,4,RACE_WYRM,ATTRIBUTE_WATER)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
