@@ -40,7 +40,7 @@ function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=e:GetHandlerPlayer()
 	local zone=s.getzones(tp)&0x1f
-	return zone~=0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
+	return zone~=0 and c:IsCanBeSpecialSummoned(e,0,tp,false,true,POS_FACEUP,tp,zone)
 end
 function s.spval(e,c)
 	return 0,s.getzones(c:GetControler())&0x1f
