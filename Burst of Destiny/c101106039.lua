@@ -60,7 +60,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local rg=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	local g=aux.SelectUnselectGroup(rg,e,tp,2,2,s.rescon,1,tp,HINTMSG_REMOVE,nil,nil,true)
 	if #g>0 then
-		 Duel.Destroy(g,REASON_EFFECT)>0
+		 Duel.Destroy(g,REASON_EFFECT)
 	end
 end
 function s.rescon(sg,e,tp,mg)
