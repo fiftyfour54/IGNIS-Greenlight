@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,id)
-	e1:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk)if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil)end end)
+	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
@@ -39,6 +39,11 @@ s.listed_names={id}
 	--Check for a "Destiny HERO" monster
 function s.filter(c)
 	return c:IsSetCard(0xc008) and c:IsType(TYPE_MONSTER) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE+LOCATION_DECK))
+end
+	--Activation legality
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
 end
 	--Place on top of your Deck, 1 of your "Destiny HERO" monsters that is banished, in GY, or Deck
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
