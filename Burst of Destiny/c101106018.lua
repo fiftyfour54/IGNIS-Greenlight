@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
@@ -40,25 +40,25 @@ s.listed_names={id}
 function s.filter(c)
 	return c:IsSetCard(0xc008) and c:IsType(TYPE_MONSTER) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE+LOCATION_DECK))
 end
-	--Activation legality
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,0,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED)
 end
 	--Place on top of your Deck, 1 of your "Destiny HERO" monsters that is banished, in GY, or Deck
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
-	if Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) then
-		Duel.ShuffleDeck(tp)
-	end
 	local tc=g:GetFirst()
-	if tc then
-		Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT)
+	if not tc then return end
+	if tc:IsLocation(LOCATION_DECK) then
+		Duel.ShuffleDeck(tp)
 		Duel.MoveToDeckTop(tc)
-		if not tc:IsLocation(LOCATION_EXTRA) then
-			Duel.ConfirmDecktop(tp,1)
-		end
+	else
+		Duel.HintSelection(g,true)
+		Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT)
+	end
+	if not tc:IsLocation(LOCATION_EXTRA) then
+		Duel.ConfirmDecktop(tp,1)
 	end
 end
 	--Check for a "Destiny HERO" monster
