@@ -8,10 +8,8 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_BOTH_SIDE)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(Duel.IsMainPhase)
 	e1:SetCost(function(e,_,_,_,_,_,_,_,chk)if chk==0 then return not e:GetHandler():IsPublic()end end)
 	e1:SetOperation(s.revop)
 	c:RegisterEffect(e1)
@@ -59,7 +57,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()
 	return rc and rc:IsType(TYPE_SPELL|TYPE_TRAP) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and
-	       (not rc:IsStatus(STATUS_ACT_FROM_HAND)) and rc:IsPreviousPosition(POS_FACEDOWN)
+	       not rc:IsStatus(STATUS_ACT_FROM_HAND) and rc:IsPreviousPosition(POS_FACEDOWN)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -67,19 +65,20 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
-function s.setfilter(c,ig)
-	return c:IsType(TYPE_SPELL|TYPE_TRAP) and c:IsSSetable(ig)
+function s.setfilter(c)
+	return c:IsType(TYPE_SPELL|TYPE_TRAP) and c:IsSSetable()
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local wasrev=s.isrev(c)
-	if Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) and wasrev and
-	   Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil,false) and
-	   Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 and wasrev and
+		Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil) and
+		Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 		Duel.BreakEffect()
-		local tc=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil,true):GetFirst()
-		Duel.SSet(tp,tc)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+		local tc=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+		if Duel.SSet(tp,tc)==0 then return end
 		--Banish it during the End Phase of the next turn.
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1)
 		local e1=Effect.CreateEffect(c)
@@ -94,7 +93,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetOperation(s.rmop)
 		Duel.RegisterEffect(e1,tp)
 	end
-	Duel.SpecialSummonComplete()
 end
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()

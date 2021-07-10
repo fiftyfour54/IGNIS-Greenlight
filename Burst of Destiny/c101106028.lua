@@ -79,7 +79,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	g:DeleteGroup()
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and Duel.IsBattlePhase() and Duel.IsChainNegatable(ev) and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
+	return rp~=tp and Duel.IsBattlePhase() and Duel.IsChainNegatable(ev)
+		and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -112,8 +113,9 @@ end
 function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local lc=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if lc<=0 then return end
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then lc=1 end
 	local rg=Duel.GetMatchingGroup(s.spfilter2,tp,LOCATION_REMOVED,0,nil,e,tp)
-	local g=aux.SelectUnselectGroup(rg,e,tp,1,math.min(lc,3),s.rescon2,1,tp,HINTMSG_SPSUMMON,nil,nil,false)
+	local g=aux.SelectUnselectGroup(rg,e,tp,1,math.min(lc,3),s.rescon2,1,tp,HINTMSG_SPSUMMON)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
