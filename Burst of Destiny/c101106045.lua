@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EFFECT_CANNOT_TRIGGER)
-	e2:SetTargetRange(0,LOCATION_MZONE)
+	e2:SetTargetRange(0,LOCATION_ALL)
 	e2:SetValue(1)
 	e2:SetTarget(s.attg)
 	c:RegisterEffect(e2)
@@ -51,6 +51,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not (c:IsRelateToEffect(e) and c:IsFaceup() and c:IsLocation(LOCATION_MZONE)
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	local ec=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_EXTRA,0,1,1,nil,0x152):GetFirst()
 	if ec then
 		Duel.Equip(tp,ec,c,true)
@@ -67,15 +68,16 @@ function s.eqlimit(e,c)
 	return c==e:GetLabelObject()
 end
 function s.atfilter(c,ty)
-	return c:IsFaceup() and c:IsSetCard(0x152) and c:IsType(ty)
+	return c:IsFaceup() and c:IsSetCard(0x152) and c:GetSequence()<5
+		and c:IsOriginalType(TYPE_MONSTER) and c:IsOriginalType(ty)
 end
 function s.attg(e,c)
-	local ty=c:GetType() & TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK 
+	local ty=c:GetType() & (TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
 	if ty==0 then return false end
 	return Duel.IsExistingMatchingCard(s.atfilter,e:GetHandlerPlayer(),LOCATION_SZONE,0,1,nil,ty)
 end
 function s.filter(c,ft)
-	return c:IsFaceup() and c:IsSetCard(0x152) and (ft>0 or (c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5))
+	return c:IsFaceup() and c:IsSetCard(0x152) and (ft>0 or c:IsInMainMZone())
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
@@ -90,7 +92,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 and c:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)>0 and c:IsRelateToEffect(e) then
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
