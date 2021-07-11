@@ -17,8 +17,8 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCountLimit(1)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
 	e2:SetCondition(s.ritcon)
 	e2:SetCost(s.ritcost)
 	e2:SetTarget(s.rittg)
@@ -58,13 +58,13 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmCards(1-tp,rc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local tc=Duel.SelectMatchingCard(tp,s.thfilter2,tp,LOCATION_DECK,0,1,1,nil,rc):GetFirst()
-	if tc and Duel.SendtoHand(tc,nil,REASON_EFFECT)~=0 then
+	if tc and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 then
 		Duel.ConfirmCards(1-tp,tc)
-		Duel.SendtoDeck(rc,nil,2,REASON_EFFECT)
+		Duel.SendtoDeck(rc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	end
 end
 function s.ritcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp
+	return Duel.IsTurnPlayer(1-tp)
 end
 function s.ritcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)

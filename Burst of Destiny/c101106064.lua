@@ -34,7 +34,7 @@ function s.gyfilter1(c,tp)
 end
 function s.gyfilter2(c,tc)
 	return c:IsRitualMonster() and c:IsAbleToGrave()
-		and c:IsAttribute(tc:GetAttribute()) and c:IsRace(tc:GetRace())
+		and (c:IsAttribute(tc:GetAttribute()) or c:IsRace(tc:GetRace()))
 end
 function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.gyfilter1(chkc,tp) end
