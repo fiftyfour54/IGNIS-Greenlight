@@ -54,28 +54,18 @@ end
 function s.ghop(e,tp,eg,ep,ev,re,r,rp)
 	local gg=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_DECK,0,nil)
 	local hg=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
-	-- Choose effect to apply
-	local op
-	if #gg>0 and s.sanct() and #hg>0 then
-		op=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
-	elseif #gg>0 then 
-		op=Duel.SelectOption(tp,aux.Stringid(id,0))
-	else 
-		op=Duel.SelectOption(tp,aux.Stringid(id,1))+1 
-	end
-	-- Apply chosen effect
-	if op==0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local g=gg:Select(tp,1,1,nil)
-		if #g>0 then
-			Duel.SendtoGrave(g,REASON_EFFECT)
-		end
-	elseif op==1 then
+	if (#hg>0 and s.sanct()) and (#gg<1 or Duel.SelectYesNo(tp,aux.Stringid(id,2))) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g=hg:Select(tp,1,1,nil)
 		if #g>0 then
 			Duel.SendtoHand(g,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,g)
+		end
+	elseif #gg>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		local g=gg:Select(tp,1,1,nil)
+		if #g>0 then
+			Duel.SendtoGrave(g,REASON_EFFECT)
 		end
 	end
 end
