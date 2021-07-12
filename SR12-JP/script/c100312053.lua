@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_RECOVER)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1)
+	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.acthtg)
 	e1:SetOperation(s.acthop)
 	c:RegisterEffect(e1)
@@ -17,6 +17,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EFFECT_DESTROY_REPLACE)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,id+100)
 	e2:SetTarget(s.reptg)
 	e2:SetValue(s.repval)
 	e2:SetOperation(s.repop)
@@ -53,7 +54,7 @@ function s.acthop(e,tp,eg,ep,ev,re,r,rp)
 		op=Duel.SelectOption(tp,aux.Stringid(id,1))+1 
 	end
 	-- Apply chosen effect
-	local gainlp
+	local gainlp=nil
 	if op==0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 		local tc=Duel.SelectMatchingCard(tp,s.acfilter,tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
