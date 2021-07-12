@@ -32,9 +32,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_names={CARD_SANCTUARY_SKY,91188343}
-function s.sanct(e)
+function s.sanct()
 	return Duel.IsEnvironment(CARD_SANCTUARY_SKY)
-		or Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_SANCTUARY_SKY),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,LOCATION_ONFIELD+LOCATION_GRAVE,1,nil)
+		or Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_SANCTUARY_SKY),0,LOCATION_ONFIELD+LOCATION_GRAVE,LOCATION_ONFIELD+LOCATION_GRAVE,1,nil)
 end
 function s.ghcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
@@ -48,7 +48,7 @@ end
 function s.ghtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil)
-			or (s.sanct(e) and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil))
+			or (s.sanct() and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil))
 	end
 end
 function s.ghop(e,tp,eg,ep,ev,re,r,rp)
@@ -56,7 +56,7 @@ function s.ghop(e,tp,eg,ep,ev,re,r,rp)
 	local hg=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
 	-- Choose effect to apply
 	local op
-	if #gg>0 and s.sanct(e) and #hg>0 then
+	if #gg>0 and s.sanct() and #hg>0 then
 		op=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
 	elseif #gg>0 then 
 		op=Duel.SelectOption(tp,aux.Stringid(id,0))
