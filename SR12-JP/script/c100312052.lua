@@ -1,5 +1,5 @@
 -- 代行者の近衛 ムーン
--- Guard Of The Agents - Moon
+-- Guard of the Agents - Moon
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
