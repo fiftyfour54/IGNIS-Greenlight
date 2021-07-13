@@ -39,9 +39,11 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		Duel.BreakEffect()
 		local g=Duel.GetMatchingGroup(nil,tp,LOCATION_MZONE,0,c)
-		if #g>0 then Duel.Destroy(g,REASON_EFFECT) end
+		if #g>0 then
+			Duel.BreakEffect()
+			Duel.Destroy(g,REASON_EFFECT)
+		end
 		-- Cannot Special Summon non-DARK monsters
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
