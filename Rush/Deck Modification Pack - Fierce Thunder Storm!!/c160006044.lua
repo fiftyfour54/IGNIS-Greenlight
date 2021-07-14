@@ -50,11 +50,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,48766543),tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil)
 		and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,1,nil)
-		Duel.HintSelection(g)
-		Duel.BreakEffect()
-		Duel.Destroy(g,REASON_EFFECT)
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+			local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,1,nil)
+			Duel.HintSelection(g)
+			Duel.BreakEffect()
+			Duel.Destroy(g,REASON_EFFECT)
 	end
 	end
 end
