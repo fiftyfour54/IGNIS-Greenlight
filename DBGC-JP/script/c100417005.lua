@@ -1,4 +1,4 @@
--- No－P.U.N.K.フォクシー・チューン
+-- Ｎｏ－Ｐ.Ｕ.Ｎ.Ｋ.フォクシー・チューン
 -- Noh P.U.N.K. Foxy Tune
 -- Scripted by Hatter
 local s,id=GetID()

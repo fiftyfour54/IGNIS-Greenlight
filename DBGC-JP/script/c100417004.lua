@@ -1,4 +1,4 @@
--- No－P.U.N.K.セアミン
+-- Ｎｏ－Ｐ.Ｕ.Ｎ.Ｋ.セアミン
 -- Noh P.U.N.K. Seamin
 -- Scripted by Hatter
 local s,id=GetID()

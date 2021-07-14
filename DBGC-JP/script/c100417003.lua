@@ -1,4 +1,4 @@
--- Jo－P.U.N.K.Mme.スパイダー
+-- Ｊｏ－Ｐ.Ｕ.Ｎ.Ｋ.Ｍｍｅ.スパイダー
 -- Joururi P.U.N.K. Madame Spider
 -- Scripted by Hatter
 local s,id=GetID()
