@@ -21,7 +21,7 @@ function s.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsDisabled()
 end
 function s.recfilter(c)
-	return c:IsFaceup() and c:IsMonster() and c:IsSetCard(0x8)
+	return c:IsFaceup() and c:IsMonster() and c:IsSetCard(0x26e)
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.filter(chkc) end
