@@ -10,12 +10,12 @@ assignees: ''
 ## SET NAME - SET ID
 (eg Link Vrains Pack 3 - 1002540XX)  
 ### BETA ID - CARD NAME - JP NAME
-- [ ] Claimed
+- [ ] Claimed []
 - [ ] Scripted
-- [ ] Testing
+- [ ] Tested
 - [ ] Ready
 ### BETA ID - CARD NAME - JP NAME
-- [ ] Claimed
+- [ ] Claimed []
 - [ ] Scripted
-- [ ] Testing
+- [ ] Tested
 - [ ] Ready
