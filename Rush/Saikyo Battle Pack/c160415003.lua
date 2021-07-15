@@ -18,7 +18,7 @@ function s.costfilter(c)
 	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsFaceup() and c:IsAbleToGraveAsCost()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_MZONE,0,2,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_MZONE,0,2,nil) end
 end
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsLevelAbove(7)
@@ -38,7 +38,7 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_MZONE,0,2,2,e:GetHandler())
+	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_MZONE,0,2,2,nil)
 	local ct=Duel.SendtoGrave(g,REASON_COST)
 	if ct>1 then
 		--Effect
