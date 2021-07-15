@@ -1,4 +1,5 @@
--- 最強旗獣サージバイコーン Saikyo Kijyuu Surge Bicorn (Saikyo Flag Beast Surge Bicorn)
+-- 最強旗獣サージバイコーン 
+-- Saikyo Flag Beast Surge Bicorn
 local s,id=GetID()
 function s.initial_effect(c)
 	--double tribute
