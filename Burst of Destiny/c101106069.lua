@@ -13,10 +13,12 @@ function s.initial_effect(c)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
 end
+local getfuncs={Card.GetRace,Card.GetAttribute,Card.GetLevel,Card.GetAttack,Card.GetDefense}
+local isfuncs={Card.IsRace,Card.IsAttribute,Card.IsLevel,Card.IsAttack,Card.IsDefense}
 function s.singleprop(c1,c2)
 	local ct=0
-	for i,prop in ipairs({Card.GetRace,Card.GetAttribute,Card.GetLevel,Card.GetAttack,Card.GetDefense}) do
-		if i<3 and (prop(c1)&prop(c2)>0) or (prop(c1)==prop(c2)) then ct=ct+1 end
+	for i=1,5 do
+		if isfuncs[i](c1,getfuncs[i](c2)) then ct=ct+1 end
 		if ct>1 then return end
 	end
 	return ct==1
@@ -50,7 +52,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local th=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,sc,sc)
-		if #th>0 and Duel.SendtoHand(th,nil,REASON_EFFECT)>0 then
+		if #th>0 and Duel.SendtoHand(th,nil,REASON_EFFECT)>0 and th:GetFirst():IsLocation(LOCATION_HAND) then
 			Duel.ConfirmCards(1-tp,th)
 			Duel.Remove(sc,POS_FACEDOWN,REASON_EFFECT)
 		end
