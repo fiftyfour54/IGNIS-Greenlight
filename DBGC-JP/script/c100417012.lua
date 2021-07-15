@@ -18,28 +18,17 @@ end
 s.listed_series={0x26e}
 --Pop
 function s.filter(c)
-	return c:IsSetCard(0x26e) and c:IsMonster() and c:IsFaceup()
+	return c:IsSetCard(0x26e) and c:IsFaceup()
+end
+function s.tgfilter(c,punk)
+	return c:IsFacedown() or punk
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local fu=Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
-	if chkc then
-		if fu then return chkc:IsOnField()
-		else return chkc:IsOnField() and chkc:IsFacedown()
-		end
-	end
-	if chk==0 then
-		if fu then return Duel.IsExistingTarget(nil,tp,0,LOCATION_ONFIELD,1,nil)
-		else return Duel.IsExistingTarget(Card.IsFacedown,tp,0,LOCATION_ONFIELD,1,nil)
-		end
-	end
-	local tc
-	if fu then 
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		tc=Duel.SelectTarget(tp,nil,tp,0,LOCATION_ONFIELD,1,1,nil)
-	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		tc=Duel.SelectTarget(tp,Card.IsFacedown,tp,0,LOCATION_ONFIELD,1,1,nil)
-	end
+	local punk=Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
+	if chkc then return chkc:IsOnField() and s.tgfilter(chkc,punk) end
+	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,0,LOCATION_ONFIELD,1,nil,punk) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local tc=Duel.SelectTarget(tp,s.tgfilter,tp,0,LOCATION_ONFIELD,1,1,nil,punk)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,1-tp,LOCATION_ONFIELD)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)

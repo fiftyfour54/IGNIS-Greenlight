@@ -3,6 +3,7 @@
 --scripted by Rundas
 local s,id=GetID()
 function s.initial_effect(c)
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -33,34 +34,33 @@ s.listed_series={0x26e}
 --Pop on attack
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	local a,at=Duel.GetAttacker(),Duel.GetAttackTarget()
-	return a and at and ((a:IsSetCard(0x26e) and a:IsControler(tp)) or (at:IsSetCard(0x26e) and at:IsControler(tp) and at:IsFaceup()))
+	if a:IsControler(1-tp) then a,at=at,a end
+	return a and at and a:IsSetCard(0x26e) and a:IsFaceup() and at:IsControler(1-tp)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local a,at=Duel.GetAttacker(),Duel.GetAttackTarget()
 	if chk==0 then return true end
-	if a:IsControler(tp) then Duel.SetOperationInfo(0,CATEGORY_DESTROY,at,1,1-tp,LOCATION_MZONE)
-	else Duel.SetOperationInfo(0,CATEGORY_DESTROY,a,1,1-tp,LOCATION_MZONE)
-	end
+	local a,at=Duel.GetAttacker(),Duel.GetAttackTarget()
+	if a:IsControler(1-tp) then a,at=at,a end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,at,1,1-tp,LOCATION_MZONE)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local a,at=Duel.GetAttacker(),Duel.GetAttackTarget()
-	if a and a:IsRelateToBattle() and a:IsControler(tp) and at:IsControler(1-tp) then
+	if a:IsControler(1-tp) then a,at=at,a end
+	if at and at:IsRelateToBattle() and at:IsControler(1-tp) then
 		Duel.Destroy(at,REASON_EFFECT)
-	elseif at and at:IsRelateToBattle() and at:IsControler(tp) and a:IsControler(1-tp) then
-		Duel.Destroy(a,REASON_EFFECT)
-	else return
 	end
 end
 --Protect
 function s.pcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return rp==1-tp and c:IsReason(REASON_EFFECT) and c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_SZONE)
+	return rp==1-tp and c:IsReason(REASON_EFFECT) and c:IsPreviousControler(tp)
+		and c:IsPreviousLocation(LOCATION_SZONE)
 end
 function s.pop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x26e))
 	e1:SetValue(1)
