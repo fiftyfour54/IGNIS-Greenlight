@@ -37,10 +37,12 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	if op==0 and c:IsRelateToEffect(e) then
 		Duel.SendtoDeck(c,nil,SEQ_DECKBOTTOM,REASON_EFFECT)
 	elseif op==1 then
+		Duel.DisableShuffleCheck(true)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
 		if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
 			Duel.ConfirmCards(1-tp,g)
+			Duel.ShuffleDeck(tp)
 			if c:IsRelateToEffect(e) then
 				Duel.SendtoDeck(c,nil,SEQ_DECKTOP,REASON_EFFECT)
 			end
