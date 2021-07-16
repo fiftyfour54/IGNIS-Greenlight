@@ -55,7 +55,7 @@ end
 function s.thfilter(c,turn)
 	return c:IsAbleToHand() and c:GetTurnID()==turn and not c:IsCode(id)
 end
-function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local turn=Duel.GetTurnCount()
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.thfilter(chkc,turn) end
 	if chk==0 then return Duel.IsExistingTarget(s.thfilter,tp,LOCATION_GRAVE,0,1,nil,turn) end
