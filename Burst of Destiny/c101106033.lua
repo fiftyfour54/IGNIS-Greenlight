@@ -43,18 +43,17 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonCount(tp,1)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) 
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
-		then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
 function s.indcon(e)
-	return not Duel.IsExistingMatchingCard(aux.TRUE,Effect.GetHandlerPlayer(e),LOCATION_MZONE,0,1,e:GetHandler())
+	local c=e:GetHandler()
+	return c:IsAttackPos() and not Duel.IsExistingMatchingCard(nil,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,c)
 end

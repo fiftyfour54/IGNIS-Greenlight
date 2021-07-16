@@ -8,26 +8,29 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_TO_GRAVE)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.tdtg)
 	e1:SetOperation(s.tdop)
 	c:RegisterEffect(e1)
 end
-s.listed_names={id}
+s.listed_names={11548522}
 function s.thfilter(c)
-	return c:IsCode(id) and c:IsAbleToHand()
+	return c:IsCode(11548522) and c:IsAbleToHand()
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToDeck() end
-	if Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)
-		and Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))==1 then
-		e:SetLabel(1)
-		e:SetCategory(CATEGORY_TOHAND+CATEGORY_TODECK)
-		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	local op=-1
+	if Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) then
+		op=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
 	else
-		e:SetLabel(Duel.SelectOption(tp,aux.Stringid(id,1)))
+		op=Duel.SelectOption(tp,aux.Stringid(id,0))
+	end
+	e:SetLabel(op)
+	if op==1 then
+		e:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND+CATEGORY_TODECK)
+		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,c,1,tp,LOCATION_GRAVE)
 end

@@ -28,8 +28,8 @@ function s.initial_effect(c)
 	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_TOHAND)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_TO_GRAVE)
 	e4:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
+	e4:SetCode(EVENT_TO_GRAVE)
 	e4:SetCountLimit(1,id)
 	e4:SetCondition(s.thcon)
 	e4:SetTarget(s.thtg)
@@ -66,17 +66,19 @@ end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e)
-		and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND) then
+	if tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-		e1:SetDescription(aux.Stringid(id,2))
 		e1:SetTargetRange(1,0)
 		e1:SetValue(s.aclimit)
 		e1:SetLabelObject(tc)
-		e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
+		if Duel.IsTurnPlayer(tp) then
+			e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
+		else
+			e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN)
+		end
 		Duel.RegisterEffect(e1,tp)
 	end
 end

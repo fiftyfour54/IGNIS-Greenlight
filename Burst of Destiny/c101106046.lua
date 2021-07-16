@@ -9,12 +9,11 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_LVCHANGE)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.lvcon)
 	e1:SetOperation(s.lvop)
+	c:RegisterEffect(e1)
 	--atk up
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -26,9 +25,8 @@ function s.initial_effect(c)
 	--damage and search
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCategory(CATEGORY_DAMAGE+CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetCountLimit(1,id)
 	e3:SetCondition(s.damcon)
@@ -63,16 +61,15 @@ function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsSummonType(SUMMON_TYPE_SYNCHRO) and r & REASON_SYNCHRO ~= 0
 end
-function s.thfilter(c)
-	return c:IsLevelBelow(8) and c:IsDefense(600) and c:IsAbleToHand()
-end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,e:GetHandler():GetReasonCard():GetLevel()*100)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_HAND)
+end
+function s.thfilter(c)
+	return c:IsLevelBelow(8) and c:IsDefense(600) and c:IsAbleToHand()
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.Damage(tp,e:GetHandler():GetReasonCard():GetLevel()*100,REASON_EFFECT)~=0 then
+	if Duel.Damage(1-tp,e:GetHandler():GetReasonCard():GetLevel()*100,REASON_EFFECT)>0 then
 		local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,1,nil)
 		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,4)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

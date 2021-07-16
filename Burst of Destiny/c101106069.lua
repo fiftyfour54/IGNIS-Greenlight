@@ -19,7 +19,7 @@ function s.singleprop(c1,c2)
 	local ct=0
 	for i=1,5 do
 		if isfuncs[i](c1,getfuncs[i](c2)) then ct=ct+1 end
-		if ct>1 then return end
+		if ct>1 then return false end
 	end
 	return ct==1
 end
@@ -49,12 +49,14 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmCards(1-tp,rc)
 	Duel.ConfirmCards(1-tp,sc)
 	if Duel.Remove(rc,POS_FACEDOWN,REASON_EFFECT)>0 and rc:IsLocation(LOCATION_REMOVED) and rc:IsFacedown() then
-		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local th=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,sc,sc)
-		if #th>0 and Duel.SendtoHand(th,nil,REASON_EFFECT)>0 and th:GetFirst():IsLocation(LOCATION_HAND) then
-			Duel.ConfirmCards(1-tp,th)
-			Duel.Remove(sc,POS_FACEDOWN,REASON_EFFECT)
+		if #th>0 then
+			Duel.BreakEffect()
+			if Duel.SendtoHand(th,nil,REASON_EFFECT)>0 and th:GetFirst():IsLocation(LOCATION_HAND) then
+				Duel.ConfirmCards(1-tp,th)
+				Duel.Remove(sc,POS_FACEDOWN,REASON_EFFECT)
+			end
 		end
 	end
 end

@@ -39,12 +39,12 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0
 		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsRace,RACE_PLANT),tp,LOCATION_MZONE,0,1,c)
-		and Duel.IsExistingMatchingCard(aux.OR(aux.nzatk,aux.nzdef),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
-		and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-		Duel.BreakEffect()
+		and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+		and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
-		local g=Duel.SelectMatchingCard(tp,aux.OR(aux.nzatk,aux.nzdef),tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+		local g=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 		if #g>0 then
+			Duel.BreakEffect()
 			Duel.HintSelection(g,true)
 			local tc=g:GetFirst()
 			-- Halve ATK
@@ -68,7 +68,7 @@ end
 function s.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
-		return not c:IsReason(REASON_REPLACE) and not c:IsReason(REASON_RULE)
+		return not c:IsReason(REASON_REPLACE) and (c:IsReason(REASON_BATTLE) or c:IsReason(REASON_EFFECT))
 			and Duel.IsExistingMatchingCard(s.desrepfilter,tp,LOCATION_DECK,0,1,nil) 
 	end
 	if Duel.SelectEffectYesNo(tp,c,96) then
