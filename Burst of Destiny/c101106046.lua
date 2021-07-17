@@ -5,12 +5,19 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),1,99)
+	--material check
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_MATERIAL_CHECK)
+	e0:SetValue(s.valcheck)
+	c:RegisterEffect(e0)
 	--change level
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_LVCHANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetLabelObject(e0)
 	e1:SetCondition(s.lvcon)
 	e1:SetOperation(s.lvop)
 	c:RegisterEffect(e1)
@@ -34,12 +41,16 @@ function s.initial_effect(c)
 	e3:SetOperation(s.damop)
 	c:RegisterEffect(e3)
 end
+function s.valcheck(e,c)
+	local lv=c:GetMaterial():Filter(Card.IsType,nil,TYPE_TUNER):GetFirst():GetLevel()
+	if lv>0 then e:SetLabel(lv) end
+end
 function s.lvcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO)
 end
 function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local lv=c:GetMaterial():Filter(Card.IsType,nil,TYPE_TUNER):GetFirst():GetLevel()
+	local lv=e:GetLabelObject():GetLabel()
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		local opt=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))
 		local e1=Effect.CreateEffect(c)
