@@ -11,6 +11,9 @@ function s.initial_effect(c)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsStatus(STATUS_SUMMON_TURN) and Duel.GetFieldGroupCount(tp,0,LOCATION_SZONE)>0
+end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
 end
@@ -21,7 +24,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local ct=g:GetFirst()
 	if ct then
 		--If it was a monster, draw 1
-		if ct:IsType(TYPE_MONSTER) and ct:IsRace(RACE_WYRM) and Duel.IsPlayerCanDraw(tp,1) and Duel.SelectYesNo(tp,aux.Stringid(id,0))  then
+		if ct:IsType(TYPE_NORMAL) and ct:IsRace(RACE_WYRM) and Duel.IsPlayerCanDraw(tp,1) and Duel.SelectYesNo(tp,aux.Stringid(id,0))  then
 			Duel.Draw(tp,1,REASON_EFFECT)
 		end
 	end
