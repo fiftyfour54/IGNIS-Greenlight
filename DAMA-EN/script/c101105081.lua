@@ -25,48 +25,31 @@ end
 function s.chcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 end
-function s.get_announceable(g)
-	local race,att=0,0
-	for c in aux.Next(g) do
-		race=race|(RACE_ALL&~c:GetRace())
-		att=att|(0x7f&~c:GetAttribute())
-	end
-	return race,att
-end
 function s.chfilter(c,e)
 	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) and c:IsCanBeEffectTarget(e)
 end
 function s.chtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local g=Duel.GetMatchingGroup(s.chfilter,tp,LOCATION_MZONE,0,nil,e)
-	local race,att=s.get_announceable(g)
-	if chk==0 then return #g>0 and (race>0 or att>0) end
-	local op
-	if race>0 and att>0 then
-		op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
-	elseif race>0 then
-		op=Duel.SelectOption(tp,aux.Stringid(id,1))
-	elseif att>0 then
-		op=Duel.SelectOption(tp,aux.Stringid(id,2))+1
-	end
-	if op==0 then
-		local rc=Duel.AnnounceRace(tp,1,race)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-		local sg=g:FilterSelect(tp,aux.NOT(Card.IsRace),1,1,nil,rc)
-		Duel.SetTargetCard(sg)
-		e:SetLabel(op,rc)
-	elseif op==1 then
-		local at=Duel.AnnounceAttribute(tp,1,att)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-		local sg=g:FilterSelect(tp,aux.NOT(Card.IsAttribute),1,1,nil,at)
-		Duel.SetTargetCard(sg)
-		e:SetLabel(op,at)
-	end
+    local g=Duel.GetMatchingGroup(s.chfilter,tp,LOCATION_MZONE,0,nil,e)
+    if chk==0 then return #g>0 end
+    if Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))==0 then
+        local rc=aux.AnnounceAnotherRace(g,tp)
+        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+        local sg=g:FilterSelect(tp,Card.IsDifferentRace,1,1,nil,rc)
+        Duel.SetTargetCard(sg)
+        e:SetLabel(op,rc)
+    else
+        local att=aux.AnnounceAnotherAttribute(g,tp)
+        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+        local sg=g:FilterSelect(tp,Card.IsDifferentAttribute,1,1,nil,att)
+        Duel.SetTargetCard(sg)
+        e:SetLabel(op,att)
+    end
 end
 function s.chop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc or not tc:IsRelateToEffect(e) or tc:IsFacedown() then return end
 	local op,decl=e:GetLabel()
-	if op==0 and not tc:IsRace(decl) then
+	if op==0 and tc:IsDifferentRace(decl) then
 		-- Change monster type
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -74,7 +57,7 @@ function s.chop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(decl)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
-	elseif op==1 and not tc:IsAttribute(decl) then
+	elseif op==1 and tc:IsDifferentAttribute(decl) then
 		-- Change attribute
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
