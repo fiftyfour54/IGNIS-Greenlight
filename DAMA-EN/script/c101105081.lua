@@ -28,8 +28,8 @@ end
 function s.get_announceable(g)
 	local race,att=0,0
 	for c in aux.Next(g) do
-		race=race|(~c:GetRace())
-		att=att|(~c:GetAttribute())
+		race=race|(RACE_ALL&~c:GetRace())
+		att=att|(0x7f&~c:GetAttribute())
 	end
 	return race,att
 end
@@ -42,11 +42,11 @@ function s.chtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return #g>0 and (race>0 or att>0) end
 	local op
 	if race>0 and att>0 then
-		op=Duel.SelectOption(tp,aux.Stringid(1),aux.Stringid(2))
+		op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
 	elseif race>0 then
-		op=Duel.SelectOption(tp,aux.Stringid(1))
+		op=Duel.SelectOption(tp,aux.Stringid(id,1))
 	elseif att>0 then
-		op=Duel.SelectOption(tp,aux.Stringid(2))+1
+		op=Duel.SelectOption(tp,aux.Stringid(id,2))+1
 	end
 	if op==0 then
 		local rc=Duel.AnnounceRace(tp,1,race)
@@ -73,7 +73,7 @@ function s.chop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_CHANGE_RACE)
 		e1:SetValue(decl)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END)
-		c:RegisterEffect(e1)
+		tc:RegisterEffect(e1)
 	elseif op==1 and not tc:IsAttribute(decl) then
 		-- Change attribute
 		local e1=Effect.CreateEffect(e:GetHandler())
@@ -81,6 +81,6 @@ function s.chop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
 		e1:SetValue(decl)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END)
-		c:RegisterEffect(e1)
+		tc:RegisterEffect(e1)
 	end
 end
