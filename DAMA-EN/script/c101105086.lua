@@ -50,16 +50,20 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	local p,loct=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_PLAYER,CHAININFO_TRIGGERING_LOCATION)
-	return loct==LOCATION_MZONE and re:IsActiveType(TYPE_MONSTER) and p~=tp
+	local loct=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
+	return loct==LOCATION_MZONE and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsControler(1-tp)
+end
+function s.cfilter(c,rc)
+	return c:IsRace(RACE_INSECT) and c~=rc
 end
 function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupCost(tp,Card.IsRace,1,false,nil,nil,RACE_INSECT) end
-	local g=Duel.SelectReleaseGroupCost(tp,Card.IsRace,1,1,false,nil,nil,RACE_INSECT)
+	local rc=re:GetHandler()
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,nil,nil,rc) end
+	local g=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,nil,nil,rc)
 	Duel.Release(g,REASON_COST)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return re:GetHandler():IsDestructable() end
+	if chk==0 then return re:GetHandler():IsLocation(LOCATION_MZONE) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
@@ -67,4 +71,3 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end
-

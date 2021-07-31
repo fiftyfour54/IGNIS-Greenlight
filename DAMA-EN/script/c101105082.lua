@@ -26,15 +26,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.scfilter(c,sc)
-	return sc~=c:GetOriginalLevel()
+	return c:GetOriginalLevel()>0 and sc~=c:GetOriginalLevel()
 end
 function s.sctg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_PZONE) and chkc~=e:GetHandler() end
-	if chk==0 then return Duel.IsExistingTarget(s.scfilter,tp,LOCATION_PZONE,0,1,c,c:GetLeftScale()) end
+	if chk==0 then return Duel.IsExistingTarget(s.scfilter,tp,LOCATION_PZONE,0,1,c,c:GetScale()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,s.scfilter,tp,LOCATION_PZONE,0,1,1,c,c:GetLeftScale())
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	Duel.SelectTarget(tp,s.scfilter,tp,LOCATION_PZONE,0,1,1,c,c:GetScale())
 end
 function s.scop(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
@@ -43,7 +42,7 @@ function s.scop(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if tc and tc:IsRelateToEffect(e) then
 		local lv=tc:GetOriginalLevel()
 		if lv~=c:GetLeftScale() then
-			-- Update scale
+			-- Change scale
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_CHANGE_LSCALE)
