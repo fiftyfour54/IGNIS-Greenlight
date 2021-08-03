@@ -1,4 +1,4 @@
---勇気の天使 ヴィクトリア
+--勇気の天使 ヴィクトリカ
 --Victorica the Angel of Courage
 --scripted by Rundas
 local s,id=GetID()
