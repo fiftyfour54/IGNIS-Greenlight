@@ -32,6 +32,7 @@ function s.spfilter(c,e,tp)
 	return c:IsLevelAbove(5) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
+	Debug.Message(Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp))
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
@@ -53,7 +54,7 @@ function s.ssop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --Search on being destroyed
-function s.remfilter(c)
+function s.remfilter(c,tp)
 	return c:IsRace(RACE_FAIRY) and c:IsAbleToRemoveAsCost() and c:IsMonster() and aux.SpElimFilter(c,true,false) and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,c:GetLevel())
 end
 function s.thfilter(c,lv)
@@ -64,9 +65,9 @@ function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsFaceup()
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.remfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.remfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler(),tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local tc=Duel.SelectMatchingCard(tp,s.remfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler()):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.remfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler(),tp):GetFirst()
 	Duel.Remove(tc,POS_FACEUP,REASON_COST)
 	e:SetLabel(tc:GetLevel())
 end
