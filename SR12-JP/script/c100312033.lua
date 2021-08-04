@@ -1,5 +1,5 @@
---天空のうたごえ
---Chorus in the Sky
+--失われた聖域
+--Lost Sanctuary
 --scripted by Rundas
 local s,id=GetID()
 function s.initial_effect(c)
@@ -8,7 +8,9 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMING_END_PHASE)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetTarget(s.settg)
 	e1:SetOperation(s.setop)
 	c:RegisterEffect(e1)
 	--Name Change
@@ -24,9 +26,11 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_DISABLE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetCountLimit(1,id)
+	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
+	e3:SetCountLimit(1,id+100)
 	e3:SetCost(s.negcost)
 	e3:SetTarget(s.negtg)
 	e3:SetOperation(s.negop)
@@ -35,15 +39,18 @@ end
 s.listed_names={CARD_SANCTUARY_SKY}
 --Set
 function s.setfilter(c)
-	return c:IsSSetable() and (c:IsCode(CARD_SANCTUARY_SKY) or aux.IsCodeListed(c,CARD_SANCTUARY_SKY)) and c:IsType(TYPE_SPELL+TYPE_TRAP)
+	return c:IsSSetable() and (c:IsCode(CARD_SANCTUARY_SKY) or (aux.IsCodeListed(c,CARD_SANCTUARY_SKY) and c:IsType(TYPE_SPELL+TYPE_TRAP)))
+end
+function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil) end
 end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-		local g=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil)
-		if #g>0 then
-			Duel.SSet(tp,g)
-		end
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+	local g=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if #g>0 then
+		Duel.SSet(tp,g)
 	end
 end
 --Negate
@@ -68,8 +75,9 @@ function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() and not tc:IsDisabled() and tc:IsControler(1-tp) then
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() and not tc:IsDisabled() then
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
