@@ -1,4 +1,4 @@
--- 流離のグリフォンライダー
+-- 運命の旅路
 -- Journey of Destiny
 -- Scripted by Hatter
 local s,id=GetID()
