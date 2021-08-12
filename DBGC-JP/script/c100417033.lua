@@ -42,14 +42,13 @@ function s.initial_effect(c)
 	e4:SetOperation(s.thop)
 	c:RegisterEffect(e4)
 end
-s.listed_names={TOKEN_BRAVE,100417030}
+s.listed_names={TOKEN_BRAVE,100417030,id}
 --No Activations during BP
 function s.eqfilter(c)
 	return c:GetEquipGroup():IsExists(Card.IsCode,1,nil,100417030)
 end
 function s.actcon(e)
-	local ph=Duel.GetCurrentPhase()
-	return Duel.IsExistingMatchingCard(s.eqfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil) and ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE
+	return Duel.IsBattlePhase() and Duel.IsExistingMatchingCard(s.eqfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 --Burn
 function s.bcon(e,tp,eg,ep,ev,re,r,rp)
@@ -58,25 +57,29 @@ function s.bcon(e,tp,eg,ep,ev,re,r,rp)
 		and rc:IsFaceup() and rc:IsControler(tp) and rc:IsCode(TOKEN_BRAVE)
 end
 function s.btg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.RegisterFlagEffect(tp,id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,eg:GetFirst():GetBattleTarget():GetTextAttack(),1-tp,0)
+	local atk=eg:GetFirst():GetBattleTarget():GetTextAttack()
+	if chk==0 then return atk>0 end
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,atk,1-tp,0)
 end
 function s.bop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Damage(1-tp,eg:GetFirst():GetBattleTarget():GetTextAttack(),REASON_EFFECT)
 end
 --Search a Field Spell
-function s.thfilter(c)
-	return c:IsType(TYPE_SPELL+TYPE_FIELD) and c:IsAbleToHand() and not c:IsCode(id) and aux.IsCodeListed(c,TOKEN_BRAVE)
-end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp) 
-	return Duel.IsMainPhase() and Duel.GetFlagEffect(tp,id)>0
+	return Duel.GetFlagEffect(tp,id)>0
+end
+function s.thfilter(c)
+	return aux.IsCodeListed(c,TOKEN_BRAVE) and c:IsType(TYPE_SPELL)
+		and c:IsType(TYPE_FIELD) and c:IsAbleToHand() and not c:IsCode(id)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
 	if #g>0 then
