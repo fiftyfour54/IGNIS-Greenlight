@@ -44,8 +44,8 @@ function s.initial_effect(c)
 end
 s.material={CARD_DARK_MAGICIAN}
 s.listed_names={CARD_DARK_MAGICIAN}
-s.listed_series={0xcf,0x1048}
-s.material_setcode={0xcf,0x1048}
+s.listed_series={0xcf,0x10cf}
+s.material_setcode={0xcf,0x10cf}
 function s.ffilter(c,fc,sumtype,tp)
 	return c:IsType(TYPE_RITUAL,fc,sumtype,tp) and (c:IsRace(0xcf,fc,sumtype,tp) or c:IsRace(0x1048,fc,sumtype,tp))
 end
@@ -69,13 +69,13 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function s.spcheck(sg,tp)
-	return sg:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_LIGHT) and sg:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_DARK)
+function s.attcheck(sg)
+	return sg:GetClassCount(Card.GetAttribute)==2
 end
 function s.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.attfilter,2,false,s.spcheck,nil) end
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.attfilter,2,false,s.attcheck,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectReleaseGroupCost(tp,s.attfilter,2,2,false,s.spcheck,nil)
+	local g=Duel.SelectReleaseGroupCost(tp,s.attfilter,2,2,false,s.attcheck,nil)
 	Duel.Release(g,REASON_COST)
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
