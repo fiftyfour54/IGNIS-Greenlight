@@ -57,10 +57,13 @@ end
 function s.drop(e,tp,eg,ep,ev,re,r,rp,c)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local d=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsRace,RACE_SPELLCASTER),tp,LOCATION_MZONE,0,nil)
-	Duel.Draw(p,d,REASON_EFFECT)
-	Duel.BreakEffect()
-	Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(p,Card.IsAbleToDeck,p,LOCATION_HAND,0,d,d,nil)
-	Duel.SendtoDeck(g,nil,SEQ_DECKTOP,REASON_EFFECT)
-	Duel.SortDecktop(p,p,d)
+	if Duel.Draw(p,d,REASON_EFFECT)==d then
+		local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,p,LOCATION_HAND,0,nil)
+		if #g==0 then return end
+		Duel.BreakEffect()
+		Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
+		local sg=g:Select(p,d,d,nil)
+		Duel.SendtoDeck(g,nil,SEQ_DECKTOP,REASON_EFFECT)
+		Duel.SortDecktop(p,p,d)
+	end
 end
