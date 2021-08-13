@@ -5,14 +5,14 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	-- Fusion Materials
-	Fusion.AddProcMix(c,true,true,CARD_DARK_MAGICIAN,{s.ffilter})
+	Fusion.AddProcMix(c,true,true,CARD_DARK_MAGICIAN,s.ffilter)
 	-- Special Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
 	e1:SetTarget(s.sptg)
@@ -44,10 +44,10 @@ function s.initial_effect(c)
 end
 s.material={CARD_DARK_MAGICIAN}
 s.listed_names={CARD_DARK_MAGICIAN}
-s.listed_series={0xcf,0x10cf}
-s.material_setcode={0xcf,0x10cf}
+s.listed_series={0xcf}
+s.material_setcode={0xcf}
 function s.ffilter(c,fc,sumtype,tp)
-	return c:IsType(TYPE_RITUAL,fc,sumtype,tp) and (c:IsRace(0xcf,fc,sumtype,tp) or c:IsRace(0x1048,fc,sumtype,tp))
+	return c:IsType(TYPE_RITUAL,fc,sumtype,tp) and (c:IsSetCard(0xcf,fc,sumtype,tp) or c:IsSetCard(0x1048,fc,sumtype,tp))
 end
 function s.attfilter(c)
 	return c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsAttribute(ATTRIBUTE_DARK)
@@ -56,7 +56,7 @@ function s.spfilter(c,e,tp)
 	return s.attfilter(c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.filter(chkc,e,tp) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.spfilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -69,8 +69,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function s.attcheck(sg)
+function s.attcheck(sg,tp)
 	return sg:GetClassCount(Card.GetAttribute)==2
+		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,sg)
 end
 function s.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.attfilter,2,false,s.attcheck,nil) end
