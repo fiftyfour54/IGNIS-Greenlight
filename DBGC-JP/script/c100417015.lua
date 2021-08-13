@@ -14,17 +14,18 @@ function s.initial_effect(c)
 	e1:SetTarget(s.drtg)
 	e1:SetOperation(s.drop)
 	c:RegisterEffect(e1)
-	-- Special Summon
+	-- Special Summon Xyz
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetCode(EVENT_MOVE)
 	e2:SetCountLimit(1,id+100)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(function(_,tp,_,_,_,_,_,rp) return rp~=tp end)
+	e2:SetCondition(s.spcon)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
-	aux.RegisterOnLeaveGraveEffect(c,e2)
+	c:RegisterEffect(e2)
 end
 s.listed_names={100417016}
 s.listed_series={0x270}
@@ -54,6 +55,9 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.Recover(tp,800,REASON_EFFECT)
 	end
+end
+function s.spcon(e,tp,eg,ep,ev,re,r,rp,chk)
+	return rp~=tp and eg:IsExists(Card.IsPreviousLocation,1,nil,LOCATION_GRAVE)
 end
 function s.spfilter(c,e,tp,mc,pg)
 	return c:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and c:IsSetCard(0x270) and mc:IsCanBeXyzMaterial(c,tp)
