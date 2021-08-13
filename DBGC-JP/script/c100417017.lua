@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e1:SetValue(function(_,c) return c:IsSummonLocation(LOCATION_GRAVE) end)
+	e1:SetValue(function(_,c)return c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:IsSummonLocation(LOCATION_GRAVE)end)
 	c:RegisterEffect(e1)
 	-- Banish
 	local e2=Effect.CreateEffect(c)
