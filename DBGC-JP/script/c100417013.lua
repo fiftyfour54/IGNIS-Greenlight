@@ -1,20 +1,20 @@
--- エクソシスター・ソフィア
--- Exorsister Sophia
+-- エクソシスター・エリス
+-- Exorsister Elise
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Draw
+	-- Special Summon self
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_DRAW+CATEGORY_RECOVER)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_RECOVER)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_MZONE)
+	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.drcon)
-	e1:SetTarget(s.drtg)
-	e1:SetOperation(s.drop)
+	e1:SetCondition(s.hspcon)
+	e1:SetTarget(s.hsptg)
+	e1:SetOperation(s.hspop)
 	c:RegisterEffect(e1)
-	-- Special Summon
+	-- Special Summon Xyz
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -26,24 +26,23 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	aux.RegisterOnLeaveGraveEffect(c,e2)
 end
-s.listed_names={100417015}
+s.listed_names={100417014}
 s.listed_series={0x270}
-function s.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x270),tp,LOCATION_MZONE,0,1,e:GetHandler())
+function s.hspcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x270),tp,LOCATION_MZONE,0,1,nil)
 end
-function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(1)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
-	if Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,100417015),tp,LOCATION_ONFIELD,0,1,nil) then
+function s.hsptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+	if Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,100417014),tp,LOCATION_ONFIELD,0,1,nil) then
 		Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,800)
 	end
 end
-function s.drop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	if Duel.Draw(p,d,REASON_EFFECT)==d 
-		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,100417015),tp,LOCATION_ONFIELD,0,1,nil) then
+function s.hspop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 
+		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,100417014),tp,LOCATION_ONFIELD,0,1,nil) then
 		Duel.BreakEffect()
 		Duel.Recover(tp,800,REASON_EFFECT)
 	end
