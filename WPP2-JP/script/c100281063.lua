@@ -3,12 +3,12 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--draw
+	--Draw
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-	--atk up
+	--Increase ATK
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_ATKCHANGE)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -69,7 +69,7 @@ function s.atkfilter(c)
 	if c:IsType(TYPE_NORMAL) then
 		return c:IsLevelAbove(5)
 	else
-		local summon_types={SUMMON_TYPE_RITUAL,SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ }
+		local summon_types={SUMMON_TYPE_RITUAL,SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ}
 		return c:GetFlagEffect(id)>0 and c:IsSummonType(table.unpack(summon_types))		
 	end
 end
@@ -77,16 +77,20 @@ function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=a:GetBattleTarget()
 	if a:IsControler(1-tp) then a,d=d,a end
-	return a and a:IsFaceup() and a:IsRelateToBattle() and s.atkfilter(c)
+	return a and a:IsFaceup() and a:IsRelateToBattle() and s.atkfilter(a)
 		and d and d:IsFaceup() and d:IsRelateToBattle()
-		and d:GetAttack()>0 and a:GetControler()~=d:GetControler()
+		and d:IsAttackAbove(0) and a:GetControler()~=d:GetControler()
 end
 function s.atkop(e,tp,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	local a=Duel.GetAttacker()
 	local d=a:GetBattleTarget()
 	if a:IsControler(1-tp) then a,d=d,a end
-	if e:GetHandler():IsRelateToEffect(e) and a:IsFaceup() and a:IsRelateToBattle() and d:IsFaceup() and d:IsRelateToBattle() then
-		local e1=Effect.CreateEffect(e:GetHandler())
+	if a and a:IsFaceup() and a:IsRelateToBattle()
+		and d and d:IsFaceup() and d:IsRelateToBattle() then
+		--Increase ATK
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(d:GetAttack())

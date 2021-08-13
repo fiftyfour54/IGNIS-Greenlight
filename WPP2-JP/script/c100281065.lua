@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsCode,CARD_BLUEEYES_W_DRAGON))
-	e2:SetValue(function(e,re,rp) return rp~=e:GetHandlerPlayer() end)
+	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	-- Destroy
 	local e3=Effect.CreateEffect(c)
@@ -30,11 +30,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	-- Special Summon
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,2))
-	e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e4:SetRange(LOCATION_SZONE)
+	e4:SetType(EFFECT_TYPE_QUICK_O)
 	e4:SetCode(EVENT_FREE_CHAIN)
+	e4:SetRange(LOCATION_SZONE)
 	e4:SetHintTiming(0,TIMING_END_PHASE)
 	e4:SetCountLimit(1,id)
 	e4:SetTarget(s.sptg)
@@ -42,10 +42,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 	-- Set Spell/Trap
 	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,3))
+	e5:SetDescription(aux.Stringid(id,2))
 	e5:SetType(EFFECT_TYPE_QUICK_O)
-	e5:SetRange(LOCATION_SZONE)
 	e5:SetCode(EVENT_FREE_CHAIN)
+	e5:SetRange(LOCATION_SZONE)
 	e5:SetHintTiming(0,TIMING_END_PHASE)
 	e5:SetCountLimit(1,id)
 	e5:SetTarget(s.settg)
@@ -63,6 +63,7 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_MZONE,0,nil)
 	Duel.Destroy(g,REASON_EFFECT)
 end
@@ -76,6 +77,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
@@ -94,16 +96,7 @@ end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local tc=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
-	if not tc then return end
-	Duel.SSet(tp,tc)
-	if tc.act_turn then
-		-- allow activation in the same turn (if applicable)
-		local e0=Effect.CreateEffect(tc)
-		e0:SetType(EFFECT_TYPE_SINGLE)
-		e0:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-		e0:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-		e0:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e0)
-	end
+	local sg=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil,tp)
+	if #sg==0 then return end
+	Duel.SSet(tp,sg)
 end

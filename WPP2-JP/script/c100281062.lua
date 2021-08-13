@@ -48,7 +48,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 		local sg=g:Select(tp,1,1,nil)
-		Duel.SSet(tp,sg:GetFirst())
+		Duel.SSet(tp,sg)
 	end
 end
 function s.spfilter(c,e,tp,code)
@@ -56,7 +56,7 @@ function s.spfilter(c,e,tp,code)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.cfilter(c,e,tp)
-	return c:IsCode(CARD_DARK_MAGICIAN,CARD_DARK_MAGICIAN_GIRL) and c:IsControler(tp)
+	return c:IsFaceup() and c:IsCode(CARD_DARK_MAGICIAN,CARD_DARK_MAGICIAN_GIRL) and c:IsSummonPlayer(tp)
 		and c:IsLocation(LOCATION_MZONE) and c:IsCanBeEffectTarget(e)
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c:GetCode())
 end
@@ -64,7 +64,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=eg:Filter(s.cfilter,nil,e,tp)
 	if #tg>0 then
 		for tc in aux.Next(tg) do
-			tc:RegisterFlagEffect(id,RESET_CHAIN,0,1)
+			tc:RegisterFlagEffect(id,RESET_CHAIN+RESET_EVENT+RESETS_STANDARD,0,1)
 		end
 		local g=e:GetLabelObject():GetLabelObject()
 		if Duel.GetCurrentChain()==0 then g:Clear() end
