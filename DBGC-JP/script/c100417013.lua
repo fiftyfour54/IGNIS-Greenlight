@@ -17,11 +17,11 @@ function s.initial_effect(c)
 	-- Special Summon Xyz
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_MOVE)
-	e2:SetCountLimit(1,id+100)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,id+100)
 	e2:SetCondition(s.spcon)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
@@ -36,11 +36,9 @@ function s.hsptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
-	if Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,100417014),tp,LOCATION_ONFIELD,0,1,nil) then
-		Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,800)
-	end
 end
 function s.hspop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 
 		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,100417014),tp,LOCATION_ONFIELD,0,1,nil) then
@@ -49,7 +47,7 @@ function s.hspop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp,chk)
-	return rp~=tp and eg:IsExists(Card.IsPreviousLocation,1,nil,LOCATION_GRAVE)
+	return rp==1-tp and eg:IsExists(Card.IsPreviousLocation,1,nil,LOCATION_GRAVE)
 end
 function s.spfilter(c,e,tp,mc,pg)
 	return c:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp) and c:IsSetCard(0x270) and mc:IsCanBeXyzMaterial(c,tp)

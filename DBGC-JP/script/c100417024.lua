@@ -19,62 +19,64 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,800) end
 	Duel.PayLPCost(tp,800)
 end
-function s.filter(c,e,tp)
-	return c:IsSetCard(0x270) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK,0,1,nil,c,e,tp)
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(0x270) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.filter2(c,tc,e,tp)
-	return c:IsSetCard(0x270) and aux.IsCodeListed(c,Card.GetCode(tc)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.rescon(sg,e,tp,mg)
+	return sg:IsExists(s.lfilter1,1,nil,sg)
+end
+function s.lfilter1(c,sg)
+	return sg:IsExists(s.lfilter2,1,c,c)
+end
+function s.lfilter2(c,tc)
+	return aux.IsCodeListed(c,tc:GetCode())
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local mg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
 	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>1
-		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+		and aux.SelectUnselectGroup(mg,e,tp,2,2,s.rescon,0) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,LOCATION_DECK)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local mg1=Duel.GetMatchingGroup(s.filter,tp,LOCATION_DECK,0,nil,e,tp)
-	if not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then
-		::restart::
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g1=mg1:Select(tp,1,1,false,nil)
-		if not g1 or #g1==0 then return end
+	local c=e:GetHandler()
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) or Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
+	local mg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
+	if #mg<2 then return end
+	local g1=aux.SelectUnselectGroup(mg,e,tp,2,2,s.rescon,1,tp,HINTMSG_SPSUMMON)
+	if #g1>1 then
+		local fid=c:GetFieldID()
 		local tc=g1:GetFirst()
-		local mg2=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_DECK,0,nil,tc,e,tp)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g2=mg2:Select(tp,1,1,true,nil)
-		if not g2 then goto restart end
-		g1:Merge(g2)
-		if #g1>1 then
-			local fid=e:GetHandler():GetFieldID()
-			local tc=g1:GetFirst()
-			for tc in aux.Next(g1) do
-				Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
-				tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
-			end
-			Duel.SpecialSummonComplete()
-			g1:KeepAlive()
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-			e1:SetCategory(CATEGORY_TODECK)
-			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-			e1:SetCode(EVENT_PHASE+PHASE_END)
-			e1:SetCountLimit(1)
-			e1:SetLabel(fid)
-			e1:SetLabelObject(g1)
-			e1:SetCondition(s.tdcon)
-			e1:SetOperation(s.tdop)
-			Duel.RegisterEffect(e1,tp)
+		for tc in aux.Next(g1) do
+			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
+			tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
 		end
+		Duel.SpecialSummonComplete()
+		g1:KeepAlive()
+		local e1=Effect.CreateEffect(c)
+		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+		e1:SetCategory(CATEGORY_TODECK)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_PHASE+PHASE_END)
+		e1:SetCountLimit(1)
+		e1:SetLabel(fid)
+		e1:SetLabelObject(g1)
+		e1:SetCondition(s.tdcon)
+		e1:SetOperation(s.tdop)
+		Duel.RegisterEffect(e1,tp)
 	end
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
-		local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(c)
+		e1:SetDescription(aux.Stringid(id,1))
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-		e1:SetDescription(aux.Stringid(id,1))
 		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		e1:SetTarget(s.splimit)
 		e1:SetTargetRange(1,0)
 		Duel.RegisterEffect(e1,tp)
+		--Lizard check
+		aux.addTempLizardCheck(c,tp,s.lizfilter)
 	end
 end
 function s.tdfilter(c,fid)
@@ -94,5 +96,8 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoDeck(tg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 end
 function s.splimit(e,c)
-	return not c:IsSetCard(0x270)
+	return not c:IsSetCard(0x270) and c:IsLocation(LOCATION_EXTRA)
+end
+function s.lizfilter(e,c)
+	return not c:IsOriginalSetCard(0x270)
 end
