@@ -12,8 +12,8 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTarget(s.destg)
-	e1:SetOperation(s.desop)
+	e1:SetTarget(s.postg)
+	e1:SetOperation(s.posop)
 	c:RegisterEffect(e1)
 	--Destroy Dragon
 	local e2=Effect.CreateEffect(c)
@@ -26,9 +26,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
 end
-
 --position
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.postg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsCanChangePositionRush,tp,0,LOCATION_MZONE,1,nil) end
 	local g=Duel.GetMatchingGroup(Card.IsCanChangePositionRush,tp,0,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
@@ -39,22 +38,20 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		Duel.HintSelection(g)
 		if g:GetFirst():IsAttackPos() then
-			Duel.ChangePosition(g,POS_FACEUP_DEFENSE)
-		elseif g:GetFirst():IsPosition(POS_FACEUP_DEFENSE) then
+			Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)
+		elseif g:GetFirst():IsPosition(POS_FACEDOWN_DEFENSE) then
 			Duel.ChangePosition(g,0,0,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 		else
 			local op=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))
 			if op==0 then
 				Duel.ChangePosition(g,0,0,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 			else
-				Duel.ChangePosition(g,POS_FACEUP_DEFENSE)
+				Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)
 			end
 		end
 	end
 	
 end
-
-
 --destroy dragon
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.filter),tp,LOCATION_MZONE,0,nil)
@@ -63,22 +60,19 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g2,1,0,LOCATION_MZONE)
 end
 function s.filter(c)
-	return c:IsFaceup() and c:Race(RACE_CYBORG)
+	return c:IsFaceup() and c:IsRace(RACE_CYBORG)
 end
 function s.filter2(c)
-	return c:IsFaceup() and c:Race(RACE_DRAGON)
+	return c:IsFaceup() and c:IsRace(RACE_DRAGON)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local tg=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_HAND,0,2,2,nil)
-	if Duel.SendtoGrave(tg,REASON_COST)==2 then
-		--Effect
-		local g=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.filter),tp,LOCATION_MZONE,0,nil)
-		local g2=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.filter2),tp,0,LOCATION_MZONE,nil)
-		if #g>0 and #g2>0 then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-			sg=g2:Select(tp,1,#g,nil)
-			sg=sg:AddMaximumCheck()
-			Duel.Destroy(sg,REASON_EFFECT)
-		end
+	--Effect
+	local g=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.filter),tp,LOCATION_MZONE,0,nil)
+	local g2=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.filter2),tp,0,LOCATION_MZONE,nil)
+	if #g>0 and #g2>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		sg=g2:Select(tp,1,#g,nil)
+		sg=sg:AddMaximumCheck()
+		Duel.Destroy(sg,REASON_EFFECT)
 	end
 end
