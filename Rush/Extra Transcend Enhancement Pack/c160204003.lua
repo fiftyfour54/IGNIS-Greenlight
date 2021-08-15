@@ -28,11 +28,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.tdop2)
 	c:RegisterEffect(e2)
 end
-function s.costfilter(c)
-	return c:IsLevelBelow(5) and c:IsRace(RACE_DRAGON) and c:IsAbleToDeckAsCost()
-end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToDeckAsCost,tp,LOCATION_GRAVE,0,1,nil) end
 end
 --shuffle from grave to deck
 function s.tdfilter(c)
@@ -49,7 +46,6 @@ function s.tdop1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.HintSelection(tg)
 	if Duel.SendtoDeck(tg,nil,SEQ_DECKBOTTOM,REASON_COST)==1 then
 		--Effect
-		Duel.SendtoGrave(g,REASON_COST)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local g=Duel.SelectMatchingCard(tp,s.tdfilter,tp,0,LOCATION_GRAVE,1,3,nil)
 		Duel.HintSelection(g)
@@ -73,8 +69,7 @@ function s.tdop2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.HintSelection(tg)
 	if Duel.SendtoDeck(tg,nil,SEQ_DECKBOTTOM,REASON_COST)==1 then
 		--Effect
-		--Effect
-		Duel.SendtoGrave(g,REASON_COST)
+		
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local g=Duel.SelectMatchingCard(tp,s.tdfilter2,tp,0,LOCATION_MZONE,1,2,nil)
 		Duel.HintSelection(g)
