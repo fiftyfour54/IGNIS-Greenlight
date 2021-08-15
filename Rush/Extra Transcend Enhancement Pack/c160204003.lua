@@ -23,11 +23,11 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_GRAVE,0,1,nil) end
 end
 --shuffle from grave to deck
-function s.filter(c)
-	return c:IsAbleToDeck()
+function s.tdfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
 end
 function s.tdtg1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,0,LOCATION_GRAVE,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tdfilter,tp,0,LOCATION_GRAVE,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE)
 end
 function s.tdop1(e,tp,eg,ep,ev,re,r,rp)
@@ -39,7 +39,7 @@ function s.tdop1(e,tp,eg,ep,ev,re,r,rp)
 		--Effect
 		Duel.SendtoGrave(g,REASON_COST)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,0,LOCATION_GRAVE,1,3,nil)
+		local g=Duel.SelectMatchingCard(tp,s.tdfilter,tp,0,LOCATION_GRAVE,1,3,nil)
 		Duel.HintSelection(g)
 		if #g>0 then
 			Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
@@ -48,10 +48,10 @@ function s.tdop1(e,tp,eg,ep,ev,re,r,rp)
 end
 --shuffle up to 2 spellcaster to the deck
 function s.tdtg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.tdfilter,tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tdfilter2,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_MZONE)
 end
-function s.tdfilter(c)
+function s.tdfilter2(c)
 	return c:IsRace(RACE_SPELLCASTER) and c:IsFaceup() and c:IsAbleToDeck()
 end
 function s.tdop2(e,tp,eg,ep,ev,re,r,rp)
@@ -64,7 +64,7 @@ function s.tdop2(e,tp,eg,ep,ev,re,r,rp)
 		--Effect
 		Duel.SendtoGrave(g,REASON_COST)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-		local g=Duel.SelectMatchingCard(tp,s.tdfilter(),tp,0,LOCATION_MZONE,1,2,nil)
+		local g=Duel.SelectMatchingCard(tp,s.tdfilter2,tp,0,LOCATION_MZONE,1,2,nil)
 		Duel.HintSelection(g)
 		if #g>0 then
 			Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
