@@ -44,7 +44,7 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ChangePosition(g,0,0,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 		else
 			local op=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))
-			if op==0
+			if op==0 then
 				Duel.ChangePosition(g,0,0,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 			else
 				Duel.ChangePosition(g,POS_FACEUP_DEFENSE)
