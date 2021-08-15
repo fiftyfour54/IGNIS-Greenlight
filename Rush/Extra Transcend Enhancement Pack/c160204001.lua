@@ -54,13 +54,14 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 end
 --gain atk
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil) and Duel.IsExistingMatchingCard(aux.FilterMaximumSideFunctionEx(s.filter2),tp,0,LOCATION_MZONE,1,nil)	end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
+	and Duel.IsExistingMatchingCard(aux.FilterMaximumSideFunctionEx(s.filter2),tp,0,LOCATION_MZONE,1,nil) end
 end
 function s.filter(c)
-	return c:IsFaceup() and c:Race(RACE_CYBORG)
+	return c:IsFaceup() and c:IsRace(RACE_CYBORG)
 end
 function s.filter2(c)
-	return c:IsFaceup() and c:Race(RACE_WARRIOR)
+	return c:IsFaceup() and c:IsRace(RACE_WARRIOR)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
