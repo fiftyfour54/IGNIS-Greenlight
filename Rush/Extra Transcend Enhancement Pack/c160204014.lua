@@ -1,8 +1,8 @@
 --虚鋼演機再動
-Imaginary Ark Turnback
+-- Imaginary Ark Turnback
 local s,id=GetID()
 function s.initial_effect(c)
-	--Destroy all level 8 or lower monsters on the field
+	--summon a light with 500 def or a cyborg
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
