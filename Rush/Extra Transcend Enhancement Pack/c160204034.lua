@@ -2,6 +2,9 @@
 --フィアスチュート・フォロール
 local s,id=GetID()
 function s.initial_effect(c)
+	--fusion material
+	c:EnableReviveLimit()
+	Fusion.AddProcMix(c,true,true,160307004,160201020)
 	--register
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
