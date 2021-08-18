@@ -38,9 +38,6 @@ end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,1) end
 end
-
-
-
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	--Requirement
@@ -66,7 +63,6 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	
 	end
 end
-
 --piercing
 function s.piercingOp(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
