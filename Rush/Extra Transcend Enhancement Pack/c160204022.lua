@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.filter(c)
-	return (c:IsFaceup() and not (c:IsRace(RACE_DRAGON) or c:IsRace(RACE_HIGH_DRAGON))) or c:IsFacedown()
+	return (c:IsFaceup() and not (c:IsRace(RACE_DRAGON) or c:IsRace(RACE_HIGHDRAGON))) or c:IsFacedown()
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsAbleToEnterBP() and not Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
