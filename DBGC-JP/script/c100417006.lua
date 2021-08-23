@@ -39,12 +39,13 @@ function s.initial_effect(c)
 end
 s.listed_series={0x26e}
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():GetBaseAttack()>0
+	return rp==1-tp and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():GetBaseAttack()>0
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local atk=re:GetHandler():GetBaseAttack()
-	if c:IsFaceup() and c:IsRelateToEffect(e) and atk>0 then
+	if c:IsFaceup() and c:IsRelateToEffect(e) and atk>0
+		and re:GetHandler():IsControler(1-tp) then
 		-- Update ATK
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
