@@ -41,6 +41,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and Duel.IsExistingMatchingCard(s.listfilter,tp,LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil,sc) 
 		and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		Duel.BreakEffect()
 		Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
