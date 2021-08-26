@@ -26,7 +26,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tg=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.HintSelection(tg)
-	local opt=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
+	local opt=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
 	if opt==0 then
 		Duel.SendtoDeck(tg,nil,SEQ_DECKTOP,REASON_EFFECT)
 	elseif opt==1 then
@@ -42,7 +42,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetValue(700)
 			c:RegisterEffect(e1)
 			local ct=Duel.GetMatchingGroupCount(Card.IsCode,tp,LOCATION_GRAVE,0,nil,70368879)
-			if ct>0 and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+			if ct>0 and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 			local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
 				if #g>0 then
 					Duel.SendtoHand(g,nil,REASON_EFFECT)
