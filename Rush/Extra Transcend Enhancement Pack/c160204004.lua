@@ -1,4 +1,5 @@
---メタリオン・ラードンスター Metallion Ladonstar
+--メタリオン・ラードンスター
+--Metallion Ladonstar
 local s,id=GetID()
 function s.initial_effect(c)
 	--fusion material
@@ -32,7 +33,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 --1 monster lose 1500 atk/def
 function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterMaximumSideFunctionEx(s.filter),,tp,0,LOCATION_MZONE,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterMaximumSideFunctionEx(s.filter),tp,0,LOCATION_MZONE,1,e:GetHandler()) end
 end
 function s.filter(c)
 	return c:IsFaceup()
