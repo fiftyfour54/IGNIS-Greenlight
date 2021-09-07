@@ -32,7 +32,7 @@ function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local b=Duel.GetAttackTarget()
 	if a:IsControler(1-tp) then a,b=b,a end
-	return a and b and a~=e:GetHandler() and a:IsControler(tp)
+	return a and b and a~=e:GetHandler() and a:IsControler(tp) and a:IsFaceup()
 		and a:IsRace(RACE_WARRIOR) and b:IsFaceup() and b:IsControler(1-tp)
 end
 function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -43,8 +43,8 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local a=Duel.GetAttacker()
 	local b=Duel.GetAttackTarget()
 	if a:IsControler(1-tp) then a,b=b,a end
-	if a and b and a:IsRelateToBattle() and b:IsRelateToBattle()
-		and a:IsControler(tp) and b:IsFaceup() and b:IsControler(1-tp) then
+	if a and b and b:IsRelateToBattle() and b:IsFaceup()
+		and b:IsControler(1-tp) then
 		-- Update ATK
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
