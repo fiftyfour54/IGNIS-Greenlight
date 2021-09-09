@@ -48,7 +48,7 @@ function s.extraval(chk,summon_type,e,...)
 		if summon_type~=SUMMON_TYPE_LINK or sc~=e:GetHandler() then
 			return Group.CreateGroup()
 		else
-			s.curgroup=Duel.GetMatchingGroup(Card.IsFacedown,tp,LOCATION_MZONE,0,nil,sc,summon_type,tp)
+			s.curgroup=Duel.GetMatchingGroup(Card.IsFacedown,tp,LOCATION_MZONE,0,nil)
 			s.curgroup:KeepAlive()
 			return s.curgroup
 		end
