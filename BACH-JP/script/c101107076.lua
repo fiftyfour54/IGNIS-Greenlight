@@ -3,7 +3,7 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -16,7 +16,9 @@ function s.initial_effect(c)
 end
 s.listed_series={0x8d}
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x8d) and c:IsType(TYPE_LINK|TYPE_FIELD)
+	return c:IsFaceup() and c:IsSetCard(0x8d)
+		and ((c:IsType(TYPE_LINK) and c:IsMonster())
+		or (c:IsType(TYPE_FIELD) and c:IsType(TYPE_SPELL)))
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
@@ -31,13 +33,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if not (tc:IsFaceup() and tc:IsRelateToEffect(e)) then return end
-	if Duel.CheckLPCost(1-tp,2000) and Duel.SelectYesNo(1-tp,aux.Stringid(id,0)) then
+	if Duel.CheckLPCost(1-tp,2000) and c:IsSSetable(true) and e:IsHasType(EFFECT_TYPE_ACTIVATE)
+		and Duel.SelectYesNo(1-tp,aux.Stringid(id,1)) then
 		Duel.PayLPCost(1-tp,2000)
-		if c:IsSSetable(true) and e:IsHasType(EFFECT_TYPE_ACTIVATE) then
-			c:CancelToGrave()
-			Duel.ChangePosition(c,POS_FACEDOWN)
-			Duel.RaiseEvent(c,EVENT_SSET,e,REASON_EFFECT,tp,tp,0)
-		end
+		c:CancelToGrave()
+		Duel.ChangePosition(c,POS_FACEDOWN)
+		Duel.RaiseEvent(c,EVENT_SSET,e,REASON_EFFECT,tp,tp,0)
 	else
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 		--Negate its effects
@@ -62,7 +63,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e3)
 		--change position
 		local fid=c:GetFieldID()
-		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
+		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
 		local e4=Effect.CreateEffect(c)
 		e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e4:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
