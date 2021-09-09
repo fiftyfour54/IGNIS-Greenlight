@@ -5,6 +5,15 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	Link.AddProcedure(c,s.matfilter,1,1)
+	--extra mat
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetRange(LOCATION_EXTRA)
+	e0:SetCode(EFFECT_EXTRA_MATERIAL)
+	e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET|EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_SET_AVAILABLE)
+	e0:SetTargetRange(1,0)
+	e0:SetValue(s.extraval)
+	c:RegisterEffect(e0)
 	--direct attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -29,8 +38,26 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x8d}
+s.curgroup=nil
 function s.matfilter(c,lc,stype,tp)
 	return c:IsSetCard(0x8d,lc,stype,tp) and not c:IsType(TYPE_LINK,lc,stype,tp)
+end
+function s.extraval(chk,summon_type,e,...)
+	if chk==0 then
+		local tp,sc=...
+		if summon_type~=SUMMON_TYPE_LINK or sc~=e:GetHandler() then
+			return Group.CreateGroup()
+		else
+			s.curgroup=Duel.GetMatchingGroup(Card.IsFacedown,tp,LOCATION_MZONE,0,nil,sc,summon_type,tp)
+			s.curgroup:KeepAlive()
+			return s.curgroup
+		end
+	elseif chk==2 then
+		if s.curgroup then
+			s.curgroup:DeleteGroup()
+		end
+		s.curgroup=nil
+	end
 end
 function s.dacon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x8d),0,LOCATION_FZONE,LOCATION_FZONE,1,nil)
