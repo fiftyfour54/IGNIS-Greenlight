@@ -25,6 +25,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	--to grave
 	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_TOGRAVE+CATEGORY_DECKDES+CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
@@ -33,6 +34,8 @@ function s.initial_effect(c)
 	e3:SetTarget(s.gytg)
 	e3:SetOperation(s.gyop)
 	c:RegisterEffect(e3,false,REGISTER_FLAG_DETACH_XMAT)
+	if not GhostBelleTable then GhostBelleTable={} end
+	table.insert(GhostBelleTable,e3)
 end
 function s.lvtg(e,c)
 	return c:IsLevelAbove(1) and c:GetOwner()~=e:GetHandlerPlayer()
@@ -44,7 +47,9 @@ function s.lvval(e,c,rc)
 end
 function s.tgval(e,re,rp)
 	local rc=re:GetHandler()
-	return re:IsActiveType(TYPE_MONSTER) and rc:IsLocation(LOCATION_MZONE) and not rc:IsSummonLocation(LOCATION_GRAVE)
+	local loc=Duel.GetChainInfo(0,CHAININFO_TRIGGERING_LOCATION)
+	return re:IsActiveType(TYPE_MONSTER) and loc==LOCATION_MZONE and not rc:IsSummonLocation(LOCATION_GRAVE)
+		and rc:IsSummonType(SUMMON_TYPE_SPECIAL)
 end
 function s.gycost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -55,17 +60,18 @@ function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,0,0,PLAYER_ALL,4)
 end
 function s.spfilter(c,e,tp)
-	return c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsType(TYPE_MONSTER) and c:IsLocation(LOCATION_GRAVE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetDecktopGroup(tp,4)+Duel.GetDecktopGroup(1-tp,4)
-	if Duel.SendtoGrave(g,REASON_EFFECT)~=0 then
-		local og=Duel.GetOperatedGroup()
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and og:IsExists(s.spfilter,1,nil,e,tp) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
-			Duel.BreakEffect()
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			local sg=og:FilterSelect(tp,s.spfilter,1,1,nil,e,tp)
-			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
-		end
+	local gy1=Duel.DiscardDeck(tp,4,REASON_EFFECT)==0
+	local gy2=Duel.DiscardDeck(1-tp,4,REASON_EFFECT)
+	if gy1==0 and gy2==0 then return end
+	local og=Duel.GetOperatedGroup()
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and og:IsExists(s.spfilter,1,nil,e,tp)
+		and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		Duel.BreakEffect()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=og:FilterSelect(tp,s.spfilter,1,1,nil,e,tp)
+		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
