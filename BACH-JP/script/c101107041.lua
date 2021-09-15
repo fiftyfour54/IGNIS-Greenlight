@@ -22,13 +22,25 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_REMOVE)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_CUSTOM+id)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(s.rmcon)
 	e2:SetTarget(s.rmtg)
 	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
+	local g=Group.CreateGroup()
+	g:KeepAlive()
+	e2:SetLabelObject(g)
+	--Register summons
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetLabelObject(g)
+	e5:SetOperation(s.regop)
+	c:RegisterEffect(e5)
+	
 	--Banish Spell/Trap
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
@@ -44,8 +56,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	aux.DoubleSnareValidity(c,LOCATION_MZONE)
 end
-s.listed_series={0x16d}
-
 function s.cfilter(c,e,tp)
 	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) and c:IsSummonType(SUMMON_TYPE_SYNCHRO)
 		and c:IsRace(RACE_WYRM)
@@ -69,19 +79,41 @@ end
 function s.filter(c,tp)
 	return c:IsSummonPlayer(tp) and c:IsAbleToRemove()
 end
-function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.filter,1,nil,1-tp) and rp~=tp
-end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(s.filter,1,nil,1-tp) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
+	local g=e:GetLabelObject():Filter(s.filter,nil,1-tp)
+	Debug.Message(#g)
+	if chk==0 then return #g>0 end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,1200)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local tc=eg:FilterSelect(tp,s.filter,1,1,nil,tp)
+	local g=e:GetLabelObject()
+	if #g==0 then return end 
+	local tc=g:FilterSelect(tp,s.filter,1,1,nil,1-tp)
 	if tc and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then
 		Duel.Damage(1-tp,1200,REASON_EFFECT)
+	end
+end
+
+function s.regop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	Debug.Message("reg")
+	local tg=eg:Filter(s.filter,nil,1-tp)
+	if #tg>0 and not tg:IsContains(c) then
+		for tc in aux.Next(tg) do
+			tc:RegisterFlagEffect(id,RESET_CHAIN,0,1)
+		end
+		local g=e:GetLabelObject()
+		if Duel.GetCurrentChain()==0 then g:Clear() end
+		g:Remove(function(c) return c:GetFlagEffect(id)==0 end,nil)
+		g:Merge(tg)
+		if c:GetFlagEffect(id+1)==0 then
+			Debug.Message("Raise")
+			c:RegisterFlagEffect(id+1,RESETS_STANDARD+RESET_CHAIN,0,1)
+			Duel.RaiseSingleEvent(c,EVENT_CUSTOM+id,e,0,tp,tp,0)
+			
+		end
 	end
 end
 --banish spell/trap
