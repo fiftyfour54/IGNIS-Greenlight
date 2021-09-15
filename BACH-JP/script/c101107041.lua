@@ -26,8 +26,8 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(s.rmcon)
-	e2:SetTarget(s.sptg)
-	e2:SetOperation(s.spop)
+	e2:SetTarget(s.rmtg)
+	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
 	--Banish Spell/Trap
 	local e3=Effect.CreateEffect(c)
@@ -72,12 +72,12 @@ end
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.filter,1,nil,1-tp) and rp~=tp
 end
-function s.remtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(s.filter,1,nil,1-tp) end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,1200)
 end
-function s.remop(e,tp,eg,ep,ev,re,r,rp)
+function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local tc=eg:FilterSelect(tp,s.filter,1,1,nil,tp)
 	if tc and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then
@@ -85,16 +85,16 @@ function s.remop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --banish spell/trap
-function s.remcon2(e,tp,eg,ep,ev,re,r,rp)
+function s.rmcon2(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
 		and ep==1-tp and re:IsActiveType(TYPE_SPELL+TYPE_TRAP) 
 end
-function s.remtg2(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.rmtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return re:GetHandler():IsAbleToRemove() end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,rg,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,1200)
 end
-function s.remop2(e,tp,eg,ep,ev,re,r,rp)
+function s.rmop2(e,tp,eg,ep,ev,re,r,rp)
 	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsRelateToEffect(re) then
 		local ct=Duel.Remove(eg,POS_FACEUP,REASON_EFFECT)
 		if ct>0 then
