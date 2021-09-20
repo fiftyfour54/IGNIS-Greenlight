@@ -3,34 +3,55 @@
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
-	--Activate
+	--Destroy the attacking monster
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetLabel(0)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
+	--Change the attack target
+	local e2=e1:Clone()
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(0)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetLabel(1)
+	c:RegisterEffect(e2)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc~=Duel.GetAttacker() end
-	if chk==0 then return true end
-	e:SetProperty(0)
-	local tg=Duel.GetMatchingGroup(Card.IsCanBeEffectTarget,tp,LOCATION_MZONE,LOCATION_MZONE,Duel.GetAttacker(),e)
-	if tg:GetFirst() and Duel.SelectYesNo(aux.Stringid(id,0)) then
-		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTACKTARGET)
-		Duel.SetTargetCard(tg:Select(tp,1,1,nil))
+	local label=e:GetLabel()
+	local bc=Duel.GetAttacker()
+	local excg=Group.FromCards(bc)
+	local dc=Duel.GetAttackTarget()
+	if dc then excg:AddCard(dc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and not excg:IsContains(chkc) end
+	if chk==0 then
+		if label==0 then
+			return bc:IsOnField()
+		else
+			return Duel.IsExistingTarget(nil,tp,LOCATION_MZONE,LOCATION_MZONE,1,excg)
+		end
+	end
+	Duel.Hint(HINT_OPSELECTED,1-tp,aux.Stringid(id,label))
+	if label==0 then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,bc,1,0,0)
 	else
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.GetAttacker(),1,0,0)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTACKTARGET)
+		Duel.SelectTarget(tp,nil,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,excg)
 	end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local a=Duel.GetAttacker()
+	local label=e:GetLabel()
+	local bc=Duel.GetAttacker()
 	local tc=Duel.GetFirstTarget()
-	if not tc and a:IsRelateToBattle() then
-		Duel.Destroy(a,REASON_EFFECT)
-	elseif tc and tc:IsRelateToEffect(e) and a:CanAttack() and not a:IsImmuneToEffect(e) then
-		Duel.CalculateDamage(a,tc)
+	if label==0 and bc:IsRelateToBattle() then
+		Duel.Destroy(bc,REASON_EFFECT)
+	elseif label==1 and bc:CanAttack() and not bc:IsImmuneToEffect(e)
+		and tc and tc:IsRelateToEffect(e) then
+		Duel.CalculateDamage(bc,tc)
 	end
 end
