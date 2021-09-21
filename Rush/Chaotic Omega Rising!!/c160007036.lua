@@ -52,6 +52,12 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
 	c:RegisterEffect(e2)
 end
+function s.tg(e,c,rp,sumtype,pos,tp,re)
+    if sumtype==SUMMON_TYPE_MAXIMUM then
+        return c.MaximumAttack and c:IsLevelBelow(9)
+    end
+    return c:IsLevelBelow(9)
+end
 --position
 function s.filter(c)
 	return c:IsCanChangePositionRush()
@@ -72,7 +78,4 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ChangePosition(g,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 		end
 	end
-end
-function s.tg(e,c)
-	return c:IsLevelBelow(9) and not c:IsMaximumModeSide()
 end
