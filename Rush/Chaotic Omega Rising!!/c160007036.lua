@@ -46,8 +46,8 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCode(EFFECT_FORCE_SPSUMMON_POSITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e2:SetTargetRange(1,1)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsLevelBelow,9))
+	e2:SetTargetRange(1,1)	
+	e2:SetTarget(s.tg)
 	e2:SetValue(POS_DEFENSE)
 	e2:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
 	c:RegisterEffect(e2)
@@ -72,4 +72,7 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ChangePosition(g,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 		end
 	end
+end
+function s.tg(e,c)
+	return c:IsLevelBelow(9) and not c:IsMaximumModeSide()
 end
