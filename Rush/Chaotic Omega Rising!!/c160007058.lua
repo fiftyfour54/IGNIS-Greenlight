@@ -59,11 +59,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 					if ct>1 then Duel.Damage(1-tp,500,REASON_EFFECT) end
 				end
 			else if Duel.Destroy(tg,REASON_EFFECT) then
-				if Duel.Draw(tp,1,REASON_EFFECT)<1 then return end
-				local dg=Duel.GetOperatedGroup()
-				Duel.ConfirmCards(1-tp,dg)
-				local ct=dg:FilterCount(s.umifilter,nil)
-				if ct>1 then Duel.Damage(1-tp,500,REASON_EFFECT) end
+					if Duel.Draw(tp,1,REASON_EFFECT)<1 then return end
+					local dg=Duel.GetOperatedGroup()
+					Duel.ConfirmCards(1-tp,dg)
+					local ct=dg:FilterCount(s.umifilter,nil)
+					if ct>1 then Duel.Damage(1-tp,500,REASON_EFFECT) end
+				end
 			end
 		end
 	end
