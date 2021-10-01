@@ -1,21 +1,21 @@
 --いろはもみじ
---Iroha Momiji
+--Irohamomiji
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--synchro summon
+	--Synchro Summon
 	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),1,99)
 	c:EnableReviveLimit()
-	--change attribute
+	--Change Attribute
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCountLimit(1,{id,0})
 	e1:SetTarget(s.atttg)
 	e1:SetOperation(s.attop)
 	c:RegisterEffect(e1)
-	--send to gy
+	--Send to GY
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
@@ -38,6 +38,7 @@ function s.attop(e,tp,eg,ep,ev,re,r,rp)
 	local rc=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
@@ -74,8 +75,8 @@ function s.group(seq,tp)
 	return g
 end
 function s.gyfilter(c,tp)
-	if c:GetSequence()>=5 then return false end
-	return #(s.group(c:GetSequence(),tp))>0
+	if not c:IsInMainMZone() then return false end
+	return #(s.group(c:GetSequence(),1-tp))>0
 end
 function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and s.gyfilter(chkc,tp) end
@@ -86,11 +87,11 @@ end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
-		local g=s.group(tc:GetSequence(),tp)
+		local g=s.group(tc:GetSequence(),1-tp)
 		if #g>0 then
 			Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TOGRAVE)
 			local sg=g:Select(1-tp,1,1,nil)
-			Duel.HintSelection(sg)
+			Duel.HintSelection(sg,true)
 			Duel.SendtoGrave(sg,REASON_RULE)
 		end
 	end
