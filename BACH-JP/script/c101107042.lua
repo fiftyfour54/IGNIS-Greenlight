@@ -30,25 +30,20 @@ function s.atttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTRIBUTE)
 	local rc=Duel.AnnounceAttribute(tp,1,ATTRIBUTE_ALL)
-	Duel.SetTargetParam(rc)	
+	Duel.SetTargetParam(rc) 
 end
 function s.attop(e,tp,eg,ep,ev,re,r,rp)
-	local rc=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
+	local rc=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-	e1:SetValue(s.value(rc))
+	e1:SetValue(rc)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e1)
-	e1:SetLabelObject(e1)
-end
-function s.value(rc)
-	return  function(e,c)
-				return rc
-			end
 end
 function s.group(seq,tp)
 	local g=Group.CreateGroup()
