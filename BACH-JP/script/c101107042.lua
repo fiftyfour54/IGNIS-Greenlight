@@ -47,20 +47,29 @@ function s.attop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.group(seq,tp)
 	local g=Group.CreateGroup()
-	local function optadd(loc,seq)
-		local c=Duel.GetFieldCard(tp,loc,seq)
+	local function optadd(loc,seq,player)
+		if not player then player=tp end
+		local c=Duel.GetFieldCard(player,loc,seq)
 		if c then g:AddCard(c) end
 	end
 	if seq+1<=4 then optadd(LOCATION_MZONE,seq+1) end
 	if seq-1>=0 then optadd(LOCATION_MZONE,seq-1) end
 	if seq<5 then
 		optadd(LOCATION_SZONE,seq)
-		if seq==1 then optadd(LOCATION_MZONE,5) end
-		if seq==3 then optadd(LOCATION_MZONE,6) end
+		if seq==1 then
+			optadd(LOCATION_MZONE,5)
+			optadd(LOCATION_MZONE,6,1-tp)
+		end
+		if seq==3 then
+			optadd(LOCATION_MZONE,6)
+			optadd(LOCATION_MZONE,5,1-tp)
+		end
 	elseif seq==5 then
 		optadd(LOCATION_MZONE,1)
+		optadd(LOCATION_MZONE,3,1-tp)
 	elseif seq==6 then
 		optadd(LOCATION_MZONE,3)
+		optadd(LOCATION_MZONE,1,1-tp)
 	end
 	return g
 end
