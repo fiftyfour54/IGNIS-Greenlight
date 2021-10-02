@@ -28,14 +28,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_names={64734921,39552864}
-function s.hspcostfilter(c,ft)
-	return c:IsCode(64734921) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true) and (ft>0 or c:IsInMainMZone())
+function s.hspcostfilter(c,tp)
+	return c:IsCode(64734921) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
+		and Duel.GetMZoneCount(tp,c)>0
 end
 function s.hspcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.hspcostfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil,ft) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.hspcostfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,s.hspcostfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,1,nil,ft)
+	local g=Duel.SelectMatchingCard(tp,s.hspcostfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,1,nil,tp)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function s.hsptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -69,14 +69,15 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(ac//500)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
 	local ct=e:GetLabel()
-	if chk==0 then return ct end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,ct,ct,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,sg,#sg,tp,LOCATION_GRAVE+LOCATION_REMOVED)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,sg,#sg,tp,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetTargetCards(e)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<#g or (#g>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)) then return end
+	if #g==0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<#g or (#g>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)) then return end
 	local c=e:GetHandler()
 	for sc in g:Iter() do
 		if Duel.SpecialSummonStep(sc,0,tp,tp,false,false,POS_FACEUP) then
