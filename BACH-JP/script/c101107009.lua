@@ -8,8 +8,8 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.settg)
 	e1:SetOperation(s.setop)
@@ -22,8 +22,8 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_DESTROYED)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_DESTROYED)
 	e3:SetCountLimit(1,{id,1})
 	e3:SetCondition(s.spcon)
 	e3:SetCost(s.spcost)
@@ -31,6 +31,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
 end
+s.listed_names={id}
 s.listed_series={0x271}
 function s.setfilter(c)
 	return c:IsSetCard(0x271) and c:IsType(TYPE_TRAP) and c:IsSSetable()
@@ -42,7 +43,8 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 	local tc=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
-	if tc and Duel.SSet(tp,tc)>0 and Duel.GetLP(tp)<=2000 and c:IsFaceup() then
+	if tc and Duel.SSet(tp,tc)>0 and Duel.GetLP(tp)<=2000 and c:IsFaceup()
+		and c:IsRelateToEffect(e) then
 		Duel.BreakEffect()
 		-- Gain ATK
 		local e1=Effect.CreateEffect(c)
@@ -53,6 +55,9 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return (r&REASON_EFFECT+REASON_BATTLE)~=0
+end
 function s.spcostfilter(c)
 	return c:IsType(TYPE_TRAP) and c:IsAbleToRemoveAsCost()
 end
@@ -61,9 +66,6 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local tg=Duel.SelectMatchingCard(tp,s.spcostfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.Remove(tg,POS_FACEUP,REASON_COST)
-end
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return (r&REASON_EFFECT+REASON_BATTLE)~=0
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x271) and c:IsLevelBelow(4) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
