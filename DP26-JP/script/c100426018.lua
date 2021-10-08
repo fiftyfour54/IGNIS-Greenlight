@@ -7,9 +7,9 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND+CATEGORY_DESTROY)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e1:SetCountLimit(1,id)
@@ -33,6 +33,7 @@ end
 s.listed_names={CARD_UMI}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_UMI),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+		or Duel.IsEnvironment(CARD_UMI)
 end
 function s.thfilter(c)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_WATER) and not c:IsCode(id) and c:IsAbleToHand()
@@ -52,7 +53,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g2=Duel.SelectTarget(tp,nil,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g1,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g1,2,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -60,8 +61,13 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) or Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 	local tg=Duel.GetTargetCards(e)
 	local th=e:GetLabelObject()
-	if th and tg:IsContains(th) and Duel.SendtoHand(th,nil,REASON_EFFECT)>0 and #tg==2 then
-		Duel.Destroy(tg-th,REASON_EFFECT)
+	if th and tg:IsContains(th) and th:IsControler(tp) and s.thfilter(th)
+		and Duel.SendtoHand(th,nil,REASON_EFFECT)>0
+		and th:IsLocation(LOCATION_HAND) and #tg==2 then
+		tg:RemoveCard(th)
+		if tg:GetFirst():IsControler(1-tp) then
+			Duel.Destroy(tg,REASON_EFFECT)
+		end
 	end
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -71,7 +77,8 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SendtoHand(c,nil,REASON_EFFECT)>0 then
+	if c:IsRelateToEffect(e) and Duel.SendtoHand(c,nil,REASON_EFFECT)>0
+		and c:IsLocation(LOCATION_HAND) then
 		Duel.NegateAttack()
 	end
 end

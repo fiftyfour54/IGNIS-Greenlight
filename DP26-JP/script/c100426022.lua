@@ -5,6 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	-- Special Summon
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -16,13 +17,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_names={CARD_UMI}
-function s.spcostfilter(c)
+function s.spcostfilter(c,tp)
 	return c:IsFaceup() and c:IsCode(CARD_UMI) and c:IsAbleToGraveAsCost()
+		and Duel.GetMZoneCount(tp,c)>0
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.spcostfilter,tp,LOCATION_ONFIELD,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.spcostfilter,tp,LOCATION_ONFIELD,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,s.spcostfilter,tp,LOCATION_ONFIELD,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.spcostfilter,tp,LOCATION_ONFIELD,0,1,1,nil,tp)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function s.spfilter1(c,e,tp)
@@ -38,16 +40,6 @@ function s.spfilter2(c,e,tp)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	-- Cannot Special Summon non-WATER monsters
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(function(_,c)return not c:IsAttribute(ATTRIBUTE_WATER)end)
-	e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,Duel.IsTurnPlayer(tp) and 2 or 1)
-	Duel.RegisterEffect(e1,tp)
 	-- Special Summon (up to 2 with different names)
 	local g=Duel.GetMatchingGroup(s.spfilter1,tp,LOCATION_HAND+LOCATION_DECK,0,nil,e,tp)
 	local ct=math.min(2,Duel.GetLocationCount(tp,LOCATION_MZONE))
@@ -59,12 +51,24 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		-- Special Summon (any number)
 		local ng=Duel.GetMatchingGroup(s.spfilter2,tp,LOCATION_HAND+LOCATION_DECK,0,nil,e,tp)
 		local nct=Duel.GetLocationCount(tp,LOCATION_MZONE)
-		if #ng<1 or nct<1 then return end
+		if #ng<1 or nct<1 or not Duel.SelectYesNo(tp,aux.Stringid(id,1)) then return end
 		if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then nct=1 end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local nsg=ng:Select(tp,1,nct,nil)
 		if #nsg>0 then
 			Duel.BreakEffect()
 			Duel.SpecialSummon(nsg,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
+	if not e:IsHasType(EFFECT_TYPE_ACTIVATE) then return end
+	-- Cannot Special Summon non-WATER monsters
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(function(_,c)return not c:IsAttribute(ATTRIBUTE_WATER)end)
+	e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,Duel.IsTurnPlayer(tp) and 2 or 1)
+	Duel.RegisterEffect(e1,tp)
 end
