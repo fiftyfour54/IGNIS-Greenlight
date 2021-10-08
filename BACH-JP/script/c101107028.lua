@@ -8,8 +8,8 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
@@ -29,8 +29,8 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_RELEASE)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_RELEASE)
 	e3:SetCountLimit(1,{id,1})
 	e3:SetTarget(s.thtg)
 	e3:SetOperation(s.thop)
@@ -40,6 +40,7 @@ function s.initial_effect(c)
 	e4:SetCondition(s.thdescon)
 	c:RegisterEffect(e4)
 end
+s.listed_names={id}
 s.listed_series={0x272}
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x272) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -53,10 +54,9 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
-		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) 
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP) 
 	end
 end
 function s.hspcostfilter(c)
@@ -70,7 +70,8 @@ function s.hspcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.hsptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.hspop(e,tp,eg,ep,ev,re,r,rp)
@@ -96,6 +97,5 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.thdescon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return rp==1-tp and c:IsPreviousControler(c:GetOwner())
+	return rp==1-tp and e:GetHandler():IsPreviousControler(tp)
 end

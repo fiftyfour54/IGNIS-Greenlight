@@ -33,7 +33,8 @@ function s.hspcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.hsptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.hspop(e,tp,eg,ep,ev,re,r,rp)
@@ -67,13 +68,13 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local rc=e:GetLabelObject()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<1 or not rc then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.smnfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp,s.typetocode(rc:GetType()))
+	local g=Duel.SelectMatchingCard(tp,s.smnfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp,s.typetocode(rc:GetOriginalType()))
 	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
 		local atk=g:GetFirst():GetBaseAttack()
 		if atk>0 then Duel.SetLP(tp,Duel.GetLP(tp)-atk) end
