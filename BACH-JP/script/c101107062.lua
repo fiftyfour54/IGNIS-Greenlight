@@ -1,6 +1,7 @@
 --新世壊
 --New Clear World
 --Scripted by Eerie Code
+local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
