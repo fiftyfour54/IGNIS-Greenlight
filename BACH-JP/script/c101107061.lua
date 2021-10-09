@@ -66,7 +66,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectMatchingCard(tp,s.spcfilter2,tp,LOCATION_MZONE,0,1,1,nil,tp)
 	Duel.SendtoDeck(g,nil,2,REASON_COST)
 end
-function s.spfilter2=aux.AND(Card.IsFaceup,s.spfilter)
+s.spfilter2=aux.AND(Card.IsFaceup,s.spfilter)
 function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_REMOVED,0,1,nil,e,tp) end
 	Duel.SpecialSummon(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_REMOVED)
