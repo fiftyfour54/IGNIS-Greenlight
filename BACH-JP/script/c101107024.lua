@@ -47,7 +47,6 @@ function s.thfilter(c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	--e2:SetCategory(+)
 	local b2=Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil)
 	local op=aux.SelectEffect(tp,
 		{true,aux.Stringid(id,1)},
