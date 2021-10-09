@@ -1,26 +1,26 @@
---X・Y・Zコンバイン
---X-Y-Z Combine
+--Ｘ・Ｙ・Ｚコンバイン
+--XYZ Combine
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--summon xyz (single)
+	--Special Summon from the Deck
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_REMOVE)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCode(EVENT_REMOVE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1,{id,0})
 	e2:SetCondition(s.spcon)
 	e2:SetTarget(s.sptg1)
 	e2:SetOperation(s.spop1)
 	c:RegisterEffect(e2)
-	--summon xyz (multi)
+	--Special Summon from banished
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_IGNITION)
@@ -36,11 +36,14 @@ function s.spcfilter1(c,tp)
 	return c:IsFaceup() and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
 		and c:IsPreviousControler(tp) and c:IsAttribute(ATTRIBUTE_LIGHT)
 		and c:IsRace(RACE_MACHINE) and c:IsType(TYPE_UNION)
+		and c:GetPreviousAttributeOnField()&ATTRIBUTE_LIGHT>0 and c:GetPreviousRaceOnField()&RACE_MACHINE>0
+		and c:GetPreviousTypeOnField()&TYPE_UNION>0
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.spcfilter1,1,nil,tp)
 end
 function s.spfilter(c,e,tp)
+	Debug.Message(tp)
 	return c:IsCode(62651957,65622692,64500000) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg1(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -69,13 +72,14 @@ end
 s.spfilter2=aux.AND(Card.IsFaceup,s.spfilter)
 function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_REMOVED,0,1,nil,e,tp) end
-	Duel.SpecialSummon(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_REMOVED)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_REMOVED)
 end
 function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<1 then return end
 	local g=Duel.GetMatchingGroup(s.spfilter2,tp,LOCATION_REMOVED,0,nil,e,tp)
+	if #g==0 then return end
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
 	ft=math.min(2,Duel.GetLocationCount(tp,LOCATION_MZONE))
 	local sg=aux.SelectUnselectGroup(g,e,tp,1,ft,aux.dncheck,1,tp,HINTMSG_SPSUMMON)
