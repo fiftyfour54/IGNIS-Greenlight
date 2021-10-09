@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
     c:EnableCounterPermit(COUNTER_SPELL)
     c:SetCounterLimit(COUNTER_SPELL,3)
-
+	--Place Spell Counter
     local e0=Effect.CreateEffect(c)
     e0:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
     e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -19,7 +19,7 @@ function s.initial_effect(c)
     e1:SetRange(LOCATION_MZONE)
     e1:SetOperation(s.acop)
     c:RegisterEffect(e1)
-    
+    --Change Level or add to hand
     local e2=Effect.CreateEffect(c)
     e2:SetDescription(aux.Stringid(id,0))
     e2:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_LVCHANGE+CATEGORY_SEARCH+CATEGORY_TOHAND)
@@ -54,7 +54,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
     else
         op=Duel.SelectOption(tp,aux.Stringid(id,1))
     end
-    if op=1 then
+    if op==1 then
         Duel.SetOperationInfo(0,CATEGORY_TOHAND,0,1,tp,LOCATION_DECK+LOCATION_GRAVE)
     end
     Duel.SetTargetParam(op)
@@ -78,7 +78,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
             e2:SetValue(1500)
             c:RegisterEffect(e2)
         end
-    elseif op=1 then
+    elseif op==1 then
         Duel.Hint(HINT_SELECTMSG,tp, HINTMSG_ATOHAND)
             local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
         if #g>0 then
