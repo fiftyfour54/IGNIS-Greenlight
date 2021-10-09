@@ -20,14 +20,14 @@ function s.initial_effect(c)
 end
 s.listed_names={id}
 s.listed_series={0x2066,0xe9}
-function s.cfilter(c,ec)
-	return c:IsMonster() and c:IsLevelBelow(4) and c:IsSetCard(0x2066) and not c:IsCode(id)
-		and not ec:IsCode(c:GetCode()) and c:IsAbleToGraveAsCost()
+function s.cfilter(c,code)
+	return c:IsMonster() and c:IsLevelBelow(4) and c:IsSetCard(0x2066)
+		and not c:IsCode(id,code) and c:IsAbleToGraveAsCost()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_DECK,0,1,nil,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_DECK,0,1,nil,e:GetHandler():GetCode()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local tc=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_DECK,0,1,1,nil,e:GetHandler()):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_DECK,0,1,1,nil,e:GetHandler():GetCode()):GetFirst()
 	Duel.SendtoGrave(tc,REASON_COST)
 	e:SetLabel(tc:GetCode())
 end
