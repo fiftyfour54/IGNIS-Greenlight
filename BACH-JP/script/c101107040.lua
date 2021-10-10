@@ -4,7 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	local eff=Fusion.AddProcMixN(c,true,true,s.ffilter,3)
+	local eff=Fusion.AddProcMix(c,true,true,s.ffilter1,s.ffilter2,s.ffilter3)
 	if not c:IsStatus(STATUS_COPYING_EFFECT) then
 		eff[1]:SetValue(s.matfilter)
 	end
@@ -30,21 +30,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_names={CARD_POLYMERIZATION}
-function s.ffilter(c,fc,sumtype,tp,sub,mg,sg)
-	--return (not sg or not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,tp),fc,tp))
-	if sg then
-		--if sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,tp),fc,tp) then return false end
-		--local lc=sg:GetClassCount(Card.GetLocation)
-		----Debug.Message("Checking "..c:GetCode()..", location "..c:GetLocation()..": #sg = "..#sg..", lc = "..lc..", #mg = "..#mg..", mloc = "..mg:GetClassCount(Card.GetLocation))
-		--if lc==0 or lc==2 then 
-		--	return true
-		--elseif lc==1 then
-		--	return sg:IsExists(aux.NOT(Card.IsLocation),1,nil,c:GetLocation())
-		--end
-		return not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,tp),fc,tp)
-	else
-		return true
-	end
+function s.ffilter1(c,fc,sumtype,tp,sub,mg,sg)
+    return c:IsLocation(LOCATION_HAND) and (not sg or not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,tp),fc,sumtype,tp))
+end
+function s.ffilter2(c,fc,sumtype,tp,sub,mg,sg)
+    return c:IsLocation(LOCATION_ONFIELD) and (not sg or not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,tp),fc,sumtype,tp))
+end
+function s.ffilter3(c,fc,sumtype,tp,sub,mg,sg)
+    return (not sg or not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,tp),fc,sumtype,tp))
 end
 function s.fusfilter(c,code,fc,tp)
 	return c:IsSummonCode(fc,SUMMON_TYPE_FUSION,tp,code) and not c:IsHasEffect(511002961)
