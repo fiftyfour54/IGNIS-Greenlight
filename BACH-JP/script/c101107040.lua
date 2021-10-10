@@ -31,16 +31,27 @@ function s.initial_effect(c)
 end
 s.listed_names={CARD_POLYMERIZATION}
 function s.ffilter(c,fc,sumtype,tp,sub,mg,sg)
-	return (not sg or not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,tp),fc,tp))
+	--return (not sg or not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,tp),fc,tp))
+	if sg then
+		--if sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,tp),fc,tp) then return false end
+		--local lc=sg:GetClassCount(Card.GetLocation)
+		----Debug.Message("Checking "..c:GetCode()..", location "..c:GetLocation()..": #sg = "..#sg..", lc = "..lc..", #mg = "..#mg..", mloc = "..mg:GetClassCount(Card.GetLocation))
+		--if lc==0 or lc==2 then 
+		--	return true
+		--elseif lc==1 then
+		--	return sg:IsExists(aux.NOT(Card.IsLocation),1,nil,c:GetLocation())
+		--end
+		return not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,sumtype,tp),fc,tp)
+	else
+		return true
+	end
 end
 function s.fusfilter(c,code,fc,tp)
 	return c:IsSummonCode(fc,SUMMON_TYPE_FUSION,tp,code) and not c:IsHasEffect(511002961)
 end
 function s.matfilter(c,fc,sub,sub2,mg,sg,tp,contact,sumtype)
 	if sumtype&SUMMON_TYPE_FUSION~=0 and fc:IsLocation(LOCATION_EXTRA) then
-		return not mg:IsExists(aux.NOT(Card.IsControler),1,nil,tp) 
-			and mg:IsExists(Card.IsLocation,1,nil,LOCATION_ONFIELD)
-			and mg:IsExists(Card.IsLocation,1,nil,LOCATION_HAND)
+		return c:IsLocation(LOCATION_ONFIELD+LOCATION_HAND) and c:IsControler(tp)
 	end
 	return true
 end
@@ -49,8 +60,8 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local mg=e:GetHandler():GetMaterial()
-	local hc=mg:FilterCount(Card.IsLocation,nil,LOCATION_HAND)
-	local fc=mg:FilterCount(Card.IsLocation,nil,LOCATION_ONFIELD)
+	local hc=mg:FilterCount(Card.IsPreviousLocation,nil,LOCATION_HAND)
+	local fc=mg:FilterCount(Card.IsPreviousLocation,nil,LOCATION_ONFIELD)
 	if chk==0 then return hc>0 and fc>0 and Duel.IsPlayerCanDraw(tp,hc)
 		and Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)>=fc end
 	Duel.SetTargetPlayer(tp)
@@ -62,8 +73,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) then return end
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local mg=c:GetMaterial()
-	local hc=mg:FilterCount(Card.IsLocation,nil,LOCATION_HAND)
-	local fc=mg:FilterCount(Card.IsLocation,nil,LOCATION_ONFIELD)
+	local hc=mg:FilterCount(Card.IsPreviousLocation,nil,LOCATION_HAND)
+	local fc=mg:FilterCount(Card.IsPreviousLocation,nil,LOCATION_ONFIELD)
 	if Duel.Draw(p,hc,REASON_EFFECT)==hc then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local g=Duel.SelectMatchingCard(tp,nil,tp,0,LOCATION_ONFIELD,fc,fc,nil)
