@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e2:SetTargetRange(LOCATION_ONFIELD,0)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetTarget(function(e,c) c~=e:GetHandler() end)
+	e2:SetTarget(function(e,c) return c~=e:GetHandler() end)
 	e2:SetValue(aux.indoval)
 	c:RegisterEffect(e2)
 	--Return to hand
