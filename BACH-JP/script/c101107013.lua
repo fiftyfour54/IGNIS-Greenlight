@@ -43,7 +43,7 @@ function s.initial_effect(c)
 	e4:SetDescription(aux.Stringid(id,3))
 	e4:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DELAY)
+	e4:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetCountLimit(1,{id,3})
 	e4:SetCondition(s.thcon)
@@ -51,6 +51,7 @@ function s.initial_effect(c)
 	e4:SetOperation(s.thop)
 	c:RegisterEffect(e4)
 end
+s.listed_names={id}
 s.listed_series={0xae,0xaf}
 function s.atkfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xae) and c:IsType(TYPE_SPELL+TYPE_TRAP)
@@ -118,7 +119,7 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_GRAVE)
+	return e:GetHandler():IsSummonLocation(LOCATION_GRAVE)
 end
 function s.thfilter(c)
 	return c:IsSetCard(0xaf) and not c:IsCode(id) and c:IsAbleToHand()

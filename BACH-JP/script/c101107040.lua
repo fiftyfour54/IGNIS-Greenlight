@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	if not c:IsStatus(STATUS_COPYING_EFFECT) then
 		eff[1]:SetValue(s.matfilter)
 	end
-	--draw and destroy
+	--Draw and destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DRAW+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -19,7 +19,14 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--cannot be target
+	--Register the materials used
+	local e1a=Effect.CreateEffect(c)
+	e1a:SetType(EFFECT_TYPE_SINGLE)
+	e1a:SetCode(EFFECT_MATERIAL_CHECK)
+	e1a:SetValue(s.valcheck)
+	e1a:SetLabelObject(e1)
+	c:RegisterEffect(e1a)
+	--Cannot be targeted by opponent's effects
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
@@ -52,28 +59,33 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) and re and re:IsActiveType(TYPE_SPELL)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local mg=e:GetHandler():GetMaterial()
-	local hc=mg:FilterCount(Card.IsPreviousLocation,nil,LOCATION_HAND)
-	local fc=mg:FilterCount(Card.IsPreviousLocation,nil,LOCATION_ONFIELD)
+	local hc,fc=table.unpack(e:GetLabelObject())
+	local dg=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
 	if chk==0 then return hc>0 and fc>0 and Duel.IsPlayerCanDraw(tp,hc)
-		and Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)>=fc end
+		and #dg>=fc end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,hc)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,fc,1-tp,LOCATION_ONFIELD)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,#dg,fc,1-tp,LOCATION_ONFIELD)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	local mg=c:GetMaterial()
-	local hc=mg:FilterCount(Card.IsPreviousLocation,nil,LOCATION_HAND)
-	local fc=mg:FilterCount(Card.IsPreviousLocation,nil,LOCATION_ONFIELD)
+	local hc,fc=table.unpack(e:GetLabelObject())
 	if Duel.Draw(p,hc,REASON_EFFECT)==hc then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local g=Duel.SelectMatchingCard(tp,nil,tp,0,LOCATION_ONFIELD,fc,fc,nil)
 		if #g>0 then
 			Duel.Destroy(g,REASON_EFFECT)
 		end
+	end
+end
+function s.valcheck(e,c)
+	local mg=c:GetMaterial()
+	local hc=mg:FilterCount(Card.IsLocation,nil,LOCATION_HAND)
+	local fc=mg:FilterCount(Card.IsLocation,nil,LOCATION_ONFIELD)
+	if hc>0 and fc>0 then
+		e:GetLabelObject():SetLabelObject({hc,fc})
 	end
 end
 function s.immcon(e)

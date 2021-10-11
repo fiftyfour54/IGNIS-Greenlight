@@ -44,7 +44,8 @@ function s.initial_effect(c)
 end
 s.listed_names={CARD_BLUEEYES_W_DRAGON}
 function s.hspfilter(c,tp,sc)
-	return c:IsCode(CARD_BLUEEYES_W_DRAGON) and c:GetEquipGroup():IsExists(Card.IsOriginalType,1,nil,TYPE_FUSION) and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0
+	return c:IsCode(CARD_BLUEEYES_W_DRAGON) and c:GetEquipGroup():IsExists(Card.IsOriginalType,1,nil,TYPE_FUSION)
+		and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0
 end
 function s.hspcon(e,c)
 	if c==nil then return true end

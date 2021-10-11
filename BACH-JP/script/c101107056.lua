@@ -3,7 +3,7 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -27,14 +27,14 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e3:SetRange(LOCATION_SZONE)
+	e3:SetRange(LOCATION_FZONE)
 	e3:SetLabelObject(e2)
 	e3:SetOperation(s.regop)
 	c:RegisterEffect(e3)
 	--to hand
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
-	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e4:SetCategory(CATEGORY_TOHAND)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_TO_GRAVE)
 	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
@@ -46,7 +46,7 @@ end
 s.listed_series={0x10af,0xaf}
 function s.damcfilter(c,tp)
 	local ty=c:GetType() & (TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
-	return ty~=0 and Duel.IsExistingMatchingCard(s.damcfilter2,tp,LOCATION_MZONE,0,1,nil,ty)
+	return c:IsSummonPlayer(1-tp) and ty~=0 and Duel.IsExistingMatchingCard(s.damcfilter2,tp,LOCATION_MZONE,0,1,nil,ty)
 end
 function s.damcfilter2(c,ty)
 	return c:IsFaceup() and c:IsSetCard(0x10af) and c:IsType(ty)
@@ -65,20 +65,18 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RaiseSingleEvent(e:GetHandler(),EVENT_CUSTOM+id,e,0,tp,tp,0)
 	end
 end
-function s.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.damcfilter,1,nil,tp)
-end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=e:GetLabelObject()
 	if chk==0 then return #g>0 and Duel.GetFlagEffect(tp,id)==0 end
 	Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
-	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(1000)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,1000)
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	if not c:IsRelateToEffect(e) then return end
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
 	local ty=0
 	local g=e:GetLabelObject()
@@ -86,6 +84,7 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 		ty=ty | tc:GetType()
 	end
 	ty=ty & (TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
+	--Cannot Special Summon monsters of the same type
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
@@ -93,11 +92,11 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetRange(LOCATION_FZONE)
 	e1:SetTargetRange(0,1)
 	e1:SetTarget(function(e2,sc,tp2,sumtp,sumpos) return sc:IsType(ty) end)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e1)
 end
 function s.thfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xaf) and (c:IsFaceup() or not c:IsLocation(LOCATION_EXTRA)) and c:IsAbleToHand()
+	return c:IsMonster() and c:IsSetCard(0xaf) and (c:IsFaceup() or not c:IsLocation(LOCATION_EXTRA)) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,nil) end
