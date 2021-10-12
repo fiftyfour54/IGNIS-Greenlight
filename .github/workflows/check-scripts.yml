@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+  pull_request:
 jobs:
   check-scripts:
     runs-on: ubuntu-latest
