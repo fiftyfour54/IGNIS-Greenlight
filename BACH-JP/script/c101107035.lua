@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCondition(function(e)return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL)end)
 	e1:SetTarget(s.atktg)
@@ -38,6 +38,8 @@ function s.initial_effect(c)
 	e3:SetOperation(s.tgop)
 	c:RegisterEffect(e3)
 end
+s.listed_names={101107054}
+s.listed_series={0x146}
 function s.atkrescon(sg)
 	return sg:IsExists(Card.IsAttackAbove,1,nil,1)
 end
