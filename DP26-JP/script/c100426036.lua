@@ -1,3 +1,4 @@
+--海晶乙女環流
 --Marincess Circulation
 --Scripted by Neo Yuno
 local s,id=GetID()
