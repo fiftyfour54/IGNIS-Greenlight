@@ -1,3 +1,4 @@
+--海晶乙女渦輪
 --Marincess Bubble Ring
 --Scripted by Neo Yuno
 local s,id=GetID()
@@ -7,18 +8,18 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-    e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+        e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-    --Multiple Attacks
+        --Multiple Attacks
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_FREE_CHAIN)
-    e2:SetRange(LOCATION_GRAVE)
+        e2:SetRange(LOCATION_GRAVE)
 	e2:SetCondition(s.atcon)
-    e2:SetCost(aux.bfgcost)
+        e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.attg)
 	e2:SetOperation(s.atop)
 	c:RegisterEffect(e2)
@@ -74,8 +75,8 @@ function s.atop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		e1:SetValue(ct-1)
 		tc:RegisterEffect(e1)
-        --No battle damage
-        local e2=Effect.CreateEffect(c)
+                --No battle damage
+                local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_NO_BATTLE_DAMAGE)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
