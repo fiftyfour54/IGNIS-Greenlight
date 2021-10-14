@@ -19,8 +19,8 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DECKDES+CATEGORY_DAMAGE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_BE_MATERIAL)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(s.mlcon)
 	e2:SetTarget(s.mltg)
@@ -57,13 +57,13 @@ function s.mltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsSetCard,0x12b),tp,LOCATION_MZONE,0,nil)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,ct) end
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,ct)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,0)
 end
 function s.mlop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsSetCard,0x12b),tp,LOCATION_MZONE,0,nil)
 	if ct<1 or Duel.DiscardDeck(tp,ct,REASON_EFFECT)<1 then return end
-	local dc=Duel.GetOperatedGroup():FilterCount(Card.IsSetCard,nil,0x12b)
+	local dc=Duel.GetOperatedGroup():Match(Card.IsSetCard,nil,0x12b):Match(Card.IsLocation,nil,LOCATION_GRAVE):GetCount()
 	if dc>0 then
+		Duel.BreakEffect()
 		Duel.Damage(1-tp,dc*200,REASON_EFFECT)
 	end
 end
