@@ -6,9 +6,8 @@ function s.initial_effect(c)
 	-- Negate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_NEGATE)
+	e1:SetCategory(CATEGORY_DISABLE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_HAND+LOCATION_MZONE)
 	e1:SetCountLimit(1,id)
@@ -29,7 +28,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={CARD_ALBAZ}
+s.listed_names={CARD_ALBAZ,id}
 function s.negconfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_FUSION) and aux.IsMaterialListCode(c,CARD_ALBAZ)
 end
@@ -39,18 +38,19 @@ function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsDiscardable() end
-	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
+	if chk==0 then return c:IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(c,REASON_COST)
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsChainNegatable(ev) and not re:GetHandler():IsStatus(STATUS_DISABLED) end
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
+	if chk==0 then return Duel.IsChainDisablable(ev) and not re:GetHandler():IsStatus(STATUS_DISABLED) end
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateActivation(ev)
+	Duel.NegateEffect(ev)
 end
 function s.thfilter(c)
-	return (c:IsCode(CARD_ALBAZ) or (c:IsMonster() and aux.IsCodeListed(c,CARD_ALBAZ))) and c:IsAbleToHand()
+	return (c:IsCode(CARD_ALBAZ) or (c:IsMonster() and aux.IsCodeListed(c,CARD_ALBAZ)))
+		and c:IsAbleToHand() and not c:IsCode(id)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

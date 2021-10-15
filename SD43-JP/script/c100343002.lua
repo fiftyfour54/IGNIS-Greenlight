@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	-- Add to hand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND+CATEGORY_TODECK)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
@@ -51,22 +51,23 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.thfilter(c)
 	return c:IsSetCard(0x160) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+		and (c:IsFaceup() or c:IsLocation(LOCATION_DECK))
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,0,tp,1)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_HAND)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DisableShuffleCheck(true)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
-	if #g<1 or Duel.SendtoHand(g,nil,REASON_EFFECT)<1 or not g:GetFirst():IsLocation(LOCATION_HAND) then return end
-	Duel.ConfirmCards(1-tp,g)
-	Duel.ShuffleDeck(tp)
+	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil):GetFirst()
+	if not (tc and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND)) then return end
+	Duel.ConfirmCards(1-tp,tc)
+	if tc:IsPreviousLocation(LOCATION_DECK) then Duel.ShuffleDeck(tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local td=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_HAND,0,1,1,nil)
 	if #td>0 then
+		Duel.DisableShuffleCheck()
 		Duel.BreakEffect()
 		Duel.SendtoDeck(td,nil,SEQ_DECKBOTTOM,REASON_EFFECT)
 	end

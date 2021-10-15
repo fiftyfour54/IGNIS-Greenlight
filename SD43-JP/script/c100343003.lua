@@ -17,9 +17,9 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_REMOVE)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
 	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.spcon)
@@ -31,7 +31,8 @@ end
 s.listed_names={CARD_ALBAZ}
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.desfilter(c)
@@ -57,7 +58,8 @@ function s.spfilter(c,e,tp)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE+LOCATION_HAND)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -65,6 +67,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,e,tp)
 	if #g>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

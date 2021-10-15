@@ -8,14 +8,14 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--inactivatable
+	--Cannot negate the activation of your Fusion Summoning cards/effects
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_CANNOT_INACTIVATE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetValue(s.efilter)
 	c:RegisterEffect(e2)
-	--act limit
+	--Cannot activate cards/effects when Fusion Summoning
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -29,11 +29,11 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_CHAIN_END)
 	e4:SetOperation(s.limop2)
 	c:RegisterEffect(e4)
-	--search
+	--Search
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,0))
-	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e5:SetProperty(EFFECT_FLAG_DELAY)
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e5:SetRange(LOCATION_SZONE)
@@ -43,7 +43,7 @@ function s.initial_effect(c)
 	e5:SetOperation(s.thop)
 	c:RegisterEffect(e5)
 end
-s.listed_names={CARD_ALBAZ }
+s.listed_names={CARD_ALBAZ}
 function s.efilter(e,ct)
 	local p=e:GetHandlerPlayer()
 	local te,tp=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER)
@@ -85,7 +85,7 @@ function s.chainlm(e,rp,tp)
 	return tp==rp
 end
 function s.cfilter(c,tp)
-	return c:GetSummonPlayer()==tp and c:IsSummonType(SUMMON_TYPE_FUSION)
+	return c:IsSummonPlayer(tp) and c:IsSummonType(SUMMON_TYPE_FUSION) and c:IsType(TYPE_FUSION)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
