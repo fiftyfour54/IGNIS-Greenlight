@@ -3,7 +3,7 @@
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Gain ATK
+	-- Change original ATK
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -28,11 +28,13 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	for tc in aux.Next(g) do
 		sum=sum+(math.abs(tc:GetBaseAttack()-tc:GetAttack()))
 	end
-	-- Update ATK
+	-- Change original ATK
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetCode(EFFECT_SET_BASE_ATTACK)
+	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(sum)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
 	c:RegisterEffect(e1)
 end

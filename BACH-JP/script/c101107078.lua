@@ -5,7 +5,8 @@ local s,id=GetID()
 function s.initial_effect(c)
 	-- Add to hand or Special Summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
@@ -52,6 +53,7 @@ function s.thspop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ShuffleDeck(tp)
 	local sc=sg:RandomSelect(1-tp,1):GetFirst()
 	if not sc then return end
+	Duel.ConfirmCards(1-tp,sc)
 	aux.ToHandOrElse(sc,tp,
 		function(sc)
 			return ft>0 and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -59,7 +61,7 @@ function s.thspop(e,tp,eg,ep,ev,re,r,rp)
 		function(sc)
 			Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
 		end,
-		aux.Stringid(id,0))
+		aux.Stringid(id,1))
 	sg=sg-sc
 	if #sg>0 then
 		Duel.MoveToDeckBottom(sg,tp)
