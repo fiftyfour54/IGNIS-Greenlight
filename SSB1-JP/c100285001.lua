@@ -3,38 +3,40 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	c:AddSetcodesRule(0x115)
-	--Special Summon procedure
+	--Special Summon procedure (your field)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetRange(LOCATION_HAND)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetCountLimit(1,{id,0})
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,{id,0},EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(s.hspcon)
 	e1:SetTarget(s.hsptg)
 	e1:SetOperation(s.hspop)
 	c:RegisterEffect(e1)
+	--Special Summon procedure (your opponent's field)
 	local e2=aux.AddLavaProcedure(c,0,POS_FACEUP,aux.TRUE,0,aux.Stringid(id,1))
 	e2:SetCondition(s.hspcon2)
-	e2:SetCountLimit(1,{id,0})
-	--destroy
+	e2:SetCountLimit(1,{id,0},EFFECT_COUNT_CODE_OATH)
+	--Destroy
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_DESTROY)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_BATTLE_DESTROYED)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCode(EVENT_BATTLE_DESTROYED)
 	e3:SetTarget(s.destg)
 	e3:SetOperation(s.desop)
 	c:RegisterEffect(e3)
 end
 s.listed_series={0x115,0x1115}
+function s.ssacechk(e)
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x1115),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+end
 function s.hspcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(c:GetControler(),aux.TRUE,1,false,1,true,c,c:GetControler(),nil,false,nil)
-		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x1115),c:GetControler(),LOCATION_MZONE,0,1,nil)
+	return Duel.CheckReleaseGroup(c:GetControler(),aux.TRUE,1,false,1,true,c,c:GetControler(),nil,false,nil) and s.ssacechk(e)
 end
 function s.hsptg(e,tp,eg,ep,ev,re,r,rp,c)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
@@ -42,7 +44,7 @@ function s.hsptg(e,tp,eg,ep,ev,re,r,rp,c)
 	if g then
 		g:KeepAlive()
 		e:SetLabelObject(g)
-	return true
+		return true
 	end
 	return false
 end
@@ -54,7 +56,7 @@ function s.hspop(e,tp,eg,ep,ev,re,r,rp,c)
 end
 function s.hspcon2(e,c)
 	if c==nil then return true end
-	return aux.LavaCondition(0,aux.TRUE)(e,c) and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x1115),c:GetControler(),LOCATION_MZONE,0,1,nil)
+	return aux.LavaCondition(1,nil)(e,c) and s.ssacechk(e)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
