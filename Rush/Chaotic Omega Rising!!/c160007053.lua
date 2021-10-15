@@ -20,6 +20,13 @@ end
 function s.cfilter(c,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToDeckOrExtraAsCost() 
 end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return 
+		 Duel.IsExistingMatchingCard(s.tdfilter,tp,LOCATION_GRAVE,0,1,nil,tp)
+	end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,2,tp,LOCATION_GRAVE)
+	Duel.SetChainLimit(s.chlimit)
+end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	--Requirement
