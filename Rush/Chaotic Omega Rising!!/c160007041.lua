@@ -17,11 +17,8 @@ function s.initial_effect(c)
 	e1:SetOperation(s.drop)
 	c:RegisterEffect(e1)
 end
-function s.costfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_DINOSAUR) and c:IsAbleToGraveAsCost()
-end
 function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,2) end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,2) and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>2 end
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
