@@ -43,8 +43,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 				Duel.Damage(1-tp,500,REASON_EFFECT)
 			end
 		end
-	end
 end
+
 function s.fupfilter(c)
 	return c:IsFaceup() and (c:IsCode(CARD_UMI) or c:IsCode(CARD_BIG_OCEAN))
 end
