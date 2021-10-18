@@ -47,5 +47,5 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 				Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 			end
 		end
-	end
 end
+
