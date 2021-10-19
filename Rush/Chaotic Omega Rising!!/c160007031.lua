@@ -42,6 +42,19 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 		if #g>0 then
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+			--Prevent non-Warriors from attacking
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_FIELD)
+			e2:SetCode(EFFECT_CANNOT_ATTACK)
+			e2:SetProperty(EFFECT_FLAG_OATH)
+			e2:SetTargetRange(LOCATION_MZONE,0)
+			e2:SetTarget(s.ftarget)
+			e2:SetReset(RESET_PHASE+PHASE_END)
+			Duel.RegisterEffect(e2,tp)
 		end
 	end
+end
+
+function s.ftarget(e,c)
+	return not c:IsAttribute(ATTRIBUTE_WATER)
 end
