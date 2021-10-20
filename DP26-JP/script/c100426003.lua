@@ -34,7 +34,7 @@ function s.attcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.attfilter(c,e)
 	local no=c.xyz_number
-	return and no and no>=101 and no<=107 and c:IsSetCard(0x48) and not c:IsImmuneToEffect(e)
+	return no and no>=101 and no<=107 and c:IsSetCard(0x48) and not c:IsImmuneToEffect(e)
 end
 function s.atttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.attfilter,tp,LOCATION_EXTRA,0,1,nil,e)
