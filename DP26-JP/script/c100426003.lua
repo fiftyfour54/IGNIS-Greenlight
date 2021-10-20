@@ -53,7 +53,7 @@ function s.attop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(c,tc)
 		--attach 1 other monster
 		local g=Duel.GetMatchingGroup(s.attfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler(),e)
-		if #g>0 and	Duel.SelectYesNo(tp,aux.Stringid(id,1)) end
+		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 			local g=Duel.SelectMatchingCard(tp,s.attfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler(),e)
@@ -64,6 +64,7 @@ function s.attop(e,tp,eg,ep,ev,re,r,rp)
 				end
 				Duel.Overlay(tc,g)
 			end
+		end
 	end
 end
 function s.attfilter2(c,e)
