@@ -1,13 +1,14 @@
+--
 --Heritage of the Light
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--draw
+	--Draw 1 card
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -20,21 +21,24 @@ function s.initial_effect(c)
 	e2:SetOperation(s.drop)
 	c:RegisterEffect(e2)
 end
-function s.cfilter(c,tp)
-	if c:IsSummonType(SUMMON_TYPE_FUSION) then
-		return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsType,TYPE_FUSION),0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
-	elseif c:IsSummonType(SUMMON_TYPE_RITUAL) then
-		return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsType,TYPE_RITUAL),0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
+function s.typecheck(sc,card_type)
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsType,card_type),0,LOCATION_MZONE,LOCATION_MZONE,1,sc)
+end
+function s.drcfilter(c)
+	if c:IsSummonType(SUMMON_TYPE_RITUAL) then
+		return s.typecheck(c,TYPE_RITUAL)
+	elseif c:IsSummonType(SUMMON_TYPE_FUSION) then
+		return s.typecheck(c,TYPE_FUSION)
 	elseif c:IsSummonType(SUMMON_TYPE_SYNCHRO) then
-		return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsType,TYPE_SYNCHRO),0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
+		return s.typecheck(c,TYPE_SYNCHRO)
 	elseif c:IsSummonType(SUMMON_TYPE_XYZ) then
-		return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsType,TYPE_XYZ),0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
+		return s.typecheck(c,TYPE_XYZ)
 	else
 		return false
 	end
 end
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.drcfilter,1,nil,tp)
+	return eg:IsExists(s.drcfilter,1,nil)
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end

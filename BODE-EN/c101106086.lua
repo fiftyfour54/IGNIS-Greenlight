@@ -1,14 +1,15 @@
+--
 --Beetrooper Light Flapper
 --Scripted by Zefile
 local s,id=GetID()
 function s.initial_effect(c)
-	--add to hand
+	--Add 2 "Beetrooper" monsters from GY or banished to hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
@@ -16,7 +17,7 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
-	-- Return self to hand
+	--Return itself to hand and negate an attack
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_TOHAND)
@@ -24,14 +25,15 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,{id,1})
-	e3:SetCondition(function(_,tp)return Duel.IsTurnPlayer(1-tp)end)
+	e3:SetCondition(function(_,tp) return Duel.IsTurnPlayer(1-tp) end)
 	e3:SetTarget(s.atktg)
 	e3:SetOperation(s.atkop)
 	c:RegisterEffect(e3)
 end
 s.listed_series={0x172}
-function s.thfilter(c)
-	return c:IsSetCard(0x172) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+function s.thfilter(c,e)
+	return c:IsSetCard(0x172) and c:IsMonster() and c:IsFaceup() and c:IsAbleToHand()
+		and c:IsCanBeEffectTarget(e)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil,e)
@@ -41,34 +43,34 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,tg,2,0,0)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
-	local c=e:GetHandler()
-	if #sg>0 and Duel.SendtoHand(sg,nil,REASON_EFFECT)~=0 then
-		Duel.ConfirmCards(1-tp,sg)
-		for sc in aux.Next(sg) do
+	local tg=Duel.GetTargetCards(e)
+	if #tg>0 and Duel.SendtoHand(tg,nil,REASON_EFFECT)>0 then
+		Duel.ConfirmCards(1-tp,tg)
+		local c=e:GetHandler()
+		--Cannot activate their effects or effects of cards with the same names
+		for sc in aux.Next(tg) do
 			local e1=Effect.CreateEffect(c)
-			e1:SetDescription(aux.Stringid(id,0))
-			e1:SetType(EFFECT_TYPE_FIELD)
-			e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-			e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-			e1:SetTargetRange(1,0)
-			e1:SetValue(s.aclimit(sc))
-			e1:SetLabelObject(sc)
-			e1:SetReset(RESET_PHASE+PHASE_END)
-			Duel.RegisterEffect(e1,tp)
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_CANNOT_TRIGGER)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			sc:RegisterEffect(e2)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CANNOT_TRIGGER)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			sc:RegisterEffect(e1)
 		end
+		local code1=tg:GetFirst():GetCode()
+		local code2=0
+		if #tg>1 then code2=tg:GetNext():GetCode() end
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_FIELD)
+		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e2:SetCode(EFFECT_CANNOT_ACTIVATE)
+		e2:SetTargetRange(1,0)
+		e2:SetValue(s.aclimit)
+		e2:SetLabelObject({code1,code2})
+		e2:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(e2,tp)
 	end
 end
-function s.aclimit(sc)
-  return function(e,re,tp)
-	return re:GetHandler():IsCode(sc:GetCode())
-  end
+function s.aclimit(e,re,tp)
+	return re:GetHandler():IsCode(table.unpack(e:GetLabelObject()))
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
