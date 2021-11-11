@@ -3,8 +3,9 @@
 --Scripted by The Razgriz
 local s,id=GetID()
 function s.initial_effect(c)
-	--Special summon this card from hand and add 1 Fish monster between level 3 and 5
+	--Special Summon itself and search
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
@@ -13,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--Can be treated as a level 3 or 4 for the Xyz summon of a "Number" Xyz monster
+	--Can be treated as Level 3 or 4 for a "Number" Xyz
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_XYZ_LEVEL)
@@ -22,64 +23,75 @@ function s.initial_effect(c)
 	e2:SetValue(s.xyzlv)
 	c:RegisterEffect(e2)
 end
+s.listed_names={id}
 s.listed_series={0x48}
-function s.filter(c)
-	return not c:IsAttribute(ATTRIBUTE_WATER)
+function s.cfilter(c)
+	return not (c:IsFaceup() and c:IsAttribute(ATTRIBUTE_WATER))
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
-	return #g>0 and not g:IsExists(s.filter,1,nil)
+	return #g>0 and not g:IsExists(s.cfilter,1,nil)
 end
 function s.thfilter(c)
-	return c:IsRace(RACE_FISH) and c:IsLevelAbove(3) and c:IsLevelBelow(5) and not c:IsCode(id) and c:IsAbleToHand()
+	return c:IsRace(RACE_FISH) and c:IsLevel(3,4,5) and not c:IsCode(id) and c:IsAbleToHand()
 end 
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,tp,LOCATION_HAND)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)  end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,LOCATION_HAND)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	--Next battle damage between your "Number" monster and opponent monster is doubled to your opponent
+	 --Cannot Special Summon, except WATER monsters
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetTargetRange(0,1)
-	e1:SetCondition(s.damcon)
-	e1:SetValue(DOUBLE_DAMAGE)
-	e1:SetReset(RESET_PHASE+PHASE_DAMAGE_CAL+PHASE_END)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(s.splimit)
+	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
-	 --Cannot special summon from the extra deck for rest of turn, except Water monsters
-	local ge1=Effect.CreateEffect(c)
-	ge1:SetType(EFFECT_TYPE_FIELD)
-	ge1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-	ge1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	ge1:SetDescription(aux.Stringid(id,1))
-	ge1:SetTargetRange(1,0)
-	ge1:SetTarget(s.splimit)
-	ge1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(ge1,tp)
+	--Next battle damage your opponent takes from your "Number" monster is doubled
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_CHANGE_DAMAGE)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetTargetRange(0,1)
+	e2:SetCondition(s.damcon)
+	e2:SetValue(s.damval)
+	e2:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e2,tp)
+	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local sc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-		if Duel.SendtoHand(sc,tp,REASON_EFFECT)>0 then
+		if #sc>0 and Duel.SendtoHand(sc,tp,REASON_EFFECT)>0 then
 			Duel.ConfirmCards(1-tp,sc)
 		end
 	end
 end
-function s.damcon(e)
-	local tp=e:GetHandlerPlayer()
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	return (a and a:IsSetCard(0x48) and a:IsMonster() and a:IsControler(tp) and d and d:IsControler(1-tp) and d~=nil) or (d and d:IsMonster()and d:IsSetCard(0x48) and d:IsControler(tp) and a and a:IsControler(1-tp))
-end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsAttribute(ATTRIBUTE_WATER)
 end
+function s.damcon(e)
+	local tp=e:GetHandlerPlayer()
+	local bc0,bc1=Duel.GetBattleMonster(tp)
+	if bc0 and bc1 and bc0:IsSetCard(0x48) and Duel.GetFlagEffect(tp,id)==0 then
+		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
+		return true
+	end
+	return false
+end
+function s.damval(e,re,dam,r,rp,rc)
+	if r&(REASON_BATTLE)~=0 then
+		return dam*2
+	else return dam end
+end
 function s.xyzlv(e,c,rc)
-	if rc:IsSetCard(0x48) and rc:IsType(TYPE_XYZ) then
+	if rc:IsSetCard(0x48) then
 		return 4,3,e:GetHandler():GetLevel()
 	else
 		return e:GetHandler():GetLevel()
