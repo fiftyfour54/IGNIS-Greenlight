@@ -3,9 +3,10 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
+	--Fusion Summon procedure
 	Fusion.AddProcMix(c,true,true,CARD_ALBAZ,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_DARK))
 	c:EnableReviveLimit()
-	--fusion summon
+	--Fusion Summon
 	local params = {s.fusfilter,Fusion.OnFieldMat(Card.IsAbleToDeck),s.fextra,Fusion.ShuffleMaterial,nil,s.stage2}
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -37,7 +38,7 @@ end
 function s.stage2(e,tc,tp,mg,chk)
 	if chk==2 then
 		local c=e:GetHandler()
-		--cannot attack
+		--Cannot attack
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3206)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -45,12 +46,12 @@ function s.stage2(e,tc,tp,mg,chk)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
-		--cannot spsummon
+		--Cannot Special Summon from the Extra Deck, except Fusion Monsters
 		local e2=Effect.CreateEffect(c)
+		e2:SetDescription(aux.Stringid(id,1))
 		e2:SetType(EFFECT_TYPE_FIELD)
 		e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-		e2:SetDescription(aux.Stringid(id,1))
 		e2:SetTargetRange(1,0)
 		e2:SetTarget(s.splimit)
 		e2:SetReset(RESET_PHASE+PHASE_END)
