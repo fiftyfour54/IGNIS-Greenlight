@@ -32,7 +32,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_HAND,0,1,1,nil)
 	if Duel.SendtoGrave(g,REASON_COST)~=0 then
 		--Effect
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF )
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
 		local tc=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
 		if not tc then return end
 		Duel.HintSelection(tc,true)
