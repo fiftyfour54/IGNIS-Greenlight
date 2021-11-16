@@ -49,10 +49,9 @@ function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,s.atkcostfilter,1,1,REASON_COST+REASON_DISCARD)
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local a,d=Duel.GetAttacker(),Duel.GetAttackTarget()
-	if a:IsControler(1-tp) then a,d=d,a end
-	if chk==0 then return a and d and a:IsControler(tp) and d:IsFaceup() and d:IsControler(1-tp) end
-	e:SetLabelObject(d)
+	local bc0,bc1=Duel.GetBattleMonster(tp)
+	if chk==0 then return bc0 and bc1 and bc1:IsFaceup() end
+	e:SetLabelObject(bc1)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -96,6 +95,7 @@ function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1) end
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
 end
 function s.penop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

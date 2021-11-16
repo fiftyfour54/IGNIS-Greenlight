@@ -23,13 +23,14 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 	s.checkop(e,tp)
-	Duel.RegisterFlagEffect(tp,id+100,RESET_PHASE+PHASE_END+RESET_SELF_TURN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,0))
+	Duel.RegisterFlagEffect(tp,id+100,RESET_PHASE+PHASE_END+RESET_SELF_TURN,0,1)
+	aux.RegisterClientHint(c,0,tp,1,0,aux.Stringid(id,0))
 end
 function s.checkop(e,tp)
 	local lpz=Duel.GetFieldCard(tp,LOCATION_PZONE,0)
 	if lpz~=nil and lpz:GetFlagEffect(id)<=0 then
 		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetDescription(aux.Stringid(id,2))
+		e1:SetDescription(aux.Stringid(id,1))
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_SPSUMMON_PROC_G)
 		e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
@@ -47,7 +48,7 @@ function s.checkop(e,tp)
 		and olpz:GetFlagEffectLabel(31531170)==orpz:GetFieldID()
 		and orpz:GetFlagEffectLabel(31531170)==olpz:GetFieldID() then
 		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetDescription(aux.Stringid(id,2))
+		e2:SetDescription(aux.Stringid(id,1))
 		e2:SetType(EFFECT_TYPE_FIELD)
 		e2:SetCode(EFFECT_SPSUMMON_PROC_G)
 		e2:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_BOTH_SIDE)
@@ -64,7 +65,7 @@ function s.pencon1(e,c,og)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	local rpz=Duel.GetFieldCard(tp,LOCATION_PZONE,1)
-	if rpz==nil or c==rpz or Duel.GetFlagEffect(tp,id)>0 then return false end
+	if rpz==nil or c==rpz or Duel.GetFlagEffect(tp,29432356)>0 then return false end
 	local lscale=c:GetLeftScale()
 	local rscale=rpz:GetRightScale()
 	if lscale>rscale then lscale,rscale=rscale,lscale end
@@ -99,16 +100,16 @@ function s.penop1(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
 	end
 	if #sg>0 then
 		Duel.Hint(HINT_CARD,0,id)
-		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END+RESET_SELF_TURN,0,1)
-		Duel.HintSelection(Group.FromCards(c))
-		Duel.HintSelection(Group.FromCards(rpz))
+		Duel.RegisterFlagEffect(tp,29432356,RESET_PHASE+PHASE_END+RESET_SELF_TURN,0,1)
+		Duel.HintSelection(c,true)
+		Duel.HintSelection(rpz,true)
 	end
 end
 function s.pencon2(e,c,og)
 	if c==nil then return true end
 	local tp=e:GetOwnerPlayer()
 	local rpz=Duel.GetFieldCard(1-tp,LOCATION_PZONE,1)
-	if rpz==nil or rpz:GetFieldID()~=c:GetFlagEffectLabel(31531170) or Duel.GetFlagEffect(tp,id)>0 then return false end
+	if rpz==nil or rpz:GetFieldID()~=c:GetFlagEffectLabel(31531170) or Duel.GetFlagEffect(tp,29432356)>0 then return false end
 	local lscale=c:GetLeftScale()
 	local rscale=rpz:GetRightScale()
 	if lscale>rscale then lscale,rscale=rscale,lscale end
@@ -145,8 +146,8 @@ function s.penop2(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
 	if #sg>0 then
 		Duel.Hint(HINT_CARD,0,31531170)
 		Duel.Hint(HINT_CARD,0,id)
-		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END+RESET_SELF_TURN,0,1)
-		Duel.HintSelection(Group.FromCards(c))
-		Duel.HintSelection(Group.FromCards(rpz))
+		Duel.RegisterFlagEffect(tp,29432356,RESET_PHASE+PHASE_END+RESET_SELF_TURN,0,1)
+		Duel.HintSelection(c,true)
+		Duel.HintSelection(rpz,true)
 	end
 end

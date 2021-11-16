@@ -63,11 +63,11 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.penfilter(c)
-	return c:IsSetCard(0x9f) and c:IsType(TYPE_PENDULUM) and not c:IsCode(id)
+	return c:IsSetCard(0x9f) and c:IsType(TYPE_PENDULUM) and not c:IsCode(id) and not c:IsForbidden()
 end
 function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_DECK,0,1,nil)
-		and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)) end
+	if chk==0 then return (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
+		and Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_DECK,0,1,nil)  end
 end
 function s.penop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return end
@@ -95,12 +95,14 @@ end
 function s.rthop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SendtoHand(c,nil,REASON_EFFECT)>0
-		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_PZONE,0,1,nil)
+		and c:IsLocation(LOCATION_HAND)
+		and Duel.IsExistingMatchingCard(s.rthfilter,tp,LOCATION_PZONE,0,1,nil)
 		and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-		local rg=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_PZONE,0,1,1,nil)
+		local rg=Duel.SelectMatchingCard(tp,s.rthfilter,tp,LOCATION_PZONE,0,1,1,nil)
 		if #rg>0 then
 			Duel.BreakEffect()
+			Duel.HintSelection(rg,true)
 			Duel.SendtoHand(rg,nil,REASON_EFFECT)
 		end
 	end
