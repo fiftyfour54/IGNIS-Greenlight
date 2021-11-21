@@ -1,6 +1,9 @@
 --夢幻刃龍ビルドリム Mugenbaryuu Buildream (Buildream the Infinidream Mythic Sword Dragon)
 local s,id=GetID()
 function s.initial_effect(c)
+	c:EnableReviveLimit()
+	-- 1 Descendant of Titan + 1 Babysitter Goat
+	Fusion.AddProcMix(c,true,true,160004024,160421037)
 	--Destroy 2 of opponent's monsters
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
