@@ -16,7 +16,7 @@ function s.initial_effect(c)
 end
 s.MaximumSide="Left"
 function s.maxCon(e)
-	return e:GetHandler():IsMaximumModeCenter()
+	return e:GetHandler():IsMaximumModeCenter() and Duel.IsAbleToEnterBP()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,1) end
@@ -60,5 +60,8 @@ function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	else return true end
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.SendtoDeck(e:GetLabelObject(),nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+	local g=Group.CreateGroup()
+	g:AddCard(e:GetLabelObject())
+	g=g:AddMaximumCheck()
+	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 end
