@@ -1,5 +1,5 @@
 -- 劫火の槍術士 ゴースト・ランサー
--- Ghost Lancer, the Underworld Spearman
+-- Hellfire Spearman Ghost Lancer
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)

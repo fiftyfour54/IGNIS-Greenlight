@@ -7,8 +7,8 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
@@ -23,13 +23,14 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetParam(ct+1)
 end
 function s.spfilter(c,e,tp)
-	return c:IsType(TYPE_XYZ) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_REMOVED) and s.spfilter(chkc,e,tp) end
 	local sg=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_MZONE,0,nil,TYPE_XYZ)
 	if chk==0 then
 		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-		if e:GetLabel()==1 then ft=Duel.GetMZoneCount(tp,Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_MZONE,0,nil,TYPE_XYZ)) end
+		if e:GetLabel()==1 then ft=Duel.GetMZoneCount(tp,sg) end
 		e:SetLabel(0)
 		return ft>0 and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_REMOVED,0,1,nil,e,tp)
 	end
@@ -45,10 +46,12 @@ function s.atfilter(c)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
+	if not tc:IsRelateToEffect(e) then return end
 	local ct=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
-	local g=Duel.GetMatchingGroup(s.atfilter,tp,LOCATION_REMOVED+LOCATION_GRAVE,0,nil)
-	if tc and tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-		and ct>0 and #g>0 and Duel.SelectYesNo(aux.Stringid(id,0)) then
+	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.atfilter),tp,LOCATION_REMOVED+LOCATION_GRAVE,0,nil)
+	if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0
+		and ct>0 and #g>0 and not tc:IsImmuneToEffect(e)
+		and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 		local mg=g:Select(tp,1,ct,nil)
 		if #mg>0 then
@@ -57,6 +60,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
+		--Each player takes 300 damage for each card in their hand
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_END)

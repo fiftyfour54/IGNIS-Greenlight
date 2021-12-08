@@ -10,7 +10,6 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_BATTLE_DESTROYED)
-	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.attcon)
 	e1:SetTarget(s.atttg)
 	e1:SetOperation(s.attop)
@@ -31,11 +30,11 @@ function s.initial_effect(c)
 	e3:SetOperation(s.posop)
 	c:RegisterEffect(e3)
 end
-function s.attconfilter(c,p)
-	return c:IsPreviousControler(p) and c:IsPreviousLocation(LOCATION_MZONE)
+function s.attconfilter(c,tp)
+	return c:IsPreviousControler(1-tp) and c:IsPreviousLocation(LOCATION_MZONE)
 end
 function s.attcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.attconfilter,1,nil,1-tp)
+	return eg:IsExists(s.attconfilter,1,nil,tp)
 end
 function s.atttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsType(TYPE_XYZ) end
@@ -47,7 +46,7 @@ function s.atttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.attop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) or tc:IsFacedown() or not tc:IsType(TYPE_XYZ) then return end
+	if not tc:IsRelateToEffect(e) or not tc:IsType(TYPE_XYZ) or tc:IsImmuneToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 	local g=Duel.SelectMatchingCard(tp,aux.AND(Card.IsMonster,Card.IsAbleToChangeControler),tp,0,LOCATION_GRAVE,1,1,nil)
 	if #g>0 then

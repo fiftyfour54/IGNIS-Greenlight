@@ -2,12 +2,13 @@
 --Hellfire Dragon, Ghost Wyvern
 local s,id=GetID()
 function s.initial_effect(c)
-	--search
+	--Search 1 "Ghost Fusion"
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCountLimit(1,{id,1})
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
@@ -21,7 +22,7 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_REMOVE)
 	e3:SetOperation(s.regop)
 	c:RegisterEffect(e3)
-	--Add this banished card to hand
+	--Search or send to the GY 1 Level 2 or lower Zombie Tuner
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_TOGRAVE)
@@ -29,14 +30,14 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_PHASE+PHASE_END)
 	e4:SetRange(LOCATION_REMOVED)
 	e4:SetCountLimit(1,{id,2})
-	e4:SetCondition(s.thcond)
-	e4:SetTarget(s.thtg)
-	e4:SetOperation(s.thop)
+	e4:SetCondition(s.thgcon)
+	e4:SetTarget(s.thgtg)
+	e4:SetOperation(s.thgop)
 	c:RegisterEffect(e4)
 end
-s.listed_names={100286011}
+s.listed_names={100286012}
 function s.thfilter(c)
-	return c:IsCode(100286011) and c:IsAbleToHand()
+	return c:IsCode(100286012) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -51,24 +52,21 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsFacedown() then return end
-	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+	local c=e:GetHandler()
+	if c:IsFacedown() then return end
+	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 end
-function s.thcond(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(id)~=0
+function s.thgcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetFlagEffect(id)>0
 end
-
-function s.thfilter(c)
-	return c:IsLevelBelow(2) and c:IsRace(RACE_ZOMBIE) and c:IsType(TYPE_TUNER) and (c:IsAbleToHand() or c:IsAbleToGrave()) and not c:IsCode(id)
+function s.thgfilter(c)
+	return c:IsLevelBelow(2) and c:IsRace(RACE_ZOMBIE) and c:IsType(TYPE_TUNER) and (c:IsAbleToHand() or c:IsAbleToGrave())
 end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+function s.thgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thgfilter,tp,LOCATION_DECK,0,1,nil) end
 end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.thgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
-	local tc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.thgfilter,tp,LOCATION_DECK,0,1,1,nil)
 	aux.ToHandOrElse(tc,tp)
 end
-
