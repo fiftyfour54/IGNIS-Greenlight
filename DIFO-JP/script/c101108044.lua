@@ -35,7 +35,7 @@ function s.initial_effect(c)
 	e3:SetCountLimit(1,{id,2})
 	e3:SetCondition(s.atkcon)
 	e3:SetCost(aux.dxmcostgen(1,1,nil))
-	e3:SetTarget(s.target)
+	e3:SetTarget(s.atktg)
 	e3:SetOperation(s.atkop)
 	c:RegisterEffect(e3)
 end
