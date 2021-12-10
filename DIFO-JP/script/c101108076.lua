@@ -19,8 +19,8 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_TODECK+CATEGORY_LEAVE_GRAVE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetHintTiming(0,TIMING_END_PHASE)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetHintTiming(0,TIMING_END_PHASE)
 	e2:SetCountLimit(1,id)
 	e2:SetTarget(s.settg)
 	e2:SetOperation(s.setop)
@@ -35,7 +35,7 @@ end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
 		and Duel.IsExistingMatchingCard(s.rmfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,1,nil,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,0,LOCATION_MZONE+LOCATION_GRAVE)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,PLAYER_EITHER,LOCATION_GRAVE)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,2,tp,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,0)
 end
@@ -48,7 +48,7 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local lv=g:GetFirst():GetLevel()
 	for i=1,2 do
 		local token=Duel.CreateToken(tp,id+100)
-		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
+		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 		-- Change level
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -72,7 +72,10 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_REMOVED,0,1,1,nil)
-	if #g>0 and Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0
+	if #g==0 then return end
+	Duel.HintSelection(g,true)
+	if #Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0
+		and g:GetFirst():IsLocation(LOCATION_DECK+LOCATION_EXTRA)
 		and c:IsRelateToEffect(e) and c:IsSSetable() then
 		Duel.SSet(tp,c)
 		-- Banish it if it leaves the field
