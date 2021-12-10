@@ -56,8 +56,8 @@ function s.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_IGNITION)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1,{id,3})
-	e5:SetTarget(s.destg2)
-	e5:SetOperation(s.desop2)
+	e5:SetTarget(s.destg)
+	e5:SetOperation(s.desop)
 	c:RegisterEffect(e5)
 end
 s.listed_names={CARD_SYMPH_AMPLIFIRE}
