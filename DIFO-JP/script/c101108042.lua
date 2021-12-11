@@ -7,10 +7,10 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Pendulum attributes
 	Pendulum.AddProcedure(c,false)
-	--add 1 pendulum from extra to hand
+	--Add 1 pendulum from extra to hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetRange(LOCATION_PZONE)
@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-	--destroy 1 attacking monster and this card
+	--Destroy 1 attacking monster and this card
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -28,7 +28,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.atktg)
 	e2:SetOperation(s.atkop)
 	c:RegisterEffect(e2)
-	-- place itself in Pzone
+	--Place itself in Pend Zone
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -38,29 +38,30 @@ function s.initial_effect(c)
 	e3:SetTarget(s.pentg)
 	e3:SetOperation(s.penop)
 	c:RegisterEffect(e3)
-	-- if special summoned, add 1 Pendulum from extra to hand
+	--If Special Summoned, add 1 Pendulum from Extra to hand
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
-	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e4:SetCategory(CATEGORY_TOHAND)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e4:SetProperty(EFFECT_FLAG_DELAY)
 	e4:SetCountLimit(1,{id,2})
 	e4:SetTarget(s.thtg)
 	e4:SetOperation(s.thop)
 	c:RegisterEffect(e4)
-	-- if "Symph Amplifire" is on the field destroy 1 card
+	--If "Symph Amplifire" is on the field destroy 1 card
 	local e5=Effect.CreateEffect(c)
-	e5:SetCategory(CATEGORY_DESTROY)
 	e5:SetDescription(aux.Stringid(id,3))
+	e5:SetCategory(CATEGORY_DESTROY)
 	e5:SetType(EFFECT_TYPE_IGNITION)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1,{id,3})
+	e5:SetCondition(s.descon)
 	e5:SetTarget(s.destg)
 	e5:SetOperation(s.desop)
 	c:RegisterEffect(e5)
 end
-s.listed_names={CARD_SYMPH_AMPLIFIRE}
+s.listed_names={75304793}
 --add 1 pendulum to hand
 function s.thfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_PENDULUM) and c:IsAbleToHand()
@@ -70,7 +71,6 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_EXTRA)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_EXTRA,0,1,1,nil)
 	if #g>0 then
@@ -80,11 +80,11 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 --destroy 1 attacking monster and this card
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetAttacker() and Duel.GetAttacker():GetControler()~=tp
+	return Duel.GetAttacker() and Duel.GetAttacker():IsControler(1-tp)
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local g=Group.CreateGroup()
 	if chk==0 then return true end
+	local g=Group.CreateGroup()
 	g:AddCard(Duel.GetAttacker())
 	g:AddCard(e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
@@ -92,11 +92,8 @@ end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetAttacker()
-	if not c:IsRelateToEffect(e) then return end
-	if tc:IsRelateToEffect(e) then
-		Duel.Destroy(tc,REASON_EFFECT)
-	end
-	Duel.Destroy(c,REASON_EFFECT)
+	if not (c:IsRelateToEffect(e) and tc:IsRelateToBattle()) then return end
+	Duel.Destroy(Group.FromCards(c,tc),REASON_EFFECT)
 end
 -- place itself in Pzone
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
@@ -115,18 +112,18 @@ function s.penop(e,tp,eg,ep,ev,re,r,rp)
 end
 --destroy 1 card
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return (Duel.IsEnvironment(CARD_SYMPH_AMPLIFIRE)
-		or Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_SYMPH_AMPLIFIRE),tp,LOCATION_FZONE,0,1,nil))
+	return Duel.IsEnvironment(75304793,tp,LOCATION_FZONE)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,0,0)
+	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
+	if chk==0 then return #g>0 end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
-	local tc=g:GetFirst()
+	local g=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	if #g>0 then
-		Duel.Destroy(tc,REASON_EFFECT)
+		Duel.HintSelection(g,true)
+		Duel.Destroy(g,REASON_EFFECT)
 	end
 end

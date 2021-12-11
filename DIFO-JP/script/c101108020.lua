@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetCountLimit(1,{id,2})
 	e3:SetTarget(s.thtg)
@@ -47,8 +47,8 @@ function s.sthfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x1066) and c:IsAbleToHand()
 end
 function s.sthtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsOnField() and s.thfilter(chkc) end
 	local c=e:GetHandler()
+	if chkc then return chkc:IsControler(tp) and chkc:IsOnField() and chkc~=c and s.thfilter(chkc) end
 	if chk==0 then return c:IsAbleToHand() and Duel.IsExistingTarget(s.sthfilter,tp,LOCATION_ONFIELD,0,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,s.sthfilter,tp,LOCATION_ONFIELD,0,1,1,c)
