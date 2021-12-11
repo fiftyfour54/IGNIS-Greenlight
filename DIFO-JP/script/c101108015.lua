@@ -1,4 +1,4 @@
---H・C ナックル・ナイフ
+--Ｈ・Ｃ ナックル・ナイフ
 --Heroic Challenger – Knuckle Knife
 --Logical Nonsense
 
@@ -19,8 +19,9 @@ function s.initial_effect(c)
 	--If Normal or Special Summoned, change levels
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e2:SetCategory(CATEGORY_LVCHANGE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetTarget(s.lvtg)
@@ -41,9 +42,10 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 	--Activation legality
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 	--Special Summon itself from hand
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -60,31 +62,22 @@ end
 function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	local lv=c:GetLevel()
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.lvfilter(chkc,lv) end
-	if chk==0 then return Duel.IsExistingTarget(s.lvfilter,tp,LOCATION_MZONE,0,1,c,lv) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.lvfilter(chkc,lv) end
+	if chk==0 then return lv>0 and Duel.IsExistingTarget(s.lvfilter,tp,LOCATION_MZONE,0,1,c,lv) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,s.lvfilter,tp,LOCATION_MZONE,0,1,1,c,lv)
 end
 	--Change levels
 function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	--Non-Xyz monsters cannot attack
-	local ge1=Effect.CreateEffect(c)
-	ge1:SetType(EFFECT_TYPE_FIELD)
-	ge1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
-	ge1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	ge1:SetTargetRange(LOCATION_MZONE,0)
-	ge1:SetTarget(function(e,c) return not c:IsType(TYPE_XYZ) end)
-	ge1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(ge1,tp)
-	--Client hint
-	aux.RegisterClientHint(c,nil,tp,1,0,aux.Stringid(id,2),nil)
 	local tc=Duel.GetFirstTarget()
-	if c:IsFaceup() and c:IsRelateToEffect(e) and tc and tc:IsFaceup() and tc:IsRelateToEffect(e) and not tc:IsLevel(c:GetLevel()) then
+	if c:IsFaceup() and c:IsRelateToEffect(e) and tc and tc:IsFaceup() and tc:IsRelateToEffect(e)
+		and not tc:IsLevel(c:GetLevel()) then
 		local g=Group.FromCards(c,tc)
-		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,3)) --Select the monster with the level you want
+		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2)) --Select the monster with the level you want
 		local sg=g:Select(tp,1,1,nil)
 		local oc=(g-sg):GetFirst()
+		--Change Level
 		local e1=Effect.CreateEffect(c)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -93,4 +86,14 @@ function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(sg:GetFirst():GetLevel())
 		oc:RegisterEffect(e1)
 	end
+	--Cannot declare attacks, except with Xyz Monsters
+	local ge1=Effect.CreateEffect(c)
+	ge1:SetType(EFFECT_TYPE_FIELD)
+	ge1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	ge1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	ge1:SetTargetRange(LOCATION_MZONE,0)
+	ge1:SetTarget(function(e,c) return not c:IsType(TYPE_XYZ) end)
+	ge1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(ge1,tp)
+	aux.RegisterClientHint(c,nil,tp,1,0,aux.Stringid(id,3),nil)
 end
