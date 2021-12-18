@@ -6,12 +6,12 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	-- 2 Rank 4 "Exorsister" Xyz Monsters
 	Xyz.AddProcedure(c,s.xyzfilter,nil,2,nil,nil,nil,nil,false)
-	-- Must be Xyz Summoned
+	-- Must be Xyz Summoned using the correct materials
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e0:SetValue(aux.xyzlimit)
+	e0:SetValue(s.splimit)
 	c:RegisterEffect(e0)
 	-- Can make a second attack
 	local e1=Effect.CreateEffect(c)
@@ -48,6 +48,9 @@ function s.initial_effect(c)
 end
 function s.xyzfilter(c,xyz,sumtype,tp)
 	return c:IsType(TYPE_XYZ,xyz,sumtype,tp) and c:IsRank(4) and c:IsSetCard(0x174,xyz,sumtype,tp)
+end
+function s.splimit(e,se,sp,st)
+	return (st&SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ and not se
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
