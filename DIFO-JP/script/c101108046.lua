@@ -25,7 +25,6 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e2:SetCountLimit(1)
@@ -40,27 +39,28 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_CHAINING)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1)
 	e3:SetCondition(s.tecon)
 	e3:SetTarget(s.tetg)
 	e3:SetOperation(s.teop)
 	c:RegisterEffect(e3)
 end
+s.listed_series={0x174}
 function s.xyzfilter(c,xyz,sumtype,tp)
 	return c:IsType(TYPE_XYZ,xyz,sumtype,tp) and c:IsRank(4) and c:IsSetCard(0x174,xyz,sumtype,tp)
 end
 function s.splimit(e,se,sp,st)
 	return (st&SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ and not se
 end
-function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
+function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_ONFIELD)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
 	if #g>0 then
+		Duel.HintSelection(g,true)
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 end
@@ -72,14 +72,16 @@ function s.tefilter(c)
 end
 function s.tetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetOverlayGroup():IsExists(s.tefilter,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_OVERLAY)
 end
 function s.teop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local tc=c:GetOverlayGroup():FilterSelect(tp,s.tefilter,1,1,nil):GetFirst()
 	if not tc or Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)<1 or not tc:IsLocation(LOCATION_EXTRA) then return end
-	if c:IsFacedown() or not c:IsRelateToEffect(e) or c:IsControler(1-tp) or c:IsImmuneToEffect(e) then return end
+	if c:IsFacedown() or c:IsControler(1-tp) or c:IsImmuneToEffect(e) then return end
 	local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)
 	if #pg>1 or (#pg==1 and not pg:IsContains(c)) then return end
 	if tc:IsType(TYPE_XYZ,c,SUMMON_TYPE_XYZ,tp)
@@ -87,6 +89,7 @@ function s.teop(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.GetLocationCountFromEx(tp,tp,c,tc)>0
 		and tc:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 		and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		Duel.BreakEffect()
 		local mg=Group.FromCards(c)
 		tc:SetMaterial(mg)
 		Duel.Overlay(tc,mg)
