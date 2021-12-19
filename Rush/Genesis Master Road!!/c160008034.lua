@@ -16,15 +16,16 @@ function s.initial_effect(c)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	--draw
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,1))
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetCategory(CATEGORY_DRAW)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCost(s.cost)
-	e1:SetTarget(s.drtg)
-	e1:SetOperation(s.drop)
-	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetCategory(CATEGORY_DRAW)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
+	e2:SetCost(s.cost)
+	e2:SetTarget(s.drtg)
+	e2:SetOperation(s.drop)
+	c:RegisterEffect(e2)
 end
 --cost
 function s.tdfilter(c)
@@ -43,13 +44,13 @@ function s.ctcheck(sg,e,tp)
 	return sg:GetClassCount(Card.GetCode)==#sg
 end
 --burn
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(1500)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,1500)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	--Requirement
 	local g=Duel.GetMatchingGroup(s.ctfilter,tp,LOCATION_GRAVE,0,nil)
 	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,s.ctcheck,1,tp,HINTMSG_TODECK)
