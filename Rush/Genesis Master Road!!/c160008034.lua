@@ -61,13 +61,13 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 --draw
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 if chk==0 then return Duel.IsPlayerCanDraw(tp,3) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(3)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,3)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	--Requirement
 	local g=Duel.GetMatchingGroup(s.ctfilter,tp,LOCATION_GRAVE,0,nil)
 	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,s.ctcheck,1,tp,HINTMSG_TODECK)
