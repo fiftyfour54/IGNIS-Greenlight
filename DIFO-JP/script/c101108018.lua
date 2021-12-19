@@ -47,5 +47,6 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_EXTRA,0,1,1,nil)
 	if #g>0 then
 		Duel.SendtoHand(g,tp,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
 end
