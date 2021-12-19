@@ -32,10 +32,10 @@ function s.initial_effect(c)
 	e3:SetOperation(s.drop)
 	c:RegisterEffect(e3)
 end
-s.listed_series={0x127}
+s.listed_series={0x1017}
 s.counter_list={0x1148}
 function s.filter(c,e,tp)
-	return c:IsSetCard(0x127) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0x1017) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp) -- Add to hand
 	if not e:GetHandler():IsRelateToEffect(e) then return end
