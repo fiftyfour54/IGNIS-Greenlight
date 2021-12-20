@@ -28,17 +28,6 @@ function s.initial_effect(c)
 	e2:SetCondition(function(_,tp) return Duel.IsTurnPlayer(tp) end)
 	e2:SetOperation(s.desregop)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_DESTROY)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e3:SetCode(EVENT_PHASE+PHASE_END)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetCountLimit(1)
-	e3:SetCondition(s.descon)
-	e3:SetTarget(s.destg)
-	e3:SetOperation(s.desop)
-	c:RegisterEffect(e3)
 end
 function s.rvfilter(c)
 	return c:GetTextAttack()>=0 and c:IsAbleToRemove() and not c:IsPublic()
@@ -88,20 +77,22 @@ end
 function s.desregop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,3,Duel.GetTurnCount())
+	-- Destroy all cards
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetCountLimit(1)
+	e1:SetLabel(Duel.GetTurnCount())
+	e1:SetCondition(s.descon)
+	e1:SetOperation(s.desop)
+	e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
+	Duel.RegisterEffect(e1,tp)
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return Duel.IsTurnPlayer(tp) and c:GetFlagEffect(id)~=0 and c:GetFlagEffectLabel(id)~=Duel.GetTurnCount()
-end
-function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	e:GetHandler():ResetFlagEffect(id)
-	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
+	return Duel.IsTurnPlayer(tp) and Duel.GetTurnCount()~=e:GetLabel()
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
 	if #g>0 then
 		Duel.Destroy(g,REASON_EFFECT)
