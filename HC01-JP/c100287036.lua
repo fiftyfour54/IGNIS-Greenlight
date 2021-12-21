@@ -35,7 +35,7 @@ function s.initial_effect(c)
 end
 function s.lpop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetFirstCardTarget()
-	if tc and eg:IsContains(tc) and tc:IsReason(REASON_BATTLE+REASON_DESTROY) then
+	if tc and eg:IsContains(tc) and tc:IsReason(REASON_BATTLE) then
 		Duel.Recover(tc:GetReasonPlayer(),2000,REASON_EFFECT)
 	end
 end
