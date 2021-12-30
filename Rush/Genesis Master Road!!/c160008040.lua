@@ -2,6 +2,9 @@
 -- ポセイギョン・アドベンチャラー
 local s,id=GetID()
 function s.initial_effect(c)
+	-- fusion
+	c:EnableReviveLimit()
+	Fusion.AddProcMix(c,true,true,160008007,CARD_JELLYPLUG)
 	--All pyro monsters you control gain ATK
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE)
