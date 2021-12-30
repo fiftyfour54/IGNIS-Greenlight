@@ -46,7 +46,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetValue(-800)
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 			tc:RegisterEffectRush(e1)
-			
+			Duel.Damage(1-tp,400,REASON_EFFECT)
 		end
 	end
 end
