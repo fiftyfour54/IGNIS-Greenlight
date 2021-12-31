@@ -8,14 +8,13 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
 s.listed_names={CARD_SUMMONED_SKULL}
 function s.filter(c,tp)
-	return c:IsFaceup() and (c:IsCode(CARD_SUMMONED_SKULL) or c:IsRace(RACE_PSYCHIC)) and Duel.IsExistingMatchingCard(s.desfilter,tp,0,LOCATION_MZONE,1,nil,c:GetAttack()) 
+	return c:IsFaceup() and (c:IsCode(CARD_SUMMONED_SKULL) or c:IsRace(RACE_THUNDER)) and Duel.IsExistingMatchingCard(s.desfilter,tp,0,LOCATION_MZONE,1,nil,c:GetAttack()) 
 end
 function s.desfilter(c,atk)
 	return c:IsType(TYPE_MONSTER) and c:IsFaceup() and c:IsDefenseBelow(atk)
