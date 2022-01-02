@@ -66,7 +66,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function s.cfilter(c)s
+function s.cfilter(c)
 	return c:IsSetCard(0x137) and c:IsLevelAbove(7) and c:IsFaceup()
 end
 function s.costcon(e,tp,eg,ep,ev,re,r,rp)
