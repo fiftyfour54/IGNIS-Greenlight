@@ -1,5 +1,5 @@
 --戦華史略－矯詔之叛
---
+--Ancient Warriors Saga – Defying the Warlord’s Demands
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
