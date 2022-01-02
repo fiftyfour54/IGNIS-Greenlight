@@ -70,7 +70,7 @@ function s.atop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(att)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1)
-		if not tc:IsImmuneToEffect(e) and tc:IsControler(1-tp) and Duel.SelectYesNo(aux.Stringid(id,2)) then
+		if not tc:IsImmuneToEffect(e) and tc:IsControler(1-tp) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.BreakEffect()
 			Duel.GetControl(tc,tp)
 		end
