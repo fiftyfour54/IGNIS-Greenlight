@@ -1,5 +1,5 @@
 --戦華史略－矯詔之叛
---Ancient Warriors Saga – Defying the Warlord’s Demands
+--Ancient Warriors Saga – Disobeying Orders
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
@@ -58,7 +58,7 @@ function s.attg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() and chkc:IsSetCard(0x137) end
 	if chk==0 then return Duel.IsExistingTarget(aux.FilterFaceupFunction(Card.IsSetCard,0x137),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsSetCard,0x137),tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsSetCard,0x137),tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end
 function s.atop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

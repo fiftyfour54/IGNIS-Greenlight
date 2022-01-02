@@ -77,7 +77,7 @@ function s.costchk(e,te_or_c,tp)
 	return Duel.CheckLPCost(tp,ct*400)
 end
 function s.costop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.PayLPCost(tp,4s00)
+	Duel.PayLPCost(tp,400)
 end
 function s.filter(c,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsControler(1-tp)
