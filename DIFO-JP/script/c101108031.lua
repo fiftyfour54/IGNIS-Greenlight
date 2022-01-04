@@ -7,8 +7,9 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Change as many other monsters to face-down defense
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_POSITION+CATEGORY_TOHAND)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
@@ -16,39 +17,44 @@ function s.initial_effect(c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,#g,0,0)
+	local fdg=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
+	local thg=Duel.GetMatchingGroup(aux.AND(Card.IsAbleToHand,aux.FilterFaceupFunction(Card.IsType,TYPE_SPELL|TYPE_TRAP)),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,fdg,#fdg,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,thg,#thg,0,0)
 end
 	--Change as many other monsters to face-down defense
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
 	if #g==0 then return end
-	Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)
-	local g2=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_SZONE,LOCATION_SZONE,nil)
-	if #g2<=0 then return end
+	if Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)==0 then return end
+	local g2=Duel.GetMatchingGroup(aux.AND(Card.IsAbleToHand,aux.FilterFaceupFunction(Card.IsType,TYPE_SPELL|TYPE_TRAP)),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+	if #g2==0 then return end
 	Duel.BreakEffect()
-	Duel.SendtoHand(g2,nil,REASON_EFFECT)
-	g2=Duel.GetOperatedGroup():Match(function(c)return c:IsLocation(LOCATION_HAND)end,nil)
+	if Duel.SendtoHand(g2,nil,REASON_EFFECT)==0 then return end
+	g2=Duel.GetOperatedGroup():Match(Card.IsLocation,nil,LOCATION_HAND)
 	local ct1=g2:FilterCount(Card.IsControler,nil,tp)
 	local ct2=#g2-ct1
-	--Each player can set Spells/Traps from hand
+	local sel=false
+	--Each player can Set Spells/Traps from hand
 	for p=tp,1-tp do
-		local set=Duel.GetMatchingGroup(Card.IsSSetable,p,LOCATION_HAND,0,nil)
-		local zcount=Duel.GetLocationCount(p,LOCATION_SZONE)
-		--For if full S/T zones and field spell is in hand
-		if set:FilterCount(Card.IsType,nil,TYPE_FIELD)>0 then zcount=zcount+1 end
-		local setg=math.min(zcount,ct1)
+		local setg=Duel.GetMatchingGroup(Card.IsSSetable,p,LOCATION_HAND,0,nil)
+		local rthct=0
 		if p==tp then
-			setg=math.min(zcount,ct1)
+			rthct=math.min(#setg,ct1)
 		else
-			setg=math.min(zcount,ct2)
+			rthct=math.min(#setg,ct2)
 		end
-		if #set>0 and Duel.SelectYesNo(p,aux.Stringid(id,0)) then
+		if #setg>0 and rthct>0 and Duel.SelectYesNo(p,aux.Stringid(id,1)) then
 			Duel.ShuffleHand(p)
-			Duel.BreakEffect()
-			Duel.Hint(HINT_SELECTMSG,p,HINTMSG_SET)
-			local sg=set:Select(p,1,setg,nil)
+			if not sel then Duel.BreakEffect() end
+			sel=true
+			local sg=aux.SelectUnselectGroup(setg,e,p,1,rthct,s.rescon,1,p,HINTMSG_SET)
 			Duel.SSet(p,sg,p,false)
 		end
 	end
+end
+function s.rescon(sg,e,tp,mg)
+	return sg:FilterCount(Card.IsSSetable,nil)==#sg
+		and sg:FilterCount(aux.NOT(Card.IsType),nil,TYPE_FIELD)<=Duel.GetLocationCount(tp,LOCATION_SZONE)
+		and sg:FilterCount(Card.IsType,nil,TYPE_FIELD)<=1
 end

@@ -17,9 +17,9 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_DESTROY_REPLACE)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetCountLimit(1)
-	e2:SetTarget(s.destg)
-	e2:SetValue(s.desvalue)
-	e2:SetOperation(s.desop)
+	e2:SetTarget(s.reptg)
+	e2:SetValue(s.repval)
+	e2:SetOperation(s.repop)
 	c:RegisterEffect(e2)
 	--Return to hand
 	local e3=Effect.CreateEffect(c)
@@ -55,15 +55,15 @@ end
 function s.repfilter(c)
 	return (c:IsSetCard(0x278) or c:IsCode(CARD_ARGYRO_SYSTEM)) and c:IsAbleToGrave()
 end
-function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(s.dfilter,1,nil,tp)
 		and Duel.IsExistingMatchingCard(s.repfilter,tp,LOCATION_DECK,0,1,nil) end
 	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
 end
-function s.desvalue(e,c)
+function s.repval(e,c)
 	return c:IsControler(e:GetHandlerPlayer()) and c:IsReason(REASON_BATTLE)
 end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.repfilter,tp,LOCATION_DECK,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_EFFECT)
