@@ -1,5 +1,5 @@
 -- セリオンズ“ブルズ”アイン
--- Therions’ “Bulls” Ein
+-- Therions’ "Bulls" Ein
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -34,14 +34,12 @@ function s.initial_effect(c)
 	e3:SetValue(700)
 	c:RegisterEffect(e3)
 	-- Equipped monster gains effect
-	local e4a=e2:Clone()
-	e4a:SetDescription(aux.Stringid(id,2))
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
 	e4:SetTarget(function(e,c) return c==e:GetHandler():GetEquipTarget() and c:IsSetCard(0x278) end)
-	e4:SetLabelObject(e4a)
+	e4:SetLabelObject(e2)
 	c:RegisterEffect(e4)
 end
 s.listed_series={0x278}
@@ -53,7 +51,7 @@ function s.eqval(ec,c,tp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.eqfilter(chkc) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.eqfilter(chkc) and not chkc:IsForbidden() end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -76,7 +74,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.desfilter(c,e,tp)
 	return c:IsCanBeEffectTarget(e) and (c:IsControler(1-tp)
-		or (c:IsControler(tp) and c:IsFaceup() and c:IsSetCard(0x278)))
+		or (c:IsFaceup() and c:IsSetCard(0x278)))
 end
 function s.desrescon(sg,e,tp,mg)
     return sg:FilterCount(Card.IsControler,nil,tp)==1
@@ -85,6 +83,7 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local rg=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,e,tp)
 	if chk==0 then return aux.SelectUnselectGroup(rg,e,tp,2,2,s.desrescon,0) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	local g=aux.SelectUnselectGroup(rg,e,tp,2,2,s.desrescon,1,tp,HINTMSG_DESTROY)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,2,0,0)

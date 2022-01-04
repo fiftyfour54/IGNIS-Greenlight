@@ -54,14 +54,12 @@ end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and c:IsLocation(LOCATION_GRAVE) 
-		and tc:IsRelateToEffect(e) and tc:IsLocation(LOCATION_GRAVE) then
-		local g=Group.FromCards(c,tc)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local hg=g:FilterSelect(tp,Card.IsAbleToHand,1,1,nil)
-		if #hg>0 and Duel.SendtoHand(hg,nil,REASON_EFFECT)~=0 then
-			Duel.ConfirmCards(1-tp,hg)
-			Duel.SendtoDeck(g-hg,nil,LOCATION_DECKBOT,REASON_EFFECT)
-		end
+	if not (c:IsRelateToEffect(e) and tc:IsRelateToEffect(e)) then return end
+	local g=Group.FromCards(c,tc)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local hg=g:FilterSelect(tp,Card.IsAbleToHand,1,1,nil)
+	if #hg>0 and Duel.SendtoHand(hg,nil,REASON_EFFECT)>0 and hg:GetFirst():IsLocation(LOCATION_HAND) then
+		Duel.ConfirmCards(1-tp,hg)
+		Duel.SendtoDeck(g-hg,nil,LOCATION_DECKBOT,REASON_EFFECT)
 	end
 end
