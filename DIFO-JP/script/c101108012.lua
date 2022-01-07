@@ -10,7 +10,6 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	e1:SetCondition(s.hspcon)
 	e1:SetValue(s.hspval)
 	c:RegisterEffect(e1)
 	-- Search
@@ -30,21 +29,14 @@ function s.initial_effect(c)
 end
 s.listed_series={0x279}
 s.sclawfilter=aux.FilterFaceupFunction(Card.IsSetCard,0x279)
-function s.sclawzones(tp)
+function s.hspval(e,c)
+	local tp=c:GetControler()
 	local zone=0
 	local lg=Duel.GetMatchingGroup(s.sclawfilter,tp,LOCATION_MZONE,0,nil)
 	for tc in aux.Next(lg) do
 		zone=(zone|tc:GetColumnZone(LOCATION_MZONE,1,1,tp))
 	end
-	return zone&0x1f
-end
-function s.hspcon(e,c)
-	if not c then return true end
-	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_TOFIELD,s.sclawzones(tp))>0
-end
-function s.hspval(e,c)
-	return 0,s.sclawzones(c:GetControler())
+	return 0,zone&0x1f
 end
 function s.thfilter(c)
 	return c:IsSetCard(0x279) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
