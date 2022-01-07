@@ -19,8 +19,8 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_EXTRA_ATTACK)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(s.atktg)
 	e2:SetCondition(s.atkcon)
+	e2:SetTarget(s.atktg)
 	e2:SetValue(s.atkval)
 	c:RegisterEffect(e2)
 end
@@ -42,11 +42,11 @@ end
 function s.hspval(e,c)
 	return 0,s.sclawzones(c:GetControler())
 end
-function s.atktg(e,c)
-	return s.sclawfilter(c) and c:IsInExtraMZone()
-end
 function s.atkcon(e)
 	return Duel.IsExistingMatchingCard(aux.AND(s.sclawfilter,Card.IsDefensePos),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+end
+function s.atktg(e,c)
+	return s.sclawfilter(c) and c:IsInExtraMZone()
 end
 function s.atkval(e)
 	local g=Duel.GetMatchingGroup(aux.AND(s.sclawfilter,Card.IsDefensePos),e:GetHandlerPlayer(),LOCATION_MZONE,0,nil)

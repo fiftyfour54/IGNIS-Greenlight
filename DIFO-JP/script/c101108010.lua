@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetTarget(s.damtg)
-	c:RegisterEffect(e1)
+	c:RegisterEffect(e2)
 end
 s.listed_series={0x279}
 s.sclawfilter=aux.FilterFaceupFunction(Card.IsSetCard,0x279)

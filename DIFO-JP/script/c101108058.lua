@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--reduce atk/def
+	--Reduce ATK/DEF
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
@@ -37,7 +37,7 @@ end
 s.listed_names={101108008}
 s.listed_series={0x279}
 function s.thfilter(c)
-	return ((c:IsSetCard(0x279) and c:IsType(TYPE_MONSTER)) or c:IsCode(101108008)) and c:IsAbleToHand()
+	return ((c:IsSetCard(0x279) and c:IsMonster()) or c:IsCode(101108008)) and c:IsAbleToHand()
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
