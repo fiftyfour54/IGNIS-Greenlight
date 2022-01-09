@@ -27,6 +27,7 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_BATTLE_DESTROYED)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1,id)
+	e3:SetCondition(s.damcon)
 	e3:SetTarget(s.damtg)
 	e3:SetOperation(s.damop)
 	c:RegisterEffect(e3)
@@ -39,19 +40,26 @@ function s.accon(e)
 		or Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,7142724),0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil))
 end
 function s.aclim(e,re,tp)
+	local rc=re:GetHandler()
 	local status=STATUS_SUMMON_TURN+STATUS_FLIP_SUMMON_TURN+STATUS_SPSUMMON_TURN
-	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsStatus(status)
+	return re:IsActiveType(TYPE_MONSTER) and rc:IsLocation(LOCATION_MZONE) and rc:IsStatus(status)
 end
-function s.damfilter(c,e,tp)
-	local rc=c:GetReasonCard()
-	return c:IsReason(REASON_BATTLE) and c:IsCanBeEffectTarget(e) and c:GetBaseAttack()>0
-		and ((c:IsPreviousControler(tp) and c:IsSetCard(0x16e))
-		or (rc and rc:IsPreviousControler(tp) and rc:IsSetCard(0x16e)))
+function s.damcfilter(c,tp,ct)
+	local bc=c:GetBattleTarget()
+	return (c:IsPreviousControler(tp) and c:IsPreviousSetCard(0x16e))
+		or (ct==1 and bc and bc:IsControler(tp) and bc:IsSetCard(0x16e))
 end
-function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(s.damfilter,1,nil,e,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,1))
-	local tg=eg:FilterSelect(tp,s.damfilter,1,1,nil,e,tp)
+function s.damcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.damcfilter,1,nil,tp,#eg)
+end
+function s.damtgfilter(c,e)
+	return c:IsCanBeEffectTarget(e) and c:GetBaseAttack()>0
+end
+function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return eg:IsContains(chkc) and s.damtgfilter(chkc,e) end
+	if chk==0 then return eg:IsExists(s.damtgfilter,1,nil,e) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local tg=eg:FilterSelect(tp,s.damtgfilter,1,1,nil,e)
 	Duel.SetTargetCard(tg)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,tg:GetFirst():GetBaseAttack())
 end
