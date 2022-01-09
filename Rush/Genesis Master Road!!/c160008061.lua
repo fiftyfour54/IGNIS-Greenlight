@@ -25,14 +25,15 @@ end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.filter1,1,nil,e,tp) and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
 end
-function s.tdfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
+function s.gyfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_REPTILE) and c:IsAbleToDeck()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(s.tdfilter,tp,0,LOCATION_GRAVE,nil)
+	local g=Duel.GetMatchingGroup(s.gyfilter,tp,LOCATION_GRAVE,0,nil)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
 end
+
 	--Destroy 1 of opponent's monsters
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	--Effect
@@ -45,7 +46,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		ge1:SetTarget(s.atktg)
 		ge1:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(ge1,tp)
-		local og=Duel.GetMatchingGroup(s.gyfilter,tp,0,LOCATION_GRAVE,nil)
+		local og=Duel.GetMatchingGroup(s.gyfilter,tp,LOCATION_GRAVE,0,nil)
 		if #og>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
