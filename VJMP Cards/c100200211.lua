@@ -48,8 +48,8 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 end
 	--Banish 1 Zombie monster from GY as cost
 function s.cfilter(c,tp)
-	return c:IsRace(RACE_ZOMBIE) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
-		and (Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or (c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5))
+	return c:IsRace(RACE_ZOMBIE) and c:IsAbleToRemoveAsCost() and Duel.GetMZoneCount(tp,c)>0
+		and aux.SpElimFilter(c,true)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil,tp) end
@@ -60,14 +60,13 @@ end
 	--Activation legality
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 	--If banished, Special Summon itself
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+	if c:IsRelateToEffect(e) and Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
 		--Return it to Deck if it leaves the field
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3301)
@@ -78,4 +77,5 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(LOCATION_DECKBOT)
 		c:RegisterEffect(e1)
 	end
+	Duel.SpecialSummonComplete()
 end
