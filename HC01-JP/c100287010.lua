@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.tdtg)
 	e1:SetOperation(s.tdop)
 	c:RegisterEffect(e1)
-	-- Search 1 "Crystal Beast" or Field Spell
+	-- Search 1 "Crystal Beast" and 1 Field Spell
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -42,23 +42,33 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local loc=LOCATION_HAND+LOCATION_ONFIELD+LOCATION_GRAVE
 	local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,loc,loc,nil,e:GetHandler())
 	if #g>0 and Duel.SendtoDeck(g,nil,0,REASON_EFFECT)>0 then
+		local dg=Duel.GetOperatedGroup()
+		local ct=dg:FilterCount(Card.IsControler,nil,tp)
+		if ct>0 then Duel.ShuffleDeck(tp) end
+		if #dg>ct then Duel.ShuffleDeck(1-tp) end
 		Duel.BreakEffect()
 		Duel.Draw(tp,5,REASON_EFFECT)
 		Duel.Draw(1-tp,5,REASON_EFFECT)
 	end
 end
-function s.thfilter(c)
-	return (c:IsType(TYPE_FIELD) or (c:IsMonster() and c:IsSetCard(0x1034))) and c:IsAbleToHand()
+function s.fsfilter(c)
+	return c:IsType(TYPE_FIELD) and c:IsAbleToHand()
+end
+function s.cbfilter(c,tp)
+	return c:IsMonster() and c:IsSetCard(0x1034) and c:IsAbleToHand()
+		and Duel.IsExistingMatchingCard(s.fsfilter,tp,LOCATION_DECK,0,1,c)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cbfilter,tp,LOCATION_DECK,0,1,nil,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,2,tp,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if #g>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
-	end
+	local g=Duel.SelectMatchingCard(tp,s.cbfilter,tp,LOCATION_DECK,0,1,1,nil,tp)
+	if #g<1 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	g=g+Duel.SelectMatchingCard(tp,s.fsfilter,tp,LOCATION_DECK,0,1,1,g)
+	if #g<2 then return end
+	Duel.SendtoHand(g,nil,REASON_EFFECT)
+	Duel.ConfirmCards(1-tp,g)
 end
