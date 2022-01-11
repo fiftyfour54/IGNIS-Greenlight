@@ -41,7 +41,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		if #g2>0 then
 			Duel.SpecialSummon(g2,0,tp,tp,false,false,POS_FACEUP)
 			local g3=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp)
-			if g2:GetFirst():IsCode(CARD_SEVENS_ROAD_MAGICIAN) #g3>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+			if g2:GetFirst():IsCode(CARD_SEVENS_ROAD_MAGICIAN) and #g3>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+				and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 				Duel.BreakEffect()
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 				local sg=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
