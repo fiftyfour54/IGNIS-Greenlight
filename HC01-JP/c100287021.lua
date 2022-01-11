@@ -3,24 +3,24 @@
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
-	c:AddSetcodesRule(0xb)
 	-- Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id)
+	e1:SetCountLimit(1,{id,0})
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	-- Set itself from GY
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetCode(EVENT_DESTROYED)
+	e2:SetCode(EVENT_LEAVE_FIELD)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCountLimit(1,id)
+	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(s.setcon)
 	e2:SetTarget(s.settg)
 	e2:SetOperation(s.setop)
@@ -29,6 +29,7 @@ end
 s.listed_series={0xb}
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0xb) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED))
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local loc=LOCATION_HAND+LOCATION_GRAVE+LOCATION_REMOVED
