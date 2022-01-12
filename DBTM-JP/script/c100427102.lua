@@ -68,7 +68,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.splimit(e,c)
-	return not c:IsSetCard(0x27a) and not c:IsSummonLocation(LOCATION_EXTRA)
+	return not c:IsSetCard(0x27a) and not c:IsLocation(LOCATION_EXTRA)
 end
 function s.disatktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()

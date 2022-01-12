@@ -67,7 +67,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.splimit(e,c)
-	return not c:IsSetCard(0x27a) and not c:IsSummonLocation(LOCATION_EXTRA)
+	return not c:IsSetCard(0x27a) and not c:IsLocation(LOCATION_EXTRA)
 end
 function s.thfilter(c,type,exc)
 	return c:IsSetCard(0x27a) and c:IsType(type) and not c:IsCode(exc) and c:IsAbleToHand()

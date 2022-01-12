@@ -38,7 +38,6 @@ function s.initial_effect(c)
 	e3:SetOperation(s.smvop)
 	c:RegisterEffect(e3)
 end
-s.toss_coin=true
 s.listed_series={0x27a}
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -67,7 +66,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.splimit(e,c)
-	return not c:IsSetCard(0x27a) and not c:IsSummonLocation(LOCATION_EXTRA)
+	return not c:IsSetCard(0x27a) and not c:IsLocation(LOCATION_EXTRA)
 end
 function s.mmvfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x27a) and c:CheckAdjacent()
