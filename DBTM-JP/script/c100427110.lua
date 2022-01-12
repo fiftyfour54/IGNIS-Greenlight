@@ -40,7 +40,7 @@ end
 s.listed_series={0x27a}
 function s.hspfilter(c,tp,sc)
 	local zone=1<<c:GetSequence()
-	return zone&0x106==zone and c:IsSetCard(0x27a) and c:IsLevelAbove(5)
+	return zone&0x6a==zone and c:IsSetCard(0x27a) and c:IsLevelAbove(5)
 		and not c:IsType(TYPE_FUSION) and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0
 end
 function s.hspcon(e,c)
