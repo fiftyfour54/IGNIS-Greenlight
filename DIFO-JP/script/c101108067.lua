@@ -60,7 +60,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=c:GetPreviousEquipTarget()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0,TYPES_TOKEN,tc:GetAttack(),0,1,tc:GetRace(),tc:GetAttribute()) then return end
-	local token=Duel.CreateToken(tp,93104633)--id+1)
+	local token=Duel.CreateToken(tp,id+1)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SET_BASE_ATTACK)
