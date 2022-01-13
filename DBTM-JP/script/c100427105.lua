@@ -102,11 +102,15 @@ end
 function s.smvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
-	local z=1<<tc:GetSequence()
-	Debug.Message("ping @edo9300#9332 to update the core to properly move from PZONE to SZONE")
-	if Duel.GetLocationCount(tp,LOCATION_SZONE,tp,LOCATION_REASON_TOFIELD,(z<<1|z>>1)&0x1f)>0 
-		and Duel.SendtoDeck(tc,nil,-2,REASON_EFFECT)>0 -- TEMP: sends the card to limbo so MoveToField works
-		and Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true,(z<<1|z>>1)&0x1f) then
+	local seq=tc:GetSequence()
+	if seq>4 then return end
+	local flag=0
+	if seq>0 and Duel.CheckLocation(tp,LOCATION_SZONE,seq-1) then flag=flag|(0x1<<seq-1) end
+	if seq<4 and Duel.CheckLocation(tp,LOCATION_SZONE,seq+1) then flag=flag|(0x1<<seq+1) end
+	if flag==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOZONE)
+	local zone=math.log(Duel.SelectDisableField(tp,1,LOCATION_SZONE,0,~(flag<<8)),2)-8
+	if Duel.MoveSequence(tc,zone,LOCATION_SZONE) then
 		-- Treat as Continuous Spell
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetCode(EFFECT_CHANGE_TYPE)
