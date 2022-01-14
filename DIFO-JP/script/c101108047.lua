@@ -48,7 +48,7 @@ function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 
 	local fp=switch and 1-tp or tp
 	local nseq=switch and 5+seq or seq
-	local tc=Duel.GetFieldGroup(fp,LOCATION_MZONE,0):Filter(Card.IsSequence,nil,nseq):GetFirst()
+	local tc=Duel.GetFieldCard(fp,LOCATION_MZONE,nseq)
 	if Duel.GetMZoneCount(fp,tc,tp,nil,1<<nseq)<1 then return s.cannot_move(c) end
 
 	local win=false
