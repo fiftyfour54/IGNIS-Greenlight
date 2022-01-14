@@ -11,8 +11,9 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--special summon
+	--Place in the Spell/Trap Zone
 	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetProperty(EFFECT_FLAG_BOTH_SIDE+EFFECT_FLAG_CARD_TARGET)
@@ -23,15 +24,17 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x27a}
+s.listed_names={id}
 function s.filter(c)
-	return c:IsType(TYPE_FIELD) and c:IsSetCard(0x27a) and not c:IsCode(id) and not c:IsForbidden()
+	return c:IsType(TYPE_FIELD) and c:IsType(TYPE_SPELL) and c:IsSetCard(0x27a) and not c:IsCode(id)
+		and not c:IsForbidden()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then
 		local tc=g:GetFirst()
@@ -46,15 +49,25 @@ end
 function s.plcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_FZONE,LOCATION_FZONE)==2
 end
+function s.plfilter(c,tp)
+	if not (c:IsFaceup() and c:IsType(TYPE_EFFECT) and c:IsInMainMZone()) then return false end
+	local cg=c:GetColumnGroup()
+	return #cg>0 and cg:IsExists(aux.AND(Card.IsControler,Card.IsMonster),1,nil,tp)
+end
 function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() and chkc:IsType(TYPE_EFFECT) end
-	if chk==0 then return Duel.IsExistingTarget(aux.FilterFaceupFunction(Card.IsType,TYPE_EFFECT),tp,0,LOCATION_MZONE,1,nil) end
+	if chkc then return chkc:IsControler(1-tp) and s.plfilter(chkc,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.plfilter,tp,0,LOCATION_MZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsType,TYPE_EFFECT),tp,0,LOCATION_MZONE,1,1,nil)
+	local tc=Duel.SelectTarget(tp,s.plfilter,tp,0,LOCATION_MZONE,1,1,nil,tp):GetFirst()
+	local seq=tc:GetSequence()
+	local dg=Duel.GetFieldGroup(tp,0,LOCATION_SZONE):Filter(Card.IsSequence,nil,seq)
+	if #dg>0 then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,0,0)
+	end
 end
 function s.plop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) or tc:IsControler(tp) then return end
+	if not (tc:IsRelateToEffect(e) and tc:IsControler(1-tp)) then return end
 	local seq=tc:GetSequence()
 	local dc=Duel.GetFieldGroup(tp,0,LOCATION_SZONE):Filter(Card.IsSequence,nil,seq):GetFirst()
 	if dc then 

@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_MOVE)
 	e3:SetCountLimit(1,{id,2})
 	e3:SetCondition(s.sspcon)
@@ -81,12 +81,11 @@ function s.sspcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsPreviousLocation(LOCATION_MZONE)
 end
 function s.sspfilter(c,e,tp)
-	return c:IsSetCard(0x27a) and c:IsOriginalType(TYPE_MONSTER)
+	return c:IsSetCard(0x27a) and c:IsOriginalType(TYPE_MONSTER) and c:GetSequence()<5
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,(1<<c:GetSequence())&0x1f)
 end
-function s.ssptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_SZONE) and s.sspfilter(c,e,tp) end
+function s.ssptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_SZONE) and s.sspfilter(chkc,e,tp) end
 	if chk==0 then return Duel.IsExistingTarget(s.sspfilter,tp,LOCATION_SZONE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,s.sspfilter,tp,LOCATION_SZONE,0,1,1,nil,e,tp)
@@ -94,7 +93,7 @@ function s.ssptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.sspop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then 
+	if tc:IsRelateToEffect(e) then 
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP,(1<<tc:GetSequence())&0x1f)
 	end
 end

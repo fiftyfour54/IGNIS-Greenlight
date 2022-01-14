@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_COIN+CATEGORY_DESTROY+CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_MOVE)
 	e3:SetCountLimit(1,{id,2})
 	e3:SetCondition(s.desthcon)
@@ -56,7 +56,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if zone~=0 then
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP,zone)
 	end
-	-- Cannot Special Summon non-"Valiants" monsters, except from the Extra Deck
+	-- Cannot Special Summon, except "Valiants" and from the Extra Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,3))
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -71,7 +71,6 @@ function s.splimit(e,c)
 	return not c:IsSetCard(0x27a) and not c:IsLocation(LOCATION_EXTRA)
 end
 function s.disatktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() and chkc:IsType(TYPE_EFFECT) end
 	if chk==0 then return Duel.IsExistingTarget(aux.FilterFaceupFunction(Card.IsType,TYPE_EFFECT),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
@@ -80,12 +79,14 @@ function s.disatktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.disatkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) then return end
+	if not (tc:IsFaceup() and tc:IsRelateToEffect(e)) then return end
+	local c=e:GetHandler()
 	if Duel.TossCoin(tp,1)==1 then
 		-- Negate its effects
-		local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1)
 		local e2=e1:Clone()
@@ -93,9 +94,10 @@ function s.disatkop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 	else
 		-- Halve its ATK
-		local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		e1:SetValue(math.ceil(tc:GetAttack()/2))
 		tc:RegisterEffect(e1)
@@ -106,7 +108,6 @@ function s.desthcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsPreviousLocation(LOCATION_MZONE)
 end
 function s.desthtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local c=e:GetHandler()
 	if chkc then return chkc:IsOnField() end
 	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
@@ -119,6 +120,6 @@ function s.desthop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.TossCoin(tp,1)==1 then
 		Duel.Destroy(tc,REASON_EFFECT)
 	else
-		Duel.SendToHand(tc,nil,REASON_EFFECT)
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	end
 end

@@ -3,7 +3,7 @@
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
-	Pendulum.AddProcedure(c)
+	Pendulum.AddProcedure(c,false)
 	c:EnableReviveLimit()
 	-- 2 "Valiants" monsters
 	Fusion.AddProcMixN(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0x27a),2)
@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_DAMAGE+CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetTarget(s.thtg)
@@ -38,6 +38,15 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x27a}
+function s.splimit(e,se,sp,st)
+	return (st&SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or e:GetHandler():GetLocation()~=LOCATION_EXTRA 
+end
+function s.contactfil(tp)
+	return Duel.GetReleaseGroup(tp)
+end
+function s.contactop(g)
+	Duel.Release(g,REASON_COST+REASON_MATERIAL)
+end
 function s.hspfilter(c,tp,sc)
 	local zone=1<<c:GetSequence()
 	return zone&0x6a==zone and c:IsSetCard(0x27a) and c:IsLevelAbove(5)
@@ -68,8 +77,8 @@ function s.spmvtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local mv=s.mvtg(e,tp,eg,ep,ev,re,r,rp,0)
 	if chk==0 then return sp or mv end
 	local op=aux.SelectEffect(tp,
-		{sp,aux.Stringid(id,3)},
-		{mv,aux.Stringid(id,4)})
+		{sp,aux.Stringid(id,2)},
+		{mv,aux.Stringid(id,3)})
 	if op==1 then
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		e:SetOperation(s.spop)
@@ -107,7 +116,7 @@ function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.thfilter(c)
-	return c:IsOriginalType(TYPE_MONSTER) and c:GetBaseAttack()>0 and c:IsAbleToHand()
+	return c:IsOriginalType(TYPE_MONSTER) and c:GetSequence()<5 and c:GetBaseAttack()>0 and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsController(1-tp) and s.thfilter(chkc) end
@@ -119,11 +128,12 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc or not tc:IsRelateToEffect(e) or Duel.SendtoHand(tc,nil,REASON_EFFECT)<1 then return end
+	if not (tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND)) then return end
 	local atk=tc:GetBaseAttack()
 	if atk<0 then return end
 	local dam=Duel.Damage(1-tp,atk,REASON_EFFECT)
 	if dam>0 then
+		Duel.BreakEffect()
 		local c=e:GetHandler()
 		-- Gain ATK
 		local e1=Effect.CreateEffect(c)

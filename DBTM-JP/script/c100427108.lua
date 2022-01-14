@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_CONTROL)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_MOVE)
 	e3:SetCountLimit(1,{id,2})
 	e3:SetCondition(s.ctcon)
@@ -63,11 +63,14 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP,zone)
 	end
 end
+function s.cafilter(c)
+	return c:IsFacedown() and c:GetSequence()<5
+end
 function s.catg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsFacedown() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFacedown,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and s.cafilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.cafilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEDOWN)
-	Duel.SelectTarget(tp,Card.IsFacedown,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil)
+	Duel.SelectTarget(tp,s.cafilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil)
 end
 function s.caop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -76,7 +79,7 @@ function s.caop(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CANNOT_TRIGGER)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_SELF_TURN)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		e1:SetValue(1)
 		tc:RegisterEffect(e1)
 	end
@@ -96,13 +99,13 @@ function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
 end
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsFaceup() and  tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e)
+	if tc:IsFaceup() and  tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e)
 		and tc:IsControler(1-tp) and tc:IsControlerCanBeChanged() and Duel.GetControl(tc,tp) then
+		local c=e:GetHandler()
 		-- Cannot activate its effects
 		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(id,3))
+		e1:SetDescription(3302)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CANNOT_TRIGGER)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
@@ -110,11 +113,12 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		-- Cannot declare an attack
 		local e2=e1:Clone()
+		e2:SetDescription(3206)
 		e2:SetCode(EFFECT_CANNOT_ATTACK)
 		tc:RegisterEffect(e2)
 		-- Treated as a "Valiants" monster
 		local e3=Effect.CreateEffect(c)
-		e3:SetDescription(aux.Stringid(id,4))
+		e3:SetDescription(aux.Stringid(id,3))
 		e3:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 		e3:SetType(EFFECT_TYPE_SINGLE)
 		e3:SetCode(EFFECT_ADD_SETCODE)

@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_DICE+CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_MOVE)
 	e3:SetCountLimit(1,{id,2})
 	e3:SetCondition(s.sspcon)
@@ -76,7 +76,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local dc=Duel.TossDice(tp,1)
 	Duel.ConfirmDecktop(tp,dc)
 	local dg=Duel.GetDecktopGroup(tp,dc):Filter(s.thfilter,nil)
-	if #dg>0 then
+	if #dg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g=dg:Select(tp,1,1,nil)
 		if #g>0 then
@@ -91,7 +91,7 @@ function s.sspcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsPreviousLocation(LOCATION_MZONE)
 end
 function s.sspfilter(c,e,tp)
-	return c:IsSetCard(0x27a) and c:IsOriginalType(TYPE_MONSTER)
+	return c:IsSetCard(0x27a) and c:IsOriginalType(TYPE_MONSTER) and c:GetSequence()<5
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,(1<<c:GetSequence())&0x1f)
 end
 function s.ssptg(e,tp,eg,ep,ev,re,r,rp,chk)

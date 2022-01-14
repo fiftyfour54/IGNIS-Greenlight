@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_MOVE)
 	e3:SetCountLimit(1,{id,2})
 	e3:SetCondition(s.smvcon)
@@ -53,7 +53,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if zone~=0 then
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP,zone)
 	end
-	-- Cannot Special Summon non-"Valiants" monsters, except from the Extra Deck
+	-- Cannot Special Summon, except "Valiants" and from the Extra Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,3))
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -92,12 +92,10 @@ function s.smvfilter(c,tp)
 	return Duel.GetLocationCount(tp,LOCATION_SZONE,tp,LOCATION_REASON_TOFIELD,(z<<1|z>>1)&0x1f)>0
 end
 function s.smvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local c=e:GetHandler()
-	if chkc then return chkc:IsOnField() end
+	if chkc then return chkc:IsLocation(LOCATION_PZONE) and s.smvfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.smvfilter,tp,LOCATION_PZONE,LOCATION_PZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local tg=Duel.SelectTarget(tp,s.smvfilter,tp,LOCATION_PZONE,LOCATION_PZONE,1,1,nil,tp)
-	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
+	Duel.SelectTarget(tp,s.smvfilter,tp,LOCATION_PZONE,LOCATION_PZONE,1,1,nil,tp)
 end
 function s.smvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

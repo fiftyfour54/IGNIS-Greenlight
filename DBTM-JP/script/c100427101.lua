@@ -22,20 +22,19 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL) end)
-	e2:SetTarget(s.sthtg)
-	e2:SetOperation(s.sthop)
+	e2:SetTarget(s.thtg)
+	e2:SetOperation(s.thop)
+	e2:SetLabel(TYPE_SPELL)
 	c:RegisterEffect(e2)
 	-- Search 1 "Valiants" monster
-	local e3=Effect.CreateEffect(c)
+	local e3=e2:Clone()
 	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_MOVE)
 	e3:SetCountLimit(1,{id,2})
 	e3:SetCondition(s.mthcon)
-	e3:SetTarget(s.mthtg)
-	e3:SetOperation(s.mthop)
+	e3:SetLabel(TYPE_MONSTER)
 	c:RegisterEffect(e3)
 end
 s.listed_names={id}
@@ -55,7 +54,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if zone~=0 then
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP,zone)
 	end
-	-- Cannot Special Summon non-"Valiants" monsters, except from the Extra Deck
+	-- Cannot Special Summon, except "Valiants" and from the Extra Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,3))
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -69,16 +68,17 @@ end
 function s.splimit(e,c)
 	return not c:IsSetCard(0x27a) and not c:IsLocation(LOCATION_EXTRA)
 end
-function s.thfilter(c,type,exc)
-	return c:IsSetCard(0x27a) and c:IsType(type) and not c:IsCode(exc) and c:IsAbleToHand()
+function s.thfilter(c,card_type)
+	return c:IsSetCard(0x27a) and c:IsType(card_type) and c:IsAbleToHand()
+		and (card_type==TYPE_SPELL or not c:IsCode(id))
 end
-function s.sthtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,TYPE_SPELL,-1) end
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,e:GetLabel()) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function s.sthop(e,tp,eg,ep,ev,re,r,rp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,TYPE_SPELL,-1)
+	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,e:GetLabel())
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
@@ -87,16 +87,4 @@ end
 function s.mthcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsLocation(LOCATION_MZONE) and c:IsPreviousLocation(LOCATION_MZONE)
-end
-function s.mthtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,TYPE_MONSTER,id) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-end
-function s.mthop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,TYPE_MONSTER,id)
-	if #g>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
-	end
 end

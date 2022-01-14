@@ -3,7 +3,7 @@
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
-	Pendulum.AddProcedure(c)
+	Pendulum.AddProcedure(c,false)
 	c:EnableReviveLimit()
 	-- 3 "Valiants" monsters
 	Fusion.AddProcMixN(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0x27a),3)
@@ -18,13 +18,14 @@ function s.initial_effect(c)
 	-- Place monster in Spell/Trap Zone
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
+	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e2:SetCountLimit(1,{id,1})
+	e2:SetCondition(function() return Duel.IsMainPhase() end)
 	e2:SetTarget(s.pltg)
 	e2:SetOperation(s.plop)
 	c:RegisterEffect(e2)
@@ -83,20 +84,27 @@ function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 		tc:MoveAdjacent()
 	end
 end
+function s.plfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and c:IsInMainMZone()
+end
 function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() and chkc:IsType(TYPE_EFFECT) end
-	if chk==0 then return Duel.IsExistingTarget(aux.FilterFaceupFunction(Card.IsType,TYPE_EFFECT),tp,0,LOCATION_MZONE,1,nil) end
+	if chkc then return chkc:IsControler(1-tp) and s.plfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.plfilter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsType,TYPE_EFFECT),tp,0,LOCATION_MZONE,1,1,nil)
+	local tc=Duel.SelectTarget(tp,s.plfilter,tp,0,LOCATION_MZONE,1,1,nil):GetFirst()
+	local seq=tc:GetSequence()
+	local dg=Duel.GetFieldGroup(tp,0,LOCATION_SZONE):Filter(Card.IsSequence,nil,seq)
+	if #dg>0 then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,0,0)
+	end
 end
 function s.plop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) or tc:IsControler(tp) then return end
+	if not (tc:IsRelateToEffect(e) and tc:IsControler(1-tp)) then return end
 	local seq=tc:GetSequence()
 	local dc=Duel.GetFieldGroup(tp,0,LOCATION_SZONE):Filter(Card.IsSequence,nil,seq):GetFirst()
-	if dc and Duel.Destroy(dc,REASON_EFFECT)>0
-		and dc:IsOriginalType(TYPE_MONSTER) and dc:GetBaseAttack()>0 then
-		Duel.Damage(tp,dc:GetBaseAttack(),REASON_EFFECT)
+	if dc and Duel.Destroy(dc,REASON_EFFECT)>0 and dc:IsOriginalType(TYPE_MONSTER) and dc:GetBaseAttack()>0 then
+		Duel.SetLP(1-tp,Duel.GetLP(1-tp)-dc:GetBaseAttack())
 	end
 	if Duel.CheckLocation(1-tp,LOCATION_SZONE,seq)
 		and Duel.MoveToField(tc,tp,1-tp,LOCATION_SZONE,POS_FACEUP,true,1<<seq) then
@@ -112,7 +120,7 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(c:GetOwner())
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
 		and c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()==1-tp
 end
 function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
