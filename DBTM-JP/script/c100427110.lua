@@ -38,15 +38,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x27a}
-function s.splimit(e,se,sp,st)
-	return (st&SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or e:GetHandler():GetLocation()~=LOCATION_EXTRA 
-end
-function s.contactfil(tp)
-	return Duel.GetReleaseGroup(tp)
-end
-function s.contactop(g)
-	Duel.Release(g,REASON_COST+REASON_MATERIAL)
-end
 function s.hspfilter(c,tp,sc)
 	local zone=1<<c:GetSequence()
 	return zone&0x6a==zone and c:IsSetCard(0x27a) and c:IsLevelAbove(5)
