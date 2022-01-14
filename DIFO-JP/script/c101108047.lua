@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	-- 2 Level 6 monsters
-	Xyz.AddProcedure(c,nil,3,2)
+	Xyz.AddProcedure(c,nil,6,2)
 	-- Roll die and move to corresponding zone
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
