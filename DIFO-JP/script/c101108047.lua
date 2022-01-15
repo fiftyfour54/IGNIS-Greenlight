@@ -15,7 +15,6 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetCondition(function(_,tp) return Duel.IsTurnPlayer(1-tp) end)
-	e1:SetCondition(function(e) return e:GetHandler():IsInMainMZone() end)
 	e1:SetTarget(s.mvtg)
 	e1:SetOperation(s.mvop)
 	c:RegisterEffect(e1)
@@ -54,8 +53,9 @@ function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 	local win=false
 	if tc then
 		if c==tc or tc:IsImmuneToEffect(e) or tc:IsType(TYPE_TOKEN) then return s.cannot_move(c) end
+		local prev=c:GetOverlayCount()
 		Duel.Overlay(c,tc)
-		win=c:GetOverlayCount()>6
+		win=(prev<7 and c:GetOverlayCount()>6)
 	end
 
 	if switch and Duel.GetControl(c,1-tp,0,0,1<<nseq) or Duel.MoveSequence(c,seq) then
