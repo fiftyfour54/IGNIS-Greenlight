@@ -29,7 +29,7 @@ function s.cannot_move(c)
 end
 function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or not c:IsInMainMZone() then return end
+	if not (c:IsRelateToEffect(e) and c:IsInMainMZone()) then return end
 	local dice=Duel.TossDice(tp,1)
 	if dice<1 or dice>6 then return end
 

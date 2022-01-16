@@ -5,7 +5,6 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOGRAVE+CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
@@ -31,10 +30,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if cl>=2 then
 		Duel.SortDecktop(tp,tp,cl)
 	end
-	if cl>=3 then
-		Duel.SendtoGrave(Duel.GetDecktopGroup(tp,1),REASON_EFFECT)
+	if cl>=3 and Duel.IsPlayerCanDiscardDeck(tp,1) then
+		Duel.BreakEffect()
+		Duel.DiscardDeck(tp,1,REASON_EFFECT)
 	end
 	if cl>=4 then
+		Duel.BreakEffect()
 		Duel.Draw(tp,1,REASON_EFFECT)
 	end
 end
