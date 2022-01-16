@@ -7,11 +7,12 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Banish up to 2 of opponent's monsters
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_REMOVE)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_REMOVE+CATEGORY_RECOVER)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
@@ -26,11 +27,12 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 	--Banish up to 2 of opponent's monsters until End Phase
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetTargetCards(e)
-	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
-	if Duel.Remove(sg,0,REASON_EFFECT+REASON_TEMPORARY)~=0 then
-		for rc in aux.Next(sg) do
-			local e1=Effect.CreateEffect(e:GetHandler())
+	local tg=Duel.GetTargetCards(e)
+	if Duel.Remove(tg,0,REASON_EFFECT+REASON_TEMPORARY)>0 then
+		local c=e:GetHandler()
+		for rc in tg:Iter() do
+			local e1=Effect.CreateEffect(c)
+			e1:SetDescription(aux.Stringid(id,1))
 			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 			e1:SetCode(EVENT_PHASE+PHASE_END)
 			e1:SetReset(RESET_PHASE+PHASE_END)

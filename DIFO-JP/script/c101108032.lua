@@ -26,9 +26,9 @@ end
 function s.effop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rc=c:GetReasonCard()
-	if rc:IsLevelBelow(8) then
+	if rc:GetOriginalLevel()<=8 then
 		-- Gain 800 ATK/DEF
-		local e1=Effect.CreateEffect(c)
+		local e1=Effect.CreateEffect(rc)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(800)
@@ -39,10 +39,19 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 		rc:RegisterEffect(e2)
 	else
 		-- Inflict piercing damage
-		local e1=Effect.CreateEffect(c)
+		local e1=Effect.CreateEffect(rc)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_PIERCE)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		rc:RegisterEffect(e1)
 	end
+	if not rc:IsType(TYPE_EFFECT) then
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_ADD_TYPE)
+		e3:SetValue(TYPE_EFFECT)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
+		rc:RegisterEffect(e3,true)
+	end
+	rc:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,0))
 end

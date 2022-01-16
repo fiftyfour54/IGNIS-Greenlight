@@ -23,14 +23,11 @@ function s.initial_effect(c)
 	e2:SetCost(aux.bfgcost)
 	c:RegisterEffect(e2)
 end
-function s.ctconfilter(c,tp)
-	local bc=c:GetBattleTarget()
-	return c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_MZONE)
-		and bc:IsControler(1-tp) and bc:IsAbleToChangeControler()
-end
 function s.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	e:SetLabelObject(e:GetHandler())
-	return s.ctconfilter(e:GetHandler(),tp)
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	return c:IsStatus(STATUS_OPPO_BATTLE) and bc and bc:IsAbleToChangeControler()
 end
 function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=e:GetLabelObject():GetReasonCard()
@@ -59,9 +56,14 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e3)
 	end
 end
+function s.ctconfilter(c,tp)
+	return c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_MZONE)
+		and c:GetPreviousRaceOnField()&RACE_ZOMBIE~=0 and c:IsStatus(STATUS_OPPO_BATTLE)
+		and c:GetBattleTarget():IsAbleToChangeControler()
+end
 function s.gctcon(e,tp,eg,ep,ev,re,r,rp)
 	if not eg or eg:IsContains(e:GetHandler()) then return false end
-	local g=eg:Filter(Card.IsRace,nil,RACE_ZOMBIE):Match(s.ctconfilter,nil,tp)
+	local g=eg:Filter(s.ctconfilter,nil,tp)
 	e:SetLabelObject(g:GetFirst())
 	return #g>0
 end
