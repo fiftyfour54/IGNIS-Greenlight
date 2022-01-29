@@ -23,7 +23,8 @@ end
 function s.thfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x277) and c:IsRitualMonster() and c:IsAbleToHand()
 end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.thfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.thfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_MZONE,0,1,1,nil)
