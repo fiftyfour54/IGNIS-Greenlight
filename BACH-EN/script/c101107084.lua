@@ -1,10 +1,11 @@
+--
 --The Great Double Casted Caster
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	Fusion.AddProcMixN(c,true,true,Card.IsNonEffectMonster,2)
-	--atk
+	--Increase ATK
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_MATERIAL_CHECK)
@@ -17,7 +18,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.atkop)
 	e1:SetLabelObject(e0)
 	c:RegisterEffect(e1)
-	--direct attack
+	--Can attack directly
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_DIRECT_ATTACK)
@@ -38,8 +39,8 @@ end
 function s.valcheck(e,c)
 	local g=c:GetMaterial()
 	local atk=0
-	for tc in aux.Next(g) do
-		if tc:IsType(TYPE_FUSION+TYPE_RITUAL+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK) then
+	for tc in g:Iter() do
+		if tc:IsType(TYPE_RITUAL+TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK) then
 			atk=atk+tc:GetBaseAttack()
 		end
 	end
@@ -52,22 +53,20 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local atk=e:GetLabelObject():GetLabel()
 	if atk>0 then
+		--Increase ATK
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(atk)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
 		c:RegisterEffect(e1)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_UPDATE_DEFENSE)
-		c:RegisterEffect(e2)
 	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return r&(REASON_EFFECT+REASON_BATTLE)~=0
 end
 function s.spfilter(c,e,tp)
-	return c:IsNonEffectMonster() and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsNonEffectMonster() and c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end
@@ -79,7 +78,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
