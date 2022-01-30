@@ -30,16 +30,9 @@ function s.initial_effect(c)
 	e2:SetCondition(s.matcon)
 	c:RegisterEffect(e2)
 	-- Gain ATK/DEF
-	local e3a=Effect.CreateEffect(c)
-	e3a:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3a:SetCode(EVENT_CHAINING)
-	e3a:SetRange(LOCATION_MZONE)
-	e3a:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e3a:SetOperation(s.regop)
-	c:RegisterEffect(e3a)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_CHAIN_SOLVED)
+	e3:SetCode(EVENT_CHAINING)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCondition(s.atkcon)
 	e3:SetOperation(s.atkop)
@@ -53,16 +46,11 @@ function s.matcheck(e,c)
 	end
 end
 function s.matcon(e)
-	return e:GetHandler():GetFlagEffect(id)>0
-end
-function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	if ep==1-tp then
-		e:GetHandler():RegisterFlagEffect(id+100,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_CHAIN,0,1)
-	end
+	local c=e:GetHandler()
+	return c:IsSummonType(SUMMON_TYPE_RITUAL) and c:GetFlagEffect(id)>0
 end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:GetFlagEffect(id+100)>0 and c:GetAttack()<3000
+	return ep==1-tp and e:GetHandler():GetAttack()<3000
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
