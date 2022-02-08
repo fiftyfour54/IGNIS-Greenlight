@@ -86,6 +86,8 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and re:IsActiveType(TYPE_SPELL)
 end
 function s.spcfilter(c,e,tp,g)
+	local ft=math.min(Duel.GetLocationCount(tp,LOCATION_MZONE),4)
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
 	return c:IsFaceup() and c:IsCode(13331639) and c:IsAbleToRemoveAsCost()
 		and aux.SelectUnselectGroup(g,e,tp,1,ft,s.rescon(aux.PropertyTableFilter(Card.GetSetCard,0x10f2,0x2073,0x2017,0x1046),c),0)
 end
@@ -102,9 +104,12 @@ function s.spfilter(c,e,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
 		and (c:IsSetCard(0x10f2) or c:IsSetCard(0x2073) or c:IsSetCard(0x2017) or c:IsSetCard(0x1046))
 end
+function s.resfilter(c)
+	return c:IsLocation(LOCATION_EXTRA) and c:IsType(TYPE_PENDULUM) and c:IsFaceup()
+end
 function s.rescon(checkfunc,zc)
 	return function(sg,e,tp,mg)
-		return true,not aux.ChkfMMZ(#sg)(sg,e,tp,mg) or not sg:CheckDifferentProperty(checkfunc)
+		return true,Duel.GetLocationCountFromEx(tp,tp,zc,TYPE_PENDULUM)<sg:FilterCount(s.resfilter,nil) or not sg:CheckDifferentProperty(checkfunc)
 	end
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
