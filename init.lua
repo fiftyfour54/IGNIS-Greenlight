@@ -1,12 +1,21 @@
+-- Effect.CreateMysteruneQPEffect(c,id,categ,uniquetg,uniqueop,rmcount)
+-- Creates an activation Effect object for the "Mysterune" Quick-Play Spells
+-- c: the owner of the Effect
+-- id: the card ID used for the HOPT restriction and strings
+-- categ: the category of the unique effect
+-- uniquetg: the unique effect's target function, excluding the banishment handling
+-- uniqueop: the unique effect's operation function, excluding the banishment handling
+-- (uniqueop must return true to proceed to the banishment part)
+
 Effect.CreateMysteruneQPEffect = (function()
 	local function spfilter(c,e,tp)
-		return c:IsSetCard(0x167) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		return c:IsSetCard(0x27b) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 			and Duel.GetLocationCountFromEx(tp,tp,nil,c,0x60)>0
 	end
 
-	local function target(id,categ,tg1,rmcount)
+	local function target(id,categ,uniquetg,rmcount)
 		return function(e,tp,eg,ep,ev,re,r,rp,chk)
-			local b1=tg1(e,tp,eg,ep,ev,re,r,rp,0) and Duel.IsPlayerCanRemove(tp)
+			local b1=uniquetg(e,tp,eg,ep,ev,re,r,rp,0) and Duel.IsPlayerCanRemove(tp)
 				and Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>=rmcount
 			local b2=Duel.IsExistingMatchingCard(spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
 			if chk==0 then return b1 or b2 end
@@ -16,7 +25,7 @@ Effect.CreateMysteruneQPEffect = (function()
 			e:SetLabel(sel)
 			if sel==1 then
 				e:SetCategory(categ)
-				tg1(e,tp,eg,ep,ev,re,r,rp,0)
+				uniquetg(e,tp,eg,ep,ev,re,r,rp,0)
 				Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_DECK)
 			elseif sel==2 then
 				e:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -28,11 +37,11 @@ Effect.CreateMysteruneQPEffect = (function()
 		end
 	end
 
-	local function operation(op1,rmcount)
+	local function operation(uniqueop,rmcount)
 		return function(e,tp,eg,ep,ev,re,r,rp)
 			local sel=e:GetLabel()
 			if sel==1 then
-				if op1(e,tp,eg,ep,ev,re,r,rp) and Duel.IsPlayerCanRemove(tp) then
+				if uniqueop(e,tp,eg,ep,ev,re,r,rp) and Duel.IsPlayerCanRemove(tp) then
 					local rg=Duel.GetDecktopGroup(1-tp,rmcount)
 					if #rg<1 then return end
 					Duel.DisableShuffleCheck()
@@ -63,14 +72,14 @@ Effect.CreateMysteruneQPEffect = (function()
 		end
 	end
 
-	return function(c,id,categ,tg1,op1,rmcount)
+	return function(c,id,categ,uniquetg,uniqueop,rmcount)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_ACTIVATE)
 		e1:SetCode(EVENT_FREE_CHAIN)
 		e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
 		e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-		e1:SetTarget(target(id,categ,tg1,rmcount))
-		e1:SetOperation(operation(op1,rmcount))
+		e1:SetTarget(target(id,categ,uniquetg,rmcount))
+		e1:SetOperation(operation(uniqueop,rmcount))
 		return e1
 	end
 end)()
