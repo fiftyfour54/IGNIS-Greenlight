@@ -33,6 +33,6 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(RESET_TURN_SET)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e2)
-		return not tc:IsImmuneToEffect(e1) and not tc:IsImmuneToEffect(e2)
+		return not (tc:IsImmuneToEffect(e1) or tc:IsImmuneToEffect(e2))
 	end
 end
