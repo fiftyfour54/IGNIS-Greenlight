@@ -15,7 +15,7 @@ function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,aux.disfilter1,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,1,0,0)
 end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) 
 		and ((tc:IsFaceup() and not tc:IsDisabled() and not tc:IsImmuneToEffect(e)) or tc:IsType(TYPE_TRAPMONSTER)) then
