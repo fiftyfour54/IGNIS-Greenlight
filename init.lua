@@ -27,9 +27,9 @@ Effect.CreateMysteruneQPEffect = (function()
 			e:SetLabel(sel)
 			if sel==1 then
 				if uniqueprop then e:SetProperty(uniqueprop) end
-				e:SetCategory(categ)
+				e:SetCategory(categ|CATEGORY_REMOVE)
 				uniquetg(e,tp,eg,ep,ev,re,r,rp,1)
-				Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_DECK)
+				if rmcount>0 then Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_DECK) end
 			elseif sel==2 then
 				e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 				Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
@@ -44,7 +44,7 @@ Effect.CreateMysteruneQPEffect = (function()
 		return function(e,tp,eg,ep,ev,re,r,rp)
 			local sel=e:GetLabel()
 			if sel==1 then
-				if uniqueop(e,tp,eg,ep,ev,re,r,rp) and Duel.IsPlayerCanRemove(tp) then
+				if uniqueop(e,tp,eg,ep,ev,re,r,rp) and Duel.IsPlayerCanRemove(tp) and rmcount>0 then
 					local rg=Duel.GetDecktopGroup(1-tp,rmcount)
 					if #rg<1 then return end
 					Duel.DisableShuffleCheck()
