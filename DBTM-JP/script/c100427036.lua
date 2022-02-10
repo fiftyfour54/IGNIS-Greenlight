@@ -14,8 +14,7 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,ct,1-tp,LOCATION_DECK)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
-	local rg=Duel.GetDecktopGroup(1-tp,math.min(ct,Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)))
+	local rg=Duel.GetDecktopGroup(1-tp,Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD))
 	if #rg>0 then
 		Duel.DisableShuffleCheck()
 		Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)
