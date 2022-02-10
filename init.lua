@@ -6,6 +6,7 @@
 -- uniquetg: the unique effect's target function, excluding the banishment handling
 -- uniqueop: the unique effect's operation function, excluding the banishment handling
 -- (uniqueop must return true to proceed to the banishment part)
+-- uniqueprop: [optional] additional Effect properties if the unique effect is chosen
 
 Effect.CreateMysteruneQPEffect = (function()
 	local function spfilter(c,e,tp)
@@ -13,8 +14,9 @@ Effect.CreateMysteruneQPEffect = (function()
 			and Duel.GetLocationCountFromEx(tp,tp,nil,c,0x60)>0
 	end
 
-	local function target(id,categ,uniquetg,rmcount)
-		return function(e,tp,eg,ep,ev,re,r,rp,chk)
+	local function target(id,categ,uniquetg,rmcount,uniqueprop)
+		return function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+			if chkc then return e:GetLabel()==1 and uniquetg(e,tp,eg,ep,ev,re,r,rp,chk,chkc) end
 			local b1=uniquetg(e,tp,eg,ep,ev,re,r,rp,0) and Duel.IsPlayerCanRemove(tp)
 				and Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>=rmcount
 			local b2=Duel.IsExistingMatchingCard(spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
@@ -24,8 +26,9 @@ Effect.CreateMysteruneQPEffect = (function()
 				{b2,aux.Stringid(id,1)})
 			e:SetLabel(sel)
 			if sel==1 then
+				if uniqueprop then e:SetProperty(uniqueprop) end
 				e:SetCategory(categ)
-				uniquetg(e,tp,eg,ep,ev,re,r,rp,0)
+				uniquetg(e,tp,eg,ep,ev,re,r,rp,1)
 				Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_DECK)
 			elseif sel==2 then
 				e:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -72,13 +75,13 @@ Effect.CreateMysteruneQPEffect = (function()
 		end
 	end
 
-	return function(c,id,categ,uniquetg,uniqueop,rmcount)
+	return function(c,id,categ,uniquetg,uniqueop,rmcount,uniqueprop)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_ACTIVATE)
 		e1:SetCode(EVENT_FREE_CHAIN)
 		e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
 		e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-		e1:SetTarget(target(id,categ,uniquetg,rmcount))
+		e1:SetTarget(target(id,categ,uniquetg,rmcount,uniqueprop))
 		e1:SetOperation(operation(uniqueop,rmcount))
 		return e1
 	end
