@@ -4,8 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Activate
-	local categ=CATEGORY_SEARCH+CATEGORY_TOHAND+CATEGORY_REMOVE
-	local e1=Effect.CreateMysteruneQPEffect(c,id,categ,s.thtg,s.thop,1)
+	local e1=Effect.CreateMysteruneQPEffect(c,id,CATEGORY_SEARCH+CATEGORY_TOHAND,s.thtg,s.thop,1)
 	c:RegisterEffect(e1)
 end
 s.listed_names={id}
