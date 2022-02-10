@@ -20,12 +20,13 @@ Effect.CreateMysteruneQPEffect = (function()
 		e1:SetCode(EFFECT_SKIP_BP)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetTargetRange(1,0)
-		if Duel.IsTurnPlayer(tp) then
+		local ph=Duel.GetCurrentPhase()
+		if Duel.IsTurnPlayer(tp) and ph>PHASE_MAIN1 and ph<PHASE_MAIN2 then
 			e1:SetLabel(Duel.GetTurnCount())
 			e1:SetCondition(function(e) return Duel.GetTurnCount()~=e:GetLabel() end)
-			e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
+			e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,2)
 		else
-			e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,1)
+			e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,1)
 		end
 		Duel.RegisterEffect(e1,tp)
 	end
@@ -88,10 +89,12 @@ Effect.CreateMysteruneQPEffect = (function()
 				end)
 			elseif sel==2 then
 				e:SetCategory(CATEGORY_SPECIAL_SUMMON)
+				e:SetProperty(0)
 				sptg(e,tp,eg,ep,ev,re,r,rp,1)
 				e:SetOperation(spop)
 			else
 				e:SetCategory(0)
+				e:SetProperty(0)
 				e:SetOperation(nil)
 			end
 		end
@@ -111,7 +114,7 @@ Effect.CreateMysteruneQPEffect = (function()
 			e0:SetDescription(aux.Stringid(id,0))
 			e0:SetCategory(uniquecat|CATEGORY_REMOVE)
 			e0:SetType(EFFECT_TYPE_ACTIVATE)
-			e0:SetCode(EVENT_TO_HAND)
+			e0:SetCode(uniquecode)
 			e0:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 			if uniqueprop then
 				e0:SetProperty(uniqueprop)
