@@ -31,7 +31,7 @@ Effect.CreateMysteruneQPEffect = (function()
 	end
 
 	local function spfilter(c,e,tp)
-		return c:IsSetCard(0x167) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		return c:IsSetCard(0x27b) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 			and Duel.GetLocationCountFromEx(tp,tp,nil,c,0x60)>0
 	end
 
