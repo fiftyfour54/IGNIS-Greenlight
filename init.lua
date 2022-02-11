@@ -14,14 +14,14 @@
 
 Effect.CreateMysteruneQPEffect = (function()
 	local function skipop(e,tp,eg,ep,ev,re,r,rp)
+		if not e:IsHasType(EFFECT_TYPE_ACTIVATE) then return end
 		-- Skip next Battle Phase
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_SKIP_BP)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetTargetRange(1,0)
-		local ph=Duel.GetCurrentPhase()
-		if Duel.IsTurnPlayer(tp) and ph>PHASE_MAIN1 and ph<PHASE_MAIN2 then
+		if Duel.IsTurnPlayer(tp) and Duel.IsBattlePhase() then
 			e1:SetLabel(Duel.GetTurnCount())
 			e1:SetCondition(function(e) return Duel.GetTurnCount()~=e:GetLabel() end)
 			e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,2)
@@ -130,7 +130,11 @@ Effect.CreateMysteruneQPEffect = (function()
 			-- complete the Special Summon effect
 			e1:SetDescription(aux.Stringid(id,1))
 			e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-			e1:SetTarget(sptg)
+			e1:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk)
+				if chk==0 then return sptg(e,tp,eg,ep,ev,re,r,rp,chk) end
+				Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+				sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+			end)
 			e1:SetOperation(spop)
 			return e0,e1
 		else
