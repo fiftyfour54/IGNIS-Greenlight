@@ -9,30 +9,27 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--Recycle and Draw
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetCategory(CATEGORY_REMOVE)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e4:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e4:SetCode(EVENT_CHAINING)
-	e4:SetRange(LOCATION_SZONE)
-	e4:SetCondition(s.condition)
-	e4:SetTarget(s.target)
-	e4:SetOperation(s.operation)
-	c:RegisterEffect(e4)
+	--Banish the top card of your opponent's Deck
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_REMOVE)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e2:SetCode(EVENT_CHAIN_SOLVED)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetCondition(s.rmcon)
+	e2:SetTarget(s.rmtg)
+	e2:SetOperation(s.rmop)
+	c:RegisterEffect(e2)
 end
 s.listed_names={id}
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_SPELL) and re:GetHandler():IsType(TYPE_QUICKPLAY)
+function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
+	return re:IsActiveType(TYPE_SPELL) and re:GetHandler():IsType(TYPE_QUICKPLAY) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetDecktopGroup(1-tp,1)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,1-tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_DECK)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
+function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetDecktopGroup(1-tp,1)
 	if #g==0 then return end
 	Duel.DisableShuffleCheck()

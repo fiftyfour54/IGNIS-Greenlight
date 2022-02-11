@@ -14,9 +14,9 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e1:SetCondition(function(e)return e:GetHandler():GetSummonLocation()&LOCATION_EXTRA==LOCATION_EXTRA end)
+	e1:SetCondition(function(e) return e:GetHandler():IsSummonLocation(LOCATION_EXTRA) end)
 	e1:SetCost(s.thcost)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
@@ -26,22 +26,22 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.negcon)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.negtg)
-	e2:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then Duel.Destroy(eg,REASON_EFFECT)end end)
+	e2:SetOperation(function(e,tp,eg,ep,ev,re,r,rp) if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then Duel.Destroy(eg,REASON_EFFECT) end end)
 	c:RegisterEffect(e2)
 	--Gain 1000 LP during the End Phase
 	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_RECOVER)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e3:SetCountLimit(1)
 	e3:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk)
 		if chk==0 then return true end
@@ -81,19 +81,20 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 	--If your "Mysterune" card(s) and/or Set card(s) is targeted
-function s.filter(c,tp)
-	return c:IsControler(tp) and ((c:IsFaceup() and c:IsSetCard(0x27b)) or c:IsFacedown())
+function s.tgfilter(c,tp)
+	return c:IsControler(tp) and c:IsOnField() and ((c:IsFaceup() and c:IsSetCard(0x27b)) or c:IsFacedown())
 end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-	if not (rp==1-tp and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET)) then return false end
+	if not (rp==1-tp and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) and Duel.IsChainNegatable(ev)) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return g and g:IsExists(s.filter,1,nil,tp) and Duel.IsChainNegatable(ev)
+	return g and g:IsExists(s.tgfilter,1,nil,tp)
 end
 	--Activation legality
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
+	local rc=re:GetHandler()
+	if rc:IsDestructable() and rc:IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
