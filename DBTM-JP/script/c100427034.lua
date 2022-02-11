@@ -9,18 +9,18 @@ function s.initial_effect(c)
 end
 s.listed_series={0x27b}
 function s.natktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsFaceup() end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end
 function s.natkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
+	if tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
 		local c=e:GetHandler()
 		-- Cannot attack this turn
 		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(3206)
+		e1:SetDescription(aux.Stringid(id,3))
 		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CANNOT_ATTACK)
@@ -35,6 +35,6 @@ function s.natkop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(function(_,_,r) return (r&REASON_BATTLE+REASON_EFFECT)~=0 end)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e2)
-		return not (tc:IsImmuneToEffect(e1) or tc:IsImmuneToEffect(e2))
+		return true
 	end
 end

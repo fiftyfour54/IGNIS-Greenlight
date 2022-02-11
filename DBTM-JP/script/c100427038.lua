@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	e2:SetCondition(s.negcon)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.negtg)
-	e2:SetOperation(function(e,tp,eg,ep,ev,re,r,rp) if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then Duel.Destroy(eg,REASON_EFFECT) end end)
+	e2:SetOperation(s.negop)
 	c:RegisterEffect(e2)
 	--Gain 1000 LP during the End Phase
 	local e3=Effect.CreateEffect(c)
@@ -96,5 +96,11 @@ function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rc=re:GetHandler()
 	if rc:IsDestructable() and rc:IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	end
+end
+	--Negate activation
+function s.negop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end
