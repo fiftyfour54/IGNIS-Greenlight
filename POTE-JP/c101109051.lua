@@ -22,9 +22,9 @@ function s.prop(c)
 	local b2=c:IsSetCard(0x3008)
 	if b1 and b2 then
 		return 3
-	elseif b1
+	elseif b1 then
 		return 1
-	elseif b2
+	elseif b2 then
 		return 2
 	else
 		return 0
