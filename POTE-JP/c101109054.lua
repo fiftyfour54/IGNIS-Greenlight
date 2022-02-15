@@ -58,7 +58,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if Duel.IsExistingMatchingCard(s.nfilter,tp,LOCATION_ONFIELD+LOCATION_GRAVE,1,nil) then
 		Duel.SendtoGrave(cc,REASON_EFFECT)
-	elseif cc:IsLocation(LOCATION_HAND)
+	elseif cc:IsLocation(LOCATION_HAND) then
 		Duel.SendtoDeck(cc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	end
 end
