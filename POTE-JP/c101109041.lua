@@ -58,17 +58,6 @@ function s.ffilter(c,fc,sumtype,tp)
 end
 --Destroy opponent's cards up to the number of different Attributes
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	--[[
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
-	for tc in aux.Next(g) do
-		att=(att|tc:GetAttribute())
-	end
-	local ct=0
-	while att~=0 do
-		if (att&0x1)~=0 then ct=ct+1 end
-		att=(att>>1)
-	end
-	--]]
 	local attg=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local ct=attg:GetClassCount(Card.GetAttribute)
 	local dg=Duel.GetMatchingGroup(nil,tp,0,LOCATION_ONFIELD,nil)
