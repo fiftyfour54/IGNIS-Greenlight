@@ -2,27 +2,28 @@
 -- Elemental HERO Shining Neos Wingman
 local s,id=GetID()
 function s.initial_effect(c)
-	--fusion material
+	--Fusion Materials
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,CARD_NEOS,s.ffilter)
-	--spsummon condition
+	--Must be Fusion Summoned
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e0:SetValue(aux.fuslimit)
 	c:RegisterEffect(e0)
-	--destroy
+	--Destroy opponent's cards up to the number of different Attributes
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.destg)
 	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
-	--atkup
+	--Increase ATK
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
@@ -30,7 +31,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(s.atkval)
 	c:RegisterEffect(e2)
-	--cannot be destroyed
+	--Cannot be destroyed by card effects
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
@@ -38,7 +39,7 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
-	--damage
+	--Inflict damage
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_DAMAGE)
@@ -55,8 +56,9 @@ s.material_setcode={0x8,0x3008,0x9,0x27c}
 function s.ffilter(c,fc,sumtype,tp)
 	return c:IsType(TYPE_FUSION,fc,sumtype,tp) and c:IsSetCard(0x27c,fc,sumtype,tp) 
 end
---destroy
+--Destroy opponent's cards up to the number of different Attributes
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	--[[
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
 	for tc in aux.Next(g) do
 		att=(att|tc:GetAttribute())
@@ -66,34 +68,30 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 		if (att&0x1)~=0 then ct=ct+1 end
 		att=(att>>1)
 	end
-	if chk==0 then return ct>0
-		and Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil) end
-	local g2=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_ONFIELD,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g2,1,0,0)
+	--]]
+	local attg=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local ct=attg:GetClassCount(Card.GetAttribute)
+	local dg=Duel.GetMatchingGroup(nil,tp,0,LOCATION_ONFIELD,nil)
+	if chk==0 then return ct>0 and #dg>0 end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
-	for tc in aux.Next(g) do
-		att=(att|tc:GetAttribute())
-	end
-	local ct=0
-	while att~=0 do
-		if (att&0x1)~=0 then ct=ct+1 end
-		att=(att>>1)
-	end
-	local g2=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_ONFIELD,nil)
-	if ct>0 and #g>0 then
+	local attg=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	if #attg==0 then return end
+	local ct=attg:GetClassCount(Card.GetAttribute)
+	if ct>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local dg=g2:Select(tp,1,ct,nil)
-		Duel.HintSelection(dg)
+		local dg=Duel.SelectMatchingCard(tp,nil,tp,0,LOCATION_ONFIELD,1,ct,nil)
+		if #dg==0 then return end
+		Duel.HintSelection(dg,true)
 		Duel.Destroy(dg,REASON_EFFECT)
 	end
 end
---gain 300 atk for each monster in gy
+--Gains 300 ATK for each monster in your GY
 function s.atkval(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsType,e:GetHandlerPlayer(),LOCATION_GRAVE,0,nil,TYPE_MONSTER)*300
+	return Duel.GetMatchingGroupCount(Card.IsMonster,e:GetHandlerPlayer(),LOCATION_GRAVE,0,nil)*300
 end
---effect damage
+--Inflict damage
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local dam=e:GetHandler():GetBattleTarget():GetBaseAttack()

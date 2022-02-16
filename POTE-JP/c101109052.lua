@@ -22,7 +22,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,1000)
 end
 function s.spfilter(c,e,tp)
-	return c:IsType(TYPE_FUSION) and c:IsLevelBelow(7) and (c:IsSetCard(0x3008) or c:IsSetCard(0x1f))
+	return c:IsLevelBelow(7) and (c:IsSetCard(0x3008) or c:IsSetCard(0x1f))
 		and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -33,7 +33,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
 	if not tc then return end
-	if Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_NEOS),tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil) then
+	if Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_NEOS),tp,LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil) then
 		Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
 	elseif Duel.SpecialSummonStep(tc,0,tp,tp,true,false,POS_FACEUP) then
 		local c=e:GetHandler()
@@ -45,7 +45,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CLIENT_HINT)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1,true)
-		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1)
 		-- Effects are negated
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
@@ -53,11 +52,11 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e2)
-		local e3=e1:Clone()
+		local e3=e2:Clone()
 		e3:SetCode(EFFECT_DISABLE_EFFECT)
 		e3:SetValue(RESET_TURN_SET)
 		tc:RegisterEffect(e3)
-		-- Return it to the Extra Deck
+		-- Return it to the Extra Deck during the End Phase
 		local e4=Effect.CreateEffect(c)
 		e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e4:SetCode(EVENT_PHASE+PHASE_END)
@@ -67,6 +66,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e4:SetCondition(s.tdcon)
 		e4:SetOperation(s.tdop)
 		Duel.RegisterEffect(e4,tp)
+		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1)
 	end
 	Duel.SpecialSummonComplete()
 end
