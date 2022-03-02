@@ -1,4 +1,4 @@
--- VV～始まりの地～
+-- ＶＶ～始まりの地～
 -- Valiants’ Var – The Land of Beginning
 -- Scripted by Hatter
 local s,id=GetID()
