@@ -32,22 +32,20 @@ function s.initial_effect(c)
 	e3:SetCondition(s.tgsetcon)
 	c:RegisterEffect(e3)
 end
-function s.drfilter(c)
-	return c:IsFaceup() and c:GetType()==TYPE_TRAP and c:IsAbleToDeck()
+function s.drfilter(c,e)
+	return c:IsFaceup() and c:GetType()==TYPE_TRAP and c:IsAbleToDeck() and c:IsCanBeEffectTarget(e)
+end
+function s.rescon(sg,e,tp,mg)
+	return #sg==3 or (#sg==6 and Duel.IsPlayerCanDraw(tp,2))
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_REMOVED+LOCATION_GRAVE) and s.drfilter(chkc) end
-	local g=Duel.GetMatchingGroup(s.drfilter,tp,LOCATION_REMOVED+LOCATION_GRAVE,0,nil)
+	if chkc then return chkc:IsLocation(LOCATION_REMOVED+LOCATION_GRAVE) and chkc:IsControler(tp) and s.drfilter(chkc,e) end
+	local g=Duel.GetMatchingGroup(s.drfilter,tp,LOCATION_REMOVED+LOCATION_GRAVE,0,nil,e)
 	if chk==0 then return #g>=3 and Duel.IsPlayerCanDraw(tp,1) end
-	local op=(#g>=6 and Duel.IsPlayerCanDraw(tp,2))
-		and Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
-		or Duel.SelectOption(tp,aux.Stringid(id,0))
-	local ct=3*op+3
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local dg=g:Select(tp,ct,ct,nil)
+	local dg=aux.SelectUnselectGroup(g,e,tp,3,6,s.rescon,1,tp,HINTMSG_TODECK,s.rescon)
 	Duel.SetTargetCard(dg)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,dg,#dg,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,op+1)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,#dg//3)
 end
 function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetTargetCards(e)
@@ -55,20 +53,14 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetOperatedGroup():Filter(Card.IsLocation,nil,LOCATION_DECK)
 	local ct=#g
 	if ct<1 then return end
-	local ct1=g:FilterCount(Card.IsControler,nil,tp)
-	if ct1>0 then
-		Duel.SortDeckbottom(tp,tp,ct1)
-	end
-	if ct>ct1 then
-		Duel.SortDeckbottom(tp,1-tp,ct-ct1)
-	end
+	Duel.SortDeckbottom(tp,tp,ct)
 	if ct>=3 then
 		Duel.BreakEffect()
 		Duel.Draw(tp,ct//3,REASON_EFFECT)
 	end
 end
 function s.rlsetconfilter(c)
-	return c:IsMonster() or (c:IsPreviousLocation(LOCATION_ONFIELD) and c:GetPreviousTypeOnField()&TYPE_MONSTER==TYPE_MONSTER)
+	return c:IsMonster() or c:IsPreviousLocation(LOCATION_MZONE)
 end
 function s.rlsetcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.rlsetconfilter,1,e:GetHandler())
@@ -77,7 +69,7 @@ function s.setfilter(c)
 	return c:GetType()==TYPE_TRAP and c:IsSSetable()
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.thfilter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.setfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.setfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 	local g=Duel.SelectTarget(tp,s.setfilter,tp,LOCATION_GRAVE,0,1,1,nil)
@@ -93,5 +85,5 @@ function s.tgsetconfilter(c,tp)
 	return c:GetType()==TYPE_TRAP and c:IsPreviousControler(tp)
 end
 function s.tgsetcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp==1-tp and r&REASON_EFFECT==REASON_EFFECT and eg:IsExists(s.tgsetconfilter,1,e:GetHandler(),tp)
+	return rp==1-tp and r&REASON_EFFECT==REASON_EFFECT and eg:IsExists(s.tgsetconfilter,1,nil,tp)
 end
