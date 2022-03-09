@@ -25,7 +25,7 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetCode(id)
+	e3:SetCode(CARD_LABRYNTH_LABYRINTH)
 	e3:SetRange(LOCATION_FZONE)
 	e3:SetTargetRange(1,0)
 	e3:SetCondition(s.addcon)
@@ -53,5 +53,5 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.addcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,id)==0
+	return Duel.GetFlagEffect(tp,CARD_LABRYNTH_LABYRINTH)==0
 end
