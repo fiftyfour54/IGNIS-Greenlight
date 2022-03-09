@@ -3,7 +3,7 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_CHAINING)
@@ -45,6 +45,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e:SetLabelObject(te:GetLabelObject())
 	local op=te:GetOperation()
 	if op then op(e,tp,eg,ep,ev,re,r,rp) end
+	if not e:IsHasType(EFFECT_TYPE_ACTIVATE) then return end
+	local ct=Duel.IsTurnPlayer(tp) and 2 or 3
 	--no damage
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -52,13 +54,13 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(0,1)
 	e1:SetValue(s.damval)
-	e1:SetReset(RESET_PHASE+PHASE_END,2)
+	e1:SetReset(RESET_PHASE+PHASE_END,ct)
 	Duel.RegisterEffect(e1,tp)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_NO_EFFECT_DAMAGE)
-	e2:SetReset(RESET_PHASE+PHASE_END,2)
+	e2:SetReset(RESET_PHASE+PHASE_END,ct)
 	Duel.RegisterEffect(e2,tp)
-	aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,0),nil)	
+	aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,1),nil)	
 end
 function s.damval(e,re,val,r,rp,rc)
 	if rp==e:GetHandlerPlayer() and (r&REASON_EFFECT)~=0 then return 0

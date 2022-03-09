@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_TODECK)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_DESTROYED)
 	e3:SetCondition(s.tdcon)
 	e3:SetTarget(s.tdtg)
@@ -57,8 +57,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.repfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsOnField()
-		and not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_EFFECT)
+	return c:IsControler(tp) and c:IsOnField() and not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_EFFECT)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
