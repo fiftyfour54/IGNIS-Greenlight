@@ -1,5 +1,6 @@
 --JP name to be added
 --Labrynth of the Platinum Castle
+--Scripted by The Razgriz
 local s,id=GetID()
 function s.initial_effect(c)
 	--Prevent activations in response to your Normal Traps
@@ -34,7 +35,7 @@ function s.initial_effect(c)
 end
 function s.chainop(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
-	if rc:GetType()==TYPE_TRAP and not (rc:GetType()&(TYPE_CONTINUOUS+TYPE_COUNTER)==TYPE_CONTINUOUS+TYPE_COUNTER) then
+	if rc:GetType()==TYPE_TRAP then
 		Duel.SetChainLimit(s.chainlm)
 	end
 end
@@ -42,7 +43,7 @@ function s.chainlm(e,re,rp,tp)
 	return tp==rp and re:IsActiveType(TYPE_MONSTER)
 end
 function s.filter(c)
-	return c:IsType(TYPE_TRAP) and not (c:IsType(TYPE_COUNTER) or c:IsType(TYPE_CONTINUOUS)) and c:IsSSetable()
+	return c:GetType()==(TYPE_TRAP) and c:IsSSetable()
 end
 function s.fgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc) end
@@ -73,8 +74,7 @@ function s.cfilter(c)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsReason(REASON_EFFECT)
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return re and re:GetHandler():GetType()==TYPE_TRAP and re:GetHandlerPlayer()==tp and eg:IsExists(s.cfilter,1,nil)
-	
+	return re and re:GetHandler():GetType()==TYPE_TRAP and re:GetHandlerPlayer()==tp and eg:IsExists(s.cfilter,1,nil)	
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD+LOCATION_HAND,1,nil) end
