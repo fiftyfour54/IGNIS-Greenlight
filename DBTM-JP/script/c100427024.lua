@@ -17,23 +17,23 @@ function s.initial_effect(c)
 end
 s.listed_series={0x27d}
 function s.filter(c)
-    return c:IsFaceup() and c:IsRace(RACE_FIEND)
+	return c:IsFaceup() and c:IsRace(RACE_FIEND)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-    return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.setfilter(c)
-    return c:GetType()==TYPE_TRAP and not c:IsSetCard(0x27d) and c:IsSSetable()
+	return c:GetType()==TYPE_TRAP and not c:IsSetCard(0x27d) and c:IsSSetable()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-    if chkc then return chkc:IsOnField() end
+	if chkc then return chkc:IsOnField() end
 	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-    local tc=Duel.GetFirstTarget()
+	local tc=Duel.GetFirstTarget()
 	if not Duel.NegateAttack() or not tc:IsRelateToEffect(e) then return end
 	Duel.Destroy(tc,REASON_EFFECT)
 	local g=Duel.GetMatchingGroup(s.setfilter,tp,LOCATION_HAND+LOCATION_DECK,0,nil)

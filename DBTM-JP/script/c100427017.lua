@@ -3,12 +3,12 @@
 --Scripted by Yuno
 local s,id=GetID()
 function s.initial_effect(c)
-    --Search a "Labrynth" card
+	--Search a "Labrynth" card
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
-    e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.thtg)
@@ -17,15 +17,15 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
-    --Draw 1 card
-    local e3=Effect.CreateEffect(c)
-    e3:SetDescription(aux.Stringid(id,1))
+	--Draw 1 card
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_DRAW)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_LEAVE_FIELD)
 	e3:SetRange(LOCATION_MZONE)
-    e3:SetCountLimit(1,id)
+	e3:SetCountLimit(1,id)
 	e3:SetCondition(s.drcon)
 	e3:SetTarget(s.drtg)
 	e3:SetOperation(s.drop)
@@ -70,37 +70,37 @@ end
 function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
-    local b1=Duel.IsExistingMatchingCard(s.ffilter,tp,LOCATION_HAND,0,1,nil,e,tp)
+	local b1=Duel.IsExistingMatchingCard(s.ffilter,tp,LOCATION_HAND,0,1,nil,e,tp)
 	local b2=Duel.IsExistingMatchingCard(s.stfilter,tp,LOCATION_HAND,0,1,nil)
 	if (b1 or b2) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-	    Duel.BreakEffect()
-	    local ops={}
+		Duel.BreakEffect()
+		local ops={}
 		local opval={}
 		local off=1
 		if b1 then
-		    ops[off]=aux.Stringid(id,3)
-		    opval[off-1]=1
-		    off=off+1
-	    end
-	    if b2 then
-		    ops[off]=aux.Stringid(id,4)
-		    opval[off-1]=2
-		    off=off+1
-	    end
-	    local op=Duel.SelectOption(tp,table.unpack(ops))
-	    local sel=opval[op]
-	    if sel==1 then
-		    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	        local tc=Duel.SelectMatchingCard(tp,s.ffilter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
-	        if tc then
-		        Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-	         end
-	    else
-		    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	        local tc=Duel.SelectMatchingCard(tp,s.stfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
-	        if tc then
-		        Duel.SSet(tp,tc)
+			ops[off]=aux.Stringid(id,3)
+			opval[off-1]=1
+			off=off+1
+		end
+		if b2 then
+			ops[off]=aux.Stringid(id,4)
+			opval[off-1]=2
+			off=off+1
+		end
+		local op=Duel.SelectOption(tp,table.unpack(ops))
+		local sel=opval[op]
+		if sel==1 then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+			local tc=Duel.SelectMatchingCard(tp,s.ffilter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
+			if tc then
+				Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+			 end
+		else
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+			local tc=Duel.SelectMatchingCard(tp,s.stfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
+			if tc then
+				Duel.SSet(tp,tc)
 			end
-	    end
+		end
 	end
 end

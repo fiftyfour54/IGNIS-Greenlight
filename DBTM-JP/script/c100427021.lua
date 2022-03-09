@@ -23,12 +23,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	-- Add effect
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetCode(CARD_LABRYNTH_LABYRINTH)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_CHAINING)
 	e3:SetRange(LOCATION_FZONE)
-	e3:SetTargetRange(1,0)
+	e3:SetCountLimit(1,id)
 	e3:SetCondition(s.addcon)
+	e3:SetOperation(s.addop)
 	c:RegisterEffect(e3)
 end
 s.listed_series={0x127d}
@@ -53,5 +53,26 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.addcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,CARD_LABRYNTH_LABYRINTH)==0
+	local rc=re:GetHandler()
+	return ep==tp and re:GetActiveType()==TYPE_TRAP and re:IsHasType(EFFECT_TYPE_ACTIVATE)
+		and rc:IsSetCard(0x127d) and not rc:IsStatus(STATUS_ACT_FROM_HAND)
+		and Duel.IsExistingMatchingCard(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,rc)
+end
+function s.addop(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.SelectYesNo(tp,aux.Stringid(id,0)) then return end
+	local oldeff=re:GetOperation()
+	Duel.ChangeChainOperation(ev,function(...)
+		oldeff(...)
+		s.desop(...)
+	end)
+	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
+	Duel.SetOperationInfo(ev,CATEGORY_DESTROY,g,1,0,0)
+end
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler())
+	if #g>0 then
+		Duel.HintSelection(g,true)
+		Duel.Destroy(g,REASON_EFFECT)
+	end
 end
