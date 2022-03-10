@@ -1,5 +1,21 @@
 CARD_VERNALIZER_FLOWER_CROWN=101109061
 
+--[[
+	Effect.CreateVernalizerSPEffect(c,id,desc,uniquecat,uniquetg,uniqueop)
+
+	Creates an ignition Effect object for the "Vernalizer Fairy" effects that
+	discard themselves and another card from the hand.
+	Includes handling for "Flower Crown of the Vernalizer Fairy" cost replacement.
+
+	Card c: the owner of the Effect
+	int id: the card ID used for the HOPT restriction and strings
+	int desc: the string ID of the effect description (will also be used for the limitcount code)
+	int uniquecat: the category of the unique effect
+	function uniquetg: the target function for the effect
+	function uniqueop: the unique effect's operation function, excluding the special summoning and lingering restriction,
+		the function must return true to proceed to the special summon,
+		it can also return an optional passcode (int) which will be excluded from the special summon
+--]]
 Effect.CreateVernalizerSPEffect=(function()
 	local stringbase=101109016 -- use strings from "Hills and Blooms" so they don't need to be stored in every card
 
