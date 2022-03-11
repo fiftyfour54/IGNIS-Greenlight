@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
 	-- Draw 1 card
-	c:RegisterEffect(Effect.CreateVernalizerSPEffect(c,id,1,CATEGORY_TOHAND,s.drtg,s.drop))
+	c:RegisterEffect(Effect.CreateVernalizerSPEffect(c,id,1,CATEGORY_DRAW,s.drtg,s.drop))
 end
 s.listed_series={0x27e}
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -29,7 +29,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		-- Can make a second attack
 		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetDescription(aux.Stringid(id,2))
+		e1:SetDescription(3201)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
 		e1:SetCode(EFFECT_EXTRA_ATTACK)
