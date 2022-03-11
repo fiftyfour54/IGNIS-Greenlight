@@ -43,9 +43,13 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp,chk)
 	if not tc:IsRelateToEffect(e) or Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)<1 then return end
 	local xg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_EXTRA,0,nil)
 	local rg=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,nil)
+	local b1=#xg>0
+	local b2=#rg>0 and Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)>0
+	if not (b1 or b2) then return end
+	if not Duel.SelectYesNo(tp,aux.Stringid(id,1)) then return end
 	local op=aux.SelectEffect(tp,
-		{#xg>0,aux.Stringid(id,1)},
-		{#rg>0 and Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)>0,aux.Stringid(id,2)})
+		{b1,aux.Stringid(id,2)},
+		{b2,aux.Stringid(id,3)})
 	if op==1 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=xg:Select(tp,1,1,nil)
