@@ -1,3 +1,4 @@
+--アマゾネス女帝王
 --Amazoness Kaiserin
 --Scripted by The Razgriz
 local s,id=GetID()
@@ -6,90 +7,74 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Fusion Summon procedure
 	Fusion.AddProcMix(c,true,true,s.matfilter,aux.FilterBoolFunctionEx(Card.IsSetCard,0x4))
-	--Special Summon 1 Amazoness card from Deck to hand
+	--Special Summon 1 "Amazoness" from your Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.condition)
-	e1:SetTarget(s.sumtg)
-	e1:SetOperation(s.sumop)
+	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--Other Amazoness monsters cannot be targted by opponent's card effects
+	--Other "Amazoness" cards cannot be targted by opponent's card effects
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(function(e,c) return c~=e:GetHandler() and c:IsSetCard(0x4) end)
+	e2:SetTargetRange(LOCATION_ONFIELD,0)
+	e2:SetTarget(function(e,c) return c~=e:GetHandler() and c:IsFaceup() and c:IsSetCard(0x4) end)
 	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
-	--Other Amazoness indestrucible by opponent's card effects
+	--Other "Amazoness" cards cannot be destroyed by opponent's card effects
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e3:SetValue(aux.indoval)
 	c:RegisterEffect(e3)
-	--Multi Attack
+	--Can make a second attack during each Battle Phase
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetCondition(s.condition)
-	e4:SetOperation(s.operation)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e4:SetCode(EFFECT_EXTRA_ATTACK)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCondition(function(e) return e:GetHandler():GetFlagEffect(id)>0 end)
+	e4:SetValue(1)
 	c:RegisterEffect(e4)
-	--Checks if Amazoness Queen and/or Amazoness Empress was used as Fusion Material
+	--Checks if "Amazoness Queen" and/or "Amazoness Empress" was used as Fusion Material
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_MATERIAL_CHECK)
 	e5:SetValue(s.valcheck)
-	e5:SetLabelObject(e4)
 	c:RegisterEffect(e5)
 end
 s.listed_names={15951532,4591250}
 s.listed_series={0x4}
 s.material_setcode={0x4}
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)
+function s.matfilter(c,fc,sumtype,tp)
+	return c:IsType(TYPE_FUSION,fc,sumtype,tp) and c:IsSetCard(0x4,fc,sumtype,tp)
 end
-function s.filter(c,e,tp)
+function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
-function s.sumop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function s.matfilter(c,fc,sumtype,tp)
-	return c:IsType(TYPE_FUSION,fc,sumtype,tp) and c:IsSetCard(0x4,fc,sumtype,tp)
-end
-function s.valfilter(c)
-	return c:IsOriginalCode(15951532) or c:IsOriginalCode(4591250)
-end
 function s.valcheck(e,c)
-	e:GetLabelObject():SetLabel(c:GetMaterial():FilterCount(s.valfilter,nil))
-end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local ct=e:GetLabel()
-	if ct>0 then
-		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(id,2))
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
-		e1:SetCode(EFFECT_EXTRA_ATTACK)
-		e1:SetValue(1)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		c:RegisterEffect(e1)
+	local g=c:GetMaterial()
+	if g:IsExists(Card.IsCode,1,nil,15951532,4591250) then
+		c:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD&~(RESET_TOFIELD|RESET_LEAVE|RESET_TEMP_REMOVE),EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,1))
 	end
 end
