@@ -27,15 +27,10 @@ function s.fexop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCountLimit(1)
 	e1:SetTargetRange(LOCATION_EXTRA,0)
 	e1:SetTarget(function(e,c) return c:IsSetCard(0x4) and c:IsAbleToGrave() end)
-	e1:SetOperation(s.matop)
 	e1:SetValue(s.matval)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.matval(e,c)
 	return c and c:IsSetCard(0x4) and c:IsControler(e:GetHandlerPlayer())
-end
-function s.matop(e,tc,tp,sg)
-	Duel.SendtoGrave(sg,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
-	sg:Clear()
 end
