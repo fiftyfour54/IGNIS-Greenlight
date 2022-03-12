@@ -46,6 +46,7 @@ function s.initial_effect(c)
 	e4:SetCondition(s.sppencon)
 	c:RegisterEffect(e4)
 end
+s.listed_series={0x4}
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local bc=Duel.GetBattleMonster(tp)
 	return bc and bc:IsFaceup() and bc:IsSetCard(0x4)
