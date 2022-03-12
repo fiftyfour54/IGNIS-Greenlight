@@ -1,4 +1,5 @@
 --Amazoness Kaiserin
+--Scripted by The Razgriz
 local s,id=GetID()
 function s.initial_effect(c)
 	--Must first be properly Summoned
@@ -36,8 +37,8 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetCondition(s.matkcon)
-	e4:SetOperation(s.matkop)
+	e4:SetCondition(s.condition)
+	e4:SetOperation(s.operation)
 	c:RegisterEffect(e4)
 	--Checks if Amazoness Queen and/or Amazoness Empress was used as Fusion Material
 	local e5=Effect.CreateEffect(c)
@@ -46,6 +47,12 @@ function s.initial_effect(c)
 	e5:SetValue(s.valcheck)
 	e5:SetLabelObject(e4)
 	c:RegisterEffect(e5)
+end
+s.listed_names={15951532,4591250}
+s.listed_series={0x4}
+s.material_setcode={0x4}
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)
 end
 function s.filter(c,e,tp)
 	return c:IsSetCard(0x4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -63,9 +70,6 @@ function s.sumop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-s.listed_names={15951532,4591250}
-s.listed_series={0x4}
-s.material_setcode={0x4}
 function s.matfilter(c,fc,sumtype,tp)
 	return c:IsType(TYPE_FUSION,fc,sumtype,tp) and c:IsSetCard(0x4,fc,sumtype,tp)
 end
@@ -74,9 +78,6 @@ function s.valfilter(c)
 end
 function s.valcheck(e,c)
 	e:GetLabelObject():SetLabel(c:GetMaterial():FilterCount(s.valfilter,nil))
-end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
