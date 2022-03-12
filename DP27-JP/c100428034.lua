@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(function(e,c) return c~=e:GetHandler() and c:IsSetCard(0x4))
+	e2:SetTarget(function(e,c) return c~=e:GetHandler() and c:IsSetCard(0x4) end)
 	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	--Other Amazoness indestrucible by opponent's card effects
