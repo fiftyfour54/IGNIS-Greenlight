@@ -3,25 +3,25 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--fusion material
+	--Fusion Material
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0x1047),aux.FilterBoolFunctionEx(Card.IsRace,RACE_FAIRY))
-	--avoid destruction
+	--Your "Gem-Knight" monsters cannot be destroyed once during each opponent's turn
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetTarget(s.indtg)
+	e1:SetTarget(function(_,c) return c:IsSetCard(0x1047) end)
 	e1:SetValue(s.indval)
 	c:RegisterEffect(e1)
-	--destroy
+	--Destroy 1 face-up card the opponent controls
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_CHAINING)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCode(EVENT_CHAINING)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(s.descon)
 	e2:SetCost(s.descost)
@@ -31,16 +31,13 @@ function s.initial_effect(c)
 end
 s.listed_series={0x1047}
 s.material_setcode={0x47,0x1047}
-function s.indtg(e,c)
-	return c:IsSetCard(0x1047)
-end
 function s.indval(e,re,r,rp)
-	if Duel.GetTurnPlayer()~=e:GetHandlerPlayer() and (r&REASON_EFFECT)~=0 then
+	if Duel.IsTurnPlayer(1-e:GetHandlerPlayer()) and (r&REASON_EFFECT)~=0 then
 		return 1
 	else return 0 end
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_MONSTER) and ep==1-tp and Duel.GetTurnPlayer()==tp
+	return ep==1-tp and Duel.IsTurnPlayer(tp) and re:IsActiveType(TYPE_MONSTER)
 end
 function s.descfilter(c)
 	return c:IsSetCard(0x1047) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
