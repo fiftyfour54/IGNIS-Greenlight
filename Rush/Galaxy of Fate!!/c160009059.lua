@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.desconfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsRace(RACE_WYRM) and c:IsLevelAbove(7)
+	return c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsLevelAbove(7)
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.desconfilter,tp,LOCATION_MZONE,0,1,nil)

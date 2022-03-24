@@ -24,9 +24,9 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local ct=5-Duel.GetFieldGroupCountRush(tp,LOCATION_HAND,0)
 	if ct<1 or Duel.Draw(p,ct,REASON_EFFECT)<1 then return end
+	Duel.ConfirmCards(1-tp,Duel.GetFieldGroup(tp,LOCATION_HAND,0))
 	local og=Duel.GetOperatedGroup():Filter(Card.IsLocation,nil,LOCATION_HAND)
 	if #og>0 and #og:Match(Card.IsMonster,nil)>0 then
-		Duel.ConfirmCards(1-tp,og)
 		Duel.ShuffleHand(tp)
 		Duel.Recover(tp,#og*200,REASON_EFFECT)
 	end
