@@ -23,6 +23,6 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.SelectMatchingCard(tp,aux.FilterFaceupFunction(Card.HasLevel),tp,0,LOCATION_MZONE,1,1,nil):GetFirst()
 	if tc then
 		Duel.HintSelection(tc,true)
-		Duel.Damage(tp,tc:GetLevel()*100,REASON_EFFECT)
+		Duel.Damage(1-tp,tc:GetLevel()*100,REASON_EFFECT)
 	end
 end

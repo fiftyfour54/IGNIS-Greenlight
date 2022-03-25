@@ -24,7 +24,7 @@ function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	if not tc:IsRelateToEffect(e) or not tc:HasLevel() then return end
+	if not (tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:HasLevel()) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
 	local ac=Duel.SelectMatchingCard(tp,aux.FilterMaximumSideFunctionEx(s.atkfilter),tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
 	if ac then
