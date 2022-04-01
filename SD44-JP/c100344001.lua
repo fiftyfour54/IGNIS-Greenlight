@@ -55,7 +55,7 @@ function s.contactcon(tp)
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	for ec in aux.Next(eg) do
-		if ec:IsSetCard(0x2034) then Duel.RegisterFlagEffect(ec:GetControler(),id,0,0,0) end
+		if ec:IsSetCard(0x2034) then Duel.RegisterFlagEffect(ec:GetSummonPlayer(),id,0,0,0) end
 	end
 end
 function s.cbfilter(c)
