@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	-- 1 "Ultimate Crystal" Monster + 7 "Crystal Beast" Monsters
-	Fusion.AddProcMixN(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0x2034),1,aux.FilterBoolFunctionEx(Card.IsSetCard,0x1034),7)
+	Fusion.AddProcMixRep(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0x1034),7,7,aux.FilterBoolFunctionEx(Card.IsSetCard,0x2034))
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.contactlim,s.contactcon)
 	-- Register "Ultimate Crystal" Special Summon
 	aux.GlobalCheck(s,function()
