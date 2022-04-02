@@ -1,5 +1,5 @@
--- 究極宝玉神 レインボー・ドラゴン・オーバー・ドライブ
--- Ultimate Crystal Rainbow Dragon Overdrive
+-- 究極宝玉神 レインボー・ドラゴン オーバー・ドライブ
+-- Rainbow Dragon Overdrive
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
 	e2:SetCondition(function(e) return e:GetHandler():GetBattledGroupCount()==0 end)
 	e2:SetCost(s.tdcost)
 	e2:SetTarget(s.tdtg)
@@ -64,13 +64,13 @@ end
 function s.atkcon(e)
 	return Duel.GetMatchingGroup(s.cbfilter,e:GetHandlerPlayer(),LOCATION_REMOVED,0,nil):GetClassCount(Card.GetCode)>=7
 end
-function s.spfilter(c,e,tp)
-	return s.cbfilter(c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function s.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsReleasable() end
 	Duel.Release(c,REASON_COST)
+end
+function s.spfilter(c,e,tp)
+	return s.cbfilter(c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -78,7 +78,7 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return #g>0 and Duel.GetMZoneCount(tp,g+c)>0
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_REMOVED,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,0,tp,LOCATION_REMOVED)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_REMOVED)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
