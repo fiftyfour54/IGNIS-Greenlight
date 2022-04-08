@@ -43,6 +43,10 @@ end
 function s.lcheck(g,lc,sumtype,tp)
 	return g:IsExists(s.lfilter,1,nil)
 end
+function s.lkcon(e)
+	local c=e:GetHandler()
+	return c:IsStatus(STATUS_SPSUMMON_TURN) and c:IsSummonType(SUMMON_TYPE_LINK)
+end
 function s.tgtg(e,c)
 	return e:GetHandler():GetLinkedGroup():IsContains(c)
 end
