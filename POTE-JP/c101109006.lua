@@ -39,8 +39,9 @@ function s.discostfilter(c)
 	return c:IsLevel(2) or c:IsRank(2) or c:IsLink(2)
 end
 function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.discostfilter,1,false,nil,e:GetHandler()) end
-	local rc=Duel.SelectReleaseGroupCost(tp,s.discostfilter,1,1,false,nil,e:GetHandler()):GetFirst()
+	local c=e:GetHandler()
+	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.discostfilter,1,false,nil,c) end
+	local rc=Duel.SelectReleaseGroupCost(tp,s.discostfilter,1,1,false,nil,c):GetFirst()
 	e:SetLabel(rc:GetLevel())
 	Duel.Release(rc,REASON_COST)
 end
