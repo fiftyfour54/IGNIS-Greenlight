@@ -26,7 +26,6 @@ function s.initial_effect(c)
 	e2:SetOperation(s.disop)
 	c:RegisterEffect(e2)
 end
-s.listed_series={0x280}
 function s.spconfilter(c)
 	return c:IsFaceup() and (c:IsLevel(2) or c:IsLink(2))
 end
