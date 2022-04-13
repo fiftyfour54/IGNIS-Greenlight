@@ -34,9 +34,18 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if #tg<1 or Duel.SendtoGrave(tg,REASON_EFFECT)<1 or #tg:Match(Card.IsLocation,nil,LOCATION_GRAVE)<1 then return end
 	local ct=tg:FilterCount(Card.IsControler,nil,1-tp)
-	local sp1=s.spop(tp,e,ct,true)
-	local sp2=s.spop(1-tp,e,#tg-ct,sp1<1)
-	if (sp1>0 or sp2>0)
+	local g1=s.spselect(tp,e,ct)
+	local g2=s.spselect(1-tp,e,#tg-ct)
+	local spcount=0
+	if g1 and #g1>0 then
+		Duel.BreakEffect()
+		spcount=spcount+Duel.SpecialSummon(g1,0,tp,tp,false,false,POS_FACEUP)
+	end
+	if g2 and #g2>0 then
+		if spcount==0 then Duel.BreakEffect() end
+		spcount=spcount+Duel.SpecialSummon(g2,0,1-tp,1-tp,false,false,POS_FACEUP)
+	end
+	if spcount>0
 		and Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,CARD_EXCHANGE_SPIRIT)
 		and Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil)
 		and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
@@ -55,18 +64,13 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function s.spop(p,e,ct,breakbeforesummon)
-	if ct<1 then return 0 end
+function s.spselect(p,e,ct)
+	if ct<1 then return end
 	local ft=math.min(ct,Duel.GetLocationCount(p,LOCATION_MZONE))
 	if ft>0 and Duel.IsExistingMatchingCard(Card.IsCanBeSpecialSummoned,p,0,LOCATION_GRAVE,1,nil,e,0,p,false,false)
 		and Duel.SelectYesNo(p,aux.Stringid(id,1)) then
 		if Duel.IsPlayerAffectedByEffect(p,CARD_BLUEEYES_SPIRIT) then ft=1 end
 		Duel.Hint(HINT_SELECTMSG,p,HINTMSG_SPSUMMON)
-		local sg=Duel.SelectMatchingCard(p,Card.IsCanBeSpecialSummoned,p,0,LOCATION_GRAVE,1,ct,nil,e,0,p,false,false)
-		if #sg>0 then
-			if breakbeforesummon then Duel.BreakEffect() end
-			return Duel.SpecialSummon(sg,0,p,p,false,false,POS_FACEUP)
-		end
+		return Duel.SelectMatchingCard(p,Card.IsCanBeSpecialSummoned,p,0,LOCATION_GRAVE,1,ct,nil,e,0,p,false,false)
 	end
-	return 0
 end
