@@ -42,6 +42,7 @@ function s.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e5:SetCode(EVENT_PREDRAW)
 	e5:SetRange(LOCATION_SZONE)
+	e5:SetCountLimit(1,{id,1})
 	e5:SetCondition(s.tgcon)
 	e5:SetTarget(s.tgtg)
 	e5:SetOperation(s.tgop)
@@ -82,7 +83,8 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsTurnPlayer(1-tp) and Duel.GetFlagEffect(1-tp,id)==0
+	return Duel.IsTurnPlayer(1-tp) and not Duel.IsPlayerAffectedByEffect(1-tp,EFFECT_CANNOT_DRAW)
+		and Duel.GetDrawCount(1-tp)>0 and Duel.GetFlagEffect(1-tp,id)==0
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
