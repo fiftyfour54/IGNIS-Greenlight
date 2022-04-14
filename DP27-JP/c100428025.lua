@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_FREE_CHAIN)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCountLimit(1,id)
-	e4:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
+	e4:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e4:SetCondition(function() return Duel.IsMainPhase() end)
 	e4:SetCost(s.thcost)
 	e4:SetTarget(s.thtg)
@@ -39,6 +39,7 @@ function s.initial_effect(c)
 	-- Declare card name
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,1))
+	e5:SetCategory(CATEGORY_TOGRAVE)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e5:SetCode(EVENT_PREDRAW)
 	e5:SetRange(LOCATION_SZONE)
@@ -92,12 +93,27 @@ function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(Duel.AnnounceCard(tp,TYPE_EXTRA,OPCODE_ISTYPE,OPCODE_NOT))
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetDrawCount(1-tp)~=1 then return end
-	local rc=Duel.GetDecktopGroup(1-tp,1):GetFirst()
-	if not rc then return end
-	Duel.ConfirmDecktop(1-tp,1)
-	if rc:IsCode(e:GetLabel()) then
-		Duel.SendtoGrave(rc,REASON_EFFECT)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or Duel.GetDrawCount(1-tp)~=1 then return end
+	--Look at the drawn card
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_DRAW)
+	e1:SetCountLimit(1)
+	e1:SetOperation(s.drawcheck)
+	e1:SetLabel(e:GetLabel())
+	e1:SetReset(RESET_PHASE+PHASE_DRAW)
+	Duel.RegisterEffect(e1,tp)
+end
+function s.drawcheck(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetCurrentPhase()==PHASE_DRAW and (r&REASON_RULE)==REASON_RULE then
+		local dc=eg:GetFirst()
+		if not dc then return end
+		Duel.ConfirmCards(tp,dc)
+		if dc:IsCode(e:GetLabel()) then
+			Duel.SendtoGrave(dc,REASON_EFFECT)
+		end
+		Duel.ShuffleHand(1-tp)
 	end
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)

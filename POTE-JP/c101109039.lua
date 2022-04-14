@@ -3,7 +3,7 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--excavate
+	--Excavate and add to hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.extg)
 	e1:SetOperation(s.exop)
 	c:RegisterEffect(e1)
-	--
+	--Place on the bottom of the Deck
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TODECK)
@@ -29,30 +29,32 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.excon(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
+	local g=Duel.GetMatchingGroup(Card.IsMonster,tp,LOCATION_GRAVE,0,nil)
 	return #g>=4 and g:GetClassCount(Card.GetCode)==#g
 end
 function s.excost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleasable() end
-	Duel.Release(e:GetHandler(),REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsReleasable() end
+	Duel.Release(c,REASON_COST)
 end 
 function s.extg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local ct=Duel.GetMatchingGroupCount(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
+		local ct=Duel.GetMatchingGroupCount(Card.IsMonster,tp,LOCATION_GRAVE,0,nil)
 		if ct>0 then
 			local g=Duel.GetDecktopGroup(tp,ct)
 			local result=g:FilterCount(Card.IsAbleToHand,nil)>0
 			return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ct and result 
 		end
+		return false
 	end
 end
 function s.exop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetMatchingGroupCount(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
+	local ct=Duel.GetMatchingGroupCount(Card.IsMonster,tp,LOCATION_GRAVE,0,nil)
 	if ct==0 then return end
 	Duel.ConfirmDecktop(tp,ct)
 	local g=Duel.GetDecktopGroup(tp,ct)
 	if #g==0 then return end
-	local g2=g:Filter(Card.IsType,nil,TYPE_MONSTER)
+	local g2=g:Filter(Card.IsMonster,nil)
 	if #g2>=2 and g2:GetClassCount(Card.GetCode)==#g2 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local sg=g2:Select(tp,1,1,nil)
@@ -69,7 +71,7 @@ function s.exop(e,tp,eg,ep,ev,re,r,rp)
 	if ct>0 then Duel.SortDecktop(tp,tp,ct) end
 end
 function s.tdfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
+	return c:IsMonster() and c:IsAbleToDeck()
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.tdfilter(chkc) end

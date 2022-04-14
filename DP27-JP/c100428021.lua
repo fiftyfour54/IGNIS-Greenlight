@@ -31,7 +31,7 @@ function s.initial_effect(c)
 end
 s.listed_names={CARD_EXCHANGE_SPIRIT}
 function s.spcostfilter(c)
-	return c:IsAttribute(ATTRIBUTE_EARTH) and c:IsRace(RACE_FAIRY) and c:IsDiscardable(REASON_COST)
+	return c:IsAttribute(ATTRIBUTE_EARTH) and c:IsRace(RACE_FAIRY) and c:IsDiscardable()
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -70,7 +70,7 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local max=(Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_EXCHANGE_SPIRIT),tp,LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil) and 5 or 3)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,s.rmfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,1,max,c)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetTargetCards(e)
