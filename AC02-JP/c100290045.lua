@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_MUST_ATTACK_MONSTER)
-	e2:SetValue(s.atkval)
+	e2:SetValue(function(e,c) return c==e:GetHandler() end)
 	c:RegisterEffect(e2)
 	--disable
 	local e3=Effect.CreateEffect(c)
