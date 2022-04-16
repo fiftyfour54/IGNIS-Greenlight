@@ -38,10 +38,9 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		--Effect
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		local tg=Duel.SelectMatchingCard(tp,s.filter,tp,0,LOCATION_MZONE,1,1,nil)
-		if #tg>0 and Duel.ChangePosition(tg,0,0,POS_FACEUP_DEFENSE)>0
+		if #tg>0 and Duel.ChangePosition(tg,0,0,POS_FACEUP_DEFENSE)>0 then
 			local g2=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.filter2),tp,0,LOCATION_MZONE,nil)
-			if #g2==0 then return end
-			if Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+			if #g2>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 				for tc in g2:Iter() do
 					--Decrease DEF
 					local e1=Effect.CreateEffect(c)
