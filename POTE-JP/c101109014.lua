@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	-- Fusion Summon
-	local fusparams={nil,Card.IsAbleToDeck,s.extramat,s.extraop}
+	local fusparams={nil,Card.IsAbleToDeck,s.extramat,s.extraop,Fusion.ForcedHandler}
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
