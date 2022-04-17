@@ -59,7 +59,7 @@ function s.tgtg(e,c)
 end
 function s.spcfilter(c,tp,rp)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousController(tp) 
-		and rp==1-tp and c:IsReason(REASON_EFFECT))
+		and rp==1-tp and c:IsReason(REASON_EFFECT)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.spcfilter,1,nil,tp,rp)
