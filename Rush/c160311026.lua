@@ -1,4 +1,4 @@
---jp name
+--ヴァキュア・アナイアレイション
 --Vacua Annihilation
 local s,id=GetID()
 function s.initial_effect(c)
