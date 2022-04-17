@@ -21,8 +21,9 @@ function s.tgfilter(c)
 end
 s.listfilter=aux.OR(aux.IsCodeListed,aux.IsMaterialListCode)
 function s.spfilter(c,e,tp)
-	return s.listfilter(c,CARD_JACK_KNIGHT) and s.listfilter(c,CARD_QUEEN_KNIGHT)
-		and s.listfilter(c,CARD_KING_KNIGHT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	if not (s.listfilter(c,CARD_JACK_KNIGHT) and s.listfilter(c,CARD_QUEEN_KNIGHT) and s.listfilter(c,CARD_KING_KNIGHT)) then return end
+	local code_chk=c:IsCode(100290001)
+	return c:IsCanBeSpecialSummoned(e,0,tp,code_chk,code_chk)
 end
 function s.spchkfilter(c,sg,tp)
 	return (c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(tp,tp,sg,c) or Duel.GetMZoneCount(tp,sg))>0
@@ -40,7 +41,7 @@ function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 		local g=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,nil)
 		return #g>2 and aux.SelectUnselectGroup(g,e,tp,3,3,s.tgrescon(summg),0)
 	end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,3,tp,LOCATION_ONFIELD+LOCATION_HAND)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,3,tp,LOCATION_MZONE+LOCATION_HAND)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA+LOCATION_GRAVE)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
@@ -52,9 +53,12 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	g=aux.SelectUnselectGroup(g,e,tp,3,3,s.tgrescon(summg),1,tp,HINTMSG_TOGRAVE)
 	if #g==3 and Duel.SendtoGrave(g,REASON_EFFECT)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg=summg:FilterSelect(tp,s.spchkfilter,1,1,nil,nil,tp)
-		if #sg>0 then
-			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
+		local sc=summg:FilterSelect(tp,s.spchkfilter,1,1,nil,nil,tp):GetFirst()
+		if sc then
+			local code_chk=sc:IsCode(100290001)
+			Duel.BreakEffect()
+			Duel.SpecialSummon(sc,0,tp,tp,code_chk,code_chk,POS_FACEUP)
+			if code_chk then sc:CompleteProcedure() end
 		end
 	end
 end

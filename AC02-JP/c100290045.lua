@@ -1,9 +1,9 @@
---Gゴーレム・ディグニファイド・トリリトン
+--Ｇゴーレム・ディグニファイド・トリリトン
 --G Golem Dignified Trilithon
 --Scripted by Eerie Code, anime version by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
-	--link summon
+	--Link Summon
 	c:EnableReviveLimit()
 	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_EARTH),2)
 	-- Must attack this card, if able
@@ -17,23 +17,22 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_MUST_ATTACK_MONSTER)
 	e2:SetValue(function(e,c) return c==e:GetHandler() end)
 	c:RegisterEffect(e2)
-	--disable
+	--Reduce ATK and negate
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_DISABLE+CATEGORY_ATKCHANGE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_BATTLE_CONFIRM)
-	e3:SetCondition(s.condition)
-	e3:SetCost(s.cost)
-	e3:SetTarget(s.target)
-	e3:SetOperation(s.operation)
+	e3:SetCondition(s.atkcon)
+	e3:SetCost(s.atkcost)
+	e3:SetTarget(s.atktg)
+	e3:SetOperation(s.atkop)
 	c:RegisterEffect(e3)
-	--negate
+	--Negate and destroy
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,1))
-	e4:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e4:SetCategory(CATEGORY_DISABLE+CATEGORY_DESTROY)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e4:SetCode(EVENT_CHAINING)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1,id)
@@ -42,33 +41,32 @@ function s.initial_effect(c)
 	e4:SetOperation(s.disop)
 	c:RegisterEffect(e4)
 end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetAttacker()
-	local bc=Duel.GetAttackTarget()
+function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	local _,bc=Duel.GetBattleMonster(tp)
 	if not bc then return false end
-	if tc:IsControler(1-tp) then bc,tc=tc,bc end
 	e:SetLabelObject(bc)
-	return bc:IsFaceup()
+	return true
 end
 function s.cfilter(c)
 	return c:IsAttribute(ATTRIBUTE_EARTH) and c:IsAbleToGraveAsCost()
 end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local d=e:GetLabelObject()
 	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,d,1,1-tp,-200)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,d,1,1-tp,LOCATION_MZONE)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local d=e:GetLabelObject()
-	if d and d:IsRelateToBattle() and d:IsFaceup() then
+	if d and d:IsRelateToBattle() and d:IsFaceup() and d:IsControler(1-tp) then
 		local c=e:GetHandler()
+		--Reduce ATK
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -76,6 +74,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		d:RegisterEffect(e1)
 		Duel.NegateRelatedChain(d,RESET_TURN_SET)
+		--Negate its effects
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_DISABLE)
@@ -96,17 +95,18 @@ function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	if rp==tp or e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return tg and tg:IsExists(s.tfilter,1,nil,tp) and Duel.IsChainNegatable(ev)
+	return tg and tg:IsExists(s.tfilter,1,nil,tp) and Duel.IsChainDisablable(ev)
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
+	local rc=re:GetHandler()
+	if chk==0 then return not rc:IsStatus(STATUS_DISABLED) end
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+	if rc:IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+	if Duel.NegateEffect(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

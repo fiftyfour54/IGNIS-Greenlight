@@ -39,7 +39,7 @@ function s.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_DESTROYED)
 	e3:SetCountLimit(1,{id,1})
-	e3:SetCondition(function(e,tp) return e:GetHandler():GetReasonPlayer()==1-tp end)
+	e3:SetCondition(s.spcon)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
@@ -81,9 +81,12 @@ function s.tartg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.tarop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		Duel.ChangeTargetCard(ev,Group.FromCards(tc))
 	end
+end
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousControler(tp) and rp==1-tp
 end
 function s.spfilter(c,e,tp)
 	return c:IsRace(RACE_DINOSAUR) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

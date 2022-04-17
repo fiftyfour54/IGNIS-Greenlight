@@ -1,13 +1,15 @@
 --Ｇゴーレム・クリスタルハート
 --G Golem Crystal Heart
+--scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
+	c:EnableCounterPermit(0x20c)
 	c:EnableReviveLimit()
 	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_CYBERSE),2)
 	--Special Summon 1 EARTH Link monster
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_COUNTER)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
@@ -42,7 +44,7 @@ function s.initial_effect(c)
 	e4:SetTarget(s.ecfilter)
 	c:RegisterEffect(e4)
 end
-s.counter_place_list={0x1115} --might need to be changed to the correct value later
+s.counter_place_list={0x20c}
 function s.spfilter(c,e,tp,zone)
 	return c:IsLinkMonster() and c:IsAttribute(ATTRIBUTE_EARTH) and zone~=0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
 end
@@ -57,15 +59,16 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	local zone=e:GetHandler():GetFreeLinkedZone()&0x1f
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and zone~=0 and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP,zone)>0 then
-		c:AddCounter(0x1115,1)
+	if tc:IsRelateToEffect(e) and zone~=0 and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP,zone)>0 then
+		c:AddCounter(0x20c,1)
 	end
 end
 function s.ecfilter(e,c)
 	return e:GetHandler():GetMutualLinkedGroup():IsContains(c) and c:IsAttribute(ATTRIBUTE_EARTH)
 end
 function s.atkvalue(e,c)
-	return e:GetHandler():GetCounter(0x1115)*600
+	return e:GetHandler():GetCounter(0x20c)*600
 end
