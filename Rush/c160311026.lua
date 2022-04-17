@@ -35,7 +35,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		sg=g:Select(tp,1,#g,nil)
 		sg=sg:AddMaximumCheck()
 		if #sg>0 then
-			Duel.Destroy(sg,REASON_EFFECT)>0
+			Duel.Destroy(sg,REASON_EFFECT)
 		end
 	end
 end
