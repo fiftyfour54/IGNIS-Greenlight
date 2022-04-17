@@ -54,16 +54,19 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	end
 end
 function s.spownfilter(c,e,tp,tg)
-	return (tg-c):GetFirst():IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
+	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and (tg-c):GetFirst():IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetTargetCards(e)
 	local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if #tg<2 or ft1<1 or Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return end
-	local ft2=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
-	if e:GetLabel()==100 and ft1>1 and (ft2<1 or Duel.SelectYesNo(tp,aux.Stringid(id,1))) then
+	local b1=Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 and tg:IsExists(s.spownfilter,1,nil,e,tp,tg)
+	local b2=ft1>1 and e:GetLabel()==100
+		and tg:FilterCount(Card.IsCanBeSpecialSummoned,nil,e,0,tp,false,false,POS_FACEUP_DEFENSE)==2
+	if b2 and (not b1 or Duel.SelectYesNo(tp,aux.Stringid(id,1))) then
 		Duel.SpecialSummon(tg,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
-	elseif ft2>0 then
+	elseif b1 then
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
 		local sg=tg:FilterSelect(tp,s.spownfilter,1,1,nil,e,tp,tg)
 		if #sg~=1 then return end
