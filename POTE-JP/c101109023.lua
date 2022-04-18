@@ -6,15 +6,15 @@ function s.initial_effect(c)
 	--Special Summon itself and Synchro Summon a "Melffy" monster
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_RELEASE+CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetHintTiming(0,TIMING_MAIN_END+TIMING_SUMMON+TIMING_SPSUMMON)
+	e1:SetHintTiming(0,TIMING_MAIN_END+TIMINGS_CHECK_MONSTER_E)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.condition)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.operation)
+	e1:SetCondition(function(_,tp) return Duel.GetFlagEffect(tp,id)>0 end)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	--Attach itself to a "Melffy" monster during the End Phase
 	local e2=Effect.CreateEffect(c)
@@ -24,6 +24,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
+	e2:SetCondition(function(_,tp) return Duel.IsTurnPlayer(tp) end)
 	e2:SetTarget(s.attg)
 	e2:SetOperation(s.atop)
 	c:RegisterEffect(e2)
@@ -39,44 +40,36 @@ end
 s.listed_names={id}
 s.listed_series={0x147}
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	for tc in aux.Next(eg) do
-		if tc:IsPreviousControler(tp) and tc:IsPreviousLocation(LOCATION_MZONE)
-			and tc:IsPreviousPosition(POS_FACEUP) and tc:GetPreviousRaceOnField(RACE_BEAST) then --not sure whether or not PreviousRaceOnField should be used
-				Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
+	for tc in eg:Iter() do
+		if tc:IsPreviousLocation(LOCATION_MZONE) and tc:IsPreviousPosition(POS_FACEUP) and tc:GetPreviousRaceOnField()&RACE_BEAST~=0 then
+			Duel.RegisterFlagEffect(tc:GetPreviousControler(),id,RESET_PHASE+PHASE_END,0,1)
 		end
 	end
 end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,id)>0
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
-function s.scfilter(c,mg)
-	return c:IsSynchroSummonable(nil,mg)
+function s.scfilter(c,tc,mg)
+	return c:IsSynchroSummonable(tc,mg)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
 		local mg=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_HAND,0,nil,0x147)
-		local eg=Duel.GetMatchingGroup(s.scfilter,tp,LOCATION_EXTRA,0,nil,mg+c)
-		if #mg>0 and #eg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		local syng=Duel.GetMatchingGroup(s.scfilter,tp,LOCATION_EXTRA,0,nil,c,mg+c)
+		if #mg>0 and #syng>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			local sg=eg:Select(tp,1,1,nil)
-			Duel.SynchroSummon(tp,sg:GetFirst(),nil,mg+c)
+			local sg=syng:Select(tp,1,1,nil)
+			Duel.SynchroSummon(tp,sg:GetFirst(),c,mg+c)
 		end
 	end
 end
 function s.afilter(c)
 	return c:IsType(TYPE_XYZ) and c:IsRace(RACE_BEAST) and c:IsFaceup()
-end
-function s.spcon2(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,tp) and aux.exccon(e)
 end
 function s.attg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.afilter(chkc) end

@@ -26,19 +26,18 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_PHASE+PHASE_BATTLE_START)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1)
-	e3:SetCondition(function(_,tp,...) return Duel.GetTurnPlayer()==1-tp end)
+	e3:SetCondition(function(_,tp) return Duel.IsTurnPlayer(1-tp) end)
 	e3:SetTarget(s.atktg)
 	e3:SetOperation(s.atkop)
 	c:RegisterEffect(e3)
 end
-s.listed_names={id}
 s.listed_series={0x147}
 function s.cfilter(c,tp)
 	return c:IsRace(RACE_BEAST) and not c:IsPublic() and c:IsAbleToDeck()
 		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,c:GetCode())
 end
 function s.thfilter(c,code)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x147) and not c:IsCode(code) and c:IsAbleToHand()
+	return c:IsMonster() and c:IsSetCard(0x147) and not c:IsCode(code) and c:IsAbleToHand()
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil,tp) end
@@ -57,31 +56,34 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=e:GetLabelObject()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,sg:GetFirst():GetCode())
-	if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)~=0 then
-		Duel.ConfirmCards(1-tp,g)
-		Duel.ShuffleDeck(tp)
-		if sg:GetFirst():IsRelateToEffect(e) then
-			Duel.SendtoDeck(sg,tp,SEQ_DECKBOTTOM,REASON_EFFECT)
+	local rc=sg:GetFirst()
+	if rc:IsRelateToEffect(e) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,rc:GetCode())
+		if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_HAND) then
+			Duel.ConfirmCards(1-tp,g)
+			Duel.ShuffleDeck(tp)
+			Duel.SendtoDeck(rc,tp,SEQ_DECKBOTTOM,REASON_EFFECT)
 		end
 	end
 	sg:DeleteGroup()
 end
 function s.rvfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x147) and not c:IsPublic()
+	return c:IsMonster() and c:IsSetCard(0x147) and not c:IsPublic()
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.rvfilter,tp,LOCATION_HAND,0,1,nil) end
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local rvg=Duel.GetMatchingGroup(s.rvfilter,tp,LOCATION_HAND,0,nil)
+	if #rvg==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 	local g=rvg:Select(tp,1,#rvg,nil)
 	local value=0
-	for tc in aux.Next(g) do
-		value = value + tc:GetAttack() + tc:GetDefense()
+	local c=e:GetHandler()
+	for tc in g:Iter() do
+		value=value+tc:GetAttack()+tc:GetDefense()
+		--Keep them revealed
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(id,2))
 		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
