@@ -82,7 +82,7 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 			opt=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))+1
 		elseif op1 then
 			op=Duel.SelectOption(tp,aux.Stringid(id,2))+1
-		elseif op2
+		elseif op2 then
 			opt=Duel.SelectOption(tp,aux.Stringid(id,3))+2
 		else
 			opt=0
