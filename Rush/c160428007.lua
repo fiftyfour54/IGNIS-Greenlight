@@ -22,7 +22,7 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return g:GetClassCount(Card.GetLevel)>=3
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return uel.IsPlayerCanDiscardDeck(tp,4) end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,4) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,4,tp,LOCATION_DECK)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
