@@ -11,26 +11,27 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--if a "Tearelement" monster is returned to the deck, target 1 card and destroy it
+	--Increase ATK
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetCategory(CATEGORY_DESTROY)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetRange(LOCATION_FZONE)
-	e2:SetCountLimit(1,id)
-	e2:SetCode(EVENT_TO_DECK)
-	e2:SetCondition(s.condition)
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.operation)
+	e2:SetTarget(function(_,c) return c:IsSetCard(0x282) or c:IsType(TYPE_FUSION) end)
+	e2:SetValue(500)
 	c:RegisterEffect(e2)
-	--atk up
+	--Destroy 1 card on the field
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_DESTROY)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
+	e3:SetCode(EVENT_TO_DECK)
 	e3:SetRange(LOCATION_FZONE)
-	e3:SetCode(EFFECT_UPDATE_ATTACK)
-	e3:SetTargetRange(LOCATION_MZONE,0)
-	e3:SetTarget(s.atktg)
-	e3:SetValue(500)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetCondition(s.descon)
+	e3:SetTarget(s.destg)
+	e3:SetOperation(s.desop)
 	c:RegisterEffect(e3)
 end
 s.listed_names={CARD_VISAS_STAFROST}
@@ -48,25 +49,21 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,sg)
 	end
 end
-function s.atktg(e,c)
-	return c:IsFaceup() and (c:IsSetCard(0x282) or c:IsType(TYPE_FUSION))
-end
 function s.cfilter(c,tp)
-	return c:IsControler(tp) and c:IsPreviousControler(tp)
-		and (c:IsPreviousLocation(LOCATION_GRAVE) or (c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)))
-		and c:IsSetCard(0x282)
+	return c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_GRAVE+LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
+		and c:IsSetCard(0x282) and (c:IsMonster() or c:IsPreviousLocation(LOCATION_MZONE)) and c:IsReason(REASON_EFFECT)
 end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return (r&REASON_EFFECT)~=0 and eg:IsExists(s.cfilter,1,nil,tp)
+function s.descon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.cfilter,1,nil,tp)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsOnField() end
-	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then

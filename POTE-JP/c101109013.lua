@@ -43,7 +43,6 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		Duel.BreakEffect()
 		Duel.DiscardDeck(tp,3,REASON_EFFECT)
 	end
 end
@@ -51,6 +50,8 @@ function s.extramat(e,tp,mg)
 	return Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_GRAVE,0,nil)
 end
 function s.extraop(e,tc,tp,sg)
+	local gg=sg:Filter(Card.IsLocation,nil,LOCATION_HAND+LOCATION_GRAVE)
+	if #gg>0 then Duel.HintSelection(gg,true) end
 	Duel.SendtoDeck(sg,nil,SEQ_DECKBOTTOM,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
 	local dg=Duel.GetOperatedGroup():Filter(Card.IsLocation,nil,LOCATION_DECK)
 	local ct=dg:FilterCount(Card.IsControler,nil,tp)
