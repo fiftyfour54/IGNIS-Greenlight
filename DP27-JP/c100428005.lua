@@ -81,15 +81,15 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 		if op1 and op2 then
 			opt=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))+1
 		elseif op1 then
-			op=Duel.SelectOption(tp,aux.Stringid(id,2))+1
+			opt=Duel.SelectOption(tp,aux.Stringid(id,2))+1
 		elseif op2 then
 			opt=Duel.SelectOption(tp,aux.Stringid(id,3))+2
 		else
 			opt=0
 		end
-		if op==1 then
+		if opt==1 then
 			Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,0,POS_FACEUP_ATTACK,0)
-		elseif op==2 then
+		elseif opt==2 then
 			Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
