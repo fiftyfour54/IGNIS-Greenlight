@@ -78,37 +78,36 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	if tc and tc:IsRelateToEffect(e) then
 		local op1,op2=tc:IsCanChangePosition(), tc:IsFaceup() and not tc:IsDisabled()
 		local opt
-			if op1 and op2 then
-				opt=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))+1
-			elseif op1 then
-				op=Duel.SelectOption(tp,aux.Stringid(id,2)+1
-			elseif op2
-				opt=Duel.SelectOption(tp,aux.Stringid(id,3))+2
-			else
-				opt=0
-			end
-			if op==1 then
-				Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,0,POS_FACEUP_ATTACK,0)
-			elseif op==2 then
-				Duel.NegateRelatedChain(tc,RESET_TURN_SET)
-				local e1=Effect.CreateEffect(c)
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_DISABLE)
-				e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-				tc:RegisterEffect(e1)
-				local e2=Effect.CreateEffect(c)
-				e2:SetType(EFFECT_TYPE_SINGLE)
-				e2:SetCode(EFFECT_DISABLE_EFFECT)
-				e2:SetValue(RESET_TURN_SET)
-				e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-				tc:RegisterEffect(e2)
-				if tc:IsType(TYPE_TRAPMONSTER) then
-					local e3=Effect.CreateEffect(c)
-					e3:SetType(EFFECT_TYPE_SINGLE)
-					e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
-					e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-					tc:RegisterEffect(e3)
-				end
+		if op1 and op2 then
+			opt=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))+1
+		elseif op1 then
+			op=Duel.SelectOption(tp,aux.Stringid(id,2))+1
+		elseif op2
+			opt=Duel.SelectOption(tp,aux.Stringid(id,3))+2
+		else
+			opt=0
+		end
+		if op==1 then
+			Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,0,POS_FACEUP_ATTACK,0)
+		elseif op==2 then
+			Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			tc:RegisterEffect(e1)
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetCode(EFFECT_DISABLE_EFFECT)
+			e2:SetValue(RESET_TURN_SET)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			tc:RegisterEffect(e2)
+			if tc:IsType(TYPE_TRAPMONSTER) then
+				local e3=Effect.CreateEffect(c)
+				e3:SetType(EFFECT_TYPE_SINGLE)
+				e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+				e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+				tc:RegisterEffect(e3)
 			end
 		end
 	end
