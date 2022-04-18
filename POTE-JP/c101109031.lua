@@ -17,9 +17,8 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
 	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetValue(1)
-	e2:SetCondition(s.spcon)
-	e2:SetOperation(s.spop)
+	e2:SetCondition(s.spproccon)
+	e2:SetOperation(s.spprocop)
 	c:RegisterEffect(e2)
 	--Special Summon 1 monster from the opponent's GY
 	local e3=Effect.CreateEffect(c)
@@ -30,6 +29,7 @@ function s.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,id)
+	e3:SetCondition(function(_,tp) return Duel.IsTurnPlayer(tp) end)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
@@ -43,36 +43,33 @@ function s.initial_effect(c)
 	end)
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local cid=Duel.GetChainInfo(ev,CHAININFO_CHAIN_ID)
-	local seq=Duel.GetChainInfo(cid,CHAININFO_TRIGGERING_SEQUENCE)
-	local loc=Duel.GetChainInfo(cid,CHAININFO_TRIGGERING_LOCATION)
-	local p=Duel.GetChainInfo(cid,CHAININFO_TRIGGERING_CONTROLER)
+	local loc,p=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TRIGGERING_CONTROLER)
 	local tc=re:GetHandler()
-	if re:IsActiveType(TYPE_MONSTER) and tc:IsRelateToEffect(re) and loc==LOCATION_MZONE and seq<5 and p==1-e:GetHandlerPlayer() then
+	if re:IsActiveType(TYPE_MONSTER) and tc:IsRelateToEffect(re) and loc==LOCATION_MZONE and p==1-Duel.GetTurnPlayer() then
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	end
 end
 function s.tfilter(c)
-	return c:GetFlagEffect(id)>0
+	return c:IsFaceup() and c:GetFlagEffect(id)>0
 end
-function s.spcon(e,c)
+function s.spproccon(e,c)
 	if c==nil then return true end
 	local tp=e:GetHandlerPlayer()
-	local rg=Duel.GetMatchingGroup(s.tfilter,0,0,LOCATION_MZONE,nil)
-	return #rg>0 and rg:FilterCount(Card.IsReleasable,nil)==#rg
-		and aux.SelectUnselectGroup(rg,e,tp,1,5,aux.ChkfMMZ(1),0)
+	local rg=Duel.GetMatchingGroup(s.tfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
+	return #rg>0 and rg:FilterCount(Card.IsReleasable,nil)==#rg and Duel.GetMZoneCount(tp,rg)>0
 end
-function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetMatchingGroup(s.tfilter,0,0,LOCATION_MZONE,nil):Filter(Card.IsReleasable,nil)
+function s.spprocop(e,tp,eg,ep,ev,re,r,rp,c)
+	local g=Duel.GetMatchingGroup(s.tfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil):Filter(Card.IsReleasable,nil)
 	Duel.Release(g,REASON_COST)
 	local atk=#g*1500
-	if atk<0 then return end
-	local e1=Effect.CreateEffect(e:GetHandler())
+	if atk==0 then return end
+	--Increase ATK
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetValue(atk)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE-RESET_TOFIELD)
-	e:GetHandler():RegisterEffect(e1)
+	c:RegisterEffect(e1)
 end
 function s.spfilter(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)

@@ -24,11 +24,20 @@ end
 function s.spcostfilter(c,tp,b1,b2)
 	local ft=Duel.GetMZoneCount(tp,c)
 	return ft>0 and c:IsType(TYPE_FUSION) and ((b1 and Duel.GetMZoneCount(1-tp,c)>0)
-		or (b2 and ft>1 and (aux.IsCodeListed(c,CARD_ALBAZ) or aux.IsMaterialListCode(c,CARD_ALBAZ))))
+		or (b2 and ft>1 and aux.IsMaterialListCode(c,CARD_ALBAZ)))
+end
+function s.rescon(ag,g1,g2)
+	return function(sg,e,tp,mg)
+		local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE)
+		local ft2=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
+		local res1=ft1>=2 and #(ag&sg)>=2
+		local res2=ft1>0 and ft2>0 and #(sg&g1)>0 and #(sg&g2)>0
+		return res1 or res2,not (res1 or res2)
+	end
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return false end
+	if chk==0 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return false end
 	local g1=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_GRAVE+LOCATION_REMOVED,nil,e,tp,tp)
 	local g2=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_GRAVE+LOCATION_REMOVED,nil,e,tp,1-tp)
 	local b1=#g1>0 and #g2>0
@@ -36,17 +45,20 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local b2=#ag>1
 	if chk==0 then return (b1 or b2) and Duel.CheckReleaseGroupCost(tp,s.spcostfilter,1,false,nil,nil,tp,b1,b2) end
 	local rc=Duel.SelectReleaseGroupCost(tp,s.spcostfilter,1,1,false,nil,nil,tp,b1,b2):GetFirst()
-	local albaz=aux.IsCodeListed(rc,CARD_ALBAZ) or aux.IsMaterialListCode(rc,CARD_ALBAZ)
+	local albaz=aux.IsMaterialListCode(rc,CARD_ALBAZ)
 	Duel.Release(rc,REASON_COST)
 	local tg=nil
-	if albaz and Duel.GetLocationCount(1-tp,LOCATION_MZONE)<1 then
+	if b1 and not b2 then
+		tg=aux.SelectUnselectGroup(g1+g2,e,tp,2,2,function(sg) return #(sg&g1)>0 and #(sg&g2)>0 end,1,tp,HINTMSG_SPSUMMON)
+	elseif not b1 and b2 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		tg=ag:Select(tp,2,2,nil)
-	elseif Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then
-		tg=aux.SelectUnselectGroup(g1+g2,e,tp,2,2,function(sg) return #(sg&g1)>0 and #(sg&g2)>0 end,1,tp,HINTMSG_SPSUMMON,nil,nil,false)
 	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		tg=(g1+g2):Select(tp,2,2,nil)
+		if not albaz then
+			tg=aux.SelectUnselectGroup(g1+g2,e,tp,2,2,function(sg) return #(sg&g1)>0 and #(sg&g2)>0 end,1,tp,HINTMSG_SPSUMMON)
+		else
+			tg=aux.SelectUnselectGroup(g1+g2,e,tp,2,2,s.rescon(ag,g1,g2),1,tp,HINTMSG_SPSUMMON)
+		end
 	end
 	if tg and #tg==2 then
 		Duel.SetTargetCard(tg)
@@ -68,9 +80,10 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(tg,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 	elseif b1 then
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
-		local sg=tg:FilterSelect(tp,s.spownfilter,1,1,nil,e,tp,tg)
-		if #sg~=1 then return end
-		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
-		Duel.SpecialSummon(tg-sg,0,tp,1-tp,false,false,POS_FACEUP)
+		local sc=tg:FilterSelect(tp,s.spownfilter,1,1,nil,e,tp,tg):GetFirst()
+		if not sc then return end
+		Duel.SpecialSummonStep(sc,0,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummonStep((tg-sc):GetFirst(),0,tp,1-tp,false,false,POS_FACEUP)
+		Duel.SpecialSummonComplete()
 	end
 end
