@@ -1,5 +1,5 @@
 --無千ジャミング
---Wireless Jamming
+--Unlimited Free Radio Jamming
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
@@ -31,13 +31,18 @@ function s.filter(c)
 	return c:IsFaceup() and c:IsAttackAbove(1000)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.GetAttacker():GetBattleTarget()
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 end
 function s.operation(check)
 	return  function(e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetHandler()
+				local reset
 				if check then
 					if not c:IsRelateToEffect(e) then return end
+					reset=RESET_EVENT+RESETS_STANDARD 
+				else
+					reset=RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END 
 				end
 				local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 				for tc in aux.Next(g) do
@@ -47,13 +52,13 @@ function s.operation(check)
 					e1:SetType(EFFECT_TYPE_SINGLE)
 					e1:SetCode(EFFECT_UPDATE_ATTACK)
 					e1:SetValue(a)
-					e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+					e1:SetReset(reset)
 					tc:RegisterEffect(e1)
 					local e2=Effect.CreateEffect(c)
 					e2:SetType(EFFECT_TYPE_SINGLE)
 					e2:SetCode(EFFECT_UPDATE_DEFENSE)
 					e2:SetValue(d)
-					e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+					e2:SetReset(reset)
 					tc:RegisterEffect(e2)
 				end
 			end
