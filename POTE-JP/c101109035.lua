@@ -48,8 +48,15 @@ function s.chop(e,tp,eg,ep,ev,re,r,rp)
 		-- Cannot target monsters with the same race as this card
 		local e3=e2:Clone()
 		e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+		e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e3:SetTarget(function(e,c) return c:IsRace(e:GetHandler():GetRace()) end)
-		e3:SetValue(function(e,re,rp) return re:IsActiveType(TYPE_MONSTER) and aux.tgoval(e,re,rp) end)
+		e3:SetValue(s.value)
 		c:RegisterEffect(e3)
 	end
+end
+function s.value(e,re,rp)
+	local rc=e:GetHandler():GetRace()
+	local trig_rc,eff=Duel.GetChainInfo(0,CHAININFO_TRIGGERING_RACE,CHAININFO_TRIGGERING_EFFECT)
+	return re:IsActiveType(TYPE_MONSTER) and re:GetActivateLocation()==LOCATION_MZONE
+		and (re:GetHandler():IsRace(rc) or (eff==re and trig_rc==rc)) and aux.tgoval(e,re,rp)
 end

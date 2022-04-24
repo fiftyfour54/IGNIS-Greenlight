@@ -8,8 +8,8 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOGRAVE+CATEGORY_LEAVE_GRAVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
 	e1:SetTarget(s.tgtg)
@@ -20,8 +20,8 @@ function s.tgfilter(c,e)
 	return c:IsAbleToGrave() and c:IsCanBeEffectTarget(e)
 end
 function s.setfilter(c,e,tp)
-	return c:IsCanBeEffectTarget(e)
-		and (c:IsType(TYPE_SPELL+TYPE_TRAP) or c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE,1-tp))
+	return c:IsCanBeEffectTarget(e) and ((c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable(true))
+		or c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE,1-tp))
 end
 function s.rescon(sg,e,tp)
 	local g1,g2=sg:Split(Card.IsOnField,nil)
@@ -52,14 +52,16 @@ function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetTargetCards(e)
+	if #tg==0 then return end
 	local g1,g2=tg:Split(Card.IsOnField,nil)
 	if #g1>0 and Duel.SendtoGrave(g1,REASON_EFFECT)>0 and g1:GetFirst():IsLocation(LOCATION_GRAVE) then
 		local sc=g2:GetFirst()
 		if not sc then return end
-		if sc:IsMonster() and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 then
-			Duel.SpecialSummon(sc,0,tp,1-tp,false,false,POS_FACEDOWN_DEFENSE)
-		elseif Duel.GetLocationCount(1-tp,LOCATION_SZONE)>0 or (sc:IsType(TYPE_SPELL) and sc:IsType(TYPE_FIELD)) then
-			Duel.SSet(1-tp,sc)
+		if sc:IsMonster() and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
+			and Duel.SpecialSummon(sc,0,tp,1-tp,false,false,POS_FACEDOWN_DEFENSE)>0 then
+			Duel.ConfirmCards(1-tp,sc)
+		elseif sc:IsType(TYPE_SPELL+TYPE_TRAP) and sc:IsSSetable() then
+			Duel.SSet(tp,sc,1-tp)
 		end
 	end
 end
