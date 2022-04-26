@@ -34,7 +34,7 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	--Requirement
 	--Effect
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
+	if not (c:IsRelateToEffect(e) and c:IsFaceup()) then return end
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_MZONE,0,nil)
 	if #g>0 then
 		Duel.ChangePosition(g,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
