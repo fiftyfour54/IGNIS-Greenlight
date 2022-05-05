@@ -19,7 +19,7 @@ function s.filter(c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(tp) and s.filter(chkc) end
-	if chk==0 then Duel.IsExistingTarget(s.filter,tp,LOCATION_SZONE,0,1,nil)
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_SZONE,0,1,nil)
 		and Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_ONFIELD,2,nil)	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g1=Duel.SelectTarget(tp,s.filter,tp,LOCATION_SZONE,0,1,1,nil)
