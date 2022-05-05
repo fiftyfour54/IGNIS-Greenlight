@@ -43,7 +43,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	local pg=eg:Filter(s.posfilter,nil)
-	if Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,CARD_SEVENS_ROAD_MAGICIAN) and #pg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) and
+	if Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,CARD_SEVENS_ROAD_MAGICIAN) and #pg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.ChangePosition(pg:GetFirst(),POS_FACEUP_DEFENSE)
 	end
 end
