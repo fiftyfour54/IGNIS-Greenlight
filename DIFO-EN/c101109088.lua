@@ -25,7 +25,7 @@ function s.rvlfilter(c,tp)
 	return c:IsRitualMonster() and c:IsSetCard(0x17d) and not c:IsPublic()
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+100,0x17d,TYPES_TOKEN,0,0,c:GetLevel(),RACE_CYBERSE,ATTRIBUTE_FIRE)
 end
-function s.nscost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tkncost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.rvlfilter,tp,LOCATION_HAND,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 	local g=Duel.SelectMatchingCard(tp,s.rvlfilter,tp,LOCATION_HAND,0,1,1,nil,tp)
