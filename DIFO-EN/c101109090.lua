@@ -22,7 +22,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(aux.FilterFaceupFunction(Card.IsSetCard,0x17d),tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingTarget(Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g1=Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsSetCard,0x17d),LOCATION_MZONE,0,1,1,nil)
+	local g1=Duel.SelectTarget(tp,aux.FilterFaceupFunction(Card.IsSetCard,0x17d),tp,LOCATION_MZONE,0,1,1,nil)
 	e:SetLabelObject(g1:GetFirst())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g2=Duel.SelectTarget(tp,Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,1,1,nil)
