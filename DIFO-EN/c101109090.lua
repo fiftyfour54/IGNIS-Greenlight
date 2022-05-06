@@ -5,6 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Return 1 "libromancer" to the hand and take control of opponent's monster
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_CONTROL)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)

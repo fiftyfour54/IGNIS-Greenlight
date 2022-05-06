@@ -23,7 +23,7 @@ end
 s.listed_series={0x17d}
 function s.rvlfilter(c,tp)
 	return c:IsRitualMonster() and c:IsSetCard(0x17d) and not c:IsPublic()
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+100,0x17d,TYPES_TOKEN,0,0,c:GetLevel(),RACE_CYBERSE,ATTRIBUTE_FIRE)
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+100,0,TYPES_TOKEN,0,0,c:GetLevel(),RACE_CYBERSE,ATTRIBUTE_FIRE)
 end
 function s.tkncost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.rvlfilter,tp,LOCATION_HAND,0,1,nil,tp) end
