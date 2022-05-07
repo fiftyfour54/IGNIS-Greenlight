@@ -49,7 +49,7 @@ function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsFaceup() and c:IsPreviousLocation(LOCATION_MZONE)
 end
 function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return s.pzcheck(tp) and not e:GetHandler():IsForbidden() end
+	if chk==0 then return s.pzcheck(tp) end
 end
 function s.penop(e,tp,eg,ep,ev,re,r,rp)
 	if not s.pzcheck(tp) then return end
