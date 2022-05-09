@@ -1,0 +1,57 @@
+--墓守の刻印
+--Gravekeeper's Engraving
+--scripted by Naim
+local s,id=GetID()
+function s.initial_effect(c)
+	--Neither player can card effects in the GY
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(function() return Duel.GetCurrentPhase()==PHASE_MAIN1 and not Duel.CheckPhaseActivity() end)
+	e1:SetOperation(s.operation1)
+	c:RegisterEffect(e1)
+	--Neither player can banish cards from the GY
+	local e2=e1:Clone()
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetOperation(s.operation2)
+	c:RegisterEffect(e2)
+	--Neither player can Special Summon from the GY
+	local e3=e1:Clone()
+	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetOperation(s.operation3)
+	c:RegisterEffect(e3)
+end
+function s.operation1(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(id,3))
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e1:SetTargetRange(1,1)
+	e1:SetTarget(function(_,re) return re:GetHandler():IsLocation(LOCATION_GRAVE) end)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+end
+function s.operation2(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(id,4))
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CANNOT_REMOVE)
+	e1:SetTargetRange(1,1)
+	e1:SetTarget(function(_,c) return c:IsLocation(LOCATION_GRAVE) end)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+end
+function s.operation3(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(id,5))
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetTargetRange(1,1)
+	e1:SetTarget(function(_,c) return c:IsLocation(LOCATION_GRAVE) end)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+end
