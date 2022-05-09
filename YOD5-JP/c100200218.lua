@@ -23,7 +23,6 @@ end
 function s.stfilter(c)
 	return c:IsType(TYPE_TRAP+TYPE_CONTINUOUS) and c:IsSSetable()
 end
-
 function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.stfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end
 end
@@ -31,8 +30,7 @@ function s.stop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.stfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
 	local tc=g:GetFirst()
-	if tc and tc:IsSSetable() then
-		Duel.SSet(tp,tc)
+	if tc and tc:IsSSetable() and Duel.SSet(tp,tc)>0
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
@@ -41,16 +39,13 @@ function s.stop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 	end
 end
-function s.tgfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_TRAP)
-end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_ONFIELD,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsType,TYPE_TRAP),tp,LOCATION_ONFIELD,0,1,nil) end
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_ONFIELD,0,nil)
-	local tc=g:GetFirst()
-	for tc in aux.Next(g) do
+	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsType,TYPE_TRAP),tp,LOCATION_ONFIELD,0,nil)
+	if #g==0 then return end
+	for tc in g:Iter() do
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
