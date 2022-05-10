@@ -45,7 +45,7 @@ function s.operation_a(e,tp,eg,ep,ev,re,r,rp)
 		local sc=g:Select(tp,1,1,nil):GetFirst()
 		if sc then
 			Duel.BreakEffect()
-			Duel.SpecialSummonStep(sc,0,tp,tp,false,false,POS_FACEUP)
+			Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end
@@ -63,9 +63,9 @@ function s.operation_d(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmDecktop(tp,res)
 	local dg=Duel.GetDecktopGroup(tp,res)
 	local ct=0
-	if dg:IsExists(s.tgfilter,1,nil) and Duel.SelectYesNo(p,aux.Stringid(id,3)) then
+	if dg:IsExists(s.tgfilter,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local tg=dg:Select(tp,1,1,nil)
+		local tg=dg:FilterSelect(tp,s.tgfilter,1,1,nil)
 		dg:RemoveCard(tg)
 		Duel.SendtoGrave(tg,REASON_EFFECT)
 		ct=1
