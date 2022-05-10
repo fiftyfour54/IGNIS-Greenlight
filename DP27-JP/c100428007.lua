@@ -4,7 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	aux.AddEquipProcedure(c,nil,s.eqfilter)
-	--Decrease ATK by 1500 during the Damage Calculation
+	--Decrease battle target's ATK by 1500 during the Damage Calculation
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -27,7 +27,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.destg)
 	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
-	--Special Summon 1 "Power Tool" monster
+	--Special Summon 1 "Life Stream Dragon"
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -41,6 +41,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={0xc2}
+s.listed_names={25165047}
 function s.eqfilter(c)
 	return c:IsType(TYPE_SYNCHRO) and c:IsAttribute(ATTRIBUTE_EARTH)
 end
