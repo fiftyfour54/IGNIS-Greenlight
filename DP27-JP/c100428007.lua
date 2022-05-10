@@ -12,14 +12,14 @@ function s.initial_effect(c)
 	e1:SetTargetRange(0,LOCATION_MZONE)
 	e1:SetCondition(s.atkcon)
 	e1:SetTarget(s.atktg)
-	e1:SetValue(function() return -1500 end)
+	e1:SetValue(-1500)
 	c:RegisterEffect(e1)
 	--Destroy 1 card on the field
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_CHANGE_POS)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1)
@@ -50,7 +50,8 @@ function s.atkcon(e)
 		and e:GetHandler():GetEquipTarget():GetBattleTarget()
 end
 function s.atktg(e,c)
-	return c==e:GetHandler():GetEquipTarget():GetBattleTarget()
+	local bc=e:GetHandler():GetEquipTarget():GetBattleTarget()
+	return c==bc and bc:IsControler(1-e:GetHandlerPlayer())
 end
 function s.cfilter(c)
 	local np=c:GetPosition()
@@ -62,9 +63,9 @@ function s.descon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() end
-	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
@@ -78,11 +79,10 @@ function s.costfilter(c,e,tp)
 	return c:IsSetCard(0xc2) and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c)
 end
 function s.spfilter(c,e,tp,mc)
-	return Duel.GetLocationCountFromEx(tp,tp,mc,TYPE_SYNCHRO)>0
-		and c:IsCode(25165047) and c:IsCanBeSpecialSummoned(e,TYPE_SYNCHRO,tp,false,false)
+	return Duel.GetLocationCountFromEx(tp,tp,mc,c)>0 and c:IsCode(25165047)
+		and c:IsCanBeSpecialSummoned(e,TYPE_SYNCHRO,tp,false,false)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	Debug.Message(Duel.CheckReleaseGroup(tp,s.costfilter,1,nil,e,tp))
 	if chk==0 then return Duel.CheckReleaseGroup(tp,s.costfilter,1,nil,e,tp) end
 	local g=Duel.SelectReleaseGroup(tp,s.costfilter,1,1,nil,e,tp)
 	Duel.Release(g,REASON_COST)
@@ -92,9 +92,8 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
 	if tc and Duel.SpecialSummon(tc,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)>0 then
 		tc:CompleteProcedure()
 	end

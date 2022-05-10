@@ -23,14 +23,13 @@ function s.spfilter2(c,e,tp)
 end
 function s.filter(c,e,tp)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and
-		((c:IsAttackPos() and Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetCode()))	or
-		(c:IsDefensePos() and Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_HAND,0,1,nil,e,tp)))
+		((c:IsAttackPos() and c:IsAbleToDeck() and Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetCode())) or
+		(c:IsDefensePos() and c:IsCanChangePosition() and Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_HAND,0,1,nil,e,tp)))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and	Duel.IsExistingTarget(s.filter,tp,0,LOCATION_MZONE,1,nil,e,tp) end
-	local tg=Duel.SelectTarget(tp,s.filter,tp,0,LOCATION_MZONE,1,1,nil,e,tp)
-	local tc=tg:GetFirst()
+		and	Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
+	local tc=Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil,e,tp):GetFirst()
 	if tc:IsAttackPos() then
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 		Duel.SetOperationInfo(0,CATEGORY_TODECK,tc,1,tp,0)
@@ -46,18 +45,18 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsAttackPos() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,s.spfilter1,tp,LOCATION_DECK,0,1,1,nil,e,tp,tc:GetCode())
-		if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) then
+		if #g==0 then return end
+		if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) then
 			Duel.BreakEffect()
-			Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)
+			Duel.ShuffleDeck(tp)
+			Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT)
 		end
-	else
-		if Duel.ChangePosition(tc,0,0,POS_FACEUP_ATTACK,0)>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-			and	Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_HAND,0,1,nil,e,tp) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			local g=Duel.SelectMatchingCard(tp,s.spfilter2,tp,LOCATION_HAND,0,1,1,nil,e,tp)
-			if #g>0 then
-				Duel.SpecialSummon(gg,0,tp,tp,false,false,POS_FACEUP)
-			end
+	elseif Duel.ChangePosition(tc,0,0,POS_FACEUP_ATTACK,0)>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and	Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_HAND,0,1,nil,e,tp) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local g=Duel.SelectMatchingCard(tp,s.spfilter2,tp,LOCATION_HAND,0,1,1,nil,e,tp)
+		if #g>0 then
+			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end

@@ -26,6 +26,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.operation_d)
 	c:RegisterEffect(e2)
 end
+s.roll_dice=true
 s.listed_series={0x26}
 function s.target_a(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -38,9 +39,9 @@ function s.spfilter(c,lv,e,tp)
 end
 function s.operation_a(e,tp,eg,ep,ev,re,r,rp)
 	local res=Duel.TossDice(tp,1)
-	if Duel.Recover(tp,res*100,REASON_EFFECT)~=res*100 then return end
-	local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_GRAVE,0,nil,res,e,tp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+	if Duel.Recover(tp,res*100,REASON_EFFECT)~=res*100 or Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.spfilter),tp,LOCATION_GRAVE,0,nil,res,e,tp)
+	if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sc=g:Select(tp,1,1,nil):GetFirst()
 		if sc then
@@ -67,7 +68,8 @@ function s.operation_d(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local tg=dg:FilterSelect(tp,s.tgfilter,1,1,nil)
 		dg:RemoveCard(tg)
-		Duel.SendtoGrave(tg,REASON_EFFECT)
+		Duel.DisableShuffleCheck()
+		Duel.SendtoGrave(tg,REASON_EFFECT+REASON_REVEAL)
 		ct=1
 	end
 	local ac=res-ct
