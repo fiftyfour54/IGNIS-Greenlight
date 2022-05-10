@@ -28,7 +28,7 @@ end
 s.listes_names={28002611}
 s.listed_series={0x26}
 function s.thfilter(c)
-	return c:IsRace(RACE_MACHINE) and c:IsLevel(1) and and c:IsAbleToHand()
+	return c:IsRace(RACE_MACHINE) and c:IsLevel(1) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
