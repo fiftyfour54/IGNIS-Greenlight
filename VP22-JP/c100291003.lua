@@ -5,10 +5,11 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DISABLE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetHintTiming(0,TIMING_MAIN_END)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMING_MAIN_END)
 	e1:SetCondition(function() return Duel.IsMainPhase() end)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
@@ -31,14 +32,17 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	c:AddMonsterAttribute(TYPE_NORMAL+TYPE_TRAP)
 	Duel.SpecialSummonStep(c,0,tp,tp,true,false,POS_FACEUP)
 	c:AddMonsterAttributeComplete()
-	Duel.SpecialSummonComplete()
-	local ct=Duel.GetMatchingGroupCount(s.filter,tp,LOCATION_ONFIELD,0,nil)
+	if Duel.SpecialSummonComplete()==0 then return end
+	local ct=Duel.GetMatchingGroupCount(s.filter,tp,LOCATION_ONFIELD,0,c)
 	local cg=Duel.GetMatchingGroup(aux.disfilter3,tp,0,LOCATION_ONFIELD,nil)
-	if ct>0 and #cg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+	if ct>0 and #cg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		local sg=cg:Select(tp,1,ct,nil)
+		if #sg==0 then return end
+		Duel.HintSelection(sg,true)
 		Duel.BreakEffect()
 		for tc in aux.Next(sg) do
+			--Negate its effects
 			Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)

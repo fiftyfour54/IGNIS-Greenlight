@@ -21,16 +21,16 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.stfilter(c)
-	return c:IsType(TYPE_TRAP+TYPE_CONTINUOUS) and c:IsSSetable()
+	return c:GetType()==TYPE_TRAP+TYPE_CONTINUOUS and c:IsSSetable()
 end
 function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.stfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end
 end
 function s.stop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.stfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
-	local tc=g:GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.stfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil):GetFirst()
 	if tc and tc:IsSSetable() and Duel.SSet(tp,tc)>0 then
+		--Can be activated this turn
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
@@ -45,8 +45,10 @@ end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.FilterFaceupFunction(Card.IsType,TYPE_TRAP),tp,LOCATION_ONFIELD,0,nil)
 	if #g==0 then return end
+	local c=e:GetHandler()
 	for tc in g:Iter() do
-		local e1=Effect.CreateEffect(e:GetHandler())
+		--Cannot be destroyed by opponent's card effects
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 		e1:SetValue(aux.indoval)
