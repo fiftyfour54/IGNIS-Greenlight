@@ -1,5 +1,5 @@
--- 古衛兵アギド
--- Agido the Ancient Sentry
+-- 古尖兵ケルベク
+-- Kelbek the Ancient Vanguard
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
