@@ -38,6 +38,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 s.listed_series={0x6f}
+function s.valcon(e,re,r,rp)
+	return (r&REASON_BATTLE)~=0
+end
 function s.cfilter(c)
 	return c:IsFacedown() or not c:IsAttribute(ATTRIBUTE_WATER)
 end
