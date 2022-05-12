@@ -59,7 +59,7 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,id)~=0
+	return Duel.GetFlagEffect(tp,id)==0
 end
 function s.thfilter(c,ft,e,tp)
 	return c:IsRace(RACE_ROCK) and c:IsAttack(0)
