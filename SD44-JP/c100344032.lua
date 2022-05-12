@@ -70,5 +70,7 @@ function s.excop(e,tp,eg,ep,ev,re,r,rp)
 			return Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
 		end,
 		aux.Stringid(id,2))
+	else
+		Duel.SendtoGrave(tc,REASON_EFFECT+REASON_REVEAL)
 	end
 end
