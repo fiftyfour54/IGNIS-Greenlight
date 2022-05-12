@@ -19,17 +19,17 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
 	c:RegisterEffect(e3)
 	-- Add to hand or Special Summon 1 Rock monster
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,id)
-	e2:SetCondition(s.thcon)
-	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.thop)
-	c:RegisterEffect(e2)
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_PHASE+PHASE_END)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,id)
+	e4:SetCondition(s.thcon)
+	e4:SetTarget(s.thtg)
+	e4:SetOperation(s.thop)
+	c:RegisterEffect(e4)
 	-- Register damage events
 	aux.GlobalCheck(s,function()
 		local ge1=Effect.CreateEffect(c)
@@ -59,7 +59,7 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,id)==0
+	return Duel.GetFlagEffect(tp,id)~=0
 end
 function s.thfilter(c,ft,e,tp)
 	return c:IsRace(RACE_ROCK) and c:IsAttack(0)
