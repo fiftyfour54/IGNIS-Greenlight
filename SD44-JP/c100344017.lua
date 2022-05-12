@@ -3,7 +3,7 @@
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Destroy 1 "Crystal Beast" monster
+	-- Destroy 1 "Crystal Beast" Monster Card
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
@@ -35,14 +35,14 @@ function s.getprops(c)
 		c:GetOriginalLevel(),c:GetOriginalRace(),c:GetOriginalAttribute()
 end
 function s.desfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0x1034) and Duel.GetMZoneCount(tp,c)>0
+	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsOriginalType(TYPE_MONSTER) and Duel.GetMZoneCount(tp,c)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+100,0x1034,TYPES_TOKEN,s.getprops(c))
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.tkfilter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(s.tkfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_ONFIELD) and s.tkfilter(chkc,e,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.tkfilter,tp,LOCATION_ONFIELD,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,s.tkfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
+	local g=Duel.SelectTarget(tp,s.tkfilter,tp,LOCATION_ONFIELD,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 end
