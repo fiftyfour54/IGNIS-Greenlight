@@ -44,7 +44,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
 	local sg=aux.SelectUnselectGroup(g,e,tp,1,ft,s.spcheck,1,tp,HINTMSG_SPSUMMON)
 	if #sg>0 then
-		Duel.SpecialSummon(sg,0,tp,tp,false,false)
+		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
 function s.spcheck(sg,e,tp,mg)
@@ -59,7 +59,7 @@ function s.countertg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return ct>0 and e:GetHandler():IsAbleToRemoveAsCost() and 
 		 Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,ct,nil)
+	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,ct,nil)
 	Duel.SetOperationInfo(0,CATEGORY_COUNTER,g,1,0,0x1101)
 end
 function s.counterop(e,tp,eg,ep,ev,re,r,rp)
