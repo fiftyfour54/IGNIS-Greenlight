@@ -1,5 +1,5 @@
 -- 宝玉の祝福
--- Crystal Favor
+-- Crystal Grace
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
