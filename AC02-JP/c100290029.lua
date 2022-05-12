@@ -52,12 +52,13 @@ function s.countertg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,1,tp,0x1101)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.counterop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:RemoveOverlayCard(tp,1,1,REASON_EFFECT) then
 		local cg=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
 		if #cg==0 then return end
-		local tc=cg:Select(tp,1,1):GetFirst()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_COUNTER)
+		local tc=cg:Select(tp,1,1,nil):GetFirst()
 		Duel.HintSelection(tc,true)
 		tc:AddCounter(0x1101,1)
 		local e1=Effect.CreateEffect(c)
@@ -81,7 +82,8 @@ end
 function s.dmgop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.hcounter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if #g==0 then return end
-	local tc=g:Select(tp,1,1):GetFirst()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local tc=g:Select(tp,1,1,nil):GetFirst()
 	Duel.HintSelection(tc,true)
 	Duel.Damage(1-tp,tc:GetAttack(),REASON_EFFECT)
 end
