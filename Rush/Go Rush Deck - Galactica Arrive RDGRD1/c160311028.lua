@@ -2,19 +2,18 @@
 --Transamu Arrive
 local s,id=GetID()
 function s.initial_effect(c)
-	--Special Summon 1 Galxy Normal monster from the GY
+	--Special Summon 1 Galaxy Normal Monster from the GY
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_DESTROYED)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
 function s.cfilter(c,tp)
-	return c:IsRace(RACE_GALAXY) and c:IsReason(REASON_BATTLE+REASON_EFFECT) and c:GetReasonPlayer()==1-tp
+	return c:GetPreviousRaceOnField()&RACE_GALAXY~=0 and c:IsReason(REASON_BATTLE+REASON_EFFECT) and c:GetReasonPlayer()==1-tp
 		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousControler(tp)
 		and not Duel.IsExistingMatchingCard(nil,tp,LOCATION_MZONE,0,1,c)
 end

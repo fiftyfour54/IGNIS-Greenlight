@@ -19,7 +19,7 @@ function s.psyfilter(c)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()
-	return tc and tc:IsControler(1-tp) and tc:IsLevelBelow(8) and tc:IsAbleToHand()
+	return tc:IsControler(1-tp) and tc:IsLevelBelow(8) and tc:IsAbleToHand()
 		and Duel.IsExistingMatchingCard(s.psyfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -32,16 +32,16 @@ function s.thfilter(c)
 	return c:IsLevelBelow(3) and c:IsAbleToHand() 
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	--local c=e:GetHandler()
 	local tc=Duel.GetAttacker()
 	if tc:IsRelateToBattle() and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND)
-		and	Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,160006013),tp,LOCATION_MZONE,0,1,nil)
+		and	Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,160006013),tp,LOCATION_ONFIELD,0,1,nil)
 		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-			local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-			if #g>0 then
-				Duel.SendtoHand(g,nil,REASON_EFFECT)
-				Duel.ConfirmCards(1-tp,g)
-			end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+		if #g>0 then
+			Duel.BreakEffect()
+			Duel.SendtoHand(g,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,g)
+		end
 	end	
 end

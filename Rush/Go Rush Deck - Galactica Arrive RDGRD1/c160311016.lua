@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(Card.IsRace,tp,LOCATION_GRAVE,0,10,nil,RACE_GALAXY)
+	return Duel.IsExistingMatchingCard(Card.IsMonster,tp,LOCATION_GRAVE,0,10,nil)
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
@@ -29,6 +29,7 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_HAND,0,1,1,nil)
 	if #g>0 then
+		Duel.BreakEffect()
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
