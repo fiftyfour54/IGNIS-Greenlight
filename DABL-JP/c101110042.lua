@@ -70,7 +70,7 @@ function s.chk(c,sg)
 		and sg:IsExists(s.spfilter2,1,c)
 end
 function s.rescon(sg,e,tp)
-	aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(s.chk,1,nil,sg)
+	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(s.chk,1,nil,sg)
 end
 function s.spcon(e,c)
 	if c==nil then return true end
