@@ -25,12 +25,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.counterfilter)
 end
-s.listed_names={9012916}
+s.listed_names={CARD_BLACK_WINGED_DRAGON}
 function s.counterfilter(c)
 	return not c:IsSummonLocation(LOCATION_EXTRA) or c:IsType(TYPE_SYNCHRO)
 end
 function s.thfilter(c)
-	return aux.IsCodeListed(c,9012916) and not c:IsCode(id) and c:IsAbleToHand()
+	return aux.IsCodeListed(c,CARD_BLACK_WINGED_DRAGON) and not c:IsCode(id) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

@@ -3,13 +3,14 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--special summon
+	--Special summon 1 monster that is banished or in the GY
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -20,19 +21,19 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-	--replace destruction
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e5:SetCode(EFFECT_DESTROY_REPLACE)
-	e5:SetRange(LOCATION_SZONE)
-	e5:SetTarget(s.desreptg)
-	e5:SetValue(s.desrepval)
-	e5:SetOperation(s.desrepop)
-	c:RegisterEffect(e5)
+	--Replace destruction
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_DESTROY_REPLACE)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetTarget(s.desreptg)
+	e3:SetValue(s.desrepval)
+	e3:SetOperation(s.desrepop)
+	c:RegisterEffect(e3)
 end
-s.listed_names={CARD_BLACK_WINGED_DRAGON }
+s.listed_names={CARD_BLACK_WINGED_DRAGON}
 s.listed_series={0x33}
-s.counter_list={COUNTER_FEATHER }
+s.counter_list={COUNTER_FEATHER}
 function s.spcfilter(c,tp)
 	return c:IsFaceup() and c:IsSummonPlayer(tp) and c:IsAttribute(ATTRIBUTE_DARK)
 		and c:IsType(TYPE_SYNCHRO) and c:IsSummonLocation(LOCATION_EXTRA)

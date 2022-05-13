@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x33}
-s.listed_names={101110052,9012916}
+s.listed_names={101110052,CARD_BLACK_WINGED_DRAGON}
 function s.tfcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
@@ -50,7 +50,7 @@ function s.tfop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.cfilter(c,tp)
-	return ((c:IsSetCard(0x103) and c:IsType(TYPE_SYNCHRO)) or c:IsCode(9012916)) and c:IsControler(tp) 
+	return ((c:IsSetCard(0x103) and c:IsType(TYPE_SYNCHRO)) or c:IsCode(CARD_BLACK_WINGED_DRAGON)) and c:IsControler(tp) 
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
