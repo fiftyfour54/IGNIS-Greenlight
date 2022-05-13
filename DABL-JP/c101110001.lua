@@ -81,4 +81,9 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(function(_,c) return c:IsLocation(LOCATION_EXTRA) and not c:IsAttribute(ATTRIBUTE_DARK) end)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	--Clock Lizard check
+	aux.addTempLizardCheck(e:GetHandler(),tp,s.lizfilter)
+end
+function s.lizfilter(e,c)
+	return not c:GetOriginalAttribute()==ATTRIBUTE_DARK
 end
