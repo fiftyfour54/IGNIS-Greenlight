@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.tgop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={id}
+s.listed_names={id,CARD_BLACK_WINGED_DRAGON}
 s.listed_series={0x33}
 function s.spconfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x33) and not c:IsCode(id)
