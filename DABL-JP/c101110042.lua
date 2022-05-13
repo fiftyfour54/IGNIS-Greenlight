@@ -16,6 +16,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e0)
 	--Special Summon procedure
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
@@ -40,7 +41,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	--Destroy all cards on the field
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
+	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_DESTROY)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
 	e4:SetHintTiming(0,TIMING_END_PHASE)
@@ -57,12 +58,12 @@ s.listed_names={CARD_BLACK_WINGED_DRAGON}
 s.synchro_tuner_required=1
 --summon proc
 function s.spfilter1(c,tp)
-	return (c:IsType(TYPE_SYNCHRO) and c:IsType(TYPE_TUNER)) and (c:IsFaceup() or not c:IsOnField())
+	return c:IsType(TYPE_SYNCHRO) and c:IsType(TYPE_TUNER) and (c:IsFaceup() or not c:IsOnField())
 		and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true,true)
 end
 function s.spfilter2(c,tp)
 	return c:IsCode(CARD_BLACK_WINGED_DRAGON) and (c:IsFaceup() or not c:IsOnField())
-		and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
+		and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true,true)
 end
 function s.chk(c,sg)
 	return ((c:IsType(TYPE_SYNCHRO) and c:IsType(TYPE_TUNER))
@@ -70,7 +71,7 @@ function s.chk(c,sg)
 		and sg:IsExists(s.spfilter2,1,c)
 end
 function s.rescon(sg,e,tp)
-	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(s.chk,1,nil,sg)
+	return Duel.GetLocationCountFromEx(tp,tp,sg,e:GetHandler())>0 and sg:IsExists(s.chk,1,nil,sg)
 end
 function s.spcon(e,c)
 	if c==nil then return true end
@@ -88,9 +89,9 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,c)
 	local rg=g1:Clone()
 	rg:Merge(g2)
 	local g=aux.SelectUnselectGroup(rg,e,tp,2,2,s.rescon,1,tp,HINTMSG_REMOVE,nil,nil,true)
-	if #rg>0 then
-		rg:KeepAlive()
-		e:SetLabelObject(rg)
+	if #g>0 then
+		g:KeepAlive()
+		e:SetLabelObject(g)
 		return true
 	end
 	return false
