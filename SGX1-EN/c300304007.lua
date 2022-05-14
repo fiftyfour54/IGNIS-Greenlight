@@ -86,7 +86,6 @@ end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return (sumtype&SUMMON_TYPE_FUSION)~=SUMMON_TYPE_FUSION
 end
-end
 function s.desfilter(c,fid)
 	return c:GetFlagEffectLabel(id)==fid
 end
