@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCondition(function(e,tp) return Duel.GetLP(tp)<=500 end)
+	e2:SetCondition(function(_,tp) return Duel.GetLP(tp)<=500 end)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.atktg)
 	e2:SetOperation(s.atkop)
@@ -50,6 +50,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
+		e2:SetValue(RESET_TURN_SET)
 		c:RegisterEffect(e2)
 		--Cannot attack
 		local e3=Effect.CreateEffect(c)
@@ -65,12 +66,12 @@ end
 function s.heroiccount(tp)
 	local mct=Duel.GetMatchingGroupCount(aux.FilterFaceupFunction(Card.IsSetCard,0x6f),tp,LOCATION_ONFIELD,0,nil)
 	local oct=Duel.GetOverlayGroup(tp,1,0):FilterCount(Card.IsSetCard,nil,0x6f)
-	return mct + oct
+	return mct+oct
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c:IsFaceup() end
 	local ct=s.heroiccount(tp)
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil) and ct>0 end
+	if chk==0 then return ct>0 and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local tc=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
 	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,tc,1,0,ct*500)
@@ -80,7 +81,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	if not (tc:IsFaceup() and tc:IsRelateToEffect(e)) then return end
 	local ct=s.heroiccount(tp)
 	if ct>0 then
-		--Gains ATK
+		--Increase ATK
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)

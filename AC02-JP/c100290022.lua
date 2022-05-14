@@ -45,10 +45,9 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsAttackPos() end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,tp,1000)
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,c,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,e:GetHandler(),1,0,0)
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.Damage(tp,1000,REASON_EFFECT)<=0 then return end

@@ -6,9 +6,10 @@ function s.initial_effect(c)
 	--Decrease levels of Insect monsters by 1
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_LVCHANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.lvtg)
 	e1:SetOperation(s.lvop)
@@ -21,8 +22,8 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_CHANGE_POS)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_CHANGE_POS)
 	e3:SetCountLimit(1,{id,1})
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
@@ -30,7 +31,7 @@ function s.initial_effect(c)
 end
 s.listed_names={id}
 function s.filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_INSECT) and c:IsLevelAbove(1)
+	return c:IsFaceup() and c:IsRace(RACE_INSECT) and c:IsLevelAbove(2)
 end
 function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil) end
@@ -38,10 +39,12 @@ end
 function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_MZONE,0,nil)
 	if #g==0 then return end
+	local c=e:GetHandler()
 	for tc in g:Iter() do
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		--Reduce Level by 1
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EFFECT_UPDATE_LEVEL)
 		e1:SetValue(-1)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)

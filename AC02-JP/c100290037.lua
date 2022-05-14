@@ -3,7 +3,7 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Fusion summon procedure
+	--Fusion Summon procedure
 	Fusion.AddProcMix(c,true,true,s.ffilter1,s.ffilter2)
 	c:EnableReviveLimit()
 	--Inflict piercing battle damage
@@ -39,13 +39,15 @@ end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsReason(REASON_BATTLE+REASON_EFFECT) and c:IsReason(REASON_DESTROY) then
+		--Special Summon 2 Level 7 or lower Warrior monsters from your GY
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(id,0))
 		e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+		e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
-		e1:SetCountLimit(1,{id,1})
 		e1:SetRange(LOCATION_GRAVE)
+		e1:SetCountLimit(1,{id,1})
 		e1:SetTarget(s.sptg)
 		e1:SetOperation(s.spop)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
