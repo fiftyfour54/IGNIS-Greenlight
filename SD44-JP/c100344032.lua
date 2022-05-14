@@ -16,11 +16,11 @@ function s.initial_effect(c)
 	-- Excavate
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON)
-	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON+CATEGORY_DECKDES)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetRange(LOCATION_GRAVE)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_MOVE)
+	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.exccon)
 	e2:SetCost(aux.bfgcost)
@@ -30,7 +30,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x1034}
 function s.spfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsOriginalType(TYPE_MONSTER)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -48,11 +48,12 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Recover(tp,g:GetSum(function(c) return math.max(0,c:GetTextAttack()) end,nil),REASON_EFFECT)
 	end
 end
-function s.excconfilter(c)
+function s.excconfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsLocation(LOCATION_SZONE) and not c:IsPreviousLocation(LOCATION_SZONE)
+		and c:IsControler(tp) and c:GetSequence()<5
 end
 function s.exccon(e,tp,eg,ep,ev,re,r,rp)
-	return eg and eg:IsExists(s.excconfilter,1,nil)
+	return eg and eg:IsExists(s.excconfilter,1,nil,tp)
 end
 function s.exctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
@@ -61,6 +62,7 @@ function s.excop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	Duel.ConfirmDecktop(tp,1)
 	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
+	Duel.DisableShuffleCheck()
 	if tc:IsSetCard(0x1034) then
 		aux.ToHandOrElse(tc,tp,
 		function(sc)
