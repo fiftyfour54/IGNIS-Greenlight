@@ -1,4 +1,4 @@
---BF－ツインシャドウ
+--ＢＦ－ツインシャドウ
 --Blackwing - Twin Shadow
 --Scripted by Eerie Code
 local s,id=GetID()
@@ -20,10 +20,10 @@ function s.initial_effect(c)
 	e2:SetCondition(s.handcon)
 	c:RegisterEffect(e2)
 end
-s.listed_names={CARD_BLACK_WINGED_DRAGON }
+s.listed_names={CARD_BLACK_WINGED_DRAGON}
 s.listed_series={0x33}
 function s.tdfilter(c)
-	return c:IsSetCard(0x33) and c:HasLevel() and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED)) and c:IsAbleToDeckAsCost()
+	return c:IsSetCard(0x33) and c:HasLevel() and c:IsFaceup() and c:IsAbleToDeckOrExtraAsCost()
 end
 function s.spfilter(c,e,tp,lv)
 	return Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 and c:IsType(TYPE_SYNCHRO) 
@@ -44,17 +44,18 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return #pg<=0 and aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,0) end
 	local dg=aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,1,tp,HINTMSG_TODECK)
 	e:SetLabel(dg:GetSum(Card.GetLevel))
-	Duel.SendtoDeck(dg,nil,2,REASON_COST)
+	Duel.ConfirmCards(1-tp,dg)
+	Duel.SendtoDeck(dg,nil,SEQ_DECKSHUFFLE,REASON_COST)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,e:GetLabel())
-	if #g>0 then
-		Duel.SpecialSummon(g,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
+	if #g>0 and Duel.SpecialSummon(g,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)>0 then
+		g:GetFirst():CompleteProcedure()
 	end
 end
 function s.handcon(e)
-	return Duel.GetMatchingGroupCount(s.cfilter,e:GetHandler():GetControler(),LOCATION_MZONE,0,nil)>=2
+	return Duel.IsExistingMatchingCard(s.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,2,nil)
 end
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x33)
