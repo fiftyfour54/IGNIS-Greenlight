@@ -25,7 +25,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.counterfilter)
 end
-s.listed_names={CARD_BLACK_WINGED_DRAGON}
+s.listed_names={id,CARD_BLACK_WINGED_DRAGON,id+100}
 function s.counterfilter(c)
 	return not c:IsSummonLocation(LOCATION_EXTRA) or c:IsType(TYPE_SYNCHRO)
 end
@@ -45,7 +45,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.cfilter(c,tp)
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or (c:IsControler(tp) and c:GetSequence()<5)
+	return Duel.GetMZoneCount(tp,c)>0
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0
@@ -53,8 +53,8 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,nil,nil,tp)
 	Duel.Release(g,REASON_COST)
 	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetTargetRange(1,0)

@@ -5,6 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_CHAINING)
@@ -25,8 +26,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.setop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={CARD_BLACK_WINGED_DRAGON }
-s.counter_list={COUNTER_FEATHER }
+s.listed_names={CARD_BLACK_WINGED_DRAGON}
+s.counter_list={COUNTER_FEATHER}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
@@ -47,16 +48,16 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_BLACK_WINGED_DRAGON),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_BLACK_WINGED_DRAGON),tp,LOCATION_ONFIELD,0,1,nil)
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsSSetable() end
-	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsSSetable() end
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,0,0)
 end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsSSetable() then
-		Duel.SSet(tp,c)
+	if c:IsRelateToEffect(e) and c:IsSSetable() and Duel.SSet(tp,c)>0 then
 		--Banish it if it leaves the field
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3300)

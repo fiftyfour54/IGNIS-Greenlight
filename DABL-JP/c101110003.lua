@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e2:SetCondition(s.quickcon)
 	c:RegisterEffect(e2)
 end
@@ -46,7 +46,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_EXTRA,0,1,1,nil)
 	if #g<1 or Duel.SendtoGrave(g,REASON_EFFECT)<1 or not g:GetFirst():IsLocation(LOCATION_GRAVE) then return end
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		-- Negate effects
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 		local e1=Effect.CreateEffect(e:GetHandler())
