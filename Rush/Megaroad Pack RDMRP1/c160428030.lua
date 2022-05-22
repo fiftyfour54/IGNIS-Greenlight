@@ -33,7 +33,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if #dg>0 then
 		Duel.HintSelection(dg,true)
 		if Duel.Destroy(dg,REASON_EFFECT)>0 then
-			if Duel.Damage(1-tp,1000,REASON_EFFECT)==1000 and c:IsFaceup() anD c:IsRelateToEffect(e) then
+			if Duel.Damage(1-tp,1000,REASON_EFFECT)==1000 and c:IsFaceup() and c:IsRelateToEffect(e) then
 				Duel.BreakEffect()
 				Duel.SendToHand(c,REASON_EFFECT)
 			end
