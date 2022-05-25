@@ -1,3 +1,4 @@
+-- ハイヒー・プリーステス
 -- Lady of Pumps
 local s,id=GetID()
 function s.initial_effect(c)
@@ -16,7 +17,7 @@ function s.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_AQUA) and c:IsLevelAbove(7)
 end
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
+	return e:GetHandler():IsStatus(STATUS_SUMMON_TURN) and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
@@ -29,6 +30,8 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.Draw(p,d,REASON_EFFECT)<1 then return end
 	local g=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.filter),tp,LOCATION_MZONE,0,nil)
 	if #g==0 then return end
+	local c=e:GetHandler()
+	Duel.BreakEffect()
 	for tc in g:Iter() do
 		--Increase ATK
 		local e1=Effect.CreateEffect(c)

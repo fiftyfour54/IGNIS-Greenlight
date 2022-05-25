@@ -1,4 +1,4 @@
--- 悪夢再び
+--悪夢再び
 --Recurring Nightmare (Rush)
 local s,id=GetID()
 function s.initial_effect(c)
@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.thfilter(c)
-	return c:IsDefenseBelow(0) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToHand()
+	return c:IsDefense(0) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToHand()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,2,nil) end

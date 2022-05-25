@@ -3,7 +3,7 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Fusion summon procedure
+	--Fusion Summon procedure
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,CARD_CAN_D,160428037)
 	--Special Summon 1 Level 6 or lower Psychic monster from the GY
@@ -30,7 +30,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	Duel.HintSelection(g)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end

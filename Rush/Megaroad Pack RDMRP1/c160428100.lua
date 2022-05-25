@@ -6,10 +6,10 @@ function s.initial_effect(c)
 	Card.Alias(c,67169062)
 	--Shuffle 5 monsters into the deck to draw 1
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCategory(CATEGORY_DRAW)
-	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
@@ -31,8 +31,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	--Requirement
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,5,5,nil)
-	Duel.HintSelection(g)
-	if Duel.SendtoDeck(g,nil,5,REASON_COST)>0 then
+	if #g==0 then return end
+	Duel.HintSelection(g,true)
+	if Duel.SendtoDeck(g,nil,5,REASON_COST)==5 then
 		Duel.ShuffleDeck(tp)
 		--Effect
 		local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)

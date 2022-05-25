@@ -23,7 +23,7 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,e:GetHandler(),1,tp,1000)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,1,1-tp,700)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_DAMAGE,nil,1,1-tp,700)
 end
 function s.zmbfilter(c)
 	return c:IsRace(RACE_ZOMBIE) and c:IsLevel(7)
@@ -37,8 +37,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		local c=e:GetHandler()
 		if c:IsFaceup() and c:IsRelateToEffect(e) and c:UpdateAttack(1000,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)==1000
 			and Duel.IsExistingMatchingCard(s.zmbfilter,tp,LOCATION_GRAVE,0,1,nil) then
-				Duel.BreakEffect()
-				Duel.Damage(1-tp,700,REASON_EFFECT)
+			Duel.BreakEffect()
+			Duel.Damage(1-tp,700,REASON_EFFECT)
 		end
 	end
 end

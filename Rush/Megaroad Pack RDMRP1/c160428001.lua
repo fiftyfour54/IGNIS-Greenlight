@@ -1,3 +1,4 @@
+--超魔輝獣マグナム・オーバーロード［Ｌ］
 --Supreme Beast Magnum Overlord [L]
 local s,id=GetID()
 function s.initial_effect(c)
@@ -24,11 +25,8 @@ function s.maxCon(e)
 	return e:GetHandler():IsMaximumModeCenter()
 end
 function s.val(e,c)
-	return Duel.GetFieldGroupCount(c:GetControler(),0,LOCATION_MZONE)*500
-end
-function s.cfilter(c)
-	return c:IsType(TYPE_MONSTER)
+	return Duel.GetFieldGroupCountRush(c:GetControler(),0,LOCATION_MZONE)*500
 end
 function s.pcon(e)
-	return e:GetHandler():IsMaximumModeCenter() and Duel.GetMatchingGroupCount(s.cfilter,e:GetHandler():GetControler(),LOCATION_GRAVE,0,nil)>=10
+	return e:GetHandler():IsMaximumModeCenter() and Duel.GetMatchingGroupCount(Card.IsMonster,e:GetHandler():GetControler(),LOCATION_GRAVE,0,nil)>=10
 end

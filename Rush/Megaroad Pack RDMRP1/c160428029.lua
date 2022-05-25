@@ -9,24 +9,19 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
-	e1:SetCost(s.cost)
 	e1:SetCondition(s.condition)
-	e1:SetTarget(s.target)
+	e1:SetCost(s.cost)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,1) end
 end
 function s.psyfilter(c)
 	return c:IsFaceup() and (c:IsRace(RACE_PSYCHIC) or c:IsRace(RACE_OMEGAPSYCHIC))
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(s.psyfilter,tp,0,LOCATION_MZONE,1,nil)
+	return Duel.IsExistingMatchingCard(s.psyfilter,tp,0,LOCATION_MZONE,1,e:GetHandler())
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,nil,1,tp,200)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,1) end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	--Requirement
@@ -48,7 +43,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffectRush(e1)
 		--Prevent Trap cards activations
-		local e2=Effect.CreateEffect(e:GetHandler())
+		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 		e2:SetOperation(s.atkop)
@@ -68,7 +63,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.aclimit(e,re,tp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsType(TYPE_TRAP)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP)
 end
 function s.actcon(e)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE

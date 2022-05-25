@@ -1,3 +1,4 @@
+--超魔輝獣マグナム・オーバーロード
 --Supreme Beast Magnum Overlord
 local s,id=GetID()
 function s.initial_effect(c)
@@ -26,5 +27,5 @@ function s.indcon(e)
 	return e:GetHandler():IsMaximumMode()
 end
 function s.indval(e,re,rp)
-	return re:IsActiveType(TYPE_TRAP)
+	return re:IsActiveType(TYPE_TRAP) and re:GetOwnerPlayer()==1-e:GetHandlerPlayer()
 end
