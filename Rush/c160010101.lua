@@ -1,5 +1,5 @@
 --碧牙の爆速竜
---Bluetooth Burst Dragon
+--Blue-Tooth Burst Dragon
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)

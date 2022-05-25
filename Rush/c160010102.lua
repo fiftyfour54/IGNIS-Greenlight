@@ -1,5 +1,5 @@
 --河童大帝リバースライダー
---Kappa Emperor Reverse Rider
+--Kappa Emperor River Slider
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
@@ -25,19 +25,19 @@ function s.desfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsLevelBelow(7)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.desfilter,tp,0,LOCATION_MZONE,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,2,tp,LOCATION_MZONE)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FilterMaximumSideFunctionEx(s.desfilter),tp,0,LOCATION_MZONE,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_MZONE)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	--Requirement
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	if Duel.SendtoGrave(g,REASON_COST)~=0 then
-		local dg=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil)
+	if Duel.SendtoGrave(g,REASON_COST)>0 then
+		local dg=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.desfilter),tp,0,LOCATION_MZONE,nil)
 		if #dg>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 			local sg=dg:Select(tp,1,2,nil)
-			Duel.HintSelection(sg)
+			Duel.HintSelection(sg,true)
 			sg=sg:AddMaximumCheck()
 			Duel.Destroy(sg,REASON_EFFECT)
 		end
