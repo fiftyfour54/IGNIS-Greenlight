@@ -40,11 +40,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e0:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e0,tp)
 	--Requirement
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SELECT)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 	local rc=Duel.SelectMatchingCard(tp,s.zfilter,tp,LOCATION_HAND,0,1,1,nil,true):GetFirst()
 	if rc then
 		Duel.ConfirmCards(1-tp,rc)
 		Duel.ShuffleHand(tp)
+	end
 	--Effect
 	local ft=Duel.GetMZoneCount(tp)
 	if ft<1 then return end
