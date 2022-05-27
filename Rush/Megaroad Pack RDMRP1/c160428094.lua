@@ -32,7 +32,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	local ct=Duel.SendtoGrave(g,REASON_COST)
 	local tg=Duel.GetOperatedGroup():GetFirst()
-	if ct==0 or Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then then return end
+	if ct==0 or Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
 	--Effect
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
