@@ -37,16 +37,13 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		res=Duel.ChangePosition(g,POS_FACEUP_DEFENSE)
 	end
-	if res=#g or res==0 then return end --if at least 1 was not changed, the cost was not paid, right?
+	if res~=#g or res==0 then return end --if at least 1 was not changed, the cost was not paid, right?
 	--Effect
 	local hg=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
 	local mct=Duel.GetMatchingGroup(s.defposfilter,tp,LOCATION_MZONE,0,nil)
 	local ct=math.min(mct,#hg)
 	if ct==0 then return end
-	local ammount={}
-	local i=1
-	for i=1,ct do ammount[i]=i end
-	local total=Duel.AnnounceNumber(tp,table.unpack(ammount))
+	local total=Duel.AnnounceNumberRange(tp,1,ct)
 	local tg=hg:RandomSelect(tp,total)
 	if Duel.SendtoGrave(tg,REASON_EFFECT)>0 then
 		local og=Duel.GetOperatedGroup():FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)
