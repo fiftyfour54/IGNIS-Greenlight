@@ -46,7 +46,3 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-[REQUIREMENT]
-Shuffle 3 Pyro Type monsters from your Graveyard into the Deck.
-[EFFECT]
-All face-up monsters on your opponent's field lose ATK equal to [the number of monsters in your opponent's Graveyard] x 100 until the end of this turn.
