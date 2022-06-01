@@ -29,7 +29,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(sg,REASON_COST)
 end
 function s.spfilter(c,e,tp)
-	return c.roll_dice and c:IsCanBeSpecialSummoned(e,0,tp,false,false) -
+	return c.roll_dice and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 --[[
 -This might need to be updated:
