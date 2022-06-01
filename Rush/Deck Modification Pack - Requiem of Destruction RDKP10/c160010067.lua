@@ -18,11 +18,11 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return a and b and a:IsControler(1-tp) and b:IsControler(tp) and b:IsFaceup() and b:IsRace(RACE_AQUA)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then true end
+	if chk==0 then return true end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
-	if not a then  return end
+	if not a then return end
 	local value=a:GetAttack()
 	if value>0 then
 		Duel.Recover(tp,value,REASON_EFFECT)
