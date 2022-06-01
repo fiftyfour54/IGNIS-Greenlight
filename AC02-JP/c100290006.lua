@@ -23,19 +23,19 @@ end
 function s.spcfilter(c,tp)
 	return Duel.GetMZoneCount(tp,c)>0
 end
-function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.spcfilter,1,false,nil,nil,tp) end
 	local sg=Duel.SelectReleaseGroupCost(tp,s.spcfilter,1,1,false,nil,nil,tp)
 	Duel.Release(sg,REASON_COST)
 end
 function s.spfilter(c,e,tp)
 	return c.roll_dice and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	--[[
+	-This might need to be updated due top the following text:
+	If you control a card that has an effect that requires a die roll: Tribute 1 monster;
+	Special Summon 1 monster from your hand or Deck THAT HAS A MONSTER EFFECT that requires a die roll.
+	]]
 end
---[[
--This might need to be updated:
-If you control a card that has an effect that requires a die roll: Tribute 1 monster;
-Special Summon 1 monster from your hand or Deck THAT HAS A MONSTER EFFECT that requires a die roll.
-]]
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
