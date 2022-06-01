@@ -17,7 +17,7 @@ end
 function s.dicefilter(c)
 	return c.roll_dice and c:IsFaceup()
 end
-function s.condition(e,tp,eg,ep,ev,re,r,rp,)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.dicefilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function s.spcfilter(c,tp)
@@ -45,6 +45,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,e,tp)
 	if #g>0 then
-		Duel.SpecialSummonStep(g:GetFirst(),0,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
