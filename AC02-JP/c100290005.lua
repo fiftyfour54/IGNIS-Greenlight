@@ -21,6 +21,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.diceop)
 	c:RegisterEffect(e2)
 end
+s.dice_roll=true
 s.listed_names={100290006} --Dimension Dice's ID, to be replaced by the official ID later
 function s.thfilter(c)
 	return c:IsCode(100290006) and c:IsAbleToHand()
@@ -35,10 +36,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,sg)
 	end
 end
+--Note: scripted as if the effect applies only to monsters the players current control
 function s.dicetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b1=Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil)
 	local b2=Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
-	if ckh==0 then return b1 or b2 end
+	if chk==0 then return b1 or b2 end
 	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,1,PLAYER_ALL,0)
 end
 function s.diceop(e,tp,eg,ep,ev,re,r,rp)
@@ -53,7 +55,7 @@ function s.diceop(e,tp,eg,ep,ev,re,r,rp)
 		g2:ForEach(s.atkchange,res2,e:GetHandler())
 	end
 end
-function s.atkchange(tc,option,c)
+function s.atkchange(tc,opt,c)
 	if opt==5 or opt==6 then --for double or half ATK
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
