@@ -17,7 +17,7 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local b=Duel.GetAttackTarget()
 	return a and b and a:IsControler(1-tp) and b:IsControler(tp) and b:IsFaceup() and b:IsRace(RACE_AQUA)
 end
-function s.activate(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
