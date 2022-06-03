@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.searchop)
 	c:RegisterEffect(e3)
 	--Target 1 "Advanced Crystal Beast" card and add it to hand or to the deck
-	local e4:Effect.CreateEffect()
+	local e4=Effect.CreateEffect()
 	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_TODECK)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
