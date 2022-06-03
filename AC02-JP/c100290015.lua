@@ -96,7 +96,7 @@ function s.thdop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		aux.ToHandOrElse(tc,tp,
 			function(c) return c:IsAbleToDeck() end,
-			function Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT) end,
+			function(tc) Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT) end,
 			aux.Stringid(id,2)
 		)
 	end
