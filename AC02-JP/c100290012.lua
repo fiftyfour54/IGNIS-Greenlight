@@ -67,5 +67,3 @@ function s.replaceop(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1)
 	Duel.RaiseEvent(c,EVENT_CUSTOM+47408488,e,0,tp,0,0)
 end
---[[
-If "Advanced Dark" is not in the Field Zone, send this card to the GY. Once per turn (Quick Effect): You can target 1 face-up monster on the field; change its battle position. If this face-up card is destroyed in a Monster Zone, you can place it face-up in your Spell & Trap Zone as a Continuous Spell, instead of sending it to the GY.
