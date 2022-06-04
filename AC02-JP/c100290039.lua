@@ -25,11 +25,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x4}
-function s.pzcheck(tp)
-	return Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)
-end
 function s.pendfilter(c,tp)
-	return c:IsType(TYPE_PENDULUM) and not c:IsForbidden() and s.pzcheck(tp) 
+	return c:IsType(TYPE_PENDULUM) and not c:IsForbidden() and aux.CheckPendulumZones(tp)
 end
 function s.cfilter(c,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x4) and (c:IsAbleToHand() or s.pendfilter(c,tp))
