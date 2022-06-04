@@ -3,6 +3,7 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
+	Duel.EnableGlobalFlag(GLOBALFLAG_SELF_TOGRAVE)
 	--Send itself to the GY if "Adanced Dark" is not face-up in the Field Spell Zone
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -23,7 +24,7 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_DIRECT_ATTACK)
-	e3:SetRange(LOCATION_SZONE)
+	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(LOCATION_MZONE,0)
 	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x5034))
 	c:RegisterEffect(e3)
@@ -31,7 +32,7 @@ function s.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
-	e4:SetRange(LOCATION_SZONE)
+	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
 	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x5034))
 	e4:SetCondition(s.rdmgcond)
@@ -39,7 +40,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 s.listed_names={CARD_ADVANCED_DARK}
-s.listed_series={0x5034} --same as the anime versions for now
+s.listed_series={0x5034}
 function s.tgcon(e)
 	return not Duel.IsEnvironment(CARD_ADVANCED_DARK)
 end

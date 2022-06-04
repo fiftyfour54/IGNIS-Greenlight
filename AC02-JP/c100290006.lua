@@ -30,11 +30,8 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.spfilter(c,e,tp)
 	return c.roll_dice and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-	--[[
-	-This might need to be updated due top the following text:
-	If you control a card that has an effect that requires a die roll: Tribute 1 monster;
-	Special Summon 1 monster from your hand or Deck THAT HAS A MONSTER EFFECT that requires a die roll.
-	]]
+		and c:IsType(TYPE_EFFECT)
+	--pending rulings, cannot SS Normal Pendulums with a die roll Pendulum Effect
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end

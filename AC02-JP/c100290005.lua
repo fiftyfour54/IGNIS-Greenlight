@@ -13,6 +13,7 @@ function s.initial_effect(c)
 	--At the start of the Battle Phase, roll die and apply effects
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_DICE+CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_PHASE+PHASE_BATTLE_START)
 	e2:SetRange(LOCATION_FZONE)
@@ -21,7 +22,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.diceop)
 	c:RegisterEffect(e2)
 end
-s.dice_roll=true
+s.roll_dice=true
 s.listed_names={100290006} --Dimension Dice's ID, to be replaced by the official ID later
 function s.thfilter(c)
 	return c:IsCode(100290006) and c:IsAbleToHand()
@@ -44,15 +45,18 @@ function s.dicetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,1,PLAYER_ALL,0)
 end
 function s.diceop(e,tp,eg,ep,ev,re,r,rp)
-	local res1=Duel.TossDice(tp,1)
-	local res2=Duel.TossDice(1-tp,1)
+	local turn_p=Duel.GetTurnPlayer()
+	local res1=Duel.TossDice(turn_p,1)
+	local res2=Duel.TossDice(1-turn_p,1)
 	local g1=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
 	local g2=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
+	if #g1==0 and #g2==0 then return end
+	local c=e:GetHandler()
 	if #g1>0 then
-		g1:ForEach(s.atkchange,res1,e:GetHandler())
+		g1:ForEach(s.atkchange,res1,c)
 	end
 	if #g2>0 then
-		g2:ForEach(s.atkchange,res2,e:GetHandler())
+		g2:ForEach(s.atkchange,res2,c)
 	end
 end
 function s.atkchange(tc,opt,c)

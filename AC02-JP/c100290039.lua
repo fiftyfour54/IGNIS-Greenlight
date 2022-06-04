@@ -8,6 +8,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMING_BATTLE_START+TIMING_END_PHASE)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
@@ -25,25 +26,25 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x4}
-function s.pendfilter(c,tp)
-	return c:IsType(TYPE_PENDULUM) and not c:IsForbidden() and aux.CheckPendulumZones(tp)
-end
-function s.cfilter(c,tp)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x4) and (c:IsAbleToHand() or s.pendfilter(c,tp))
-end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
+function s.pendfilter(c,tp)
+	return c:IsType(TYPE_PENDULUM) and not c:IsForbidden() and aux.CheckPendulumZones(tp)
+end
+function s.cfilter(c,tp)
+	return c:IsMonster() and c:IsSetCard(0x4) and (c:IsAbleToHand() or s.pendfilter(c,tp))
+end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_DECK,0,nil,tp)
-	if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SELECT)
+	if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
 		local tc=g:Select(tp,1,1,nil)
-		aux.ToHandOrElse(tc,tp,s.pendfilter(tc,tp),
-						function(tc,tp) Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true) end,
-						aux.Stringid(id,2)
+		aux.ToHandOrElse(tc,tp,function(tc) return s.pendfilter(tc,tp) end,
+						function(tc) Duel.MoveToField(tc:GetFirst(),tp,tp,LOCATION_PZONE,POS_FACEUP,true) end,
+						aux.Stringid(id,3)
 						)
 	end
 end
@@ -58,5 +59,5 @@ function s.lptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,ev)
 end
 function s.lpop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Recover(tp,ev,REASON_EFFECT,true)
+	Duel.Recover(tp,ev,REASON_EFFECT)
 end
