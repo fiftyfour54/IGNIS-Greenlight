@@ -34,7 +34,7 @@ end
 function s.thfilter(c)
 	return c:IsSetCard(0x283) and not c:IsCode(93504463,23377425,18205590)
 		and (c:IsAbleToHand() or c:IsAbleToGrave())
-	--Since the card did not receive the setcode yet, use c:IsCode(63945693) to test adding "Rainbow Bridge" t hand
+	--Since the card did not receive the setcode yet, use c:IsCode(63945693) to test adding "Rainbow Bridge" to hand
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x1034) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -46,9 +46,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local label=e:GetLabel() --1, if revealed, 0 otherwise. 1=only 1 effect, 0=only 1 effect or both 
 	--It might not be necessary to check for label in the second and third options in this SelectEffect:
 	local op=aux.SelectEffect(tp,
-		{(b1 and b2 and label==0), aux.Stringid(id,2)}, --both effects
-		{(b1 and (label==0 or label==1)), aux.Stringid(id,3)},--to hand or to gy
-		{(b2 and (label==0 or label==1)), aux.Stringid(id,4)})--special summon
+		{(b1 and b2 and label==0), aux.Stringid(id,1)}, --both effects
+		{(b1 and (label==0 or label==1)), aux.Stringid(id,2)},--to hand or to gy
+		{(b2 and (label==0 or label==1)), aux.Stringid(id,3)})--special summon
 	if op==1 then
 		e:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_TOGRAVE+CATEGORY_SPECIAL_SUMMON)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATIONS)
@@ -69,7 +69,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local b1=Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)
 	local b2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATIONS,0,1,nil,e,tp)
 	if b1 and (opt==1 or opt==2) then
-		--Add to hand OR send to Grave
+		--Add to hand OR send to GY 1 "Bridge" card
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SELECT)
 		local tc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
 		if #tc>0 then
@@ -77,7 +77,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	if b2 and (opt==1 or opt==3) then
-		--Special Summon
+		--Special Summon 1 "Crystal Beast" monster
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATIONS,0,1,1,nil,e,tp)
 		if #g>0 then
