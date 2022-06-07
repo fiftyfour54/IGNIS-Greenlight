@@ -70,7 +70,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp)
 	local opt=e:GetLabel() --1= both, 2=TohandOrGY, 3= SpecialSummon
 	local b1=Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)
 	local b2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATIONS,0,1,nil,e,tp)
-	if b1 (and opt==1 or opt==2) then
+	if b1 and (opt==1 or opt==2) then
 		--Add to hand OR send to Grave
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SELECT)
 		local tc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
