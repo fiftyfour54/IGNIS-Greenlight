@@ -19,13 +19,10 @@ function s.cfilter(c,opt)
 	return c:IsSetCard(0x2034) and((opt==1 and not c:IsPublic()) or (opt==2 and c:IsFaceup()))
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local a=Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil,1) --to reveal
-	local b=Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil,2) --already on the field 
-	if chk==0 then return a or b end
-	local op=aux.SelectEffect(tp,
-		{a,aux.Stringid(id,0)},
-		{b,aux.Stringid(id,1)})
-	if op==1 then
+	local b1=Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil,1) --to reveal
+	local b2=Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil,2) --already on the field 
+	if chk==0 then return b1 or b2 end
+	if b1 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 		local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,nil,1)
 		Duel.ConfirmCards(1-tp,g)
