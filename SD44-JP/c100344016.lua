@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 local LOCATIONS=LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE+LOCATION_SZONE
-s.listed_series={0x1034,0x2034,0x283} --Crytal Beast, Ultimate Crystal, Bridge
+s.listed_series={0x1034,0x2034,0x283} --Crystal Beast, Ultimate Crystal, Bridge
 function s.cfilter(c,opt)
 	return c:IsSetCard(0x2034) and((opt==1 and not c:IsPublic()) or (opt==2 and c:IsFaceup()))
 end
@@ -87,12 +87,3 @@ function s.target(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
-
---[[
-Reveal 1 "Ultimate Crystal" monster in your hand to activate 1 of these effects;
-OR
-If you control an "Ultimate Crystal" monster: Activate 1 or both of these effects;
-● Take 1 "Bridge" card (except "Evolutionary Bridge", "S-Force Bridgehead", and "Satellarknight Skybridge") or 1 "Rainbow Refraction" from your Deck, and either add it to your hand or send it to the GY.
-● Special Summon 1 "Crystal Beast" Monster Card from your hand, Deck, GY, or Spell & Trap Zone.
-You can only activate 1 "Awakening of the Crystal Lord" per turn.
