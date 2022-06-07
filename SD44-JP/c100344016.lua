@@ -36,7 +36,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.thfilter(c)
 	return c:IsSetCard(0x283)) and not c:IsCode(93504463,23377425,18205590)
-		and (c:IsAbleToHand() or c:IsAbleToGrave()
+		and (c:IsAbleToHand() or c:IsAbleToGrave())
 	--Since the card did not receive the setcode yet, use c:IsCode(63945693) to test adding "Rainbow Bridge" t hand
 end
 function s.spfilter(c,e,tp)
