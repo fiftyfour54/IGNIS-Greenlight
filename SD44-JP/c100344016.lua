@@ -23,11 +23,11 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b=Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil,2) --already on the field 
 	if chk==0 then return a or b end
 	local op=aux.SelectEffect(tp,
-		{a,aux.Stringid(id,0)},
-		{b,aux.Stringid(id,1)})
+		{a,aux.Stringid(19048328,2)},
+		{b,aux.Stringid(19048328,3)})
 	if op==1 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-		local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil,1)
+		local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,nil,1)
 		Duel.ConfirmCards(1-tp,g)
 		e:SetLabel(1) --if revealed, can only use one of the effects
 	else
@@ -48,9 +48,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local label=e:GetLabel() --1, if revealed, 0 otherwise. 1=only 1 effect, 0=only 1 effect or both 
 	--It might not be necessary to check for label in the second and third options here:
 	local op=aux.SelectEffect(tp,
-		{b1 and b2 and label==0, aux.Stringid(id,2)}, --both effects
-		{b1 and (label==0 or label==1), aux.Stringid(id,2)},--to hand or to gy
-		{b2 and (label==0 or label==1), aux.Stringid(id,3)})--special summon
+		{b1 and b2 and label==0, aux.Stringid(19048328,4)}, --both effects
+		{b1 and (label==0 or label==1), aux.Stringid(19048328,5)},--to hand or to gy
+		{b2 and (label==0 or label==1), aux.Stringid(19048328,6)})--special summon
 	if op==1 then
 		e:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_TOGRAVE+CATEGORY_SPECIAL_SUMMON)
 		Duel.SetOperationOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATIONS)
@@ -81,7 +81,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp)
 	if b2 and (opt==1 or opt==3) then
 		--Special Summon
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATIONS,0,1,1,nil,e,tp)
+		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATIONS,0,1,1,nil,e,tp)
 		if #g>0 then
 			Duel.SpecialSummon(g2,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 		end
