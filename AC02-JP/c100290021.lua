@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.thcond(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(nil,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)>0
 end
 function s.eqpfilter(c)
 	return c:IsType(TYPE_SPELL) and c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
@@ -37,16 +37,12 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local g=aux.SelectUnselectGroup(rvg,e,tp,2,2,aux.dncheck,1,tp,HINTMSG_CONFIRM)
 	if #g==2 then
 		Duel.ConfirmCards(1-tp,g)
+		Duel.ShuffleDeck(tp)
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
-		local sg=g:RandomSelect(1-tp,1):GetFirst()
-		if sg:IsAbleToHand() then
-			Duel.SendtoHand(sg,tp,REASON_EFFECT)
-			Duel.ConfirmCards(tp,sg)
-			Duel.ShuffleHand(1-tp)
-		else
-			Duel.SendtoGrave(sg,REASON_RULE)
-		end
+		local sg=g:Select(1-tp,1,1,nil)
+		Duel.SendtoHand(sg,tp,REASON_EFFECT)
 		g:RemoveCard(sg)
+		Duel.ShuffleDeck(tp)
 		Duel.MoveToDeckBottom(g,tp)
 	end
 end
