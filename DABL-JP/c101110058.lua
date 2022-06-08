@@ -11,13 +11,12 @@ function s.initial_effect(c)
 	-- Mill 3 cards
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_DECKDES)
+	e1:SetCategory(CATEGORY_DECKDES+CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetRange(LOCATION_SZONE)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.tgcon)
 	e1:SetTarget(s.tgtg)
 	e1:SetOperation(s.tgop)
 	c:RegisterEffect(e1)
@@ -35,16 +34,16 @@ function s.initial_effect(c)
 	e3:SetCondition(function(e) return e:GetHandler():IsReason(REASON_EFFECT) end)
 	e3:SetTarget(s.thtg)
 	e3:SetOperation(s.thop)
-	c:RegisterEffect(e2)
+	c:RegisterEffect(e3)
 end
 s.listed_names={CARD_VISAS_STARFROST}
 s.listed_series={0x182}
-function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_VISAS_STARFROST),tp,LOCATION_ONFIELD,0,1,eg)
-		or Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x182),tp,LOCATION_MZONE,0,1,eg)
+function s.cfilter(c)
+	return c:IsFaceup() and (c:IsCode(CARD_VISAS_STARFROST) or (c:IsSetCard(0x182) and c:IsMonster()))
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,3) end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,3)
+		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_ONFIELD,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,3)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
