@@ -1,6 +1,7 @@
 --鉄球魔神ゴロゴーン
 --Thunder Ball
 --scripted by Naim
+
 local s,id=GetID()
 function s.initial_effect(c)
 	--Special summon itself from the hand
