@@ -43,7 +43,7 @@ function s.initial_effect(c)
 	e4:SetOperation(s.rmop)
 	c:RegisterEffect(e4)
 end
-s.listed_series={SET_KSHATRILA }
+s.listed_series={0x285}
 function s.ntcon(e,c,minc)
 	if c==nil then return true end
 	return minc==0 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
@@ -52,7 +52,7 @@ function s.nttg(e,c)
 	return c:IsLevel(7)
 end
 function s.spfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_KSHATRILA) and not c:IsType(TYPE_XYZ)
+	return c:IsFaceup() and c:IsSetCard(0x285) and not c:IsType(TYPE_XYZ)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
