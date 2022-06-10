@@ -45,7 +45,7 @@ end
 s.listed_names={63708033,101110025}
 s.listed_series={0x183}
 function s.atkcon(e)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsAttribute,ATTRIBUTE_EARTH),e:GetHandlerPlayer(),LOCATION_MZONE,0,2,nil)
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsAttribute,ATTRIBUTE_EARTH),e:GetHandlerPlayer(),LOCATION_MZONE,0,5,nil)
 end
 function s.spcostfilter(c)
 	return c:IsCode(63708033) and c:IsAbleToRemoveAsCost()
@@ -73,7 +73,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.thconfilter(c,tp)
-	return c:IsSummonLocation(LOCATION_GRAVE) and c:IsPreviousControler(tp)
+	return c:IsSetCard(0x183) and c:IsPreviousLocation(LOCATION_GRAVE) and c:IsPreviousControler(tp)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.thconfilter,1,nil,tp)
