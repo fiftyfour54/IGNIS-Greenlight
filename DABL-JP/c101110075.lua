@@ -2,13 +2,12 @@
 --Scareclaw Twinsaw
 --scripted by Naim
 local s,id=GetID()
-local s,id=GetID()
 function s.initial_effect(c)
 	--Tribute 1 "Scareclaw" monster to destroy 2 targets
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_REMOVE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
@@ -19,7 +18,8 @@ function s.initial_effect(c)
 	--Prevent the activation of effect of Link monsters
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCondition(s.gycond)
 	e2:SetCost(aux.bfgcost)
@@ -43,18 +43,23 @@ function s.spcheck(sg,tp,exg,dg)
 	end
 	return #dg-a>=2
 end
+function s.tgfilter(c,e,tp)
+	if not c:IsCanBeEffectTarget(e) then return false end
+	local visas=Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_VISAS_STARFROST),tp,LOCATION_ONFIELD,0,1,nil)
+	return not visas or c:IsAbleToRemove()
+end
 function s.cfilter(c)
 	return c:IsSetCard(0x17c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc~=e:GetHandler() end
-	local dg=Duel.GetMatchingGroup(Card.IsCanBeEffectTarget,tp,0,LOCATION_ONFIELD,e:GetHandler(),e)
+	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and s.tgfilter(chkc,e,tp) end
+	local dg=Duel.GetMatchingGroup(s.tgfilter,tp,0,LOCATION_ONFIELD,nil,e,tp)
 	if chk==0 then
 		if e:GetLabel()==1 then
 			e:SetLabel(0)
 			return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,s.spcheck,nil,dg)
 		else
-			return Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_ONFIELD,1,e:GetHandler())
+			return Duel.IsExistingTarget(nil,tp,0,LOCATION_ONFIELD,1,nil)
 		end
 	end
 	if e:GetLabel()==1 then
@@ -63,25 +68,24 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.Release(sg,REASON_COST)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,2,2,e:GetHandler())
+	local g=Duel.SelectTarget(tp,s.tgfilter,tp,0,LOCATION_ONFIELD,2,2,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,tp,0)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_REMOVE,g,#g,tp,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
-	local loc=LOCATION_REMOVED and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_VISAS_STARFROST),tp,LOCATION_ONFIELD,0,1,nil)
-	Duel.Destroy(sg,REASON_EFFECT,loc)
+	local tg=Duel.GetTargetCards(e)
+	if #tg==0 then return end
+	local loc=Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,CARD_VISAS_STARFROST),tp,LOCATION_ONFIELD,0,1,nil) and LOCATION_REMOVED or LOCATION_GRAVE
+	Duel.Destroy(tg,REASON_EFFECT,loc)
 end
 function s.gycond(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsLinkAbove,3),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 and Duel.GetFlagEffect(1-tp,id)==0 end
+	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
-	Duel.RegisterFlagEffect(1-tp,id,RESET_PHASE+PHASE_END,0,1)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetType(EFFECT_TYPE_FIELD)
