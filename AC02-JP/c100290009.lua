@@ -1,5 +1,5 @@
 -- 鎮魂の決闘
--- Requiem Duel
+-- Battle of Sleeping Spirits
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
