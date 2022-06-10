@@ -59,7 +59,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 			e:SetLabel(0)
 			return Duel.CheckReleaseGroupCost(tp,s.cfilter,1,false,s.spcheck,nil,dg)
 		else
-			return Duel.IsExistingTarget(nil,tp,0,LOCATION_ONFIELD,1,nil)
+			return Duel.IsExistingTarget(s.tgfilter,tp,0,LOCATION_ONFIELD,1,nil,e,tp)
 		end
 	end
 	if e:GetLabel()==1 then
