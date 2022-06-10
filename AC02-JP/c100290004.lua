@@ -26,10 +26,10 @@ function s.initial_effect(c)
 	e2:SetTarget(s.destg)
 	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
-	--Return a cardfrom the Gy to the hand
+	--Return a card from the GY to the hand
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_TOHAND)
+	e3:SetCategory(CATEGORY_DICE+CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_TO_GRAVE)
@@ -58,7 +58,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHanlder()
 	local cg=c:GetColumnGroup():Filter(Card.IsMonster,c)
 	if #cg>0 then
-		Duel.Destroy(g,REASON_EFFECT)
+		Duel.Destroy(cg,REASON_EFFECT)
 	end
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -73,7 +73,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-
 function s.thcond(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsReason(REASON_DESTROY)
@@ -82,6 +81,7 @@ end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_GRAVE,0,1,nil) end
 	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,0,tp,1)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,tp,LOCATION_GRAVE)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
