@@ -1,5 +1,5 @@
--- Kshatri-La Unicorn
 -- クシャトリラ・ユニコーン
+-- Kshatri-La Unicorn
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -35,7 +35,7 @@ function s.initial_effect(c)
 	local e4=e3:Clone()
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e4:SetProperty(EFFECT_FLAG_DELAY)
-	e4:SetCode(EVENT_CHAINING)
+	e4:SetCode(EVENT_CHAIN_SOLVED)
 	e4:SetCondition(s.rmeffcon)
 	c:RegisterEffect(e4)
 end
@@ -61,7 +61,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_EXTRA)>0 end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_EXTRA)>0 and Duel.IsPlayerCanRemove(tp) end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_EXTRA)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
@@ -69,7 +69,7 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if #g<1 then return end
 	Duel.ConfirmCards(tp,g)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local sg=g:FilterSelect(tp,aux.AND(Card.IsMonster,Card.IsAbleToRemove),1,1,nil)
+	local sg=g:FilterSelect(tp,Card.IsAbleToRemove,1,1,nil,tp,POS_FACEDOWN)
 	if #sg>0 then
 		Duel.Remove(sg,POS_FACEDOWN,REASON_EFFECT)
 		Duel.ShuffleExtra(1-tp)

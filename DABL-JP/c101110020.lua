@@ -1,5 +1,5 @@
--- Naturia Molcricket
 -- ナチュル・モルクリケット
+-- Naturia Molcricket
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,id)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_END_PHASE)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e1:SetCondition(function() return Duel.IsMainPhase() end)
 	e1:SetCost(aux.CostWithReplace(s.spcost,CARD_NATURIA_CAMELLIA))
 	e1:SetTarget(s.sptg)
@@ -60,7 +60,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.gspconfilter(c,tp)
-	return c:IsSummonLocation(LOCATION_EXTRA) and (c:IsSummonPlayer(1-tp) or c:IsSetCard(0x2a))
+	return c:IsSummonLocation(LOCATION_EXTRA) and (c:IsSummonPlayer(1-tp) or (c:IsFaceup() and c:IsSetCard(0x2a)))
 end
 function s.gspcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.gspconfilter,1,nil,tp)

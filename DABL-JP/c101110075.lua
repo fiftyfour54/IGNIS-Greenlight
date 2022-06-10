@@ -82,10 +82,10 @@ function s.gycond(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsLinkAbove,3),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
+	if chk==0 then return Duel.GetFlagEffect(0,id)==0 end
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(0,id,RESET_PHASE+PHASE_END,0,1)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetType(EFFECT_TYPE_FIELD)

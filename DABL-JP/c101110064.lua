@@ -6,7 +6,6 @@ function s.initial_effect(c)
 	-- Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetTarget(s.acttg)
@@ -46,7 +45,7 @@ function s.spfilter(c,e,tp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.spfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -62,24 +61,22 @@ function s.syncheck(tp,sg,sc)
 end
 function s.syntg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local prevcheck=Synchro.CheckAdditional
-		Synchro.CheckAdditional=aux.AND(s.syncheck,prevcheck)
+		Synchro.CheckAdditional=s.syncheck
 		local res=Duel.IsExistingMatchingCard(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,1,nil)
-		Synchro.CheckAdditional=prevcheck
+		Synchro.CheckAdditional=nil
 		return res
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.synop(e,tp,eg,ep,ev,re,r,rp)
-	local prevcheck=Synchro.CheckAdditional
-	Synchro.CheckAdditional=aux.AND(s.syncheck,prevcheck)
+	Synchro.CheckAdditional=s.syncheck
 	local g=Duel.GetMatchingGroup(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,nil)
 	if #g>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:Select(tp,1,1,nil)
 		Duel.SynchroSummon(tp,sg:GetFirst())
 	end
-	Synchro.CheckAdditional=prevcheck
+	Synchro.CheckAdditional=nil
 end
 function s.fuscheck(tp,sg,fc)
 	return sg:IsExists(aux.FilterBoolFunction(Card.IsSetCard,0x2a,fc,SUMMON_TYPE_FUSION,tp),1,nil)
