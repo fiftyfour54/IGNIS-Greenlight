@@ -1,4 +1,4 @@
---ドラゴニックＰe
+--ドラゴニックＰ
 --Dragonic Pendulum
 --scripted by Naim
 local s,id=GetID()
@@ -25,8 +25,8 @@ function s.initial_effect(c)
 	e4:SetDescription(aux.Stringid(id,0))
 	e4:SetCategory(CATEGORY_DESTROY)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_CHAIN_SOLVED)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e4:SetCode(EVENT_CHAINING)
 	e4:SetRange(LOCATION_FZONE)
 	e4:SetCountLimit(1,{id,1})
 	e4:SetCondition(s.descon)
@@ -41,21 +41,22 @@ function s.initial_effect(c)
 	e5:SetProperty(EFFECT_FLAG_DELAY)
 	e5:SetCode(EVENT_DESTROYED)
 	e5:SetCountLimit(1,{id,2})
-	e5:SetCondition(s.thcon)
+	e5:SetCondition(function(e) return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) end)
 	e5:SetTarget(s.thtg)
 	e5:SetOperation(s.thop)
 	c:RegisterEffect(e5)
 end
-s.listed_series={0xc7}
+s.listed_series={0xc7,0xda}
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	local c=re:GetHandler()
-	return re:IsActiveType(TYPE_MONSTER) and c:IsSetCard(0xc7) and c:IsControler(tp) and re:GetActivateLocation()==LOCATION_MZONE
+	local rc=re:GetHandler()
+	local cont,loc,race=Duel.GetChainInfo(0,CHAININFO_TRIGGERING_CONTROLER,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TRIGGERING_RACE)
+	return re:IsActiveType(TYPE_MONSTER) and rc:IsSetCard(0xc7) and cont==tp and loc==LOCATION_MZONE and race==RACE_DRAGON
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() end
-	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,tp,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -64,31 +65,26 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return r&REASON_EFFECT~=0 and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
-end
 function s.filter(c,ft,e,tp)
-	return (c:IsSetCard(0xd8) or c:IsSetCard(0xda)) and c:IsMonster() and (c:IsAbleToHand() or c:IsCanBeSpecialSummoned(e,0,tp,false,false))
+	return (c:IsSetCard(0xc7) or c:IsSetCard(0xda)) and c:IsMonster() and (c:IsAbleToHand() or c:IsCanBeSpecialSummoned(e,0,tp,false,false))
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,1))
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	if #g>0 then
-		tc=g:GetFirst()
-		aux.ToHandOrElse(tc,tp,
-						function()
-							return tc:IsCanBeSpecialSummoned(e,0,tp,false,false)
-								and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-						end,
-						function()
-							Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-						end,
-						aux.Stringid(id,2)
-						)
-		end
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
+	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp):GetFirst()
+	if not tc then return end
+	aux.ToHandOrElse(tc,tp,
+					function()
+						return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+							and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) 
+					end,
+					function()
+						Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+					end,
+					aux.Stringid(id,3)
+					)
 end

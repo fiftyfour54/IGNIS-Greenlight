@@ -22,6 +22,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_HAND)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
 	e2:SetCost(s.ptcost)
+	e2:SetTarget(s.pttg)
 	e2:SetOperation(s.ptop)
 	c:RegisterEffect(e2)
 	-- Search 1 Field Spell
@@ -37,7 +38,6 @@ function s.initial_effect(c)
 	e3:SetOperation(s.fthop)
 	c:RegisterEffect(e3)
 end
-s.listed_names={id}
 s.listed_series={0xc7,0xd0}
 function s.thfilter(c,code)
 	return c:IsSetCard(0xc7) and c:IsType(TYPE_PENDULUM) and c:IsAbleToHand() and not c:IsCode(code)
@@ -48,10 +48,12 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 		return pc and (pc:IsSetCard(0xc7) or pc:IsSetCard(0xd0))
 			and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,pc:GetOriginalCode())
 	end
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_EXTRA)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_PZONE)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local pc=Duel.GetFirstMatchingCard(nil,tp,LOCATION_PZONE,0,e:GetHandler())
+	if not pc then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,pc:GetOriginalCode())
 	if #g<1 or Duel.SendtoHand(g,nil,REASON_EFFECT)<1 then return end
@@ -61,6 +63,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local dg=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_PZONE,0,1,1,nil)
 	if #dg>0 then
+		Duel.HintSelection(dg,true)
 		Duel.BreakEffect()
 		Duel.Destroy(dg,REASON_EFFECT)
 	end
@@ -70,11 +73,16 @@ function s.ptcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return c:IsDiscardable() end
 	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
 end
+function s.pttg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
+end
 function s.ptop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 	local c=e:GetHandler()
 	-- "Dracoslayer" monsters target protection
-	local e1=Effect.CreateEffect(e:GetHandler())
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xc7))
@@ -84,15 +92,16 @@ function s.ptop(e,tp,eg,ep,ev,re,r,rp)
 	-- "Dracoslayer" monsters destruction protection
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e2:SetProperty(0)
 	e2:SetValue(aux.indoval)
 	Duel.RegisterEffect(e2,tp)
 	aux.RegisterClientHint(c,0,tp,1,0,aux.Stringid(id,4),RESET_PHASE+PHASE_END,1)
 end
 function s.fthcon(e,tp,eg,ep,ev,re,r,rp)
-	return re and re:GetHandler():IsSetCard(0x131) or e:GetHandler():IsSummonType(SUMMON_TYPE_PENDULUM)
+	return re and re:GetHandler():IsSetCard(0xc7) or e:GetHandler():IsSummonType(SUMMON_TYPE_PENDULUM)
 end
 function s.fthfilter(c)
-	return c:IsType(TYPE_FIELD) and c:IsAbleToHand()
+	return c:IsType(TYPE_FIELD) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
 end
 function s.fthtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.fthfilter,tp,LOCATION_DECK,0,1,nil) end

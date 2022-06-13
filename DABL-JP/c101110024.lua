@@ -3,9 +3,9 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Pendulum attributes 1 "Dracoslayer" or "Dinomist" in your other Pendulum Zone
+	--Pendulum attributes
 	Pendulum.AddProcedure(c)
-	--Special Summon 1
+	--Special Summon 1 "Dracoslayer" or "Dinomist" in your other Pendulum Zone
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -28,17 +28,18 @@ function s.initial_effect(c)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={101110024}
+s.listed_names={id}
 s.listed_series={0xd8,0xc7}
 function s.spfilter(c,e,tp)
 	return (c:IsSetCard(0xd8) or c:IsSetCard(0xc7)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_PZONE) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end
+	local c=e:GetHandler()
+	if chkc then return chkc:IsLocation(LOCATION_PZONE) and chkc:IsControler(tp) and chkc~=c and s.spfilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_PZONE,0,1,e:GetHandler(),e,tp) end
+		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_PZONE,0,1,c,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_PZONE,0,1,1,e:GetHandler(),e,tp)
+	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_PZONE,0,1,1,c,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,tp,LOCATION_PZONE)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
