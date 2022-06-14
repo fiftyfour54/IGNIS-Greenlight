@@ -3,7 +3,7 @@
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Banish 3 cards
+	-- Banish up to 3 cards
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_REMOVE+CATEGORY_HANDES)
@@ -14,10 +14,10 @@ function s.initial_effect(c)
 	e1:SetTarget(s.rmtg)
 	e1:SetOperation(s.rmop)
 	c:RegisterEffect(e1)
-	-- Add 1 Fiend monster to the hand
+	-- Add 1 banished Fiend monster to the hand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_GRAVE)
@@ -31,7 +31,7 @@ function s.rmfilter(c,tp)
 	return c:IsAbleToRemove(tp) and aux.SpElimFilter(c,false)
 end
 function s.tgfilter(c)
-	return c:IsRace(RACE_FIEND) and c:IsDiscardable()
+	return c:IsRace(RACE_FIEND) and c:IsDiscardable(REASON_EFFECT)
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local loc=LOCATION_GRAVE+LOCATION_MZONE
@@ -40,7 +40,7 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,s.rmfilter,tp,loc,loc,1,3,nil,tp)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,#g,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
@@ -69,6 +69,5 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
-		Duel.ShuffleHand(tp)
 	end
 end
