@@ -16,7 +16,7 @@ end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local atkr=Duel.GetAttacker()
 	local defr=Duel.GetAttackTarget()
-	return atkr and defr and atkr:IsControler(1-tp) and defr:IsControler(tp) and defr:IsPosition(POS_FACEDOWN_ATTACK) and defr:IsAttribute(ATTRIBUTE_LIGHT) and atkr:HasLevel()
+	return atkr and defr and atkr:IsControler(1-tp) and defr:IsControler(tp) and defr:IsFaceup() and defr:IsAttackPos() and defr:IsAttribute(ATTRIBUTE_LIGHT) and atkr:HasLevel()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
