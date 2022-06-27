@@ -30,7 +30,7 @@ end
 function s.rcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	-- Requirement
-	if Duel.ChangePosition(c,POS_FACEUP_DEFENSE)<1 then return end
+	if Duel.ChangePosition(c,POS_FACEUP_DEFENSE,0,0,0)<1 then return end
 	-- Effect
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local tc=Duel.SelectMatchingCard(tp,s.rcfilter,tp,0,LOCATION_MZONE,1,1,nil):GetFirst()
