@@ -26,6 +26,7 @@ function s.rcfilter(c)
 end
 function s.rctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.rcfilter,tp,0,LOCATION_MZONE,1,nil) end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_DRAW,nil,1,tp,1)
 end
 function s.rcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

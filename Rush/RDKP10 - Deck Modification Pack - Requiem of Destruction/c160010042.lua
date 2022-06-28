@@ -1,5 +1,5 @@
 -- 暴れ牛鬼
--- Abare Ushioni
+-- Abare Ushioni (Rush)
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -18,6 +18,7 @@ s.toss_coin=true
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_EITHER,1000)
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p=math.abs(tp-Duel.TossCoin(tp,1))

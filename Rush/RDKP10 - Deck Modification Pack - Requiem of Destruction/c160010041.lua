@@ -1,5 +1,5 @@
 -- 人投げトロール
--- Man-Thro' Tro'
+-- Man-Thro' Tro' (Rush)
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
