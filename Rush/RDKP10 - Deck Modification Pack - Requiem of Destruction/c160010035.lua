@@ -35,7 +35,7 @@ function s.rcop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local tc=Duel.SelectMatchingCard(tp,s.rcfilter,tp,0,LOCATION_MZONE,1,1,nil):GetFirst()
 	if not tc then return end
-	Duel.HintSelection(tc)
+	Duel.HintSelection(tc,true)
 	-- Change Type
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
