@@ -10,8 +10,8 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DESTROY)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.destg)
@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	-- Special Summon 1 monster "Fur Hire"
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
@@ -33,18 +33,19 @@ s.listed_series={0x114}
 function s.lcheck(g,lc,sumtype,tp)
 	return g:CheckDifferentPropertyBinary(Card.GetRace,lc,sumtype,tp)
 end
-function s.desfilter(c,tp)
-	return c:IsControler(1-tp) or (c:IsFaceup() and c:IsSetCard(0x114))
+function s.desfilter(c,e,tp)
+	return c:IsControler(1-tp) or (c:IsFaceup() and c:IsSetCard(0x114)) and c:IsCanBeEffectTarget(e)
 end
 function s.desrescon(sg,e,tp,mg)
 	return sg:GetClassCount(Card.GetControler)==2
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	if chkc then return false end
+	local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e,tp)
 	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,2,2,s.desrescon,0) end
 	local dg=aux.SelectUnselectGroup(g,e,tp,2,2,s.desrescon,1,tp,HINTMSG_DESTROY)
 	Duel.SetTargetCard(dg)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,2,PLAYER_ALL,LOCATION_MZONE)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,2,PLAYER_ALL,LOCATION_MZONE)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetTargetCards(e)
@@ -52,17 +53,17 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(g,REASON_EFFECT)
 	end
 end
-function s.spfilter(c,e,tp,code)
-	return c:IsSetCard(0x114) and not c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function s.spcostfilter(c,e,tp)
 	return Duel.GetMZoneCount(tp,c)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp,c:GetCode())
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp,c:GetOriginalCode())
+end
+function s.spfilter(c,e,tp,code)
+	return c:IsSetCard(0x114) and not c:IsOriginalCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroupCost(tp,s.spcostfilter,1,false,nil,nil,e,tp) end
 	local rc=Duel.SelectReleaseGroupCost(tp,s.spcostfilter,1,1,false,nil,nil,e,tp):GetFirst()
-	e:SetLabel(rc:GetCode(),rc:GetType())
+	e:SetLabel(rc:GetOriginalCode(),rc:GetType())
 	Duel.Release(rc,REASON_COST)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
