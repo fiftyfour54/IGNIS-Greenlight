@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_GRAVE)
 	e3:SetCountLimit(1,{id,1})
-	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e3:SetCondition(s.gthcon)
 	e3:SetCost(aux.bfgcost)
 	e3:SetTarget(s.gthtg)
@@ -50,8 +50,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.gthcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsMainPhase()
-		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x114),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsMainPhase() and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x114),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.gthfilter(c,ft,e,tp)
 	return c:IsSetCard(0x114)
@@ -62,18 +61,27 @@ function s.gthtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.gthfilter(chkc,ft,e,tp) end
 	if chk==0 then return Duel.IsExistingTarget(s.gthfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler(),ft,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	Duel.SelectTarget(tp,s.gthfilter,tp,LOCATION_GRAVE,0,1,1,nil,ft,e,tp)
+	local g=Duel.SelectTarget(tp,s.gthfilter,tp,LOCATION_GRAVE,0,1,1,nil,ft,e,tp)
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,tp,0)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,g,1,tp,LOCATION_GRAVE)
+	if g:GetFirst():IsMonster() then
+		Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,tp,LOCATION_GRAVE)
+	end
 end
 function s.gthop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
-	aux.ToHandOrElse(tc,tp,
-		function(tc)
-			return tc:IsMonster() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-				and tc:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		end,
-		function(tc)
-			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-		end,
-		aux.Stringid(id,2))
+	if not tc:IsMonster() then
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+	else
+		aux.ToHandOrElse(tc,tp,
+			function(tc)
+				return tc:IsMonster() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+					and tc:IsCanBeSpecialSummoned(e,0,tp,false,false)
+			end,
+			function(tc)
+				Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+			end,
+			aux.Stringid(id,2))
+	end
 end
