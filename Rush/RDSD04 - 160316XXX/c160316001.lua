@@ -1,9 +1,10 @@
---
+--アナライズ・フロギストン
 --Analyze Phlogiston
 --Scripted by YoshiDuels
 local s,id=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TODECK+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
@@ -19,52 +20,40 @@ end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_HAND,0,1,nil) end
 end
-function s.tdfilter1(c,oppLvl)
-	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_PYRO) and c:IsAbleToDeck() and c:GetLevel()>0
-		and Duel.IsExistingMatchingCard(s.tdfilter2,tp,LOCATION_GRAVE,0,1,c,opplvl-c:GetLevel(),c)
-end
-function s.tdfilter2(c,opplvl,mc)
-	local g=Group.CreateGroup()
-	g:AddCard(c)
-	g:AddCard(mc)
-	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_PYRO) and c:IsAbleToDeck() and c:GetLevel()>0
-		and Duel.IsExistingMatchingCard(s.tdfilter3,tp,LOCATION_GRAVE,0,1,c,opplvl-c:GetLevel(),g)
-end
-function s.tdfilter3(c,lvl)
-	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_PYRO) and c:IsAbleToDeck() and c:IsLevel(lvl)
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.oppfilter),tp,0,LOCATION_MZONE,nil,0)
-	local oppLvl=g:GetSum(Card.GetLevel)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.tdfilter1,tp,LOCATION_GRAVE,0,1,nil,opplvl) end
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,3,1-tp,LOCATION_GRAVE)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
-end
 function s.oppfilter(c)
 	return c:IsFaceup() and c:IsAttackPos() and c:IsLevelBelow(8)
+end
+function s.tdfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_PYRO) and c:IsAbleToDeck() and c:HasLevel()
+end
+function s.rescon(lvl)
+	return function(sg,e,tp,mg)
+		return sg:GetSum(Card.GetLevel)==lvl
+	end
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local og=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.oppfilter),tp,0,LOCATION_MZONE,nil)
+	local lvl=og:GetSum(Card.GetLevel)
+	local dg=Duel.GetMatchingGroup(s.tdfilter,tp,LOCATION_GRAVE,0,nil)
+	if chk==0 then return #dg>=3 and aux.SelectUnselectGroup(dg,e,tp,3,3,s.rescon(lvl),0) end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,3,tp,LOCATION_GRAVE)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,og,#og,tp,0)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	--Requirement
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_HAND,0,1,1,nil)
-	if Duel.SendtoGrave(g,REASON_COST)~=0 then
+	if Duel.SendtoGrave(g,REASON_COST)>0 then
 		--Effect
-		local sg=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.oppfilter),tp,0,LOCATION_MZONE,nil,0)
-		local oppLvl=sg:GetSum(Card.GetLevel)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-		local dg1=Duel.SelectMatchingCard(tp,s.tdfilter1,tp,LOCATION_GRAVE,0,1,1,nil,oppLvl)
-		if #dg1==0 then return end
-		local tc1=dg1:GetFirst()
-		local tc2=Duel.SelectMatchingCard(tp,s.tdfilter2,tp,LOCATION_GRAVE,0,1,1,tc1,oppLvl-tc1:GetLevel(),tc1):GetFirst()
-		if tc2==nil then return end
-		dg1:AddCard(tc2)
-		local tc3=Duel.SelectMatchingCard(tp,s.tdfilter3,tp,LOCATION_GRAVE,0,1,1,dg1,oppLvl-tc1:GetLevel()-tc2:GetLevel()):GetFirst()
-		if tc3==nil then return end
-		dg1:AddCard(tc3)
-		Duel.HintSelection(dg1,true)
-		Duel.SendtoDeck(dg1,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+		local og=Duel.GetMatchingGroup(aux.FilterMaximumSideFunctionEx(s.oppfilter),tp,0,LOCATION_MZONE,nil)
+		local lvl=og:GetSum(Card.GetLevel)
+		local dg=Duel.GetMatchingGroup(s.tdfilter,tp,LOCATION_GRAVE,0,nil)
+		if #dg<3 then return end
+		local g=aux.SelectUnselectGroup(dg,e,tp,3,3,s.rescon(lvl),1,tp,HINTMSG_TODECK)
+		Duel.HintSelection(g,true)
+		Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 		Duel.BreakEffect()
-		Duel.Destroy(sg,REASON_EFFECT)
+		Duel.Destroy(og,REASON_EFFECT)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(aux.Stringid(id,2))
 		e1:SetType(EFFECT_TYPE_FIELD)
