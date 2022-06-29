@@ -1,10 +1,11 @@
---
+--ジョインテック・トスケラトプス
 --Jointech Tossceratops
 --Scripted by YoshiDuels
 local s,id=GetID()
 function s.initial_effect(c)
 	--Toss a coin a draw
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_COIN+CATEGORY_ATKCHANGE+CATEGORY_POSITION)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
@@ -22,11 +23,12 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	 --Effect
-	 local c=e:GetHandler()
+	--Effect
+	local c=e:GetHandler()
 	local res=Duel.TossCoin(tp,1)
+	if not (c:IsRelateToEffect(e) and c:IsFaceup()) then return end
 	if 0==res then
-		Duel.ChangePosition(e:GetHandler(),POS_FACEUP_DEFENSE)
+		Duel.ChangePosition(c,POS_FACEUP_DEFENSE)
 	else
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
