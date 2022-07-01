@@ -12,44 +12,71 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_REMOVE)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_CUSTOM+id)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1,id)
-	e2:SetCondition(s.condition)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
-	--Special Summon 1 "Byssted" monster
+	local g=Group.CreateGroup()
+	g:KeepAlive()
+	e2:SetLabelObject(g)
+	--Mass removal register
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_REMOVE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetCountLimit(1)
-	e3:SetCondition(s.spcond)
-	e3:SetTarget(s.sptg)
-	e3:SetOperation(s.spop)
+	e3:SetLabelObject(e2)
+	e3:SetOperation(s.regop)
 	c:RegisterEffect(e3)
+	--Special Summon 1 "Byssted" monster
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,2))
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e4:SetRange(LOCATION_SZONE)
+	e4:SetCountLimit(1)
+	e4:SetCondition(s.spcond)
+	e4:SetTarget(s.sptg)
+	e4:SetOperation(s.spop)
+	c:RegisterEffect(e4)
 end
 s.listed_series={0x286}
-function s.cfilter(c,e,eg)
+function s.cfilter(c,e)
 	return c:IsAttribute(ATTRIBUTE_DARK+ATTRIBUTE_LIGHT) and c:IsFaceup() and c:IsAbleToDeck() and c:IsCanBeEffectTarget(e)
-	and eg:IsContains(c)
 end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,e,eg)
+function s.regop(e,tp,eg,ep,ev,re,r,rp)
+	local tg=eg:Filter(s.cfilter,nil,e)
+	if #tg>0 then
+		for tc in aux.Next(tg) do
+			tc:RegisterFlagEffect(id,RESET_CHAIN,0,1)
+		end
+		local g=e:GetLabelObject():GetLabelObject()
+		if Duel.GetCurrentChain()==0 then g:Clear() end
+		g:Merge(tg)
+		g:Remove(function(c) return c:GetFlagEffect(id)==0 end,nil)
+		e:GetLabelObject():SetLabelObject(g)
+		if Duel.GetFlagEffect(tp,id)==0 then
+			Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
+			Duel.RaiseSingleEvent(e:GetHandler(),EVENT_CUSTOM+id,e,0,tp,tp,0)
+		end
+	end
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and eg:IsContains(chkc) and s.cfilter(chkc,e,eg) end
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.GetFlagEffect(tp,id)==0 end
+	local g=e:GetLabelObject():Filter(s.cfilter,nil,e)
+	if chkc then return g:IsContains(chkc) and chkc:IsLocation(LOCATION_REMOVED) and s.cfilter(chkc,e) end
+	if chk==0 then return #g>0 and Duel.IsPlayerCanDraw(tp,1) and Duel.GetFlagEffect(tp,id)==0 end
 	Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,1,nil,e,eg)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,tp,0)
+	local tg=g:Select(tp,1,1,nil)
+	Duel.SetTargetCard(tg)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,tg,1,tp,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,1,tp,0)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
