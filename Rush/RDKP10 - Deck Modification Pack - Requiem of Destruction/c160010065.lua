@@ -25,6 +25,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(2)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_POSITION,nil,1,tp,0)
 end
 function s.filter(c)
 	return c:IsAttackPos() and c:IsCanChangePositionRush()

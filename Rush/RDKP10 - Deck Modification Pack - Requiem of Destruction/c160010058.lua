@@ -20,6 +20,7 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,nil,0,tp,1000)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	--Effect
