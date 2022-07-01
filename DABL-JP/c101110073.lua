@@ -39,7 +39,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x160,0x286}
 function s.condition(e,tp)
-	return Duel.IsMainPhase() and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0xfb),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsMainPhase() and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x286),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.tribfilter(c)
 	return c:IsRace(RACE_DRAGON)
