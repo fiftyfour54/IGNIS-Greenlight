@@ -65,7 +65,7 @@ function s.rmvcond(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return rp==1-tp and c:IsReason(REASON_EFFECT) and c:IsPreviousControler(tp) and c:IsPreviousPosition(POS_FACEUP) and not c:IsLocation(LOCATION_DECK)
 end
-function c.rmvfilter(c)
+function s.rmvfilter(c)
 	return c:IsFacedown() and c:IsAbleToRemove()
 end
 function s.rmvtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -80,7 +80,7 @@ function s.rmvop(e,tp,eg,ep,ev,re,r,rp)
 		local fid=c:GetFieldID()
 		local og=Duel.GetOperatedGroup()
 		for oc in aux.Next(og) do
-			oc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
+			oc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,2,fid)
 		end
 		og:KeepAlive()
 		local e1=Effect.CreateEffect(c)
@@ -90,25 +90,27 @@ function s.rmvop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetCountLimit(1)
 		e1:SetLabel(fid)
-		e1:SetLabelObject(g)
-		e1:SetCondition(s.descon)
-		e1:SetOperation(s.desop)
+		e1:SetLabelObject(og)
+		e1:SetCondition(s.rcond)
+		e1:SetOperation(s.roper)
+		e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
-function s.desfilter(c,fid)
+function s.rfilter(c,fid)
 	return c:GetFlagEffectLabel(id)==fid
 end
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
+function s.rcond(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.IsTurnPlayer(tp) then return false end
 	local g=e:GetLabelObject()
-	if not g:IsExists(s.desfilter,1,nil,e:GetLabel()) then
+	if not g:IsExists(s.rfilter,1,nil,e:GetLabel()) then
 		g:DeleteGroup()
 		e:Reset()
 		return false
 	else return true end
 end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.roper(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
-	local rg=g:Filter(s.desfilter,nil,e:GetLabel())
+	local rg=g:Filter(s.rfilter,nil,e:GetLabel())
 	Duel.SendtoHand(rg,nil,REASON_EFFECT)
 end
