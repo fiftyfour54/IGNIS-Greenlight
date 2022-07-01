@@ -45,7 +45,8 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and eg:IsContains(chkc) and s.cfilter(chkc,e,eg) end
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.GetFlagEffect(tp,id)==0 end
+	Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,1,nil,e,eg)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,tp,0)
