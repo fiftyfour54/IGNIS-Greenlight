@@ -1,5 +1,5 @@
 --赫の聖女カルテシア
---Cartesia, the Red Saint
+--Red Cartesia, the Virtuous
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
@@ -59,7 +59,7 @@ function s.cfilter(c)
 	return c:IsFaceup() and c:IsCode(CARD_ALBAZ)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
