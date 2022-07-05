@@ -28,11 +28,10 @@ function s.initial_effect(c)
 end
 s.listed_series={0x2b,0x61}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	Debug.Message(type(tp))
-	return Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
+	return Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)>0
 end
-function s.ninjitsu(c,stzones)
-	return c:IsSetCard(0x61) and c:IsSSetable() and ((stzones and stzones>0) or c:IsType(TYPE_FIELD))
+function s.ninjitsu(c,chk,stzones)
+	return c:IsSetCard(0x61) and c:IsSSetable() and (chk or (stzones>0 or c:IsType(TYPE_FIELD)))
 end
 function s.ninja(c,e,tp)
 	return c:IsSetCard(0x2b) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN)
@@ -41,7 +40,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local mzones=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local stzones=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	if e:GetHandler():IsLocation(LOCATION_HAND) then stzones=stzones-1 end
-	if chk==0 then return Duel.IsExistingMatchingCard(s.ninjitsu,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,stzones)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.ninjitsu,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,false,stzones)
 		or (mzones>0 and Duel.IsExistingMatchingCard(s.ninja,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp)) end
 	if mzones>0 and Duel.IsExistingMatchingCard(s.ninja,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) then
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -55,7 +54,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if mzones>0 then 
 		g1=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.ninja),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil,e,tp)
 	end
-	local g2=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.ninjitsu),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
+	local g2=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.ninjitsu),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil,true)
 	if #(g1+g2)==0 then return end
 	local sg=aux.SelectUnselectGroup(g1+g2,e,tp,1,2,s.rescon,1,tp,HINTMSG_TOFIELD)
 	if #sg==0 then return end
@@ -70,7 +69,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.rescon(sg,e,tp)
 	locs=sg:GetClassCount(Card.GetLocation)
-	return locs==#sg and (sg:FilterCount(s.ninjitsu,nil)==1 or sg:FilterCount(s.ninja,nil,e,tp)==1)
+	return locs==#sg and (sg:FilterCount(s.ninjitsu,nil,true)==1 or sg:FilterCount(s.ninja,nil,e,tp)==1)
 end
 function s.poscond(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
