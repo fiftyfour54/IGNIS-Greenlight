@@ -61,8 +61,7 @@ end
 function s.posop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsFacedown,tp,LOCATION_MZONE,0,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-	local sg=g:Select(tp,1,#g,false,nil)
-	for c in sg:Iter() do Duel.ChangePosition(c,POS_FACEUP_DEFENSE) end
+	Duel.ChangePosition(g:Select(tp,1,#g,false,nil),POS_FACEUP_DEFENSE)
 end
 function s.posfilter(c)
 	return c:IsFaceup() and c:IsCanTurnSet()
@@ -76,6 +75,5 @@ end
 function s.posop2(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.posfilter,tp,LOCATION_MZONE,0,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-	local sg=g:Select(tp,1,#g,false,nil)
-	for c in sg:Iter() do Duel.ChangePosition(c,POS_FACEDOWN_DEFENSE) end
+	Duel.ChangePosition(g:Select(tp,1,#g,false,nil),POS_FACEUP_DEFENSE)
 end
