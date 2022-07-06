@@ -8,19 +8,11 @@ function s.initial_effect(c)
 	Fusion.AddProcMixN(c,true,true,s.ffilter,2)
 	--Alternative Summon procedure
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit,nil,nil,nil,false)
-	--Must first be Special Summoned by proper procedure
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e0:SetRange(LOCATION_EXTRA)
-	e0:SetValue(aux.fuslimit)
-	c:RegisterEffect(e0)
 	--"Ninja" monsters can attack directly
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_DIRECT_ATTACK)
+	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x2b))
 	c:RegisterEffect(e1)
@@ -51,7 +43,7 @@ function s.ffilter(c,fc,sumtype,sp,sub,mg,sg)
 	return c:IsSetCard(0x2b,fc,sumtype,sp) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or not sg:IsExists(Card.IsRace,1,c,c:GetRace(),fc,sumtype,sp))
 end
 function s.splimit(e,se,sp,st)
-	return (st&SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+	return (st&SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end
 function s.contactfil(tp)
 	return Duel.GetReleaseGroup(tp)
@@ -68,7 +60,7 @@ end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
@@ -76,5 +68,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENSE|POS_FACEDOWN_DEFENSE)
+		if g:GetFirst():IsFacedown() then
+			Duel.ConfirmCards(1-tp,g)
+		end
 	end
 end

@@ -19,6 +19,7 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_POSITION+CATEGORY_DISABLE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,{id,1})
@@ -28,6 +29,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x2b}
+s.listed_names={id}
 function s.cfilter(c)
 	return (c:IsFaceup() and c:IsSetCard(0x2b)) or (c:IsPosition(POS_FACEDOWN_DEFENSE) and c:IsLocation(LOCATION_MZONE))
 end
@@ -53,17 +55,18 @@ function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingTarget(Card.IsPosition,tp,LOCATION_MZONE,0,1,nil,POS_FACEDOWN_DEFENSE)	and c:IsCanTurnSet() end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-	local g=Duel.SelectTarget(tp,Card.IsPosition,tp,LOCATION_MZONE,0,1,1,nil,POS_FACEDOWN_DEFENSE)
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,tp,POS_FACEUP_DEFENSE)
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,c,1,tp,POS_FACEDOWN_DEFENSE)
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+	local tc=Duel.SelectTarget(tp,Card.IsPosition,tp,LOCATION_MZONE,0,1,1,nil,POS_FACEDOWN_DEFENSE):GetFirst()
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,Group.FromCards(c,tc),1,tp,0)
+	if tc:IsSetCard(0x2b) and not tc:IsCode(id) then
+		Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+	end
 end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFacedown() and Duel.ChangePosition(tc,POS_FACEUP_DEFENSE)>0
-		and c:IsRelateToEffect(e) and c:IsFaceup() and Duel.ChangePosition(c,POS_FACEUP_DEFENSE)>0
-		and (tc:IsSetCard(0x2b) and not tc:IsCode(id)) then
+		and c:IsRelateToEffect(e) and c:IsFaceup() and Duel.ChangePosition(c,POS_FACEDOWN_DEFENSE)>0
+		and tc:IsSetCard(0x2b) and not tc:IsCode(id) then
 		Duel.BreakEffect()
 		Duel.NegateEffect(ev)
 	end
