@@ -37,13 +37,13 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_TO_GRAVE)
 	e4:SetCountLimit(1,{id,1})
 	e4:SetCondition(function(e) return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) end)
-	e4:SetTarget(s.target)
-	e4:SetOperation(s.operation)
+	e4:SetTarget(s.thsptg)
+	e4:SetOperation(s.thspop)
 	c:RegisterEffect(e4)
 end
 s.listed_series={0x2b}
 function s.costfilter(c)
-	return c:IsSetCard(0x2b) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
+	return c:IsSetCard(0x2b) and c:IsMonster() and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
 end
 function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil) end
@@ -60,14 +60,14 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
 function s.cfilter(c,e,tp,ft) 
 	return c:IsMonster() and c:IsSetCard(0x2b) and (c:IsAbleToHand() or (ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE)))
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.thsptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and s.cfilter(chkc,e,tp,ft) end
 	if chk==0 then return Duel.IsExistingTarget(s.cfilter,tp,LOCATION_REMOVED,0,1,nil,e,tp,ft) end
@@ -76,13 +76,16 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,sg,1,tp,LOCATION_REMOVED)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,sg,1,tp,LOCATION_REMOVED)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.thspop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
-		aux.ToHandOrElse(sc,tp,
+	if tc:IsRelateToEffect(e) then
+		aux.ToHandOrElse(tc,tp,
 			function(c) return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE) end,
-			function(c) Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE) end,
-			aux.Stringid(id,1)
+			function(c)
+				Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)
+				Duel.ConfirmCards(1-tp,tc)
+			end,
+			aux.Stringid(id,2)
 		)
 	end
 end
