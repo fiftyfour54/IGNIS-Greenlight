@@ -32,8 +32,8 @@ s.listed_names={id}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)>0
 end
-function s.ninjitsu(c)
-	return c:IsSetCard(0x61) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable() and not c:IsCode(id)
+function s.ninjitsu(c,zone_chk)
+	return c:IsSetCard(0x61) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable() and not c:IsCode(id) and (zone_chk or c:IsType(TYPE_FIELD))
 end
 function s.ninja(c,e,tp)
 	return c:IsSetCard(0x2b) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE) and not c:IsCode(id)
@@ -42,12 +42,12 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local mzones=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local stzones=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	if e:GetHandler():IsLocation(LOCATION_HAND) then stzones=stzones-1 end
-	if chk==0 then return (stzones>0 and Duel.IsExistingMatchingCard(s.ninjitsu,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil))
+	if chk==0 then return Duel.IsExistingMatchingCard(s.ninjitsu,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,stzones>0)
 		or (mzones>0 and Duel.IsExistingMatchingCard(s.ninja,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp)) end
 	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function s.rescon(sg,e,tp,mg)
-	local res=sg:GetClassCount(Card.GetLocation)==#sg and (sg:FilterCount(s.ninjitsu,nil)==1 or sg:FilterCount(s.ninja,nil,e,tp)==1)
+	local res=sg:GetClassCount(Card.GetLocation)==#sg and (sg:FilterCount(s.ninjitsu,nil,true)==1 or sg:FilterCount(s.ninja,nil,e,tp)==1)
 	return res,not res
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -56,7 +56,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if mzones>0 then 
 		g1=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.ninja),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil,e,tp)
 	end
-	local g2=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.ninjitsu),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
+	local g2=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.ninjitsu),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil,true)
 	g1:Merge(g2)
 	if #g1==0 then return end
 	local sg=aux.SelectUnselectGroup(g1,e,tp,1,2,s.rescon,1,tp,HINTMSG_TOFIELD)
