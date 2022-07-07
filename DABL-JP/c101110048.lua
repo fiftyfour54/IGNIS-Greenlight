@@ -4,6 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
+	--Link Summon procedure
 	Link.AddProcedure(c,nil,2,2,s.lcheck)
 	--Cannot be Link Material the turn it is Link Summoned
 	local e1=Effect.CreateEffect(c)

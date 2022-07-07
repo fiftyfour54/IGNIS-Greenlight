@@ -38,7 +38,6 @@ s.listed_names={101110063,94997874}
 function s.spconvalue(e,se,sp,st)
 	return aux.ritlimit(e,se,sp,st) or se:GetHandler():IsCode(94997874)
 end
-
 function s.spfilter(c,e,tp)
 	return c:IsType(TYPE_FLIP) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE)
 end
