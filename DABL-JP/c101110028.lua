@@ -31,8 +31,8 @@ s.listed_names={TOKEN_BRAVE}
 function s.counterfilter(c)
 	return c:IsCode(TOKEN_BRAVE) or (aux.IsCodeListed(c,TOKEN_BRAVE) and c:IsMonster())
 end
-function s.spcon(e)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,TOKEN_BRAVE),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,TOKEN_BRAVE),tp,LOCATION_ONFIELD,0,1,nil)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
