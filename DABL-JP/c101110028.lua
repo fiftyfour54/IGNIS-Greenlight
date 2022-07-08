@@ -27,6 +27,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.counterfilter)
 end
+--a test
 s.listed_names={TOKEN_BRAVE}
 function s.counterfilter(c)
 	return c:IsCode(TOKEN_BRAVE) or (aux.IsCodeListed(c,TOKEN_BRAVE) and c:IsMonster())
