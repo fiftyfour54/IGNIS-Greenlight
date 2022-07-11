@@ -80,6 +80,3 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
---[[
-When your opponent activates a monster effect on the field (Quick Effect): You can Tribute this card from your hand or field; Special Summon 1 Machine "Rescue-ACE" monster from your Deck. You can only use each effect of "Rescue-ACE Impulse" once per turn.
-]]
