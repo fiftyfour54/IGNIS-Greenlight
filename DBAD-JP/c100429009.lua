@@ -1,31 +1,37 @@
+--ＲＥＳＣＵＥ！
 --RESCUE!
 --Scripted by Zefile
 local s,id=GetID()
 function s.initial_effect(c)
-	--activate
-	local e3=Effect.CreateEffect(c)
-	e3:SetCode(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_ACTIVATE)
-	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetCountLimit(1,id)
-	e3:SetTarget(s.sptg)
-	e3:SetOperation(s.spop)
-	c:RegisterEffect(e3)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCode(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMING_END_PHASE)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
+	c:RegisterEffect(e1)
 end
 s.listed_series={0x287}
-function s.spfilter(c,e,tp,ex)
-	return c:IsCanBeSpecialSummoned(e,0,tp,false,false) and ((c:IsSetCard(0x287) and c:IsControler(tp)) or (ex and c:IsControler(1-tp)))
+s.listed_names={100429004}
+function s.spfilter(c,e,tp)
+	return (c:IsSetCard(0x287) or c:IsControler(1-tp)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local ex=Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,100429004),tp,LOCATION_MZONE,0,1,nil)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and s.spfilter(chkc,e,tp,ex) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,tp,ex) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local hydrant_chk=Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,100429004),tp,LOCATION_ONFIELD,0,1,nil)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and (chkc:IsControler(tp) or hydrant_chk) and s.spfilter(chkc,e,tp) end
+	local loc=hydrant_chk and LOCATION_GRAVE or 0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE,loc,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,e,tp,ex)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_GRAVE,loc,1,1,nil,e,tp)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,tp,0)
 end
-function s.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)

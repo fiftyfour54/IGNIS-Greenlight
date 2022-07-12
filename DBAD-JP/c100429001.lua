@@ -6,7 +6,6 @@ function s.initial_effect(c)
 	--Prevent the activation of the target's effect
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,id)
@@ -31,21 +30,21 @@ s.listed_series={0x287}
 function s.cfilter(c)
 	return c:IsMonster() and c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsHasEffect(EFFECT_CANNOT_TRIGGER)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local g=Duel.GetMatchingGroup(s.cfilter,tp,0,LOCATION_MZONE,nil)
 		local tg=g:GetMaxGroup(Card.GetAttack)
 		return tg and #tg>0
 	end
 end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.cfilter,tp,0,LOCATION_MZONE,nil)
 	local tg=g:GetMaxGroup(Card.GetAttack)
 	if #tg==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local sg=tg:Select(tp,1,1,nil)
-	if sg then
-		Duel.HintSelection(sg)
+	if #sg>0 then
+		Duel.HintSelection(sg,true)
 		--Cannot activate its effects this turn
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(3302)
@@ -65,7 +64,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(c,REASON_COST)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x287) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x287) and c:IsRace(RACE_MACHINE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetMZoneCount(tp,e:GetHandler())>0
