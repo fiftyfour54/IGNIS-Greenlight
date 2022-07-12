@@ -1,5 +1,6 @@
+--ＥＸＴＩＮＧＵＩＳＨ！
+--EXTINGUISH!
 --Scripted by IanxWaifu
---CONTAIN!
 local s,id=GetID()
 function s.initial_effect(c)
 	--Target Effect Monster
