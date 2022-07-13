@@ -1,4 +1,4 @@
---VV－ソロアクティベート
+--ＶＶ－ソロアクティベート
 --Vaylantz Vakening - Solo Activation
 --Scripted by Eerie Code
 local s,id=GetID()
