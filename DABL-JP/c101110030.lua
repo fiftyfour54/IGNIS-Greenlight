@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_HAND)
 	e3:SetHintTiming(0,TIMING_MAIN_END+TIMINGS_CHECK_MONSTER_E)
 	e3:SetCountLimit(1,id)
-	e3:SetCondition(function(_,tp) return Duel.GetFlagEffect(tp,id)>0 end)
+	e3:SetCondition(function() return Duel.GetFlagEffect(0,id)>0 end)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
@@ -36,7 +36,7 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
 	e4:SetCode(EVENT_CHAINING)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1,id)
+	e4:SetCountLimit(1,{id,1})
 	e4:SetCondition(s.setcond)
 	e4:SetTarget(s.settg)
 	e4:SetOperation(s.setop)
@@ -45,7 +45,7 @@ function s.initial_effect(c)
 	aux.GlobalCheck(s,function()
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_CHAINING) --maybe EVENT_CHAIN_SOLVED
+		ge1:SetCode(EVENT_CHAINING)
 		ge1:SetOperation(s.checkop)
 		Duel.RegisterEffect(ge1,0)
 	end)
@@ -57,8 +57,8 @@ function s.tgcond(e)
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
-	if (rc:IsSetCard(0x17f) or not rc:IsCode(id)) or (re:IsHasType(EFFECT_TYPE_ACTIVATE) and rc:GetType()==TYPE_TRAP)then
-		Duel.RegisterFlagEffect(e:GetHandlerPlayer(),id,RESET_PHASE+PHASE_END,0,1)
+	if (rc:IsSetCard(0x17f) or not rc:IsCode(id)) or (re:IsHasType(EFFECT_TYPE_ACTIVATE) and rc:GetType()==TYPE_TRAP) then
+		Duel.RegisterFlagEffect(0,id,RESET_PHASE+PHASE_END,0,1)
 	end
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -86,6 +86,6 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 	local g=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil,re:GetHandler():GetCode())
 	if #g>0 then
-		Duel.SSet(tp,g:GetFirst())
+		Duel.SSet(tp,g)
 	end
 end

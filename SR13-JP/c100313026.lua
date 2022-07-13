@@ -50,7 +50,8 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		if #sg==0 then return end
 		local atk=og:GetFirst():GetLevel()*100
 		for tc in sg:Iter() do
-			local e1=Effect.CreateEffect(c)
+			--Increase ATK
+			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_UPDATE_ATTACK)
 			e1:SetValue(atk)
@@ -60,11 +61,10 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.dfilter(c,tp)
-	return c:IsControler(tp) and c:IsOriginalType(RACE_FIEND) and c:IsReason(REASON_EFFECT)
-		and (c:GetReasonCard():IsSetCard(0x6) or c:GetReasonPlayer()==1-tp)
+	return c:IsControler(tp) and c:IsPreviousControler(tp) and c:IsOriginalRace(RACE_FIEND) and c:IsReason(REASON_EFFECT)
 end
 function s.drwcond(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.dfilter,1,nil,tp)
+	return eg:IsExists(s.dfilter,1,nil,tp) and (re:GetHandler():IsSetCard(0x6) or rp==1-tp)
 end
 function s.drwtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) and Duel.IsPlayerCanDraw(tp,2) end
@@ -74,8 +74,7 @@ end
 function s.drwop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	local g=Duel.SelectMatchingCard(tp,Card.IsDiscardable,tp,LOCATION_HAND,0,1,1,nil)
-	if #g>0 then
-		Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)
+	if #g>0 and Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)>0 then
 		Duel.BreakEffect()
 		Duel.Draw(tp,2,REASON_EFFECT)
 	end

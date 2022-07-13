@@ -1,9 +1,9 @@
 --VV－ソロアクティベート
---Vaylantz Vake - Solo Activation
+--Vaylantz Vakening - Solo Activation
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--to pzone
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -12,14 +12,14 @@ function s.initial_effect(c)
 	e1:SetTarget(s.pztg)
 	e1:SetOperation(s.pzop)
 	c:RegisterEffect(e1)
-	--move
+	--Move 1 of your "Vaylantz" monsters
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(function(e) return Duel.CheckLocation(e:GetHandlerPlayer(),LOCATION_FZONE,0) end)
+	e2:SetCondition(function() return Duel.GetFieldGroupCount(0,LOCATION_FZONE,LOCATION_FZONE)>0 end)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.mmvtg)
 	e2:SetOperation(s.mmvop)
@@ -31,10 +31,10 @@ function s.pzfilter(c)
 end
 function s.pztg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.pzfilter,tp,LOCATION_DECK,0,1,nil)
-		and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)) end
+		and aux.CheckPendulumZones(tp) end
 end
 function s.pzop(e,tp,eg,ep,ev,re,r,rp)
-	if not (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)) then return end
+	if not aux.CheckPendulumZones(tp) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local tc=Duel.SelectMatchingCard(tp,s.pzfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
 	if tc then
@@ -45,7 +45,6 @@ function s.mmvfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x17e) and c:CheckAdjacent()
 end
 function s.mmvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.mmvfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.mmvfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
@@ -53,7 +52,7 @@ function s.mmvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.mmvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then 
+	if tc:IsRelateToEffect(e) and tc:IsControler(tp) and not tc:IsImmuneToEffect(e) then 
 		tc:MoveAdjacent()
 	end
 end
