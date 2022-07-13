@@ -39,10 +39,10 @@ function s.lkcon(e)
 	return c:IsStatus(STATUS_SPSUMMON_TURN) and c:IsSummonType(SUMMON_TYPE_LINK)
 end
 function s.repfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE)  and c:IsReason(REASON_EFFECT+REASON_BATTLE)
+	return c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsReason(REASON_EFFECT+REASON_BATTLE)
 end
 function s.cfilter(c,e)
-	return c:IsRace(RACE_PLANT) and c:IsReleasableByEffect(e)
+	return c:IsRace(RACE_FIEND) and c:IsReleasableByEffect(e)
 		and not c:IsStatus(STATUS_DESTROY_CONFIRMED+STATUS_BATTLE_DESTROYED)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
