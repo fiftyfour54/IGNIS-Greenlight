@@ -18,11 +18,11 @@ function s.initial_effect(c)
 	--Opponent must guess the card at the End Phase
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCategory(CATEGORY_TOGRAVE+CATEGORY_HANDES+CATEGORY_TOHAND)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,id)
-	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetCondition(s.condition)
 	e3:SetTarget(s.target)
 	e3:SetOperation(s.operation)
@@ -34,9 +34,8 @@ function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetDecktopGroup(tp,1)
-	if not g or #g==0 or c:IsFacedown() or not c:IsRelateToEffect(e) then return end
-	local ec=g:GetFirst()
+	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
+	local ec=Duel.GetDecktopGroup(tp,1):GetFirst()
 	if ec then
 		Duel.DisableShuffleCheck()
 		s.equipop(c,e,tp,ec)
@@ -85,14 +84,14 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not eg or #eg==0 then return end
 	local op=Duel.SelectOption(1-tp,70,71,72)
 	Duel.ConfirmCards(1-tp,eg:GetFirst())
-	local res= s.testtype(op,eg:GetFirst())
+	local res=s.testtype(op,eg:GetFirst())
 	if res then --correctly guessed
 		Duel.SendtoGrave(c,REASON_EFFECT)
 	else --incorrectly guessed
 		local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND,nil)
 		if #g==0 then return end
 		local sg=g:RandomSelect(1-tp,1)
-		if Duel.SendtoGrave(sg,REASON_DISCARD+REASON_EFFECT)>0 and Duel.GetOperatedGroup():FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)>0 then
+		if Duel.SendtoGrave(sg,REASON_DISCARD+REASON_EFFECT)>0 then
 			Duel.SendtoHand(c,nil,REASON_EFFECT)
 		end
 	end

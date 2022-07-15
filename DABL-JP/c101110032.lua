@@ -28,6 +28,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
+s.listed_names={id}
 function s.selfthcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(Card.IsSummonType,1,nil,SUMMON_TYPE_PENDULUM)
 end
@@ -62,7 +63,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
 		local og=Duel.GetOperatedGroup():Filter(Card.IsLocation,nil,LOCATION_HAND)
 		local hg=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
-		if #og>0 and #hg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		if #og>0 and #hg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 			local sg=hg:Select(tp,1,1,nil)
 			Duel.BreakEffect()
