@@ -38,6 +38,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	if not g or #g==0 or c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 	local ec=g:GetFirst()
 	if ec then
+		Duel.DisableShuffleCheck()
 		s.equipop(c,e,tp,ec)
 	end
 end
