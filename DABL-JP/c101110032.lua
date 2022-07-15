@@ -41,11 +41,11 @@ function s.selfthop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(c,nil,REASON_EFFECT)
 	end
 end
-function s.cfilter(c,tp)
-	return c:IsControler(tp) and c:IsAbleToHand()
+function s.pendfilter(c,tp)
+	return c:IsControler(tp) and c:IsLocation(LOCATION_PZONE)
 end
 function s.pzfilter(c,tp)
-	return c:IsLocation(LOCATION_PZONE) and (c:IsAbleToHand() or c:GetColumnGroup():IsExists(s.cfilter,1,nil,tp))
+	return c:IsAbleToHand() and (c:IsLocation(LOCATION_PZONE) or c:GetColumnGroup():IsExists(s.pendfilter,1,nil,tp))
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.pzfilter,tp,LOCATION_ONFIELD,0,1,nil,tp) end
