@@ -10,7 +10,6 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCost(s.cost)
-	e1:SetCondition(s.condition)
 	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
 end
