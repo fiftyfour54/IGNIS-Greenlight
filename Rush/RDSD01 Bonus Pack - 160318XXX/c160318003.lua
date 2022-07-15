@@ -4,7 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--double tribute
-	c:AddDoubleTribute(s.otfilter,s.eftg,0,FLAG_DOUBLE_TRIB_FIRE)
+	c:AddDoubleTribute(id,s.otfilter,s.eftg,0,FLAG_DOUBLE_TRIB_FIRE)
 end
 function s.otfilter(c,tp)
 	return c:IsDoubleTribute(FLAG_DOUBLE_TRIB_FIRE) and (c:IsControler(tp) or c:IsFaceup())
