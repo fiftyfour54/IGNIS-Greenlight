@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--Cannot target
+	--Opponent cannot target your face-down Defense Position monsters
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
@@ -18,18 +18,43 @@ function s.initial_effect(c)
 	e2:SetTarget(function(_,c) return c:IsPosition(POS_FACEDOWN_DEFENSE) end)
 	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
-	--Flipped face-up gain 1500 ATK/DEF
-	--TODO
-	--If destroyed, Summon from GY in face-down defense
+	--Register a flag to monsters that are flipped face-up
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e3:SetCode(EVENT_DESTROYED)
-	e3:SetCondition(s.spcon)
-	e3:SetTarget(s.sptg)
-	e3:SetOperation(s.spop)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_FLIP)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetOperation(s.flipop)
 	c:RegisterEffect(e3)
+	--Increase the ATK/DEF of flipped monsters by 1500
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetCode(EFFECT_UPDATE_ATTACK)
+	e4:SetRange(LOCATION_SZONE)
+	e4:SetTargetRange(LOCATION_MZONE,0)
+	e4:SetTarget(function(e,c) return c:GetFlagEffect(e:GetHandler():GetFieldID())>0 end)
+	e4:SetValue(1500)
+	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetCode(EFFECT_UPDATE_DEFENSE)
+	c:RegisterEffect(e5)
+	--Special Summon 1 monster from GY in face-down Defense Position
+	local e6=Effect.CreateEffect(c)
+	e6:SetDescription(aux.Stringid(id,0))
+	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e6:SetProperty(EFFECT_FLAG_DELAY)
+	e6:SetCode(EVENT_DESTROYED)
+	e6:SetCondition(s.spcon)
+	e6:SetTarget(s.sptg)
+	e6:SetOperation(s.spop)
+	c:RegisterEffect(e6)
+end
+function s.flipop(e,tp,eg,ep,ev,re,r,rp)
+	local fid=e:GetHandler():GetFieldID() --in case we have multiples, the id will not be enough
+	for tc in eg:Iter() do
+		tc:RegisterFlagEffect(fid,RESET_EVENT+RESETS_STANDARD,0,1)
+	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
