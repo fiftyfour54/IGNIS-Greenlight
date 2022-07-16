@@ -2,8 +2,9 @@
 --Methyl the Flame Jinn of the Lamp
 local s,id=GetID()
 function s.initial_effect(c)
-	--Draw and send 1 card from hand to GY
+	--Add 1 level 4 Pyro monster to the hand
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
@@ -15,7 +16,7 @@ function s.initial_effect(c)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsSummonType(SUMMON_TYPE_NORMAL) and c:IsStatus(STATUS_SUMMON_TURN)		
+	return c:IsSummonType(SUMMON_TYPE_NORMAL) and c:IsStatus(STATUS_SUMMON_TURN)
 end
 function s.thfilter(c)
 	return c:IsRace(RACE_PYRO) and c:IsLevel(4) and c:IsType(TYPE_NORMAL) and c:IsAbleToHand()

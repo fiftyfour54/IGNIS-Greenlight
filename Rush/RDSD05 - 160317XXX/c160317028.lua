@@ -5,6 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--When your opponent normal/special summons a monster, discard
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_HANDES+CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
@@ -36,10 +37,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local dg=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
 	if #dg>0 then
 		local g=dg:RandomSelect(tp,1)
-		Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)
-		if Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>=2 and Duel.IsPlayerCanDraw(1-tp,1) and Duel.SelectYesNo(1-tp,aux.Stringid(id,0)) then
-			Duel.BreakEffect()
-			Duel.Draw(1-tp,1,REASON_EFFECT)
+		if Duel.SendtoGrave(g,REASON_EFFECT)>0 and Duel.GetOperatedGroup():FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)>0 then
+			if Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>=2 and Duel.IsPlayerCanDraw(1-tp,1) and Duel.SelectYesNo(1-tp,aux.Stringid(id,1)) then
+				Duel.BreakEffect()
+				Duel.Draw(1-tp,1,REASON_EFFECT)
+			end
 		end
 	end
 end

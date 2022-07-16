@@ -29,7 +29,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	g=g:AddMaximumCheck()
 	if Duel.Destroy(g,REASON_EFFECT)>0 and c:IsRelateToEffect(e) and c:IsFaceup() then
 		Duel.BreakEffect()
-		local ct=Duel.GetOperatedGroup():GetCount()
+		local ct=#Duel.GetOperatedGroup()
 		local e1=Effect.CreateEffect(c)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetType(EFFECT_TYPE_SINGLE)
