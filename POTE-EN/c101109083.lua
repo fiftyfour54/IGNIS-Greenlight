@@ -34,7 +34,7 @@ function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsActiveType(TYPE_MONSTER) and (loc&LOCATION_MZONE)~=0 and bit.extract(c:GetLinkedZone(),seq)~=0
 end
 function s.filter(c)
-	return c:IsFaceup() and not (c:GetAttack()==0 and c:IsDisabled())
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not (c:GetAttack()==0 and c:IsDisabled())
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.filter(chkc) end
@@ -61,21 +61,14 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(RESET_TURN_SET)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e2)
-		if tc:IsType(TYPE_TRAPMONSTER) then
-			local e3=Effect.CreateEffect(c)
-			e3:SetType(EFFECT_TYPE_SINGLE)
-			e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
-			e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			tc:RegisterEffect(e3)
-		end
 		--Change ATK to 0
-		local e4=Effect.CreateEffect(c)
-		e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e4:SetType(EFFECT_TYPE_SINGLE)
-		e4:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e4:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e4:SetValue(0)
-		tc:RegisterEffect(e4)
+		local e3=Effect.CreateEffect(c)
+		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e3:SetValue(0)
+		tc:RegisterEffect(e3)
 	end
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)

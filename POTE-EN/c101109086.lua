@@ -40,6 +40,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.syncsumop)
 	c:RegisterEffect(e3)
 end
+s.listed_names={id}
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToRemoveAsCost() end
@@ -79,7 +80,7 @@ function s.syncsumcond(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsTurnPlayer(1-tp) and Duel.IsMainPhase() and e:GetHandler():IsStatus(STATUS_SPSUMMON_TURN)
 end
 function s.syncmfilter(c,must)
-	return c:IsRace(RACE_Fish) and c:IsSynchroSummonable(must)
+	return c:IsRace(RACE_FISH) and c:IsSynchroSummonable(must)
 end
 function s.syncsumtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
