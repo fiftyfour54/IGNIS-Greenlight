@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_SUMMON)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.negcon)
+	e1:SetCondition(function() return Duel.GetCurrentChain(true)==0 end)
 	e1:SetTarget(s.negtg)
 	e1:SetOperation(s.negop)
 	c:RegisterEffect(e1)
@@ -29,9 +29,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x6}
-function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentChain(true)==0
-end
 function s.tgfilter(c)
 	return c:IsRace(RACE_FIEND) and c:IsDiscardable(REASON_EFFECT)
 end
