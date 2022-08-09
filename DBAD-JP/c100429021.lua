@@ -1,9 +1,9 @@
---ピュアリィ・デリシャスメモリー
---Purery Delicious Memory
+--ピュアリィ・ハッピーメモリー
+--Purery Happy Memory
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Targeted monster cannot be destroyed by battle, discard 1 card and Special Summon 1 "Purery" monster
+	--Targeted card cannot be destroyed by effects, discard 1 card and Special Summon 1 "Purery" monster
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_HANDES+CATEGORY_SPECIAL_SUMMON)
@@ -13,23 +13,19 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--Increase ATK/DEF of a "Purery" Xyz monster with this card as material
+	--Grants extra attacks to "Purery" Xyz monster with this card as material
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetType(EFFECT_TYPE_XMATERIAL)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetType(EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_EXTRA_ATTACK_MONSTER)
 	e2:SetCondition(function(e) return e:GetHandler():IsSetCard(0x289) end)
-	e2:SetValue(s.atkvalue)
+	e2:SetValue(s.value)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EFFECT_UPDATE_DEFENSE)
-	c:RegisterEffect(e3)
 end
+s.listed_names={id}
 s.listed_series={0x289}
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(nil,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
 	Duel.SetPossibleOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
@@ -38,18 +34,19 @@ function s.spfilter(c,e,tp)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SELECT)
-	local tc=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler()):GetFirst()
 	if not tc then return end
 	Duel.HintSelection(tc,true)
-	--Cannot be destroyed by battle
+	--Cannot be destroyed by effects once
 	local extraproperty=tc:IsPosition(POS_FACEDOWN) and EFFECT_FLAG_SET_AVAILABLE or 0
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetDescription(3000)
-	e1:SetProperty(EFFECT_FLAG_CLIENT_HINT+extraproperty)
+	e1:SetProperty(EFFECT_FLAG_CLIENT_HINT+EFFECT_FLAG_NO_TURN_RESET+extraproperty)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,2)
-	e1:SetValue(1)
+	e1:SetCountLimit(1)
+	e1:SetValue(function(e,re,r,rp) return r&REASON_EFFECT>0 end)
 	tc:RegisterEffect(e1)
 	--Discard 1 card and Special Summon 1 "Purery" monster from the Deck
 	if Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) 
@@ -66,6 +63,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function s.atkvalue(e,c)
-	return e:GetHandler():GetOverlayCount()*300
+function s.value(e)
+	local g=e:GetHandler():GetOverlayGroup():FilterCount(Card.IsCode,nil,id)
 end
