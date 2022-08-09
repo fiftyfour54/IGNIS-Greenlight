@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetHintTiming(0,TIMING_END_PHASE)
 	c:RegisterEffect(e2)
-	-- Attack "Purery" Quick-Play Spell
+	-- Attach "Purery" Quick-Play Spell
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_REMOVE)
@@ -94,6 +94,8 @@ function s.qpovop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+
+-- auxiliary.lua
 function Duel.RemoveUntil(card_or_group,pos,reason,phase,e,tp,flag)
 	local g=(type(card_or_group)=="Group" and card_or_group or Group.FromCards(card_or_group))
 	if Duel.Remove(g,pos,reason|REASON_TEMPORARY)==0 or g:Match(Card.IsLocation,nil,LOCATION_REMOVED)==0 then return 0 end
