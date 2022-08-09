@@ -90,30 +90,7 @@ function s.qpovop(e,tp,eg,ep,ev,re,r,rp)
 			local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 			if #g==0 then return end
 			Duel.BreakEffect()
-			Duel.RemoveUntil(g,nil,REASON_EFFECT,PHASE_END,e,tp,id+100)
+			Duel.RemoveUntil(g,nil,REASON_EFFECT,PHASE_END,e,tp,aux.DefaultFieldReturnOp)
 		end
 	end
-end
-
--- auxiliary.lua
-function Duel.RemoveUntil(card_or_group,pos,reason,phase,e,tp,flag)
-	local g=(type(card_or_group)=="Group" and card_or_group or Group.FromCards(card_or_group))
-	if Duel.Remove(g,pos,reason|REASON_TEMPORARY)==0 or g:Match(Card.IsLocation,nil,LOCATION_REMOVED)==0 then return 0 end
-	local c=e:GetHandler()
-	local function retcon(eff) return eff:GetLabelObject():GetFlagEffect(flag)>0 end
-	local function retop(eff) Duel.ReturnToField(eff:GetLabelObject()) end
-	for tc in g:Iter() do
-		tc:RegisterFlagEffect(flag,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(4825390,1)) -- use string from "Ichiroku's Ledger Book" for now
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_PHASE|phase)
-		e1:SetReset(RESET_PHASE|phase)
-		e1:SetLabelObject(tc)
-		e1:SetCountLimit(1)
-		e1:SetCondition(retcon)
-		e1:SetOperation(retop)
-		Duel.RegisterEffect(e1,tp)
-	end
-	return #g
 end
