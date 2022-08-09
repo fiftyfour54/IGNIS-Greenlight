@@ -64,7 +64,7 @@ function s.rthcond(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.xyzfilter,1,nil,tp,rp)
 end
 function s.qpfilter(c)
-	return c:IsSetCard(0x289) and c:IsType(TYPE_SPELL) and c:IsType(TYPE_QUICK) and c:IsAbleToHand()
+	return c:IsSetCard(0x289) and c:IsType(TYPE_SPELL) and c:IsType(TYPE_QUICKPLAY) and c:IsAbleToHand()
 end
 function s.rthtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.qpfilter,tp,LOCATION_GRAVE,0,1,nil,tp) end
