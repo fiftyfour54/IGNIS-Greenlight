@@ -39,7 +39,7 @@ function s.thfilter(c)
 	return c:IsSetCard(0x289) and c:IsAbleToHand() and not c:IsCode(id)
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsDiscardable() and Duel.CheckLPCost(tp,500) end
+	if chk==0 then return Duel.CheckLPCost(tp,500) end
 	Duel.PayLPCost(tp,500)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
