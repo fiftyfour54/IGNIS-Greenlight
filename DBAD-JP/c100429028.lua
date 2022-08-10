@@ -36,13 +36,13 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_DAMAGE_STEP_END)
 	e4:SetRange(LOCATION_FZONE)
-	e4:SetCondition(function() return Duel.GetAttacker():IsSetCard(0x289) end)
+	e4:SetCondition(function() return Duel.GetAttacker():IsSetCard(0x28a) end)
 	e4:SetCost(s.cacost)
 	e4:SetTarget(s.catg)
 	e4:SetOperation(s.caop)
 	c:RegisterEffect(e4)
 end
-s.listed_series={0x289}
+s.listed_series={0x28a}
 function s.atkfilter(c)
 	return c:GetEquipCount()>0
 end
@@ -51,7 +51,7 @@ function s.atkcon(e)
 end
 function s.actcon(e)
 	local bc=Duel.GetBattleMonster(e:GetHandlerPlayer())
-	return bc and bc:IsFaceup() and bc:IsSetCard(0x289)
+	return bc and bc:IsFaceup() and bc:IsSetCard(0x28a)
 end
 function s.cacostfilter(c)
 	return c:IsType(TYPE_EQUIP) and c:IsAbleToGrave()

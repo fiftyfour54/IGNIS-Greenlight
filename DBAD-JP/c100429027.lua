@@ -39,14 +39,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 s.listed_names={id}
-s.listed_series={0x289}
+s.listed_series={0x28a}
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return not c:IsPublic() end
 	Duel.ConfirmCards(1-tp,c)
 end
 function s.thfilter(c)
-	return c:IsSetCard(0x289) and c:IsAbleToHand() and not c:IsCode(id)
+	return c:IsSetCard(0x28a) and c:IsAbleToHand() and not c:IsCode(id)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -79,7 +79,7 @@ function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=Duel.GetFirstTarget()
-	if not ec or not ec:IsRelateToEffect(e) then return end
+	if not ec or not ec:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local tc=Duel.SelectMatchingCard(tp,s.eqtcfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,ec):GetFirst()
 	if tc then
