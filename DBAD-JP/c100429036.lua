@@ -34,11 +34,11 @@ s.listed_series={0x28a}
 function s.eqpcond(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x28a),tp,LOCATION_MZONE,0,1,nil)
 end
-function s.eqfilter(c,ec)
-	return c:IsFaceup() and ec:CheckEquipTarget(c)
+function s.eqfilter(c,ec,tp)
+	return c:IsType(TYPE_EQUIP) and ec:CheckEquipTarget(c) and c:CheckUniqueOnField(tp)
 end
 function s.cfilter()
-	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_DECK,0,1,nil,c)
+	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_DECK,0,1,nil,c,tp)
 end
 function s.eqptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
@@ -51,19 +51,19 @@ function s.eqpop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not (tc:IsFaceup() and tc:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0) then return end 
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_DECK,0,1,1,nil,tc)
+	local g=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_DECK,0,1,1,nil,tc,tp)
 	if #g>0 then
 		Duel.Equip(tp,g:GetFirst(),tc)
 	end
 end
 function s.eqpfilter(c,tp)
-	return c:IsControler(tp) and c:IsType(TYPE_SPELL) and c:IsType(TYPE_EQUIP)
+	return c:IsControler(tp) and c:IsType(TYPE_EQUIP)
 end
 function s.thcond(e,tp,eg,ep,ev,re,r,rp)
 	return not eg:IsContains(e:GetHandler()) and eg:IsExists(s.eqpfilter,1,nil,tp)
 end
 function s.thfilter(c)
-	return c:IsType(TYPE_SPELL) and c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
+	return c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.thfilter(chkc) end
