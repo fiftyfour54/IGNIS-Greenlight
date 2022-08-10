@@ -15,8 +15,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	--Grants extra attacks to "Purery" Xyz monster with this card as material
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetType(EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_SINGLE)
+	e2:SetType(EFFECT_TYPE_XMATERIAL)
 	e2:SetCode(EFFECT_EXTRA_ATTACK_MONSTER)
 	e2:SetCondition(function(e) return e:GetHandler():IsSetCard(0x289) end)
 	e2:SetValue(s.value)
@@ -40,7 +39,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	--Cannot be destroyed by effects once
 	local extraproperty=tc:IsPosition(POS_FACEDOWN) and EFFECT_FLAG_SET_AVAILABLE or 0
 	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetDescription(3000)
+	e1:SetDescription(3001)
 	e1:SetProperty(EFFECT_FLAG_CLIENT_HINT+EFFECT_FLAG_NO_TURN_RESET+extraproperty)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
@@ -50,9 +49,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	tc:RegisterEffect(e1)
 	--Discard 1 card and Special Summon 1 "Purery" monster from the Deck
 	if Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) 
-	and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-	and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
-	and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
+		and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.BreakEffect()
 		if Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_EFFECT+REASON_DISCARD,nil)>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -64,5 +63,5 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.value(e)
-	local g=e:GetHandler():GetOverlayGroup():FilterCount(Card.IsCode,nil,id)
+	return e:GetHandler():GetOverlayGroup():FilterCount(Card.IsCode,nil,id)
 end

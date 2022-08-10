@@ -46,17 +46,17 @@ function s.tgfilter(e,c)
 	return c:IsFaceup() and c:IsSetCard(0x289) and c:IsStatus(STATUS_SPSUMMON_TURN)
 end
 function s.xyzfilter(c,tp,rp)
-	return c:IsPreviousPosition(POS_FACEUP) and c:IsType(TYPE_XYZ) and c:IsSetCard(0x289) and c:IsPreviousControler(tp) and rp==1-tp
+	return c:IsPreviousPosition(POS_FACEUP) and c:IsType(TYPE_XYZ) and c:IsPreviousSetCard(0x289) and c:IsPreviousControler(tp) and rp==1-tp
 end
 function s.spcond(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.xyzfilter,1,nil,tp,rp)
 end
-function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x289) and c:IsLevel(1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+end
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(0x289) and c:IsLevel(1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
@@ -78,13 +78,13 @@ function s.attachtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and Duel.IsExistingMatchingCard(s.atchfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
-	--Duel.SetPossibleOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,tp,0)
 end
 function s.attachop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsType(TYPE_XYZ) then
+	if tc:IsRelateToEffect(e) and tc:IsType(TYPE_XYZ) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-		local g=Duel.SelectMatchingCard(tp,s.atchfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
+		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.atchfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
+		if #g==0 then return end
 		Duel.Overlay(tc,g)
 	end
 end

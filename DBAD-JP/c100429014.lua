@@ -38,9 +38,6 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function s.atkfilter(c)
-	return c:IsFaceup() and c:GetAttack()>0
-end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
@@ -50,11 +47,12 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local c=e:GetHandler()
 	if c:GetOverlayGroup():IsExists(Card.IsCode,1,nil,100429021)
-		and Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+		and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 		and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
-		local tc=Duel.SelectMatchingCard(tp,s.atkfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil):GetFirst()
+		local tc=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil):GetFirst()
 		if not tc then return end
+		Duel.HintSelection(tc,true)
 		-- Halve ATK
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -65,14 +63,17 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.qpovcon(e,tp,eg,ep,ev,re,r,rp)
-	if rp~=tp or not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return end
+	if rp==1-tp or not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	local rc=re:GetHandler()
 	return rc:IsSetCard(0x289) and rc:GetType()==TYPE_SPELL+TYPE_QUICKPLAY
 		and rc:IsOnField() and rc:IsCanBeXyzMaterial(e:GetHandler(),tc,REASON_EFFECT)
 end
 function s.qpovtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) end
-	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,1-tp,LOCATION_SZONE)
+	if chk==0 then return true end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,1-tp,LOCATION_ONFIELD)
+end
+function s.rthfilter(c)
+	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
 end
 function s.qpovop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -83,11 +84,12 @@ function s.qpovop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(c,rc)
 		if not c:GetOverlayGroup():IsContains(rc) then return end
 		rc:CancelToGrave()
-		if Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,0,LOCATION_SZONE,1,nil)
+		if Duel.IsExistingMatchingCard(s.rthfilter,tp,0,LOCATION_ONFIELD,1,nil)
 			and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-			local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHand,tp,0,LOCATION_SZONE,1,1,nil)
+			local g=Duel.SelectMatchingCard(tp,s.rthfilter,tp,0,LOCATION_ONFIELD,1,1,nil)
 			if #g==0 then return end
+			Duel.HintSelection(g,true)
 			Duel.BreakEffect()
 			Duel.SendtoHand(g,nil,REASON_EFFECT)
 		end

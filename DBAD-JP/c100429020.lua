@@ -35,16 +35,16 @@ function s.initial_effect(c)
 end
 s.listed_names={id}
 s.listed_series={0x289}
-function s.thfilter(c)
-	return c:IsSetCard(0x289) and c:IsAbleToHand() and not c:IsCode(id)
-end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,500) end
 	Duel.PayLPCost(tp,500)
 end
+function s.thfilter(c)
+	return c:IsSetCard(0x289) and c:IsAbleToHand() and not c:IsCode(id)
+end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,3,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil,0x289)
@@ -58,7 +58,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.xyzfilter(c,tp,rp)
-	return c:IsPreviousPosition(POS_FACEUP) and c:IsType(TYPE_XYZ) and c:IsSetCard(0x289) and c:IsPreviousControler(tp) and rp==1-tp
+	return c:IsPreviousPosition(POS_FACEUP) and c:IsType(TYPE_XYZ) and c:IsPreviousSetCard(0x289) and c:IsPreviousControler(tp) and rp==1-tp
 end
 function s.rthcond(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.xyzfilter,1,nil,tp,rp)
@@ -67,7 +67,7 @@ function s.qpfilter(c)
 	return c:IsSetCard(0x289) and c:IsType(TYPE_SPELL) and c:IsType(TYPE_QUICKPLAY) and c:IsAbleToHand()
 end
 function s.rthtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.qpfilter,tp,LOCATION_GRAVE,0,1,nil,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.qpfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
 end
 function s.rthop(e,tp,eg,ep,ev,re,r,rp)

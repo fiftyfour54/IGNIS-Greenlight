@@ -3,7 +3,7 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Targeted monster cannot be destroyed by battle, discard 1 card and Special Summon 1 "Purery" monster
+	--Selected monster cannot be destroyed by battle, discard 1 card and Special Summon 1 "Purery" monster
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_HANDES+CATEGORY_SPECIAL_SUMMON)
@@ -15,11 +15,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	--Increase ATK/DEF of a "Purery" Xyz monster with this card as material
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_XMATERIAL)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(function(e) return e:GetHandler():IsSetCard(0x289) end)
 	e2:SetValue(s.atkvalue)
 	c:RegisterEffect(e2)
@@ -53,9 +52,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	tc:RegisterEffect(e1)
 	--Discard 1 card and Special Summon 1 "Purery" monster from the Deck
 	if Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) 
-	and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-	and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
-	and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
+		and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.BreakEffect()
 		if Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_EFFECT+REASON_DISCARD,nil)>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

@@ -13,8 +13,8 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCondition(s.gyovcon)
-	e1:SetCost(s.gyovcost)
 	e1:SetTarget(s.gyovtg)
 	e1:SetOperation(s.gyovop)
 	c:RegisterEffect(e1)
@@ -41,11 +41,6 @@ s.listed_series={0x289}
 function s.gyovcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:IsHasType(EFFECT_TYPE_QUICK_O)==e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,100429023)
 end
-function s.gyovcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:GetFlagEffect(id)==0 end
-	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-end
 function s.gyovfilter(c,xc,tp)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsCanBeXyzMaterial(xc,tp,REASON_EFFECT)
 end
@@ -66,13 +61,13 @@ function s.gyovop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.qpovcon(e,tp,eg,ep,ev,re,r,rp)
-	if rp~=tp or not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return end
+	if rp==1-tp or not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	local rc=re:GetHandler()
 	return rc:IsSetCard(0x289) and rc:GetType()==TYPE_SPELL+TYPE_QUICKPLAY
 		and rc:IsOnField() and rc:IsCanBeXyzMaterial(e:GetHandler(),tc,REASON_EFFECT)
 end
 function s.qpovtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) end
+	if chk==0 then return true end
 	Duel.SetPossibleOperationInfo(0,CATEGORY_REMOVE,nil,1,PLAYER_ALL,LOCATION_MZONE)
 end
 function s.qpovop(e,tp,eg,ep,ev,re,r,rp)
@@ -89,8 +84,9 @@ function s.qpovop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 			local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 			if #g==0 then return end
+			Duel.HintSelection(g,true)
 			Duel.BreakEffect()
-			Duel.RemoveUntil(g,nil,REASON_EFFECT,PHASE_END,e,tp,aux.DefaultFieldReturnOp)
+			aux.RemoveUntil(g,nil,REASON_EFFECT,PHASE_END,e,tp,aux.DefaultFieldReturnOp)
 		end
 	end
 end
