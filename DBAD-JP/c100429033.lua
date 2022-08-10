@@ -20,6 +20,12 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_TRIGGER)
 	e2:SetCondition(s.actcond)
 	c:RegisterEffect(e2)
+	--Send the equiped monster to the GY
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e3:SetCode(EVENT_LEAVE_FIELD)
+	e3:SetOperation(s.tgop)
+	c:RegisterEffect(e3)
 end
 s.listed_series={0x28a}
 function s.contcond(e)
@@ -28,4 +34,10 @@ end
 function s.actcond(e)
 	local ec=e:GetHandler():GetEquipTarget()
 	return ec:GetControler()==e:GetHandlerPlayer()
+end
+function s.tgop(e,tp,eg,ep,ev,re,r,rp)
+	local ec=e:GetHandler():GetEquipTarget()
+	if ec and ec:IsLocation(LOCATION_MZONE) then
+		Duel.SendtoGrave(ec,REASON_EFFECT)
+	end
 end
