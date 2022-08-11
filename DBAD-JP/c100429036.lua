@@ -34,17 +34,17 @@ s.listed_series={0x28a}
 function s.eqpcond(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,0x28a),tp,LOCATION_MZONE,0,1,nil)
 end
-function s.eqfilter(c,ec,tp)
-	return c:IsType(TYPE_EQUIP) and ec:CheckEquipTarget(c) and c:CheckUniqueOnField(tp)
+function s.eqfilter(c,eqtg,tp)
+	return c:IsType(TYPE_EQUIP) and c:CheckEquipTarget(eqtg) and c:CheckUniqueOnField(tp)
 end
-function s.cfilter()
+function s.cfilter(c,tp)
 	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_DECK,0,1,nil,c,tp)
 end
 function s.eqptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	if e:GetHandler():IsLocation(LOCATION_HAND) then ft=ft-1 end
-	if chk==0 then return ft>0 and Duel.IsExistingTarget(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if chk==0 then return ft>0 and Duel.IsExistingTarget(s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp) end
+	Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_DECK)
 end
 function s.eqpop(e,tp,eg,ep,ev,re,r,rp)
