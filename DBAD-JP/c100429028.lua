@@ -36,9 +36,8 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_DAMAGE_STEP_END)
 	e4:SetRange(LOCATION_FZONE)
-	e4:SetCondition(function() return Duel.GetAttacker():IsSetCard(0x28a) end)
+	e4:SetCondition(s.cacon)
 	e4:SetCost(s.cacost)
-	e4:SetTarget(s.catg)
 	e4:SetOperation(s.caop)
 	c:RegisterEffect(e4)
 end
@@ -56,15 +55,15 @@ end
 function s.cacostfilter(c)
 	return c:IsType(TYPE_EQUIP) and c:IsAbleToGrave()
 end
+function s.cacon(e,tp,eg,ep,ev,re,r,rp)
+	local bc=Duel.GetBattleMonster(tp)
+	return bc and bc:IsSetCard(0x28a) and bc==Duel.GetAttacker() and bc:CanChainAttack(0,true)
+end
 function s.cacost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cacostfilter,tp,LOCATION_SZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.cacostfilter,tp,LOCATION_SZONE,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
-end
-function s.catg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetAttacker():CanChainAttack(0,true) end
 end
 function s.caop(e,tp,eg,ep,ev,re,r,rp)
 	local bc=Duel.GetAttacker()

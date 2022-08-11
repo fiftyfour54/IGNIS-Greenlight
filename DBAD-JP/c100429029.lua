@@ -29,7 +29,7 @@ end
 s.listed_names={id}
 s.listed_series={0x28a}
 function s.spfilter(c,e,tp)
-	return c:IsMonster() and c:IsSetCard(0x28a) and c:IsCanBeSpecialSummoned(e,0,tp,true,true)
+	return c:IsMonster() and c:IsSetCard(0x28a) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
@@ -40,11 +40,11 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
-	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_DEFENSE) then
+	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,true,false,POS_FACEUP) then
 		local c=e:GetHandler()
 		local fid=c:GetFieldID()
-		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1,fid)
-		-- Return to the hand in the End Phase
+		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,fid,aux.Stringid(id,2))
+		-- Return to the hand in the opponent's End Phase
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
@@ -59,6 +59,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummonComplete()
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.IsTurnPlayer(tp) then return false end
 	if e:GetLabelObject():GetFlagEffectLabel(id)==e:GetLabel() then return true end
 	e:Reset()
 	return false
