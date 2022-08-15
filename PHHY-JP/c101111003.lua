@@ -64,7 +64,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.repfilter(c,tp)
-	return c:IsFaceup() and (c:IsSetCard({0x55) or c:IsSetCard(0x7b))
+	return c:IsFaceup() and (c:IsSetCard(0x55) or c:IsSetCard(0x7b))
 		and c:IsLocation(LOCATION_MZONE) and c:IsControler(tp) 
 		and not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_BATTLE)
 end
