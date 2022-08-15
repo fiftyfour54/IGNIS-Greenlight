@@ -61,7 +61,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function s.filter(c)
-	return (c:IsSetCard({0x55) or c:IsSetCard(0x7b)) and not c:IsCode(id) and (c:IsAbleToHand() or c:IsAbleToGrave())
+	return (c:IsSetCard(0x55) or c:IsSetCard(0x7b)) and not c:IsCode(id) and (c:IsAbleToHand() or c:IsAbleToGrave())
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end

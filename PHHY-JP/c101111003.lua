@@ -44,7 +44,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
 end
 function s.matfilter(c)
-	return c:IsFaceup() and and c:IsType(TYPE_XYZ)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -64,7 +64,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.repfilter(c,tp)
-	return c:IsFaceup() and (c:IsSetCard({0x55) or c:IsSetCard(0x7b))
+	return c:IsFaceup() and (c:IsSetCard(0x55) or c:IsSetCard(0x7b))
 		and c:IsLocation(LOCATION_MZONE) and c:IsControler(tp) 
 		and not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_BATTLE)
 end
