@@ -41,7 +41,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,ft,tp):GetFirst()
 	if not tc then return end
 	aux.ToHandOrElse(tc,tp,
-		nil,
+		function(c)
+			return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and not c:IsForbidden() and c:CheckUniqueOnField(tp)
+		end,
 		function(c)
 			Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		end,
