@@ -12,10 +12,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	--Special Summon 1 "Mikanko" monster, re-equip and return equip target to the hand
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCountLimit(1,id)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1,id)
 	e2:SetTarget(s.sptg)
@@ -25,6 +24,7 @@ end
 s.listed_series={0x28a}
 function s.spfilter(c,e,tp,code)
 	return c:IsSetCard(0x28a) and not c:IsOriginalCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and e:GetHandler():CheckEquipTarget(c)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local eqc=e:GetHandler():GetEquipTarget()

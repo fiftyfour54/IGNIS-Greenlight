@@ -3,26 +3,26 @@
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
+	c:EnableReviveLimit()
 	--Xyz Summon
 	Xyz.AddProcedure(c,nil,4,2)
-	c:EnableReviveLimit()
 	--Increase ATK
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetTarget(s.atktg)
+	e1:SetTarget(function(e,c) return c:IsAttribute(ATTRIBUTE_LIGHT) and c~=e:GetHandler() end)
 	e1:SetValue(500)
 	c:RegisterEffect(e1)
-	--Search
+	--Search or send to the GY
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_TOGRAVE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id)
-	e2:SetCost(s.cost)
+	e2:SetCost(aux.dxmcostgen(1,1,nil))
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2,false,REGISTER_FLAG_DETACH_XMAT)
@@ -31,8 +31,8 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_LVCHANGE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_CUSTOM+id)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_CUSTOM+id)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,{id,1})
 	e3:SetTarget(s.lvtg)
@@ -43,39 +43,31 @@ function s.initial_effect(c)
 	e3:SetLabelObject(g)
 	--Mass register
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,2))
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetLabelObject(e3)
 	e4:SetOperation(s.regop)
 	c:RegisterEffect(e4)
 end
 s.listed_series={0x55,0x7b}
-function s.atktg(e,c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) and c~=e:GetHandler()
-end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-end
 function s.filter(c)
-	return (c:IsSetCard(0x55) or c:IsSetCard(0x7b)) and not c:IsCode(id) and (c:IsAbleToHand() or c:IsAbleToGrave())
+	return (c:IsSetCard(0x55) or c:IsSetCard(0x7b)) and (c:IsAbleToHand() or c:IsAbleToGrave())
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
-	local tc=g:GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
 	aux.ToHandOrElse(tc,tp)
 end
 function s.cfilter(c,e,tp)
-	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_LIGHT) and c:HasLevel()
-		and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE)
-		and c:IsCanBeEffectTarget(e)
+	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_LIGHT) and c:HasLevel() and c:IsControler(tp)
+		and c:IsLocation(LOCATION_MZONE) and c:IsCanBeEffectTarget(e)
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=eg:Filter(s.cfilter,nil,e,tp)
@@ -99,7 +91,7 @@ function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if #g==1 then
 		tc=g:GetFirst()
 	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 		tc=g:Select(tp,1,1,nil)
 	end
 	Duel.SetTargetCard(tc)
@@ -109,10 +101,11 @@ function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) and tc:HasLevel() then
 		local lv=Duel.AnnounceLevel(tp,4,8,5,6,7,tc:GetLevel())
+		--Change its Level
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CHANGE_LEVEL)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_CHANGE_LEVEL)
 		e1:SetValue(lv)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)

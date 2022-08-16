@@ -5,11 +5,13 @@ local s,id=GetID()
 function s.initial_effect(c)
     -- Activate
     local e1=Effect.CreateEffect(c)
+    e1:SetDescription(aux.Stringid(id,0))
     e1:SetCategory(CATEGORY_TOGRAVE)
     e1:SetType(EFFECT_TYPE_ACTIVATE)
     e1:SetCode(EVENT_FREE_CHAIN)
     e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-    e1:SetOperation(s.actop)
+	e1:SetTarget(s.target)
+    e1:SetOperation(s.activate)
     c:RegisterEffect(e1)
     -- Look at opponent's Extra Deck
     local e2=Effect.CreateEffect(c)
@@ -27,10 +29,14 @@ function s.initial_effect(c)
 end
 s.listed_names={CARD_GALAXYEYES_P_DRAGON}
 s.listed_series={0x55,0x7b,0x48}
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+end
 function s.tgfilter(c)
     return (c:IsSetCard(0x55) or c:IsSetCard(0x7b)) and c:IsAbleToGrave()
 end
-function s.actop(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
     local g=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_DECK,0,nil)
     if #g==0 or not Duel.SelectYesNo(tp,aux.Stringid(id,0)) then return end
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
@@ -40,7 +46,7 @@ function s.actop(e,tp,eg,ep,ev,re,r,rp)
     end
 end
 function s.edconfilter(c,tp)
-    return c:IsCode(CARD_GALAXYEYES_P_DRAGON) and c:IsControler(tp)
+    return c:IsCode(CARD_GALAXYEYES_P_DRAGON) and c:IsFaceup() and c:IsControler(tp)
 end
 function s.edcon(e,tp,eg,ep,ev,re,r,rp)
     return eg:IsExists(s.edconfilter,1,nil,tp)
@@ -61,19 +67,22 @@ function s.edop(e,tp,eg,ep,ev,re,r,rp)
     local sg=g:Filter(s.spfilter,nil,e,tp)
     local b1=#rg>0
     local b2=#sg>0 and Duel.GetLocationCountFromEx(tp,tp)>0 
-    local op=aux.SelectEffect(tp,
-        {b1,aux.Stringid(id,2)},
-        {b2,aux.Stringid(id,3)})
-    if op==1 then
-        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-        local tg=rg:Select(tp,1,1,nil)
-        if #tg==0 then return end
-        Duel.Remove(tg,POS_FACEUP,REASON_EFFECT)
-    elseif op==2 then
-        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-        local tg=sg:Select(tp,1,1,nil)
-        if #tg==0 then return end
-        Duel.SpecialSummon(tg,0,tp,tp,false,false,POS_FACEUP)
-    end
+	if not ((b1 or b2) and Duel.SelectYesNo(tp,aux.Stringid(id,2))) then return Duel.ShuffleExtra(1-tp) end
+	local op=aux.SelectEffect(tp,
+		{b1,aux.Stringid(id,3)},
+		{b2,aux.Stringid(id,4)})
+	--Banish 1 monster
+	if op==1 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+		local tg=rg:Select(tp,1,1,nil)
+		if #tg==0 then return end
+		Duel.Remove(tg,POS_FACEUP,REASON_EFFECT)
+	--Special Summon 1 "Number"
+	elseif op==2 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local tg=sg:Select(tp,1,1,nil)
+		if #tg==0 then return end
+		Duel.SpecialSummon(tg,0,tp,tp,false,false,POS_FACEUP)
+	end
     Duel.ShuffleExtra(1-tp)
 end
