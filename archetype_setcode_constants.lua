@@ -5,21 +5,19 @@
 	Notes:
 - Alphabetical order? Strict alphabetical or group sub-archetypes
 together with the original?
-- Maybe ones that aren't used in scripts like Dark Magician's
-"Magician" shouldn't get a constant, avoids overlapping in
-some cases, like with the Pendulum "Magician" archetype.
-- For archetypes like "The Agent" or "The Weather", maybe don't 
-include the "THE" in the constant unless necessary? ("The Phantom Knights")
 
+- 0x67 Iron (unused, non-existent archetype, アイアン, 9 OCG cards include it in their names)
 - 0x68 Tin (unused, non-existent archetype, ブリキ, 3 OCG cards include it in their names)
-- 0x8a Envy (unused super-archetype of "Traptrix")
-- 0xb6 not used?
-- 0xb8 not used?
+- 0x6c Lightray (unused, non-existent archetype, ライトレイ, 6 OCG cards include it in their names)
+- 0x8c Druid (unused, non-existent archetype, ドルイド, 4 OCG cards include it in their names)
 
-- "Abyss" 0x75 overlap with "Abyss-" 0xec ("Abyss" not used in scripts)
-- "Magician" 0x98 maybe just "SET_MAGICIAN" (if DM's "MAGICIAN" constant isn't added)
+- 0x106d Djinn of Rituals (unused sub-archetype of "Djinn")
+- 0x8a Envy (unused super-archetype of "Traptrix")
+
+- 0xb6 not used at all?
+- 0xb8 not used at all?
+
 - "True Draco|True King" 0xf9 include the "King" from "True King"? TRUE_DRACO_KING?
-- "Number" 0x16c for Spells/Traps, overlap with "Number" 0x48 for monsters, NUMBER_ST/NUMBER_SPELLTRAP?
 
 	Other ideas/corrections/fixes are of course welcome.
 --]]
@@ -62,7 +60,6 @@ SET_BES                           = 0x15
 SET_ROID                          = 0x16
 SET_VEHICROID                     = 0x1016
 SET_SPEEDROID                     = 0x2016
-SET_SYNCHRO                       = 0x17
 SET_SYNCHRON                      = 0x1017
 SET_SYNCHRO_DRAGON                = 0x2017
 SET_CLOUDIAN                      = 0x18
@@ -86,7 +83,6 @@ SET_BATTERYMAN                    = 0x28
 SET_DRAGUNITY                     = 0x29
 SET_NATURIA                       = 0x2a
 SET_NINJA                         = 0x2b
-SET_ARMOR_NINJA                   = 0x102b
 SET_FLAMVELL                      = 0x2c
 SET_NITRO                         = 0x2d
 SET_GRAVEKEEPERS                  = 0x2e
@@ -134,7 +130,6 @@ SET_TIMELORD                      = 0x4a
 SET_AESIR                         = 0x4b
 SET_TRAP_HOLE                     = 0x4c
 SET_BEASTS_BATTLE                 = 0x4d
-SET_EVOL                          = 0x4e
 SET_EVOLTILE                      = 0x304e
 SET_EVOLSAUR                      = 0x604e
 SET_EVOLZAR                       = 0x504e
@@ -166,13 +161,10 @@ SET_INFESTATION                   = 0x65
 SET_WARRIOR                       = 0x66
 SET_SYMPHONIC_WARRIOR             = 0x1066
 SET_MAGNET_WARRIOR                = 0x2066
-SET_IRON                          = 0x67
 SET_HIERATIC                      = 0x69
 SET_BUTTERSPY                     = 0x6a
 SET_BOUNZER                       = 0x6b
-SET_LIGHTRAY                      = 0x6c
 SET_DJINN                         = 0x6d
-SET_DJINN_OF_RITUALS              = 0x106d
 SET_PROPHECY                      = 0x6e
 SET_SPELLBOOK                     = 0x106e
 SET_HEROIC                        = 0x6f
@@ -191,7 +183,6 @@ SET_HERALDIC_BEAST                = 0x76
 SET_ATLANTEAN                     = 0x77
 SET_NIMBLE                        = 0x78
 SET_FIRE_FIST                     = 0x79
-SET_NOBLE                         = 0x7a
 SET_NOBLE_KNIGHT                  = 0x107a
 SET_NOBLE_ARMS                    = 0x207a
 SET_GALAXY                        = 0x7b
@@ -220,7 +211,6 @@ SET_BUJIN                         = 0x88
 SET_HOLE                          = 0x89
 SET_TRAPTRIX                      = 0x108a
 SET_MALICEVOROUS                  = 0x8b
-SET_DRUID                         = 0x8c
 SET_GHOSTRICK                     = 0x8d
 SET_VAMPIRE                       = 0x8e
 SET_ZUBABA                        = 0x8f
@@ -235,7 +225,7 @@ SET_CYBERNETIC                    = 0x94
 SET_RANK_UP_MAGIC                 = 0x95
 SET_FISHBORG                      = 0x96
 SET_ARTIFACT                      = 0x97
-SET_PENDULUM_MAGICIAN             = 0x98
+SET_MAGICIAN                      = 0x98
 SET_ODD_EYES                      = 0x99
 SET_SUPERHEAVY_SAMURAI            = 0x9a
 SET_SUPERHEAVY_SAMURAI_SOUL       = 0x109a
@@ -248,7 +238,6 @@ SET_YANG_ZING                     = 0x9e
 SET_PERFORMAPAL                   = 0x9f
 SET_LEGENDARY_KNIGHT              = 0xa0
 SET_LEGENDARY_DRAGON              = 0xa1
-SET_MAGICIAN                      = 0xa2
 SET_DARK_MAGICIAN                 = 0x10a2
 SET_MAGICIAN_GIRL                 = 0x20a2
 SET_DARK_MAGICIAN_GIRL            = 0x30a2
@@ -278,7 +267,6 @@ SET_RITUAL_BEAST_TAMER            = 0x10b5
 SET_SPIRITUAL_BEAST               = 0x20b5
 SET_SPIRITUAL_BEAST_TAMER         = 0x30b5
 SET_RITUAL_BEAST_ULTI             = 0x40b5
-SET_ENTITY                        = 0xb7
 SET_OUTER_ENTITY                  = 0x10b7
 SET_ELDER_ENTITY                  = 0x20b7
 SET_OLD_ENTITY                    = 0x40b7
@@ -304,7 +292,6 @@ SET_AROMA                         = 0xc9
 SET_EMPOWERED_WARRIOR             = 0xca
 SET_AETHER                        = 0xcb
 SET_PREDICTION_PRINCESS           = 0xcc
-SET_AQUA                          = 0xcd
 SET_AQUAACTRESS                   = 0x10cd
 SET_AQUARIUM                      = 0x20cd
 SET_CHAOS                         = 0xcf
@@ -342,7 +329,6 @@ SET_SILENT_MAGICIAN               = 0xe8
 SET_MAGNA_WARRIOR                 = 0xe9
 SET_CRYSTRON                      = 0xea
 SET_CHEMICRITTER                  = 0xeb
-SET_ABYSS                         = 0xec
 SET_ABYSS_ACTOR                   = 0x10ec
 SET_ABYSS_SCRIPT                  = 0x20ec
 SET_SUBTERROR                     = 0xed
@@ -362,7 +348,6 @@ SET_INVOKED                       = 0xf4
 SET_GANDORA                       = 0xf5
 SET_SKYSCRAPER                    = 0xf6
 SET_LYRILUSC                      = 0xf7
-SET_SUPREME_KING                  = 0xf8
 SET_SUPREME_KING_GATE             = 0x10f8
 SET_SUPREME_KING_DRAGON           = 0x20f8
 SET_TRUE_DRACO                    = 0xf9
@@ -454,7 +439,6 @@ SET_APPLIANCER                    = 0x14a
 SET_NUMERON                       = 0x14b
 SET_NUMERON_GATE                  = 0x114b
 SET_FOSSIL                        = 0x14c
-SET_SPIRITUAL_ART                 = 0x14d
 SET_SPIRITUAL_EARTH_ART           = 0x314d
 SET_SPIRITUAL_FIRE_ART            = 0x514d
 SET_SPIRITUAL_WATER_ART           = 0x614d
@@ -469,7 +453,6 @@ SET_KI_SIKIL                      = 0x153
 SET_LIL_LA                        = 0x154
 SET_EVIL_TWIN                     = 0x155
 SET_LIVE_TWIN                     = 0x156
-SET_SUN                           = 0x157
 SET_SUNAVALON                     = 0x1157
 SET_SUNVINE                       = 0x2157
 SET_SUNSEED                       = 0x4157
@@ -480,7 +463,7 @@ SET_STARRY_KNIGHT                 = 0x15b
 SET_DOLL_MONSTER                  = 0x15c
 SET_RANK_DOWN_MAGIC               = 0x15d
 SET_AMAZEMENT                     = 0x15e
-SET_ATTRACTI                      = 0x15f
+SET_ATTRACTION                    = 0x15f
 SET_BRANDED                       = 0x160
 SET_WAR_ROCK                      = 0x161
 SET_MATERIACTOR                   = 0x162
@@ -490,12 +473,11 @@ SET_URSARCTIC                     = 0x165
 SET_DESPIA                        = 0x166
 SET_MAGIKEY                       = 0x167
 SET_GUNKAN                        = 0x168
-SET_OF_THE_FOREST                 = 0x169
 SET_MYSTICAL_BEAST_OF_THE_FOREST  = 0x1169
 SET_MYSTICAL_SPIRIT_OF_THE_FOREST = 0x2169
 SET_STEALTH_KRAGEN                = 0x16a
 SET_NUMEROUNIOUS                  = 0x16b
-SET_NUMBER                        = 0x16c
+SET_NUMBER_SPELL_TRAP             = 0x16c
 SET_SWORDSOUL                     = 0x16d
 SET_ICEJADE                       = 0x16e
 SET_FLOOWANDEREEZE                = 0x16f
@@ -507,7 +489,6 @@ SET_EXOSISTER                     = 0x174
 SET_DINOMORPHIA                   = 0x175
 SET_LADY_OF_LAMENT                = 0x176
 SET_SEVENTH                       = 0x177
-SET_BARIAN                        = 0x178
 SET_BARIANS                       = 0x1178
 SET_BATTLEGUARD                   = 0x2178
 SET_KAIRYU_SHIN                   = 0x179
@@ -524,7 +505,6 @@ SET_TEARLAMENTS                   = 0x182
 SET_VERNUSYLPH                    = 0x183
 SET_MOKEY_MOKEY                   = 0x184
 SET_WINGMAN                       = 0x185
-SET_DOODLE                        = 0x186
 SET_DOODLE_BEAST                  = 0x1186
 SET_DOODLEBOOK                    = 0x2186
 SET_G_GOLEM                       = 0x187
