@@ -1,10 +1,9 @@
 --[[
-	Archetype setcode constant list (akin to common card names).
-	Includes every archetype except the 2 in the notes below.
+	Archetype setcode constants list (akin to common card names).
+	Includes every archetype that's being used in official card scripts.
 	
 	Notes:
-- Alphabetical order? Strict alphabetical or group sub-archetypes
-together with the original?
+- Alphabetical order? Strict alphabetical or group sub-archetypes together with the original?
 
 - 0x67 Iron (unused, non-existent archetype, アイアン, 9 OCG cards include it in their names)
 - 0x68 Tin (unused, non-existent archetype, ブリキ, 3 OCG cards include it in their names)
@@ -508,10 +507,11 @@ SET_WINGMAN                       = 0x185
 SET_DOODLE_BEAST                  = 0x1186
 SET_DOODLEBOOK                    = 0x2186
 SET_G_GOLEM                       = 0x187
+SET_GHOTI                         = 0x18b
+--Currently unreleased in the TCG, the official English name is unknown
 SET_BRIDGE                        = 0x188
 SET_BYSSTED                       = 0x189
 SET_KSHATRI_LA                    = 0x18a
-SET_GHOTI                         = 0x18b
 SET_RESCUE_ACE                    = 0x18c
 SET_PURERY                        = 0x18d
 SET_MIKANKO                       = 0x18e
