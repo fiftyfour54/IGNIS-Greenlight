@@ -1,70 +1,119 @@
--- Common flag effects
-FLAG_TO_ADD_COUNTER=1
-FLAG_TEMPORARY_BANISH=2
-
---[[
-	An operation function to be used with `aux.RemoveUntil`.
-	Will return the banished cards to the monster zone.
-	Makes the player select cards to return if there are less available zones than returnable cards.
---]]
-function Auxiliary.DefaultFieldReturnOp(rg,e,tp)
-	if #rg==0 then return end
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE,0)
-	local tg=rg
-	if ft>0 and #tg>1 and #tg>ft then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-		tg=rg:Select(tp,ft,ft,nil)
-	end
-	for tc in tg:Iter() do
-		Duel.ReturnToField(tc)
-	end
-	for tc in rg:Sub(tg):Iter() do
-		Duel.ReturnToField(tc)
+local function add_to_lookup_table(t,val,...)
+	for _,entry in ipairs({...}) do
+		t[entry]=val
 	end
 end
 
---[[
-	Banishes card(s) and applies an operation to them in a given phase (usually return them to their current location).
+function Auxiliary.AddListedNames(s,...)
+	s.listed_names=s.listed_names or {}
+	add_to_lookup_table(s.listed_names,true,...)
+end
 
-		Card|Group card_or_group: the cards to banish
-		int|nil pos: the cards' position when banished. `nil` will use their current position
-		int reason: the reason for banishing
-		int phase: the phase when `op` will be applied to the banished cards
-		Effect e: the effect performing the banishment
-		int tp: the player performing the banishment, and will later perform `op`
-		function op: a function with the signature (rg,e,tp,eg,ep,ev,re,r,rp)
-			where `rg` is the group of cards that can be returned
-		function|nil con: an additional condition function with the signature (rg,e,tp,eg,ep,ev,re,r,rp).
-			By default, `rg` is automatically checked if it's not empty.
---]]
-function Auxiliary.RemoveUntil(card_or_group,pos,reason,phase,e,tp,op,con)
-	local g=(type(card_or_group)=="Group" and card_or_group or Group.FromCards(card_or_group))
-	if Duel.Remove(g,pos,reason|REASON_TEMPORARY)==0 or g:Match(Card.IsLocation,nil,LOCATION_REMOVED)==0 then return end
-	local fid=e:GetFieldID()
-	for tc in g:Iter() do
-		tc:RegisterFlagEffect(FLAG_TEMPORARY_BANISH,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
+function Auxiliary.AddListedSeries(s,...)
+	s.listed_series=s.listed_series or {}
+	add_to_lookup_table(s.listed_series,true,...)
+end
+
+function Auxiliary.AddListedCardType(s,...)
+	s.listed_card_types=s.listed_card_types or {}
+	add_to_lookup_table(s.listed_card_types,true,...)
+end
+
+function Auxiliary.AddMaterialNames(s,...)
+	s.material_names=s.material_names or {}
+	add_to_lookup_table(s.material_names,true,...)
+end
+
+function Auxiliary.AddMaterialSeries(s,...)
+	s.material_series=s.material_series or {}
+	add_to_lookup_table(s.material_series,true,...)
+end
+
+function Auxiliary.AddPlaceableCounters(s,...)
+	s.listed_counters=s.listed_counters or {}
+	--"1" denotes the counter can be placed
+	add_to_lookup_table(s.listed_counters,1,...)
+end
+
+function Auxiliary.AddListedCounters(s,...)
+	s.listed_counters=s.listed_counters or {}
+	--do not use helper function to not overwrite placeable counters (already set to 1)
+	for _,entry in ipairs({...}) do
+		if t[entry]==nil then t[entry]=val end
 	end
-	g:KeepAlive()
-	local function get_returnable_group(e)
-		return e:GetLabelObject():Filter(function(c)
-			return c:GetFlagEffectLabel(FLAG_TEMPORARY_BANISH)==e:GetLabel()
-		end,nil)
+end
+
+------------------------------------------------------------------
+
+local function is_in_lookup_table(t,...)
+	if not t then return false end
+	for _,entry in ipairs({...}) do
+		if t[entry] then return true end
 	end
-	--Return
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PHASE|phase)
-	e1:SetReset(RESET_PHASE|phase)
-	e1:SetLabelObject(g)
-	e1:SetLabel(fid)
-	e1:SetCountLimit(1)
-	e1:SetCondition(function(eff,...)
-		local rg=get_returnable_group(eff)
-		return #rg>0 and (not con or con(rg,eff,...))
-	end)
-	e1:SetOperation(function(eff,...)
-		if op then op(get_returnable_group(eff),eff,...) end
-	end)
-	Duel.RegisterEffect(e1,tp)
-	return e1
+	return false
+end
+
+--Returns true if the Card "c" specifically lists any of the card IDs in "..."
+function Card.HasListedName(c,...)
+	return is_in_lookup_table(c.listed_names,...) -- or check_table(s.fit_material,...) -- is this needed?
+end
+
+--Returns true if the Card "c" lists any of the archetype codes in "..."
+function Card.HasListedSeries(c,...)
+	return is_in_lookup_table(c.listed_series,...)
+end
+
+--Returns true if the Card "c" lists any of the card IDs in "..." as material
+function Card.HasListedMaterialName(c,...)
+	return is_in_lookup_table(c.material_names,...)
+end
+
+local function match_set_code(set_code,to_match)
+    return (set_code&0xfff)==(to_match&0xfff) and (set_code&to_match)==set_code
+end
+
+--Returns true if the Card "c" lists any of the archetype codes in "..." as material
+function Card.HasListedMaterialSeries(c,...)
+	if not c.material_series then return false end
+	for _,setcode in ipairs({...}) do
+		for listed in pairs(c.material_series) do
+			if match_set_code(setcode,listed) then return true end
+		end
+	end
+	return false
+end
+
+--Returns true if the Card "c" lists a card ID belonging in any of the archetypes in "..."
+function Card.HasListedCardWithSetcode(c,...)
+	if not c.listed_names then return false end
+	local setcodes={...}
+	if #setcodes==0 then return false end
+	for _,cardcode in pairs(c.listed_names) do
+		local match_setcodes={Duel.GetCardSetcodeFromCode(cardcode)}
+		for _,to_match in ipairs(match_setcodes) do
+			for _,setcode in ipairs(setcodes) do
+				if match_set_code(setcode,to_match) then return true end
+			end
+		end
+	end
+	return false
+end
+
+--Returns true if the Card "c" specifically lists any of the card types in "..."
+function Card.HasListedCardType(c,...)
+	return is_in_lookup_table(c.listed_card_types,...)
+end
+
+--Returns true if the Card "c" has an effect that places any of the counters in "..."
+function Card.CanPlaceCounter(c,...)
+	if not c.listed_counters then return false end
+	for _,counter in ipairs({...}) do
+		if c.listed_counters[counter]==1 then return true end
+	end
+	return false
+end
+
+--Returns true if the Card "c" has an effect that places any of the counters in "..."
+function Card.HasListedCounter(c,...)
+	return is_in_lookup_table(c.counter_list,...)
 end
