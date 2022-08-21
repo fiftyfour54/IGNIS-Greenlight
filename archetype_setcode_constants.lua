@@ -21,7 +21,7 @@
 	Other ideas/corrections/fixes are of course welcome.
 --]]
 
-SET_AOJ	                          = 0x1
+SET_ALLY_OF_JUSTICE	          = 0x1
 SET_GENEX                         = 0x2
 SET_R_GENEX                       = 0x1002
 SET_GENEX_ALLY                    = 0x2002
