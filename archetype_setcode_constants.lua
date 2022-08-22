@@ -16,12 +16,10 @@
 - 0xb6 not used at all?
 - 0xb8 not used at all?
 
-- "True Draco|True King" 0xf9 include the "King" from "True King"? TRUE_DRACO_KING?
-
 	Other ideas/corrections/fixes are of course welcome.
 --]]
 
-SET_ALLY_OF_JUSTICE	          = 0x1
+SET_ALLY_OF_JUSTICE	              = 0x1
 SET_GENEX                         = 0x2
 SET_R_GENEX                       = 0x1002
 SET_GENEX_ALLY                    = 0x2002
@@ -31,11 +29,11 @@ SET_ARCANA_FORCE                  = 0x5
 SET_DARK_WORLD                    = 0x6
 SET_ANCIENT_GEAR                  = 0x7
 SET_HERO                          = 0x8
-SET_E_HERO                        = 0x3008
-SET_V_HERO                        = 0x5008
-SET_EVL_HERO                      = 0x6008
-SET_M_HERO                        = 0xa008
-SET_D_HERO                        = 0xc008
+SET_ELEMENTAL_HERO                = 0x3008
+SET_VISION_HERO                   = 0x5008
+SET_EVIL_HERO                     = 0x6008
+SET_MASKED_HERO                   = 0xa008
+SET_DESTINY_HERO                  = 0xc008
 SET_NEOS                          = 0x9
 SET_LSWARM                        = 0xa
 SET_STEELSWARM                    = 0x100a
@@ -117,7 +115,7 @@ SET_JUNK                          = 0x43
 SET_THE_AGENT                     = 0x44
 SET_ARCHFIEND                     = 0x45
 SET_RED_DRAGON_ARCHFIEND          = 0x1045
-SET_POLYMERIZATION                = 0x46
+SET_FUSION                        = 0x46
 SET_FUSION_DRAGON                 = 0x1046
 SET_GEM                           = 0x47
 SET_GEM_KNIGHT                    = 0x1047
@@ -349,7 +347,7 @@ SET_SKYSCRAPER                    = 0xf6
 SET_LYRILUSC                      = 0xf7
 SET_SUPREME_KING_GATE             = 0x10f8
 SET_SUPREME_KING_DRAGON           = 0x20f8
-SET_TRUE_DRACO                    = 0xf9
+SET_TRUE_DRACO_KING               = 0xf9
 SET_PHANTASM_SPIRAL               = 0xfa
 SET_GOUKI                         = 0xfb
 SET_TRICKSTAR                     = 0xfc
