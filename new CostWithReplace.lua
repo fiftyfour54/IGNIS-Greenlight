@@ -1,4 +1,3 @@
-
 function Auxiliary.CostWithReplace(base,replacecode,extracon,alwaysexecute)
 	return function(e,tp,eg,ep,ev,re,r,rp,chk)
 		if alwaysexecute and not alwaysexecute(e,tp,eg,ep,ev,re,r,rp,0) then return false end
@@ -19,18 +18,20 @@ function Auxiliary.CostWithReplace(base,replacecode,extracon,alwaysexecute)
 		if not cond or (#effs>0 and Duel.SelectYesNo(tp,98)) then
 			local eff=effs[1]
 			if #effs>1 then
-				local effsPerCard={}							--sorting effects into a 2D table of "card:effects of that card"
-				local effsHandlersGroup=Group.CreateGroup()	 --a group of all cost replacement effects' handlers
+				local effsPerCard={}						 --sorting effects into a 2D table of "card:effects of that card"
+				local effsHandlersGroup=Group.CreateGroup()  --a group of all cost replacement effects' handlers
 				for _,_eff in ipairs(effs) do
 					local _effCard=_eff:GetHandler()
 					effsHandlersGroup:AddCard(_effCard)
 					if not effsPerCard[_effCard] then effsPerCard[_effCard]={} end
 					table.insert(effsPerCard[_effCard],_eff)
 				end
-				local effCard=effsHandlersGroup:Select(tp,1,1,nil):GetFirst()	   --select the card with the cost replacement effect
+				local effCard=#effsHandlersGroup>1 and effsHandlersGroup:Select(tp,1,1,nil):GetFirst() or effsHandlersGroup:GetFirst()
+					--select a card with the cost replacement effect if there are more than 1
 				local effsOfThatCard=effsPerCard[effCard]
-				eff=effsOfThatCard[1]
-				if #effsOfThatCard>1 then					   --if the card has more than applicable cost replacement effect, apply the old description selection
+				if #effsOfThatCard==1 then --if the card has more than applicable cost replacement effect, apply the old description selection
+					eff=effsOfThatCard[1]
+				else
 					local desctable={}
 					for _,_eff in ipairs(effsOfThatCard) do
 						table.insert(desctable,_eff:GetDescription())
