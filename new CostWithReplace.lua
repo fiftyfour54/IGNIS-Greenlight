@@ -27,6 +27,7 @@ function Auxiliary.CostWithReplace(base,replacecode,extracon,alwaysexecute)
 					table.insert(effsPerCard[_effCard],_eff)
 				end
 				local effCard=#effsHandlersGroup>1 and effsHandlersGroup:Select(tp,1,1,nil):GetFirst() or effsHandlersGroup:GetFirst()
+				Duel.HintSelection(effCard,true)
 					--select a card with the cost replacement effect if there are more than 1
 				local effsOfThatCard=effsPerCard[effCard]
 				if #effsOfThatCard==1 then --if the card has more than applicable cost replacement effect, apply the old description selection
