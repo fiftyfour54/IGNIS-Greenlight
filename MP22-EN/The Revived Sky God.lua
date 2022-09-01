@@ -22,14 +22,16 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetHintTiming(TIMING_END_PHASE,TIMING_END_PHASE)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
+	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
+	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.tdtg)
 	e2:SetOperation(s.tdop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={CARD_MONSTER_REBORN,10000000}
+s.listed_names={CARD_MONSTER_REBORN,10000020}
 function s.spfilter(c,e,tp)
-	return c:IsCode(10000000) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
+	return c:IsCode(10000020) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct1=6-Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
@@ -73,10 +75,11 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 		local check=false
 		if tc:IsLocation(LOCATION_DECK) then
 			Duel.ShuffleDeck(tp)
-			Duel.MoveSequence(tc,0)
+			Duel.MoveToDeckTop(tc)
 			check=true
-		else 
-			Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)
+		else
+			Duel.HintSelection(g,true)
+			Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT)
 			check=tc:IsLocation(LOCATION_DECK+LOCATION_EXTRA)
 		end
 		if not tc:IsLocation(LOCATION_EXTRA) then
