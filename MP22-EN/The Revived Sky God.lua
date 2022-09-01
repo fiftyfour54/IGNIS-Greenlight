@@ -9,6 +9,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(TIMING_DRAW_PHASE,TIMING_STANDBY_PHASE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE+EFFECT_FLAG_CANNOT_INACTIVATE)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.target)
@@ -72,20 +73,19 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
 	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)):GetFirst()
 	if tc then
-		local check=false
 		if tc:IsLocation(LOCATION_DECK) then
 			Duel.ShuffleDeck(tp)
 			Duel.MoveToDeckTop(tc)
-			check=true
 		else
-			Duel.HintSelection(g,true)
+			Duel.HintSelection(tc,true)
 			Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT)
-			check=tc:IsLocation(LOCATION_DECK+LOCATION_EXTRA)
 		end
 		if not tc:IsLocation(LOCATION_EXTRA) then
 			Duel.ConfirmDecktop(tp,1)
 		end
-		if check and Duel.IsExistingMatchingCard(Card.IsRace,tp,LOCATION_GRAVE,0,1,nil,RACE_DIVINE) then
+		if (tc:IsLocation(LOCATION_DECK) and Duel.GetDecktopGroup(tp,1):IsContains(tc)
+			or tc:IsLocation(LOCATION_EXTRA) and Duel.GetExtraTopGroup(tp,1):IsContains(tc))
+			and Duel.IsExistingMatchingCard(Card.IsRace,tp,LOCATION_GRAVE,0,1,nil,RACE_DIVINE) then
 			Duel.BreakEffect()
 			Duel.Draw(tp,1,REASON_EFFECT)
 		end
