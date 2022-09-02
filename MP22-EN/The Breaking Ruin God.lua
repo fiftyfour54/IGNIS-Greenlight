@@ -1,3 +1,4 @@
+--
 --The Breaking Ruin God
 --Scripted by Eerie Code
 local s,id=GetID()
@@ -17,7 +18,8 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_REMOVE+CATEGORY_DAMAGE)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_RELEASE)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_CANNOT_NEGATE)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE+EFFECT_FLAG_DELAY)
+	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(s.rmcon)
 	e2:SetCost(aux.bfgcost)
@@ -54,15 +56,15 @@ function s.efilter(e,re)
 	return e:GetOwnerPlayer()==1-re:GetOwnerPlayer()
 end
 function s.rmcfilter(c,tp)
-	return c:IsReason(REASON_COST) and c:IsPreviousControler(tp)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
 end
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	return re and re:IsActivated() and rp==tp 
-		and eg:FilterCount(s.rmcfilter,nil,tp)>=2 
+	return rp==tp and r&REASON_COST==REASON_COST and re and re:IsActivated()
+		and eg:IsExists(s.rmcfilter,2,nil,tp)
 		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,10000000),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.rmfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
+	return c:IsMonster() and c:IsAbleToRemove()
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_GRAVE,nil)
@@ -73,7 +75,7 @@ end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_GRAVE,nil)
 	if Duel.Remove(g,POS_FACEUP,REASON_EFFECT)~=0 then
-		local ct=Duel.GetOperatedGroup():FilterCount(Card.IsControler,nil,1-tp)
+		local ct=Duel.GetOperatedGroup():FilterCount(Card.IsLocation,nil,LOCATION_REMOVED)
 		Duel.Damage(1-tp,ct*500,REASON_EFFECT)
 	end
 end
