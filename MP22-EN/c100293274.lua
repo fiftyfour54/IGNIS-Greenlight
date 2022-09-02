@@ -3,22 +3,25 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--special summon
+	local EFFECT_FLAG_CANNOT_NEGATE_ACTIV_EFF=EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE+EFFECT_FLAG_CANNOT_INACTIVATE
+	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_NEGATE_ACTIV_EFF)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_CANNOT_NEGATE)
 	e1:SetCountLimit(1,{id,0})
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--damage
+	--Banish all monsters in your opponent's GY
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_REMOVE+CATEGORY_DAMAGE)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_NEGATE_ACTIV_EFF+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_RELEASE)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE+EFFECT_FLAG_DELAY)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(s.rmcon)
@@ -40,20 +43,18 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
-	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then
+	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
+		--Unaffected by your opponent's card effects this turn
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(3110)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_IMMUNE_EFFECT)
 		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
+		e1:SetCode(EFFECT_IMMUNE_EFFECT)
 		e1:SetRange(LOCATION_MZONE)
-		e1:SetValue(s.efilter)
+		e1:SetValue(function(e,re) return e:GetOwnerPlayer()==1-re:GetOwnerPlayer() end)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 	end
-end
-function s.efilter(e,re)
-	return e:GetOwnerPlayer()==1-re:GetOwnerPlayer()
 end
 function s.rmcfilter(c,tp)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
@@ -61,7 +62,7 @@ end
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==tp and r&REASON_COST==REASON_COST and re and re:IsActivated()
 		and eg:IsExists(s.rmcfilter,2,nil,tp)
-		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,10000000),tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsCode,10000000),tp,LOCATION_ONFIELD,0,1,nil)
 end
 function s.rmfilter(c)
 	return c:IsMonster() and c:IsAbleToRemove()
@@ -74,7 +75,7 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_GRAVE,nil)
-	if Duel.Remove(g,POS_FACEUP,REASON_EFFECT)~=0 then
+	if Duel.Remove(g,POS_FACEUP,REASON_EFFECT)>0 then
 		local ct=Duel.GetOperatedGroup():FilterCount(Card.IsLocation,nil,LOCATION_REMOVED)
 		Duel.Damage(1-tp,ct*500,REASON_EFFECT)
 	end
