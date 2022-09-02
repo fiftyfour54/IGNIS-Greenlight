@@ -20,22 +20,12 @@ function s.initial_effect(c)
 	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e2:SetTarget(s.limtg)
 	c:RegisterEffect(e2)
-	aux.GlobalCheck(s,function()
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(s.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end)
 	--Send this card from field or 1 "Winged Dragon of Ra - Immortal Phoenix" from Deck to send 1 "Winged Dragon of Ra" from field to GY
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_TOGRAVE)
 	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1)
-	e3:SetCondition(s.tgcon)
-	e3:SetCost(s.tgcost)
 	e3:SetTarget(s.tgtg)
 	e3:SetOperation(s.tgop)
 	c:RegisterEffect(e3)
@@ -49,51 +39,41 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_DECK,0,nil)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local sg=g:Select(tp,1,1,nil)
-		Duel.SendtoHand(sg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,sg)
-	end
-end
-function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	for tc in eg:Iter() do
-		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
 end
 function s.limtg(e,c)
-	return not c:IsCode(CARD_RA) and c:GetFlagEffect(id)>0
+	return not c:IsCode(CARD_RA) and c:IsStatus(STATUS_SPSUMMON_TURN)
 end
-function s.tgcon(e)
-	local tp=e:GetHandlerPlayer()
-	return Duel.IsMainPhase() and Duel.GetTurnPlayer()==tp
-end
-function s.cfilter(c,e)
-	return ((c:IsCode(10000090) and c:IsLocation(LOCATION_DECK)) or (c==e:GetHandler() and c:IsFaceup() and c:IsLocation(LOCATION_SZONE))) and c:IsAbleToGraveAsCost()
+function s.cfilter(c)
+	return c:IsCode(10000090) and c:IsAbleToGrave()
 end
 function s.tgfilter(c)
 	return c:IsCode(CARD_RA) and c:IsAbleToGrave()
 end
-function s.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local sg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_DECK+LOCATION_SZONE,0,nil,e)
-	if chk==0 then return #sg>0 end
-	local tc=sg:Select(tp,1,1,nil):GetFirst()
-	Duel.SendtoGrave(tc,REASON_COST)
-end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_MZONE,0,nil)
-	if chk==0 then return #g>0 end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,tp,0)
+	if chk==0 then return (Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_DECK,0,1,nil) or c:IsAbleToGrave())
+		and Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK+LOCATION_ONFIELD)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_MZONE,0,nil)
-	if #g==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local sg=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	if #sg>0 then
-		Duel.SendtoGrave(sg,REASON_EFFECT)
+	local c=e:GetHandler()
+	local tc=nil
+	if c:IsRelateToEffect(e) and c:IsAbleToGrave() then tc=c end
+	local tg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_DECK,0,nil)
+	if #tg>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		tc=(tg+tc and tc or tg):Select(tp,1,1,nil):GetFirst()
+	end
+	if tc and Duel.SendtoGrave(tc,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_GRAVE) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		local sg=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_MZONE,0,1,1,nil)
+		if #sg>0 then
+			Duel.SendtoGrave(sg,REASON_EFFECT)
+		end
 	end
 end
