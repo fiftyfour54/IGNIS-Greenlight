@@ -62,13 +62,10 @@ function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=nil
-	if c:IsRelateToEffect(e) and c:IsAbleToGrave() then tc=c end
 	local tg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_DECK,0,nil)
-	if #tg>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		tc=(tg+tc and tc or tg):Select(tp,1,1,nil):GetFirst()
-	end
+	if c:IsRelateToEffect(e) and c:IsAbleToGrave() then tg:AddCard(c) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local tc=tg:Select(tp,1,1,nil):GetFirst()
 	if tc and Duel.SendtoGrave(tc,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_GRAVE) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local sg=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_MZONE,0,1,1,nil)
