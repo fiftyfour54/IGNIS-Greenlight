@@ -8,24 +8,27 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.tgtg)
 	e1:SetOperation(s.tgop)
 	c:RegisterEffect(e1)
-	-- Search 1 Beast, Beast-Warrior, Winged Beast, Insect, or Plant monster
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_DESTROYED)
-	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(s.thcon)
-	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.thop)
+	local e2=e1:Clone()
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
+	-- Search 1 Beast, Beast-Warrior, Winged Beast, Insect, or Plant monster
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_DESTROYED)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetCondition(s.thcon)
+	e3:SetTarget(s.thtg)
+	e3:SetOperation(s.thop)
+	c:RegisterEffect(e3)
 end
 s.listed_names={id}
 function s.tgfilter(c,race)
@@ -44,7 +47,7 @@ function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc or not tc:IsRelateToEffect(e) then return end
+	if not tc:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil,tc:GetOriginalRace())
 	if #g>0 then
@@ -52,8 +55,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsPreviousControler(tp) and rp==1-tp
+	return e:GetHandler():IsPreviousControler(tp) and rp==1-tp
 end
 function s.thfilter(c)
 	return c:IsRace(RACES_BEAST_BWARRIOR_WINGB|RACE_INSECT|RACE_PLANT) and c:IsAbleToHand() and not c:IsCode(id)
