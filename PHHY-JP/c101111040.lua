@@ -9,8 +9,8 @@ function s.initial_effect(c)
 	--Gains 1000 ATK the turn a card is banished
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(function() return Duel.GetFlagEffect(0,id)>0 end)
 	e1:SetValue(1000)
@@ -20,8 +20,8 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
@@ -43,15 +43,12 @@ function s.initial_effect(c)
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_REMOVE)
-		ge1:SetOperation(s.checkop)
+		ge1:SetOperation(function() Duel.RegisterFlagEffect(0,id,RESET_PHASE+PHASE_END,0,1) end)
 		Duel.RegisterEffect(ge1,0)
 	end)
 end
-function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.RegisterFlagEffect(0,id,RESET_PHASE+PHASE_END,0,1)
-end
 function s.thfilter(c)
-	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_LIGHT|ATTRIBUTE_DARK) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and s.thfilter(chkc) end
@@ -67,8 +64,8 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.cfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and c:IsAbleToRemoveAsCost()
-		and ((c:IsLocation(LOCATION_GRAVE+LOCATION_MZONE) and aux.SpElimFilter(c,true)) or c:IsLocation(LOCATION_HAND))
+	return c:IsAttribute(ATTRIBUTE_LIGHT|ATTRIBUTE_DARK) and c:IsAbleToRemoveAsCost()
+		and ((c:IsLocation(LOCATION_GRAVE|LOCATION_MZONE) and aux.SpElimFilter(c,true)) or c:IsLocation(LOCATION_HAND))
 end
 function s.rescon(sg,e,tp,mg)
 	return aux.ChkfMMZ(1)(sg,e,tp,mg)
@@ -77,14 +74,14 @@ function s.rescon(sg,e,tp,mg)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_MZONE,0,c)
+	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_HAND|LOCATION_GRAVE|LOCATION_MZONE,0,c)
 	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,chk) end
 	local rg=aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,1,tp,HINTMSG_REMOVE)
 	Duel.Remove(rg,POS_FACEUP,REASON_COST)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return C:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)

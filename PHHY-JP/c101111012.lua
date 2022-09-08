@@ -21,13 +21,13 @@ function s.tgfilter(c,e)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_LIGHT|ATTRIBUTE_DARK) and c:IsCanBeEffectTarget(e)
 end
 function s.attrescon(sg)
-	local c1,c2=sg:GetFirst(),sg:GetNext()
-	return not c2 or (c1:GetAttribute()&c2:GetAttribute())==0
+	return sg:GetClassCount(Card.GetAttribute)==#sg
 end
 function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local rmg=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_MZONE|LOCATION_HAND|LOCATION_GRAVE,0,e:GetHandler())
+	local c=e:GetHandler()
+	local rmg=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_MZONE|LOCATION_HAND|LOCATION_GRAVE,0,c)
 	local tgg=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_REMOVED,0,nil,e)
-	if chk==0 then return e:GetHandler():HasLevel() and #rmg>0 or #tgg>0 end
+	if chk==0 then return c:HasLevel() and (#rmg>0 or #tgg>0) end
 	e:SetCategory(0)
 	e:SetProperty(0)
 	local op=aux.SelectEffect(tp,
@@ -48,8 +48,6 @@ function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function s.lvop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or not c:HasLevel() then return end
 	local op,ct=e:GetLabel()
 	if op==2 then
 		local tg=Duel.GetTargetCards(e)
@@ -58,6 +56,8 @@ function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	elseif op~=1 then return end
 	if not ct or ct==0 then return end
+	local c=e:GetHandler()
+	if not (c:IsRelateToEffect(e) and c:IsFaceup() and c:HasLevel()) then return end
 	local b1=c:IsLevelAbove(ct+1)
 	local b2=true
 	local lvop=aux.SelectEffect(tp,

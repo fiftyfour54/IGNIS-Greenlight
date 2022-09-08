@@ -9,8 +9,8 @@ function s.initial_effect(c)
 	--Gains 2000 ATK the turn a card is banished
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(function() return Duel.GetFlagEffect(0,id)>0 end)
 	e1:SetValue(2000)
@@ -32,8 +32,8 @@ function s.initial_effect(c)
 	e4:SetDescription(aux.Stringid(id,0))
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_LEAVE_FIELD)
 	e4:SetProperty(EFFECT_FLAG_DELAY)
+	e4:SetCode(EVENT_LEAVE_FIELD)
 	e4:SetCountLimit(1,id)
 	e4:SetCondition(s.spcon)
 	e4:SetTarget(s.sptg)
@@ -44,15 +44,12 @@ function s.initial_effect(c)
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_REMOVE)
-		ge1:SetOperation(s.checkop)
+		ge1:SetOperation(function() Duel.RegisterFlagEffect(0,id,RESET_PHASE+PHASE_END,0,1) end)
 		Duel.RegisterEffect(ge1,0)
 	end)
 end
 s.listed_series={0xcf}
 s.listed_names={id}
-function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.RegisterFlagEffect(0,id,RESET_PHASE+PHASE_END,0,1)
-end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and e:GetHandler():IsPreviousControler(tp)
 end
@@ -65,11 +62,9 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
-		if #g>0 then
-			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-		end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
+	if #g>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

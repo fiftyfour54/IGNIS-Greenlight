@@ -44,7 +44,7 @@ function s.tkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local blk=(e:GetLabel())==101111109
 	if chk==0 then
 		if Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)>0 then return false end
-		return not blk or (c:IsReleasable() and Duel.GetMZoneCount(tp,c)>0)
+		return not blk or c:IsReleasable()
 	end
 	if blk then Duel.Release(c,REASON_COST) end
 	-- Cannot Special Summon monsters from the Extra Deck, except LIGHT or DARK Synchro monsters
@@ -64,7 +64,7 @@ function s.lizfilter(e,c)
 	return not c:IsOriginalType(TYPE_SYNCHRO) or not c:IsAttribute(ATTRIBUTE_LIGHT|ATTRIBUTE_DARK)
 end
 function s.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1
+	if chk==0 then return Duel.GetMZoneCount(tp,e:GetHandler())>1
 		and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,e:GetLabel())
 	end
