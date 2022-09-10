@@ -31,8 +31,8 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	-- Cannot declare attacks, except with Ritual Monsters
 	local c=e:GetHandler()
+	-- Cannot declare attacks, except with Ritual Monsters
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
