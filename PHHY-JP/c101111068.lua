@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	-- Equip 1 "Evil Eye" card to a Link monster
+	--Equip 1 "Evil Eye" card to a Link monster
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_EQUIP)
@@ -31,27 +31,25 @@ function s.initial_effect(c)
 end
 SET_EVIL_EYE = 0x129 --to test while the constants are not available
 s.listed_series={SET_EVIL_EYE}
-function s.tgfilter1(c)
-	return c:IsMonster() and c:IsAbleToGraveAsCost()
-end
-function s.tgfilter2(c)
-	return c:IsSpellTrap() and c:IsAbleToGraveAsCost()
-end
 function s.thfilter(c)
-	return c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
+    return c:IsSetCard(SET_EVIL_EYE) and c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
 end
-function s.rescon(sg,e,tp,mg)
-	return sg:IsExists(s.tgfilter1,1,nil) and sg:IsExists(s.tgfilter2,1,nil)
-		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,sg)
+function s.tgfilter(c)
+    return c:IsSetCard(SET_EVIL_EYE) and c:IsAbleToGraveAsCost()
+end
+function s.rescon(sg)
+    return sg:FilterCount(Card.IsMonster,nil)==1
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_DECK,0,nil,SET_EVIL_EYE)
-	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,0) end
-	local dg=aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,1,tp,HINTMSG_TOGRAVE)
-	Duel.SendtoGrave(dg,REASON_COST)
+    local g=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_DECK,0,nil)
+    local hg=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
+    if #hg==1 then g:Sub(hg) end
+    if chk==0 then return #hg>0 and aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,0) end
+    local dg=aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,1,tp,HINTMSG_TOGRAVE)
+    Duel.SendtoGrave(dg,REASON_COST)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
