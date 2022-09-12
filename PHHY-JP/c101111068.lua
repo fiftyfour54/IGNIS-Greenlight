@@ -42,7 +42,7 @@ function s.thfilter(c)
 end
 function s.rescon(sg,e,tp,mg)
 	return sg:IsExists(s.tgfilter1,1,nil) and sg:IsExists(s.tgfilter2,1,nil)
-		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,sg)
+		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,sg)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_DECK,0,nil,SET_EVIL_EYE)
