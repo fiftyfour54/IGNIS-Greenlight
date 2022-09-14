@@ -1,5 +1,5 @@
 --クシャトリラ・オーバーラップ
---Kshatri-La Overwrap
+--Kshatri-La Overlap
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
@@ -23,28 +23,25 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_REMOVE)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,{id,id})
-	e2:SetCondition(s.discon)
 	e2:SetTarget(s.distg)
 	e2:SetOperation(s.disop)
 	c:RegisterEffect(e2)
 end
 SET_KSHATRI_LA=0x18a --to test while the constants are not available, to be removed later
 s.listed_series={SET_KSHATRI_LA}
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
+end
 function s.rmvfilter(c)
 	return c:IsMonster() and c:IsAttack(1500) and c:IsDefense(2100) and c:IsAbleToRemove()
 		and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
 end
 function s.tgfilter(c,tp)
-	return c:IsFaceup()
-		and Duel.IsExistingMatchingCard(s.rmvfilter,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_MZONE,LOCATION_MZONE,1,c)
-end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
+	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.rmvfilter,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_MZONE,LOCATION_MZONE,1,c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() and s.tgfilter(chkc,tp) end
+	if chkc then return chkc:IsFaceup() and chkc:IsLocation(LOCATION_MZONE) and s.tgfilter(chkc,tp) end
 	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
 	Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp)
@@ -60,8 +57,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		rg=g:Select(tp,1,1,nil)
-	--if we can only banish the target, select it
-	elseif s.rmvfilter(tc) then
+	--else, check if we can banish tc and select it
+	elseif tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsAttack(1500) and tc:IsDefense(2100) and tc:IsAbleToRemove() then
 		rg=Group.FromCards(tc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		rg=rg:Select(tp,1,1,nil)
@@ -75,9 +72,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(1500)
 		tc:RegisterEffect(e1)
 	end
-end
-function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsFaceup()
 end
 function s.disfilter(c)
 	return c:IsType(TYPE_EFFECT) and c:IsFaceup() and not c:IsDisabled()
@@ -94,6 +88,7 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and not tc:IsDisabled() then
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+		--Negate the effects of the target
 		local c=e:GetHandler()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
