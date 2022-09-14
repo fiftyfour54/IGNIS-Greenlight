@@ -37,12 +37,12 @@ function s.rmvcond(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function s.rmfilter(c,p)
-    return Duel.IsPlayerCanRemove(p,c) and not c:IsType(TYPE_TOKEN)
+	return Duel.IsPlayerCanRemove(p,c) and not c:IsType(TYPE_TOKEN)
 end
 function s.rmvtg(e,tp,eg,ep,ev,re,r,rp,chk)
-    local g1=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_MZONE,0,nil,tp)
+	local g1=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_MZONE,0,nil,tp)
 	local g2=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_MZONE,nil,1-tp)
-    if chk==0 then return (#g1>1 and not Duel.IsPlayerAffectedByEffect(tp,30459350))
+	if chk==0 then return (#g1>1 and not Duel.IsPlayerAffectedByEffect(tp,30459350))
 		or (#g2>1 and not Duel.IsPlayerAffectedByEffect(1-tp,30459350)) end
 end
 function s.rmvop(e,tp,eg,ep,ev,re,r,rp)
@@ -87,8 +87,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOHAND)
 	local sc=g:FilterSelect(tp,s.thfilter,1,1,nil,tp):GetFirst()
 	if sc and Duel.SendtoHand(sc,nil,REASON_EFFECT)>0 and sc:IsLocation(LOCATION_HAND)
-	and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-	and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
 	and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 		Duel.BreakEffect()
 		Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
