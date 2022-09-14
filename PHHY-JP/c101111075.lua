@@ -51,16 +51,16 @@ function s.rmvop(e,tp,eg,ep,ev,re,r,rp)
 	local g1=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_MZONE,0,nil,p1)
 	if not Duel.IsPlayerAffectedByEffect(p1,30459350) and #g1>1 then
 		local ct=#g1-1
-	 	Duel.Hint(HINT_SELECTMSG,p1,HINTMSG_REMOVE)
-        local sg=g:FilterSelect(p1,Card.IsAbleToRemove,ct,ct,nil,p1,POS_FACEDOWN,REASON_RULE)
-        Duel.Remove(sg,POS_FACEDOWN,REASON_RULE)
+		Duel.Hint(HINT_SELECTMSG,p1,HINTMSG_REMOVE)
+		local sg=g:FilterSelect(p1,Card.IsAbleToRemove,ct,ct,nil,p1,POS_FACEDOWN,REASON_RULE)
+		Duel.Remove(sg,POS_FACEDOWN,REASON_RULE)
 	end
 	local g2=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_MZONE,nil,p2)
 	if not Duel.IsPlayerAffectedByEffect(p2,30459350) and #g2>1 then
 		local ct=#g2-1
-	 	Duel.Hint(HINT_SELECTMSG,p2,HINTMSG_REMOVE)
-        local sg=g:FilterSelect(p2,Card.IsAbleToRemove,ct,ct,nil,p2,POS_FACEDOWN,REASON_RULE)
-        Duel.Remove(sg,POS_FACEDOWN,REASON_RULE)
+		Duel.Hint(HINT_SELECTMSG,p2,HINTMSG_REMOVE)
+		local sg=g:FilterSelect(p2,Card.IsAbleToRemove,ct,ct,nil,p2,POS_FACEDOWN,REASON_RULE)
+		Duel.Remove(sg,POS_FACEDOWN,REASON_RULE)
 	end
 end
 function s.thfilter(c,tp)
@@ -87,11 +87,10 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOHAND)
 	local sc=g:FilterSelect(tp,s.thfilter,1,1,nil,tp):GetFirst()
 	if sc and Duel.SendtoHand(sc,nil,REASON_EFFECT)>0 and sc:IsLocation(LOCATION_HAND)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-			Duel.BreakEffect()
-			Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
-		end
+	and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		Duel.BreakEffect()
+		Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
