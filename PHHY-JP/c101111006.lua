@@ -80,7 +80,8 @@ function s.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=Duel.GetDecktopGroup(1-tp,3)
-	if chk==0 then return rg:FilterCount(Card.IsAbleToRemove,nil,POS_FACEDOWN)==3 end
+	if chk==0 then return rg:FilterCount(Card.IsAbleToRemove,nil,POS_FACEDOWN)==3
+		and not e:GetHandler():IsLevel(7) end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,rg,3,1-tp,LOCATION_DECK)
 end
 function s.rmfilter(c)
