@@ -52,14 +52,14 @@ function s.rmvop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsPlayerAffectedByEffect(p1,30459350) and #g1>1 then
 		local ct=#g1-1
 		Duel.Hint(HINT_SELECTMSG,p1,HINTMSG_REMOVE)
-		local sg=g:FilterSelect(p1,Card.IsAbleToRemove,ct,ct,nil,p1,POS_FACEDOWN,REASON_RULE)
+		local sg=g1:FilterSelect(p1,Card.IsAbleToRemove,ct,ct,nil,p1,POS_FACEDOWN,REASON_RULE)
 		Duel.Remove(sg,POS_FACEDOWN,REASON_RULE)
 	end
 	local g2=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_MZONE,nil,p2)
 	if not Duel.IsPlayerAffectedByEffect(p2,30459350) and #g2>1 then
 		local ct=#g2-1
 		Duel.Hint(HINT_SELECTMSG,p2,HINTMSG_REMOVE)
-		local sg=g:FilterSelect(p2,Card.IsAbleToRemove,ct,ct,nil,p2,POS_FACEDOWN,REASON_RULE)
+		local sg=g2:FilterSelect(p2,Card.IsAbleToRemove,ct,ct,nil,p2,POS_FACEDOWN,REASON_RULE)
 		Duel.Remove(sg,POS_FACEDOWN,REASON_RULE)
 	end
 end
