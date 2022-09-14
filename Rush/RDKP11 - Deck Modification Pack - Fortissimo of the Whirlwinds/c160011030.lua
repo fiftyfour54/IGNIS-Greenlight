@@ -39,8 +39,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.HintSelection(g)
 		if g:GetFirst():IsAttackPos() then
 			Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)
-		elseif g:GetFirst():IsPosition(POS_FACEDOWN_DEFENSE) then
-			Duel.ChangePosition(g,0,0,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 		else
 			local op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))
 			if op==0 then
