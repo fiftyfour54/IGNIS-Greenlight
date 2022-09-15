@@ -29,7 +29,7 @@ end
 s.listed_series={SET_KSHATRI_LA}
 s.listed_names={id}
 function s.tgfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_KSHATRI_LA)	and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetAttribute())
+	return c:IsFaceup() and c:IsSetCard(SET_KSHATRI_LA) and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetAttribute())
 end
 function s.spfilter(c,e,tp,attr)
 	return c:IsSetCard(SET_KSHATRI_LA) and not c:IsAttribute(attr) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
