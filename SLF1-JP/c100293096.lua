@@ -23,14 +23,15 @@ function s.tgfilter(c,p)
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,0,LOCATION_MZONE,1,nil,1-tp) end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_MZONE)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,1-tp,LOCATION_MZONE)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_MZONE)
-	if #g==0 then return end
+	if #g<3 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SELECT)
 	local tc=g:Select(tp,1,1,nil):GetFirst()
 	if not tc then return end
+	Duel.HintSelection(tc,true)
 	g:RemoveCard(tc)
 	local b1=Duel.IsPlayerCanSendtoGrave(1-tp,tc)
 	local b2=g:IsExists(s.tgfilter,1,nil,1-tp)
