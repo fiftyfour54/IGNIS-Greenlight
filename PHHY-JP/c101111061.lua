@@ -2,13 +2,11 @@
 --Tearlaments Perlregia
 --scripted by Naim
 local s,id=GetID()
-SET_TEARLAMENTS=0x182 --to test while the constants are not available, to be removed later
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	--Increase ATK
 	local e2=Effect.CreateEffect(c)
@@ -21,10 +19,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	--Send 1 Aqua monster from Deck to GY
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_TOGRAVE)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetRange(LOCATION_FZONE)
 	e3:SetCountLimit(1,id)
@@ -52,11 +50,12 @@ function s.grop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.grvfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 and Duel.SendtoGrave(g,REASON_EFFECT)>0 then
 		local tc=Duel.GetOperatedGroup():GetFirst()
-		--Cannot activate card or effects with the same name if it's not a "Tearlaments"
-		if not tc:IsSetCard(SET_TEARLAMENTS) then
+		if tc:IsLocation(LOCATION_GRAVE) and not tc:IsSetCard(SET_TEARLAMENTS) then
+			--Cannot activate card or effects with the same name if it's not a "Tearlaments"
 			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetDescription(aux.Stringid(id,2))
 			e1:SetType(EFFECT_TYPE_FIELD)
-			e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+			e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
 			e1:SetCode(EFFECT_CANNOT_ACTIVATE)
 			e1:SetTargetRange(1,0)
 			e1:SetValue(s.aclimit)

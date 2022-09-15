@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e1:SetCondition(function() return Duel.IsMainPhase() end)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
@@ -68,7 +68,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.smltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,3) or Duel.IsPlayerCanDiscardDeck(1-tp,3) end
-	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,PLAYER_ALL,3)
+	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,PLAYER_EITHER,3)
 end
 function s.smlop(e,tp,eg,ep,ev,re,r,rp)
 	local b1=Duel.IsPlayerCanDiscardDeck(tp,3)
