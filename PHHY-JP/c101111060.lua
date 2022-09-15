@@ -34,18 +34,17 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 	--Destroy 1 card the opponent controls
 	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,0))
+	e5:SetDescription(aux.Stringid(id,1))
 	e5:SetCategory(CATEGORY_DESTROY)
 	e5:SetType(EFFECT_TYPE_IGNITION)
 	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e5:SetRange(LOCATION_SZONE)
 	e5:SetCountLimit(1,id)
-	e5:SetCost(s.cost)
-	e5:SetTarget(s.target)
-	e5:SetOperation(s.operation)
+	e5:SetCost(s.descost)
+	e5:SetTarget(s.destg)
+	e5:SetOperation(s.desop)
 	c:RegisterEffect(e5)
 end
-SET_SCARECLAW = 0x17c --to test while the constants are not available, to be removed later
 s.listed_series={SET_SCARECLAW}
 s.listed_names={CARD_VISAS_STARFROST}
 function s.cfilter(e,c)
@@ -54,20 +53,20 @@ end
 function s.costfilter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_SCARECLAW) and c:IsLinkMonster() and c:IsAbleToRemoveAsCost()
 end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,1,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c:IsControler(1-tp) end
 	if chk==0 then return Duel.IsExistingTarget(nil,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,nil,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.Destroy(tc,REASON_EFFECT)

@@ -8,10 +8,11 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(TIMING_DAMAGE_STEP,TIMING_DAMAGE_STEP+TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
 	e1:SetCountLimit(1,id)
+	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
@@ -29,14 +30,17 @@ function s.initial_effect(c)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={CARD_VISAS_STARFROST}
+s.listed_names={CARD_VISAS_STARFROST,id}
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
+end
 function s.tgfilter(c,e,tp)
 	return c:IsFaceup() and c:IsCanBeEffectTarget(e)
 		and ((c:IsCode(CARD_VISAS_STARFROST) and c:IsControler(tp))
-		or (c:IsControler(1-tp) and c:IsType(TYPE_EFFECT) and not c:IsDisabled()))
+		or (c:IsControler(1-tp) and c:IsType(TYPE_EFFECT) and c:IsNegatableMonster()))
 end
 function s.rescon(sg,e,tp,mg)
-	return sg:Filter(Card.IsControler,nil,tp)==1
+	return sg:FilterCount(Card.IsControler,nil,tp)==1
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
@@ -55,10 +59,10 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc1=g:GetFirst()
 	local tc2=g:GetNext()
 	if tc2==e:GetLabelObject() then tc1,tc2=tc2,tc1 end
-	if tc2 and tc2:IsControler(1-tp) and tc2:IsRelateToEffect(e) and tc:IsFaceup() and not tc:IsDisabled() and not tc:IsImmuneToEffect(e) then
+	if tc2 and tc2:IsControler(1-tp) and tc2:IsFaceup() and not tc2:IsDisabled() and not tc2:IsImmuneToEffect(e) then
+		local c=e:GetHandler()
 		Duel.NegateRelatedChain(tc2,RESET_TURN_SET)
 		--Negate the effects of the opponent's monster
-		local c=e:GetHandler()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
@@ -70,10 +74,10 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(RESET_TURN_SET)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc2:RegisterEffect(e2)
+		local val=math.max(tc2:GetBaseAttack(),tc2:GetBaseDefense())/2
+		if val==0 then return end
 		--Your monster gains half of the original ATK/DEF (whichever is higher)
-		if tc1 and tc1:IsControler(tp) and tc:IsRelateToEffect(e) and tc1:IsFaceup() then
-			local val=math.max(tc2:GetBaseAttack(),tc2:GetBaseDefense())/2
-			if val==0 then return end
+		if tc1 and tc1:IsControler(tp) and tc1:IsRelateToEffect(e) and tc1:IsFaceup() then
 			tc1:UpdateAttack(val,RESET_EVENT+RESETS_STANDARD,c)
 		end
 	end

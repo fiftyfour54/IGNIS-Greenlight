@@ -21,14 +21,13 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DISABLE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_REMOVE)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1,{id,id})
+	e2:SetCode(EVENT_REMOVE)
+	e2:SetCountLimit(1,{id,1})
 	e2:SetTarget(s.distg)
 	e2:SetOperation(s.disop)
 	c:RegisterEffect(e2)
 end
-SET_KSHATRI_LA=0x18a --to test while the constants are not available, to be removed later
 s.listed_series={SET_KSHATRI_LA}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
@@ -41,12 +40,12 @@ function s.tgfilter(c,tp)
 	return c:IsFaceup() and Duel.IsExistingMatchingCard(s.rmvfilter,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_MZONE,LOCATION_MZONE,1,c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsFaceup() and chkc:IsLocation(LOCATION_MZONE) and s.tgfilter(chkc,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.tgfilter(chkc,tp) end
 	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
-	Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp)
+	local tc=Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp)
 	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,tc,1,0,1500)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,0,LOCATION_HAND+LOCATION_GRAVE+LOCATION_MZONE)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,PLAYER_EITHER,LOCATION_HAND+LOCATION_GRAVE+LOCATION_MZONE)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -65,6 +64,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if #rg==0 then return end
 	if Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)>0 and rg:GetFirst():IsLocation(LOCATION_REMOVED) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+		--Increase ATK
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -74,11 +74,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.disfilter(c)
-	return c:IsType(TYPE_EFFECT) and c:IsFaceup() and not c:IsDisabled()
+	return c:IsType(TYPE_EFFECT) and c:IsNegatableMonster()
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c:IsControler(1-tp) and s.disfilter(chkc) end
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.Faceupfilter(Card.IsSetCard,SET_KSHATRI_LA),tp,LOCATION_MZONE,0,1,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_KSHATRI_LA),tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingTarget(s.disfilter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
 	local tc=Duel.SelectTarget(tp,s.disfilter,tp,0,LOCATION_MZONE,1,1,nil):GetFirst()

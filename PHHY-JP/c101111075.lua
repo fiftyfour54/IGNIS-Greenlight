@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMING_BATTLE_START+TIMING_END_PHASE)
+	e1:SetHintTiming(0,TIMING_BATTLE_START+TIMINGS_CHECK_MONSTER_E)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.rmvcond)
 	e1:SetTarget(s.rmvtg)
@@ -20,15 +20,13 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_REMOVE)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e2:SetRange(LOCATION_MZONE)
+	e2:SetCode(EVENT_REMOVE)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
-SET_KSHATRI_LA=0x18a --to test while the constants are not available, to be removed later
 s.listed_series={SET_KSHATRI_LA}
 function s.xyzfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsSetCard(SET_KSHATRI_LA)
@@ -48,14 +46,14 @@ end
 function s.rmvop(e,tp,eg,ep,ev,re,r,rp)
 	local p1=Duel.GetTurnPlayer() --used to make the turn player banish first
 	local p2=1-Duel.GetTurnPlayer()
-	local g1=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_MZONE,0,nil,p1)
+	local g1=Duel.GetMatchingGroup(s.rmfilter,p1,LOCATION_MZONE,0,nil,p1)
 	if not Duel.IsPlayerAffectedByEffect(p1,30459350) and #g1>1 then
 		local ct=#g1-1
 		Duel.Hint(HINT_SELECTMSG,p1,HINTMSG_REMOVE)
 		local sg=g1:FilterSelect(p1,Card.IsAbleToRemove,ct,ct,nil,p1,POS_FACEDOWN,REASON_RULE)
 		Duel.Remove(sg,POS_FACEDOWN,REASON_RULE)
 	end
-	local g2=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_MZONE,nil,p2)
+	local g2=Duel.GetMatchingGroup(s.rmfilter,p2,LOCATION_MZONE,0,nil,p2)
 	if not Duel.IsPlayerAffectedByEffect(p2,30459350) and #g2>1 then
 		local ct=#g2-1
 		Duel.Hint(HINT_SELECTMSG,p2,HINTMSG_REMOVE)
@@ -84,11 +82,12 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp,chk)
 	if not tc:IsRelateToEffect(e) then return end
 	local g=tc:GetOverlayGroup()
 	if #g==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOHAND)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local sc=g:FilterSelect(tp,s.thfilter,1,1,nil,tp):GetFirst()
-	if sc and Duel.SendtoHand(sc,nil,REASON_EFFECT)>0 and sc:IsLocation(LOCATION_HAND)
-	and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
-	and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+	if sc and Duel.SendtoHand(sc,nil,REASON_EFFECT)>0 and sc:IsLocation(LOCATION_HAND) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and sc:IsCanBeSpecialSummoned(e,0,tp,false,false) then
+		Duel.ShuffleHand(tp)
+		if not Duel.SelectYesNo(tp,aux.Stringid(id,2)) then return end
 		Duel.BreakEffect()
 		Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
 	end
