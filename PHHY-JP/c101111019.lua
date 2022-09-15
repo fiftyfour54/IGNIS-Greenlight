@@ -3,14 +3,14 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Special summon itself from hand
+	--Special Summon itself from the hand or GY
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.spcon)
 	e1:SetTarget(s.sptg)
@@ -22,23 +22,22 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(function(e,tp) return Duel.IsTurnPlayer(1-tp) end )
+	e2:SetCondition(function(_,tp) return Duel.IsTurnPlayer(1-tp) end)
 	e2:SetTarget(s.lnktg)
 	e2:SetOperation(s.lnkop)
 	c:RegisterEffect(e2)
 end
-SET_EVIL_EYE = 0x129 --to test while the constants are not available
 s.listed_series={SET_EVIL_EYE}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FilterFaceupFunction(Card.IsSetCard,SET_EVIL_EYE),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_EVIL_EYE),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -48,8 +47,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3300)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
 		e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
 		e1:SetValue(LOCATION_REMOVED)
 		c:RegisterEffect(e1,true)
@@ -63,7 +62,12 @@ function s.lnkfilter(c)
 end
 function s.lnktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local e1,e2 = s.tempregister(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.lnkfilter,tp,LOCATION_EXTRA,0,1,nil) end
+	if chk==0 then
+		local res=Duel.IsExistingMatchingCard(s.lnkfilter,tp,LOCATION_EXTRA,0,1,nil)
+		e1:Reset()
+		e2:Reset()
+		return res
+	end
 	e1:Reset()
 	e2:Reset()
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
@@ -73,11 +77,28 @@ function s.lnkop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.lnkfilter,tp,LOCATION_EXTRA,0,nil)
 	if #g>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg=g:Select(tp,1,1,nil)
-		Duel.LinkSummon(tp,sg:GetFirst())
+		local sc=g:Select(tp,1,1,nil):GetFirst()
+		if not sc then
+			e1:Reset()
+			e2:Reset()
+			return
+		end
+		Duel.LinkSummon(tp,sc)
+		--Manually reset e1 and e2 when the monster would be Link Summoned
+		local e3=Effect.CreateEffect(e:GetHandler())
+		e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e3:SetCode(EVENT_SPSUMMON)
+		e3:SetOperation(s.resetop)
+		e3:SetLabelObject({e1,e2})
+		Duel.RegisterEffect(e3,tp)
 	end
+end
+function s.resetop(e,tp,eg,ep,ev,re,r,rp)
+	local e1,e2=table.unpack(e:GetLabelObject())
 	e1:Reset()
 	e2:Reset()
+	e:Reset()
 end
 function s.tempregister(e,tp,eg,ep,ev,re,r,rp,chk)
 	--Can treat "Evil Eye" Equip cards as Link Material if using this effect
@@ -100,7 +121,7 @@ function s.tempregister(e,tp,eg,ep,ev,re,r,rp,chk)
 	return e1,e2
 end
 function s.matfilter(c)
-	return c:IsFaceup() and c:IsSetCard(SET_EVIL_EYE) and c:IsSpell() and c:IsType(TYPE_EQUIP) and c:GetSequence()<5
+	return c:IsFaceup() and c:IsSetCard(SET_EVIL_EYE) and c:IsSpell() and c:IsType(TYPE_EQUIP)
 end
 function s.extraval(chk,summon_type,e,...)
 	if chk==0 then
@@ -109,7 +130,7 @@ function s.extraval(chk,summon_type,e,...)
 			return Group.CreateGroup()
 		else
 			Duel.RegisterFlagEffect(tp,id,0,0,1)
-			return Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_SZONE,0,nil)
+			return Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_ONFIELD,0,nil)
 		end
 	elseif chk==2 then
 		Duel.ResetFlagEffect(e:GetHandlerPlayer(),id)

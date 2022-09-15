@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--Equip 1 "Evil Eye" card to a Link monster
+	--Equip 1 "Evil Eye" card to 1 "Evil Eye" Link Monster
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_EQUIP)
@@ -29,10 +29,9 @@ function s.initial_effect(c)
 	e2:SetOperation(s.eqpop)
 	c:RegisterEffect(e2)
 end
-SET_EVIL_EYE = 0x129 --to test while the constants are not available
 s.listed_series={SET_EVIL_EYE}
 function s.thfilter(c)
-    return c:IsSetCard(SET_EVIL_EYE) and c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
+    return c:IsSetCard(SET_EVIL_EYE) and c:IsSpell() and c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
 end
 function s.tgfilter(c)
     return c:IsSetCard(SET_EVIL_EYE) and c:IsAbleToGraveAsCost()
@@ -59,12 +58,15 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
-	local e1=Effect.CreateEffect(e:GetHandler())
+	local c=e:GetHandler()
+	--Lose 500 LP each time you activate a non-"Evil Eye" card or effect
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_CHAIN_SOLVED) --use EVENT_CHAINING if needs to be imediately, and not after it resolves
+	e1:SetCode(EVENT_CHAIN_SOLVED)
 	e1:SetOperation(s.damop)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	aux.RegisterClientHint(c,0,tp,1,0,aux.Stringid(id,2))
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	if not re:GetHandler():IsSetCard(SET_EVIL_EYE) and rp==tp then
@@ -82,18 +84,20 @@ function s.eqtcfilter(c,ec)
 	return c:IsSetCard(SET_EVIL_EYE) and c:IsLinkMonster() and c:IsFaceup() and ec:CheckEquipTarget(c)
 end
 function s.eqfilter(c,tp)
-	return c:IsSetCard(SET_EVIL_EYE) and c:IsType(TYPE_EQUIP) and c:CheckUniqueOnField(tp)
-		and Duel.IsExistingMatchingCard(s.eqtcfilter,0,LOCATION_MZONE,0,1,nil,c)
+	return c:IsSetCard(SET_EVIL_EYE) and c:IsSpell() and c:IsType(TYPE_EQUIP) and c:CheckUniqueOnField(tp)
+		and Duel.IsExistingMatchingCard(s.eqtcfilter,tp,LOCATION_MZONE,0,1,nil,c)
 end
 function s.eqptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_GRAVE,0,1,nil,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,tp,0)
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_GRAVE)
 end
 function s.eqpop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	local ec=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_GRAVE,0,1,1,nil,tp):GetFirst()
-	if not ec or Duel.GetLocationCount(tp,LOCATION_SZONE)==0 then return end
+	if not ec then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local tc=Duel.SelectMatchingCard(tp,s.eqtcfilter,tp,LOCATION_MZONE,0,1,1,nil,ec):GetFirst()
 	if tc then
