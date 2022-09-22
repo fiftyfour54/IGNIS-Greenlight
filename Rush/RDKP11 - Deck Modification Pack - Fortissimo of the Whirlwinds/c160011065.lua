@@ -31,9 +31,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		Duel.HintSelection(tc,true)
 		if Duel.Destroy(tc,REASON_EFFECT)>0 and tc:IsType(TYPE_EQUIP)
-			and eg:IsExists(Card.IsLevelBelow,1,nil,8)
+			and eg:IsExists(aux.FaceupFilter(Card.IsLevelBelow,8),1,nil)
 			and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-			local sg=eg:FilterSelect(tp,Card.IsLevelBelow,1,1,nil,8)
+			local sg=eg:FilterSelect(tp,aux.FaceupFilter(Card.IsLevelBelow,8),1,1,nil)
 			Duel.HintSelection(sg,true)
 			Duel.BreakEffect()
 			Duel.Destroy(sg,REASON_EFFECT)
