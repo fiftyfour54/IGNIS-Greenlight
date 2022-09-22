@@ -27,17 +27,16 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil) end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	--Requirement
 	Duel.PayLPCost(tp,500) 
 	--Effect
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil)
 	if #g>0 then
-		Duel.HintSelection(g)
+		Duel.HintSelection(g,true)
 		local tc=g:GetFirst()
 		--Piercing
-		local e1=Effect.CreateEffect(c)
+		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(3201)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)

@@ -32,7 +32,6 @@ function s.filter(c)
 	return c:IsFaceup() and c:IsLevelBelow(7) and c:IsAttackAbove(2500)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	--Requirement
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local tg=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_HAND,0,1,1,nil)
@@ -49,7 +48,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 			if #g>0 then
 				g=g:AddMaximumCheck()
 				Duel.HintSelection(g)
-				local e1=Effect.CreateEffect(c)
+				local e1=Effect.CreateEffect(e:GetHandler())
 				e1:SetType(EFFECT_TYPE_SINGLE)
 				e1:SetCode(EFFECT_UPDATE_ATTACK)
 				e1:SetValue(-2500)

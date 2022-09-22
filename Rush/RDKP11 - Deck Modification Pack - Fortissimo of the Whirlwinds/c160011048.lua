@@ -37,15 +37,14 @@ function s.desfilter(c)
 	return c:IsFaceup() and c:IsLevelAbove(7) and c:IsType(TYPE_NORMAL)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	--requirement
 	if Duel.DiscardDeck(tp,3,REASON_COST)>2 then
 		--Effect
 		local g=Duel.SelectMatchingCard(tp,aux.FilterMaximumSideFunctionEx(s.filter,tp),tp,0,LOCATION_MZONE,1,1,nil)
 		if #g>0 then
 			g=g:AddMaximumCheck()
-			Duel.HintSelection(g)
-			local ct=Duel.GetMatchingGroupCount(s.cfilter,c:GetControler(),LOCATION_GRAVE,0,nil)
+			Duel.HintSelection(g,true)
+			local ct=Duel.GetMatchingGroupCount(s.cfilter,tp,LOCATION_GRAVE,0,nil)
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_UPDATE_ATTACK)

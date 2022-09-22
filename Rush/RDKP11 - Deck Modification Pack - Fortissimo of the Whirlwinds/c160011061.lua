@@ -6,7 +6,6 @@ function s.initial_effect(c)
 	--Activate(summon)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCost(s.cost)
@@ -20,14 +19,13 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_MZONE,0,1,nil) end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,aux.FilterMaximumSideFunctionEx(Card.IsAbleToGraveAsCost),tp,LOCATION_MZONE,0,1,1,nil)
 	g=g:AddMaximumCheck()
 	local ct=Duel.SendtoGrave(g,REASON_COST)
 	if ct>0 then
-		--disable spsummon
-		local e1=Effect.CreateEffect(c)
+		--Prevent players from Special Summoning level 7 or 8 monsters from the GY
+		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(aux.Stringid(id,1))
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)

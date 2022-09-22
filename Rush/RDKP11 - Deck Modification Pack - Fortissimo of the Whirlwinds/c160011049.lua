@@ -28,7 +28,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,1)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_MZONE)
 end
 function s.desfilter(c)
 	return c:IsFaceup() and c:IsLevelAbove(7) and c:IsType(TYPE_NORMAL)
@@ -44,7 +44,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,chk)
 		local tc=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp):GetFirst()
 		if tc then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,math.min(ft,2),nil,e,tp,tc:GetLevel())
+			local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_GRAVE,0,1,math.min(ft,2),nil,e,tp,tc:GetLevel())
 			if #g>0 then
 				Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 				local sg=Duel.GetMatchingGroup(s.desfilter,tp,0,LOCATION_MZONE,nil)

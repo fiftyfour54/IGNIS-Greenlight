@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Set from your GY
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_RECOVER)
+	e1:SetCategory(CATEGORY_RECOVER+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
@@ -20,13 +20,15 @@ function s.setfilter(c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
 function s.spfilter(c,e,tp)
 	return c:IsRace(RACE_PLANT) and c:IsType(TYPE_NORMAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	--Effect
-	local g=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.setfilter),tp,LOCATION_GRAVE,0,1,1,nil)
 	if #g==0 or Duel.SSet(tp,g)==0 then return end
 	Duel.DisableShuffleCheck()
 	local g2=Duel.GetMatchingGroup(function(c)return c:GetSequence()<1 end,tp,LOCATION_DECK,0,nil)

@@ -16,13 +16,13 @@ function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	--Requirement
 	Duel.DisableShuffleCheck()
 	local g=Duel.GetMatchingGroup(function(c)return c:GetSequence()<1 end,tp,LOCATION_DECK,0,nil)
 	Duel.SendtoGrave(g,REASON_EFFECT)
 	local ct=Duel.GetOperatedGroup():GetFirst()
 	--Effect
+	local c=e:GetHandler()
 	if c:IsFaceup() and c:IsRelateToEffect(e) then
 		--Cannot be destroyed by opponent's trap
 		local e1=Effect.CreateEffect(c)
