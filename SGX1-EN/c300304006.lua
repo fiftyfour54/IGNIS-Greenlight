@@ -33,6 +33,7 @@ function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 				e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 				e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 				sc:RegisterEffect(e1)
+				Duel.RaiseEvent(sc,EVENT_CUSTOM+47408488,e,0,tp,0,0)
 			end
 		end
 	end
