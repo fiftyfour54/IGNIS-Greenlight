@@ -27,7 +27,7 @@ function s.initial_effect(c)
 	e3a:SetDescription(aux.Stringid(id,1))
 	e3a:SetCategory(CATEGORY_REMOVE)
 	e3a:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3a:SetProperty(EFFECT_FLAG_DELAY)
+	e3a:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e3a:SetCode(EVENT_CUSTOM+id)
 	e3a:SetRange(LOCATION_MZONE)
 	e3a:SetCountLimit(1,{id,1})
@@ -78,26 +78,30 @@ function s.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectReleaseGroupCost(tp,Card.IsAttribute,1,1,false,nil,c,ATTRIBUTE_DARK+ATTRIBUTE_LIGHT)
 	Duel.Release(g,REASON_COST)
 end
-function s.filter(c,tp,e)
+function s.tgfilter(c,tp,e)
 	return c:IsSummonPlayer(1-tp) and c:IsLocation(LOCATION_MZONE)
 		and c:IsAbleToRemove() and c:GetType()&(TYPE_EXTRA+TYPE_RITUAL)>0
-		and (not e or c:IsRelateToEffect(e))
+		and (not e or (c:IsRelateToEffect(e) and c:IsCanBeEffectTarget(e)))
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=e:GetLabelObject():Filter(s.filter,nil,tp,nil)
+	local g=e:GetLabelObject():Filter(s.tgfilter,nil,tp,nil)
+	if chkc then return g:IsContains(chkc) and s.tgfilter(chkc,tp,e) end
 	if chk==0 then return #g>0 end
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
-	Duel.SetTargetCard(g)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
+	local tc=nil
+	if #g==1 then
+		tc=g:GetFirst()
+		Duel.SetTargetCard(tc)
+	else
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+		tc=g:Select(tp,1,1,nil)
+		Duel.SetTargetCard(tc)
+	end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,tc,1,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=e:GetLabelObject()
-	if #g==0 then return end 
-	local bg=g:FilterSelect(tp,s.filter,1,1,nil,tp,e)
-	if #bg>0 then
-		Duel.Remove(bg,POS_FACEUP,REASON_EFFECT)
-	end
+	local tc=Duel.GetFirstTarget()
+	Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFlagEffect(tp,id)>0 then return end
