@@ -3,7 +3,7 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	c:EnableReviveLimit()
+	c:EnableUnsummonable()
 	--Must be Special Summoned by a Wyrm monster effect
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
@@ -16,8 +16,8 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_RELEASE)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_DELAY,EFFECT_FLAG2_CHECK_SIMULTANEOUS)
+	e1:SetCode(EVENT_REMOVE)
 	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.spcon)
@@ -49,19 +49,19 @@ end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and ((c:IsLocation(LOCATION_GRAVE) and not eg:IsContains(c)) or (c:IsLocation(LOCATION_HAND))) end
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+		c:CompleteProcedure()
 		--Banish it if it leaves the field
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3300)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
 		e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
 		e1:SetValue(LOCATION_REMOVED)
 		c:RegisterEffect(e1,true)
@@ -69,14 +69,13 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.rmrescon(sg,e,tp,mg)
 	return sg:FilterCount(Card.IsLocation,nil,LOCATION_FZONE)==1
-		and sg:FilterCount(Card.IsMonster,nil)==1
 end
 function s.rmfilter(c,e)
 	return c:IsCanBeEffectTarget(e) and c:IsAbleToRemove() and (c:IsMonster() or c:IsLocation(LOCATION_FZONE))
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	local g=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,nil,e)
+	local g=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_FZONE,LOCATION_FZONE+LOCATION_MZONE+LOCATION_GRAVE,nil,e)
 	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,2,2,s.rmrescon,0) end
 	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,s.rmrescon,1,tp,HINTMSG_REMOVE)
 	Duel.SetTargetCard(sg)

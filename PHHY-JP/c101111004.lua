@@ -80,12 +80,12 @@ function s.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.tgfilter(c,tp,e)
 	return c:IsSummonPlayer(1-tp) and c:IsLocation(LOCATION_MZONE)
-		and c:IsAbleToRemove() and c:GetType()&(TYPE_EXTRA+TYPE_RITUAL)>0
-		and (not e or (c:IsRelateToEffect(e) and c:IsCanBeEffectTarget(e)))
+		and c:IsAbleToRemove() and c:IsType(TYPE_RITUAL|TYPE_EXTRA)
+		and (not e or c:IsCanBeEffectTarget(e))
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=e:GetLabelObject():Filter(s.tgfilter,nil,tp,nil)
-	if chkc then return g:IsContains(chkc) and s.tgfilter(chkc,tp,e) end
+	local g=e:GetLabelObject():Filter(s.tgfilter,nil,tp,e)
+	if chkc then return g:IsContains(chkc) and s.tgfilter(chkc,tp,nil) end
 	if chk==0 then return #g>0 end
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 	local tc=nil
@@ -101,12 +101,14 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
+	if tc:IsRelateToEffect(e) then
+		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
+	end
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFlagEffect(tp,id)>0 then return end
 	local c=e:GetHandler()
-	local tg=eg:Filter(s.filter,nil,tp)
+	local tg=eg:Filter(s.tgfilter,nil,tp)
 	if #tg>0 then
 		for tc in aux.Next(tg) do
 			tc:RegisterFlagEffect(id,RESET_CHAIN,0,1)
