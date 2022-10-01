@@ -55,7 +55,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-		if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
 		--Banish it if it leaves the field
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3300)
@@ -68,7 +68,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.rmrescon(sg,e,tp,mg)
-	return sg:FilterCount(Card.IsLocation,nil,LOCATION_FZONE,nil)==1
+	return sg:FilterCount(Card.IsLocation,nil,LOCATION_FZONE)==1
 		and sg:FilterCount(Card.IsMonster,nil)==1
 end
 function s.rmfilter(c,e)
