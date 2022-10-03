@@ -37,7 +37,6 @@ end
 function s.immtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local ch=Duel.GetCurrentChain()
-	local ch=Duel.GetCurrentChain()
 	if ch<=1 then return end
 	local chp,chcode=Duel.GetChainInfo(ch-1,CHAININFO_TRIGGERING_PLAYER,CHAININFO_TRIGGERING_CODE)
 	if chp~=1-tp or not chcode then return end
