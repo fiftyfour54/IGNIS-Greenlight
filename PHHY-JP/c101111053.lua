@@ -35,7 +35,7 @@ function s.tgspcon(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsAttribute,ATTRIBUTE_WATER),tp,LOCATION_MZONE,0,1,nil)
 end
 function s.tgspfilter(c,e,tp,ft)
-	return c:IsSetCard(SET_ICEJADE) and (c:IsAbleToGrave() or (ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
+	return c:IsSetCard(SET_ICEJADE) and c:IsMonster() and (c:IsAbleToGrave() or (ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
 end
 function s.tgsptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
