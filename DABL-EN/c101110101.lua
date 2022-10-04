@@ -59,7 +59,7 @@ function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(s.setfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 	local g=Duel.SelectTarget(tp,s.setfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
-	if g:GetFirst():IsLocation(LOCATION_GRAVE)
+	if g:GetFirst():IsLocation(LOCATION_GRAVE) then
 		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,tp,0)
 	end
 end
