@@ -85,19 +85,14 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 		and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)) then return end
 	for p=tp,1-tp,(tp==0 and 1 or -1) do
 		local token=Duel.CreateToken(tp,TOKEN_PLUNDER_PATROLL)
-		token:AssumeProperty(ASSUME_ATTRIBUTE,att) -- needed for Gozen Match
-		if Duel.SpecialSummonStep(token,0,tp,p,false,false,POS_FACEUP_DEFENSE) then
-			-- Change attribute
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-			e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-			e1:SetRange(LOCATION_MZONE)
-			e1:SetValue(att)
-			e1:SetReset((RESET_EVENT|RESETS_STANDARD)&~RESET_TOFIELD)
-			token:RegisterEffect(e1,true)
-		end
-		Duel.AssumeReset()
+		-- Change attribute
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
+		e1:SetValue(att)
+		e1:SetReset((RESET_EVENT|RESETS_STANDARD)&~RESET_TOFIELD)
+		token:RegisterEffect(e1,true)
+		Duel.SpecialSummonStep(token,0,tp,p,false,false,POS_FACEUP_DEFENSE)
 	end
 	Duel.SpecialSummonComplete()
 end
