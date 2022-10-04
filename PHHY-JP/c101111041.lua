@@ -42,7 +42,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.gthop)
 	c:RegisterEffect(e3)
 end
-local TOKEN_PLUNDER_PATROLL=TOKEN_OPTION
+local TOKEN_PLUNDER_PATROLL=101111141
 s.listed_names={TOKEN_PLUNDER_PATROLL}
 s.listed_names={SET_PLUNDER_PATROLL}
 function s.attcheck(tp,att,targ_p)
@@ -85,13 +85,7 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 		and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)) then return end
 	for p=tp,1-tp,(tp==0 and 1 or -1) do
 		local token=Duel.CreateToken(tp,TOKEN_PLUNDER_PATROLL)
-		-- Change attribute
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-		e1:SetValue(att)
-		e1:SetReset((RESET_EVENT|RESETS_STANDARD)&~RESET_TOFIELD)
-		token:RegisterEffect(e1,true)
+		token:Attribute(att)
 		Duel.SpecialSummonStep(token,0,tp,p,false,false,POS_FACEUP_DEFENSE)
 	end
 	Duel.SpecialSummonComplete()
