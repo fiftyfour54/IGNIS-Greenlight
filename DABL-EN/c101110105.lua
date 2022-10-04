@@ -29,12 +29,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 local REASON_SYNCHRO_MATERIAL=REASON_MATERIAL+REASON_SYNCHRO
-function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.rmvtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=e:GetHandler():GetBattleTarget()
 	if chk==0 then return tc and tc:IsControler(1-tp) and tc:IsAbleToRemove(tp,POS_FACEUP) end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,tc,1,0,0)
 end
-function s.rmop(e,tp,eg,ep,ev,re,r,rp)
+function s.rmvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetBattleTarget()
 	if tc and tc:IsRelateToBattle() then
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
