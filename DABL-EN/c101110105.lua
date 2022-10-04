@@ -66,7 +66,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,chk)
 			and mg:FilterCount(aux.NecroValleyFilter(s.mgfilter),nil,e,tp,c)==ct
 			and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.BreakEffect()
-			if Duel.SpecialSummon(mg,0,tp,tp,false,false,POS_FACEUP)>0
+			if Duel.SpecialSummon(mg,0,tp,tp,false,false,POS_FACEUP)>0 then
 				for tc in mg:Iter() do
 					--Banish them when it leaves the field
 					local e1=Effect.CreateEffect(c)
