@@ -7,7 +7,6 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMING_END_PHASE)
 	c:RegisterEffect(e1)
 	-- Banish monsters
 	local e2=Effect.CreateEffect(c)
@@ -18,7 +17,7 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1,id)
-	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
 	e2:SetTarget(s.rmtg)
 	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
@@ -38,7 +37,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function s.rmfilter(c,e,tp)
-	return c:IsCanBeEffectTarget(e) and (c:IsControler(1-tp) or (c:IsFaceup() and c:IsMonster() and c:IsRace(RACE_FISH)))
+	return c:IsCanBeEffectTarget(e) and (c:IsControler(1-tp) or (c:IsFaceup() and c:IsRace(RACE_FISH)))
 end
 function s.rmrescon(sg,e,tp,mg)
     return sg:FilterCount(Card.IsControler,nil,tp)==1
@@ -53,10 +52,13 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetTargetCards(e)
+	if #tg~=2 then return end
+	local reset_count=(Duel.IsTurnPlayer(tp) and Duel.GetCurrentPhase()==PHASE_STANDBY) and 2 or 1
+	local turn_chk=Duel.GetTurnCount()
 	aux.RemoveUntil(tg,nil,REASON_EFFECT,PHASE_STANDBY,id,e,tp,
 		aux.DefaultFieldReturnOp,
-		function() return Duel.IsTurnPlayer(tp) end,
-		RESET_PHASE|PHASE_STANDBY|RESET_SELF_TURN)
+		function() return Duel.IsTurnPlayer(tp) and (reset_count==1 or Duel.GetTurnCount()~=turn_chk) end,
+		RESET_PHASE|PHASE_STANDBY|RESET_SELF_TURN,reset_count)
 end
 function s.atkfilter(c,tp)
 	return c:IsFaceup() and c:IsRace(RACE_FISH) and c:IsControler(tp)

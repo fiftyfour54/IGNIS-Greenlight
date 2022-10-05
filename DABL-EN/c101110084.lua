@@ -5,6 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_POSITION+CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -25,15 +26,16 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if #g>0 and Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)>0 then
-		local p1=Duel.GetTurnPlayer() --to make the turn player send first
-		local p2=1-Duel.GetTurnPlayer()
-		local g1=Duel.GetMatchingGroup(Card.IsFaceup,p1,LOCATION_MZONE,0,nil)
-		local g2=Duel.GetMatchingGroup(Card.IsFaceup,p1,0,LOCATION_MZONE,nil)
+		local turn_p=Duel.GetTurnPlayer()
+		local g1=Duel.GetMatchingGroup(Card.IsFaceup,turn_p,LOCATION_MZONE,0,nil)
+		local g2=Duel.GetMatchingGroup(Card.IsFaceup,turn_p,0,LOCATION_MZONE,nil)
+		if #g1==0 and #g2==0 then return end
+		Duel.BreakEffect()
 		if #g1>0 then
-			Duel.SendtoGrave(g1,REASON_EFFECT,p1)
+			Duel.SendtoGrave(g1,REASON_RULE)
 		end
 		if #g2>0 then
-			Duel.SendtoGrave(g2,REASON_EFFECT,p2)
+			Duel.SendtoGrave(g2,REASON_RULE)
 		end
 	end
 end
