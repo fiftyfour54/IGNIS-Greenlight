@@ -1,4 +1,4 @@
---サークル・オブ・フェアリー
+--円喚師フェアリ
 --Hexenringe Master Faeri
 --scripted by Naim
 local s,id=GetID()
@@ -16,16 +16,15 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EFFECT_NONTUNER)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(s.ntval)
 	c:RegisterEffect(e2)
 end
 function s.spcon(e,c)
 	if c==nil then return true end
-	local tp=e:GetHandlerPlayer()
-	return Duel.IsExistingMatchingCard(Card.IsRace,tp,LOCATION_GRAVE,0,1,nil,RACE_PLANT|RACE_INSECT)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	return Duel.IsExistingMatchingCard(Card.IsRace,0,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,RACE_PLANT|RACE_INSECT)
+		and Duel.GetLocationCount(e:GetHandlerPlayer(),LOCATION_MZONE)>0
 end
 function s.ntval(c,sc,tp)
 	return sc and sc:IsRace(RACE_PLANT|RACE_INSECT)
