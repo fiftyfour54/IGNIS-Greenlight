@@ -22,7 +22,7 @@ function s.setcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.stfilter(c,th)
 	local typ=c:GetType()
-	return (typ==TYPE_TRAP or typ==TYPE_SPELL) and (th and c:IsAbleToHand() or c:IsSSetable())
+	return (typ==TYPE_TRAP or typ==TYPE_SPELL) and (th and c:IsAbleToHand() or c:IsSSetable()) and not c:IsCode(id)
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.stfilter,tp,LOCATION_DECK,0,1,nil)
