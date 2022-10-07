@@ -12,8 +12,9 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
+local sumtypes={SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK}
 function s.filter(c)
-	return c:IsFaceup() and c:GetFlagEffect(id)==0
+	return c:IsFaceup() and c:GetFlagEffect(id)==0 and s.CanBeTributeOrMaterial(c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,0,LOCATION_MZONE,1,nil) end
@@ -44,4 +45,15 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e3)
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,0)
 	end
+end
+function s.CanBeTributeOrMaterial(c)
+	for _,sumtyp in ipairs(sumtypes) do
+		if c:IsCanBeMaterial(sumtyp) then
+			return true
+		end
+	end
+	if not (c:IsHasEffect(EFFECT_UNRELEASABLE_SUM) or c:IsHasEffect(EFFECT_UNRELEASABLE_NONSUM)) then
+		return true
+	end
+	return false
 end
