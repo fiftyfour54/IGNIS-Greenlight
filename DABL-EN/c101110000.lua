@@ -16,10 +16,10 @@ function s.filter(c)
 	return c:IsFaceup() and c:GetFlagEffect(id)==0
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,0,LOCATION_MZONE,1,nil) end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local sg=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_ONFIELD,nil)
+	local sg=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil)
 	if #sg==0 then return end
 	local c=e:GetHandler()
 	for tc in sg:Iter() do
