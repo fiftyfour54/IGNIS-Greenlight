@@ -40,7 +40,7 @@ end
 function s.rmcostfilter(c)
 	return (c:IsSetCard(SET_NINJA) or c:IsSetCard(SET_NINJITSU_ART)) and c:IsAbleToRemoveAsCost()
 		and (c:IsFaceup() or not c:IsOnField())
-		and (c:IsLocation(LOCATION_HAND) or aux.SpElimFilter(c,true))
+		and (not c:IsLocation(LOCATION_GRAVE) or aux.SpElimFilter(c,true))
 end
 function s.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

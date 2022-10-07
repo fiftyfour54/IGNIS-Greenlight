@@ -25,7 +25,7 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_LEAVE_FIELD)
 	e3:SetCondition(s.spcon)
 	e3:SetTarget(s.sptg)
@@ -51,7 +51,8 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return rp==1-tp and c:IsReason(REASON_EFFECT) and c:IsLocation(LOCATION_GRAVE|LOCATION_REMOVED) and c:IsFaceup()
+	return rp==1-tp and c:IsReason(REASON_EFFECT) and c:IsLocation(LOCATION_GRAVE|LOCATION_REMOVED)
+		and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_FZONE)
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(SET_NINJA) and c:IsCanBeEffectTarget(e)
@@ -70,7 +71,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetTargetCards(e)
-	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)>1 then
-		Duel.ShuffleSetCard(g)
+	if #g>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)
 	end
 end
