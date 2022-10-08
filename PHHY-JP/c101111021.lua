@@ -52,22 +52,15 @@ function s.spcon(e,c)
 	local g=nil
 	local rg1=Duel.GetMatchingGroup(s.costfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,c)
 	local rg2=Duel.GetMatchingGroup(s.costfilter,tp,LOCATION_GRAVE+LOCATION_HAND,0,c)
-	if Duel.IsPlayerAffectedByEffect(tp,69832741) then
-		return aux.SelectUnselectGroup(rg1,e,tp,3,3,aux.ChkfMMZ(1),0)
-	else
-		return aux.SelectUnselectGroup(rg2,e,tp,3,3,aux.ChkfMMZ(1),0)
-	end
+	local rg=Duel.IsPlayerAffectedByEffect(tp,69832741) and rg1 or rg2
+	return aux.SelectUnselectGroup(rg,e,tp,3,3,aux.ChkfMMZ(1),0)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,c)
 	local c=e:GetHandler()
-	local g=nil
 	local rg1=Duel.GetMatchingGroup(s.costfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,c)
 	local rg2=Duel.GetMatchingGroup(s.costfilter,tp,LOCATION_GRAVE+LOCATION_HAND,0,c)
-	if Duel.IsPlayerAffectedByEffect(tp,69832741) then
-		g=aux.SelectUnselectGroup(rg1,e,tp,3,3,aux.ChkfMMZ(1),1,tp,HINTMSG_REMOVE,nil,nil,true)
-	else
-		g=aux.SelectUnselectGroup(rg2,e,tp,3,3,aux.ChkfMMZ(1),1,tp,HINTMSG_REMOVE,nil,nil,true)
-	end
+	local rg=Duel.IsPlayerAffectedByEffect(tp,69832741) and rg1 or rg2
+	local g=aux.SelectUnselectGroup(rg,e,tp,3,3,aux.ChkfMMZ(1),1,tp,HINTMSG_REMOVE,nil,nil,true)
 	if #g>0 then
 		g:KeepAlive()
 		e:SetLabelObject(g)
