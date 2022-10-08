@@ -3,10 +3,10 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
+	c:EnableUnsummonable()
 	--Can only be Special Summoned once per turn
 	c:SetSPSummonOnce(id)
 	--Must be Special Summoned by its own procedure
-	c:EnableReviveLimit()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -16,9 +16,10 @@ function s.initial_effect(c)
 	--Special Summon procedure
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_SPSUMMON_PROC)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e2:SetRange(LOCATION_HAND)
+	e2:SetCode(EFFECT_SPSUMMON_PROC)
+	e2:SetRange(LOCATION_HAND|LOCATION_GRAVE)
+	e2:SetCondition(s.spcon)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
@@ -44,6 +45,19 @@ function s.costfilter(c)
 	return c:IsRace(RACE_PLANT|RACE_INSECT) and c:IsAbleToRemoveAsCost()
 		and (c:IsLocation(LOCATION_HAND) or aux.SpElimFilter(c,true,true))
 end
+function s.spcon(e,c)
+	if c==nil then return true end
+	local tp=c:GetControler()
+	local c=e:GetHandler()
+	local g=nil
+	local rg1=Duel.GetMatchingGroup(s.costfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,c)
+	local rg2=Duel.GetMatchingGroup(s.costfilter,tp,LOCATION_GRAVE+LOCATION_HAND,0,c)
+	if Duel.IsPlayerAffectedByEffect(tp,69832741) then
+		return aux.SelectUnselectGroup(rg1,e,tp,3,3,aux.ChkfMMZ(1),0)
+	else
+		return aux.SelectUnselectGroup(rg2,e,tp,3,3,aux.ChkfMMZ(1),0)
+	end
+end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,c)
 	local c=e:GetHandler()
 	local g=nil
@@ -68,7 +82,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	g:DeleteGroup()
 end
 function s.chainop(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsActiveType(TYPE_SPELL+TYPE_TRAP) and re:GetOwnerPlayer()==tp then
+	if re:IsActiveType(TYPE_SPELL|TYPE_TRAP) and re:GetOwnerPlayer()==tp then
 		Duel.SetChainLimit(s.chainlm)
 	end
 end
@@ -84,19 +98,19 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,atk)
+	local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if #g>0 then
 		Duel.Destroy(g,REASON_EFFECT)
 	end
 	local c=e:GetHandler()
 	if c:IsFaceup() and c:IsRelateToEffect(e) then
-		local e1=Effect.CreateEffect(e:GetHandler())
 		--Cannot attack directly this turn
+		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3207)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
 		e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e1)
+		c:RegisterEffect(e1)
 	end
 end

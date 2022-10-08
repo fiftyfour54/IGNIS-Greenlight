@@ -52,7 +52,7 @@ function s.matfilter(lvl)
 	end
 end
 function s.splimit(e,se,sp,st)
-	return (st&SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or not e:GetHandler():IsLocation(LOCATION_EXTRA)
+	return aux.fuslimit(e,se,sp,st) or not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end
 function s.hspfilter(c,tp,sc)
 	return c:IsRace(RACE_INSECT) and c:IsDefenseAbove(2000) and c:GetEquipCount()>0
