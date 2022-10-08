@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	-- Special Summon and discard
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_HANDES)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
@@ -32,7 +32,7 @@ function s.spcostfilter(c,e,tp,dc_chk,sp_chk)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local dc_chk=c:IsDiscardable()
+	local dc_chk=c:IsDiscardable(REASON_EFFECT)
 	local sp_chk=c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 	if chk==0 then return (dc_chk or sp_chk) and not c:IsPublic()
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -62,7 +62,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.thconfilter(c,tp,ct)
 	local bc=c:GetBattleTarget()
-	return (c:IsPreviousControler(tp) and c:IsPreviousRace(RACE_FIEND))
+	return (c:IsPreviousControler(tp) and c:GetPreviousRaceOnField()&RACE_FIEND>0)
 		or (ct==1 and bc and bc:IsControler(tp) and bc:IsRace(RACE_FIEND))
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
