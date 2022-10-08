@@ -28,6 +28,7 @@ function s.initial_effect(c)
 	-- Shuffle 1 "Abyss Script" Spell to the Deck
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetCategory(CATEGORY_TODECK)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_DESTROYED)
@@ -64,7 +65,7 @@ function s.revop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmCards(1-owner,g)
 	Duel.ShuffleDeck(owner)
 	local tc=g:RandomSelect(1-owner,1):GetFirst()
-	if tc and Duel.SSet(owner,tc)>0 then
+	if tc and Duel.SSet(owner,tc,owner,false)>0 then
 		aux.DelayedOperation(tc,PHASE_END,id,e,tp,function(ag) Duel.Destroy(ag,REASON_EFFECT) end,nil,0)
 	end
 end
@@ -79,6 +80,7 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,s.tdfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	if #g>0 then
+		Duel.HintSelection(g,true)
 		Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	end
 end
