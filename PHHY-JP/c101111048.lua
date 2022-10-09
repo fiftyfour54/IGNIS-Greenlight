@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.rmtg)
 	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
-	-- Send 1 "Tri-Brigade" card from deck to GY
+	-- Send 1 Beast, Beast-Warrior, or Winged Beast monster to the GY
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_TOGRAVE)
@@ -41,6 +41,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.tgop)
 	c:RegisterEffect(e3)
 end
+s.listed_series={SET_TRI_BRIGADE}
 function s.spcostfilter(c)
 	return c:IsSetCard(SET_TRI_BRIGADE) and c:IsSpellTrap()
 end
