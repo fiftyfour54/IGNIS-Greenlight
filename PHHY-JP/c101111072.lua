@@ -1,4 +1,4 @@
---Japanese name
+--ギガンティック・サンダークロス
 --Gigantic Thunder Cross
 --scripted by Naim
 local s,id=GetID()
@@ -35,10 +35,10 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local rg=Duel.GetTargetCards(e)
 	if #rg==0 then return end
 	if Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)>0 and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,1-tp,LOCATION_DECK,0,1,nil,e,tp)
+		and Duel.IsExistingMatchingCard(s.spfilter,1-tp,LOCATION_DECK,0,1,nil,e,1-tp)
 		and Duel.SelectYesNo(1-tp,aux.Stringid(id,1)) then
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
-		local sg=Duel.SelectMatchingCard(1-tp,s.spfilter,1-tp,LOCATION_DECK,0,1,1,nil,e,tp)
+		local sg=Duel.SelectMatchingCard(1-tp,s.spfilter,1-tp,LOCATION_DECK,0,1,1,nil,e,1-tp)
 		if #sg>0 then
 			Duel.BreakEffect()
 			Duel.SpecialSummon(sg,0,1-tp,1-tp,false,false,POS_FACEUP)

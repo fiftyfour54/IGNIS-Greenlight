@@ -1,5 +1,5 @@
 -- 鉄獣式強襲機動兵装改＂ＢｕｃｅｐｈａｌｕｓⅡ＂
--- Tri-Brigade Arms “Bucephalus II”
+-- Tri-Brigade Arms "Bucephalus II"
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -24,8 +24,8 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetTarget(s.rmtg)
 	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
@@ -56,10 +56,10 @@ end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToRemove()
-		or Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil) end
+		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil) end
 	local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,nil)
 	g:AddCard(c)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,LOCATION_ONFIELD,PLAYER_ALL)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,PLAYER_ALL,LOCATION_ONFIELD)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -67,7 +67,7 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(c,POS_FACEUP,REASON_EFFECT)
 	end
 	local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,nil)
-	if c:IsAbleToRemove() and #g>0 then
+	if #g>0 then
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 end
