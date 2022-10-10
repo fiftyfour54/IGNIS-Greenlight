@@ -1,4 +1,4 @@
---
+--リィラップ
 --Lil-la-Rap
 --Scripted by Larry126
 local s,id=GetID()
@@ -28,7 +28,7 @@ end
 function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.filter,1,nil,tp)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLP(1-tp)>=1000 and Duel.GetFlagEffect(tp,id)==0 end
 	Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,500)
