@@ -43,9 +43,12 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if #g==0 then return end
 	local c0=e:GetLabelObject()
 	if g:IsContains(c0) and c0:IsControler(tp)
-		and Duel.SpecialSummon(c0,1,tp,1-tp,false,false,POS_FACEUP)>0
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and #g:RemoveCard(c0)==1 and g:GetFirst():IsControler(1-tp) then
-		Duel.SpecialSummon(g,1,tp,tp,false,false,POS_FACEUP)
+		and Duel.SpecialSummonStep(c0,0,tp,1-tp,false,false,POS_FACEUP)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+		local c1=g:RemoveCard(c0):GetFirst()
+		if c1 and c1:IsControler(1-tp) then
+			Duel.SpecialSummonStep(c1,0,tp,tp,false,false,POS_FACEUP)
+		end
 	end
+	Duel.SpecialSummonComplete()
 end
