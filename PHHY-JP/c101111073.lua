@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_REMOVE+CATEGORY_DISABLE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetRange(LOCATION_SZONE)
+	e1:SetRange(LOCATION_SZONE)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCondition(s.negcon)
@@ -41,16 +41,15 @@ function s.negcon2(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or #g~=1 then return false end
 	local tc=g:GetFirst()
-	return tc:IsSetCard(0x189) and tc:IsControler(tp) and tc:IsLocation(LOCATION_MZONE) and tc:IsFaceup() and 
+	return tc:IsSetCard(0x189) and tc:IsControler(tp) and tc:IsLocation(LOCATION_MZONE) and tc:IsFaceup()
 end
-function s.rmvfilter(c,tp)
-	return c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and c:IsAbleToRemove() and aux.SpElimFilter(c,true)
-		and c:IsFaceup()
+function s.rmvfilter(c)
+	return c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and c:IsAbleToRemove() and aux.SpElimFilter(c,true) and c:IsFaceup()
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingTarget(s.rmvfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_GRAVE,1,nil,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.rmvfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectTarget(tp,s.rmvfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,tp)
+	local g=Duel.SelectTarget(tp,s.rmvfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,tp,0)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
