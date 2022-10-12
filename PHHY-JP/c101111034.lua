@@ -51,9 +51,6 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function s.filter(c1,c2,e,tp)
-	return c1:IsAbleToRemove() and c2:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function s.filter(c,e,tp,rmv_chk,sp_chk)
 	return c:IsCode(CARD_ALBAZ) and ((sp_chk and c:IsAbleToRemove()) or (rmv_chk and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
 end
