@@ -49,7 +49,7 @@ function s.atkcon(e)
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsNegatable() end
-	local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsRace,RACE_INSECT|RACE_PLANT),tp,LOCATION_MZONE,0,1,nil)
+	local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsRace,RACE_INSECT|RACE_PLANT),tp,LOCATION_MZONE,0,nil)
 	if chk==0 then return ct>0 and Duel.IsExistingTarget(Card.IsNegatable,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
 	local g=Duel.SelectTarget(tp,Card.IsNegatable,tp,0,LOCATION_ONFIELD,1,ct,nil)
@@ -76,7 +76,7 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 		if not (neg_chk or tc:IsImmuneToEffect(e1) or tc:IsImmuneToEffect(e2)) then neg_chk=true end
 	end
 	if not neg_chk then return end
-	local rg=Duel.GetMatchingGroup(aux.AND(s.ntfilter,Card.IsAbleToRemove),tp,LOCATION_GRAVE,0,1,nil)
+	local rg=Duel.GetMatchingGroup(aux.AND(s.ntfilter,Card.IsAbleToRemove),tp,LOCATION_GRAVE,0,nil)
 	if #rg==0 or not Duel.SelectYesNo(tp,aux.Stringid(id,1)) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local srg=rg:Select(tp,1,1,nil)

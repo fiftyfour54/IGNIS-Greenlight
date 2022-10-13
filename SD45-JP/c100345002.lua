@@ -35,7 +35,7 @@ function s.initial_effect(c)
 	e3:SetValue(function(_,_,r) return (r&REASON_EFFECT==REASON_EFFECT) and 1 or 0 end)
 	c:RegisterEffect(e3)
 end
-s.listed_series={SET_TRAPTRIX,SET_HOLE,SET_TRAP_HOLE}
+s.listed_series={SET_TRAPTRIX,SET_HOLE}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsMainPhase() and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_TRAPTRIX),tp,LOCATION_MZONE,0,1,nil)
 end
