@@ -46,16 +46,16 @@ function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local dg=eg:Filter(Card.IsPreviousControler,nil,1-tp)
 	if #dg==0 or #dg>1 then return false end
 	local rc=dg:GetFirst():GetReasonCard()
-	if rc:IsRelateToBattle() and rc:IsControler(tp) then
-		return true
-	elseif not rc:IsRelateToBattle() and rc:IsPreviousControler(tp) then
-		return true
+	if rc:IsRelateToBattle() then
+		return rc:IsControler(tp)
+	else
+		return rc:IsPreviousControler(tp)
 	end
-	return false
 end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local dam=eg:Filter(Card.IsPreviousControler,nil,1-tp):GetFirst():GetBaseAttack()
-	if chk==0 then return dam>0 end
+	local dc=eg:Filter(Card.IsPreviousControler,nil,1-tp):GetFirst()
+	if chk==0 then return dc and dc:GetBaseAttack()>0 end
+	local dam=dc:GetBaseAttack()
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(dam)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)
