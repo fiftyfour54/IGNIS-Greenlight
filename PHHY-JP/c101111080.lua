@@ -1,5 +1,5 @@
 -- 威迫鉱石-サモナイト
--- Threatening Ore – Summonite
+-- Threatening Ore - Summonite
 -- Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)

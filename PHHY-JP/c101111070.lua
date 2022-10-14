@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.rmfilter(c)
-	return c:IsFaceup() and not c:IsForbidden() and (c:IsControler(c:GetOwner()) or c:IsAbleToChangeControler())
+	return c:IsFaceup() and c:IsAbleToRemove() and not c:IsForbidden()
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_FZONE) and s.rmfilter(chkc) end
@@ -45,12 +45,16 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 		or Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)==0
 		or not tc:IsLocation(LOCATION_REMOVED)
 		or (tc:IsControler(old_fp) and not tc:IsAbleToChangeControler())
-		or tc:IsForbidden()
-		or not s.placefield(tc,tp,1-old_fp) then return end
+		or tc:IsForbidden() then return end
+	Duel.BreakEffect()
+	if not s.placefield(tc,tp,1-old_fp) then return end
 	local g=Duel.GetMatchingGroup(s.plfilter,tc:GetControler(),LOCATION_GRAVE,0,nil,old_fp,tc:GetOriginalCode())
 	if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 		local pc=g:Select(tp,1,1,nil):GetFirst()
-		if pc then s.placefield(pc,tp,old_fp) end
+		if not pc then return end
+		Duel.HintSelection(pc,true)
+		Duel.BreakEffect()
+		s.placefield(pc,tp,old_fp)
 	end
 end

@@ -34,6 +34,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TOGRAVE)
 	local tg=g:Select(1-tp,ct-1,ct-1,nil)
 	if #tg>0 then
+		Duel.HintSelection(tg,true)
 		Duel.SendtoGrave(tg,REASON_RULE)
 	end
 end

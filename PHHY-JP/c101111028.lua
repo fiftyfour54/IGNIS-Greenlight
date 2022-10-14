@@ -1,5 +1,5 @@
 --次元同異体ヴァリス
---Varis, Dimensional Isotope
+--Dimensional Isoallotope Varis
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
@@ -20,12 +20,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.indval(e,c)
-	return (not c:IsAttribute(e:GetHandler():GetAttribute())) or (not c:IsRace(e:GetHandler():GetRace()))
+	local handler=e:GetHandler()
+	return c:IsAttribute(handler:GetAttribute()) or c:IsRace(handler:GetRace())
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk then return true end
-	local att=e:GetHandler():AnnounceAnotherAttribute(tp)
-	local rc=e:GetHandler().AnnounceAnotherRace(tp)
+	if chk==0 then return true end
+	local c=e:GetHandler()
+	local rc=c:AnnounceAnotherRace(tp)
+	local att=c:AnnounceAnotherAttribute(tp)
 	e:SetLabel(rc,att)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -44,12 +46,12 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if c:IsDifferentAttribute(att) then
 		-- Change attribute
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-		e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
-		e1:SetValue(att)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END,2)
-		c:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_CHANGE_ATTRIBUTE)
+		e2:SetProperty(EFFECT_FLAG_COPY_INHERIT)
+		e2:SetValue(att)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END,2)
+		c:RegisterEffect(e2)
 	end
 end
