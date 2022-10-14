@@ -1,5 +1,6 @@
 --サイバー・アサルト・ドラゴン
 --Cyber Assault Dragon
+--scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
 	--Summon with 1 tribute
