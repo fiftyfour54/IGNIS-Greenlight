@@ -2,7 +2,7 @@
 --Assault Synchron
 --Scripted by Eerie Code
 local s,id=GetID()
-function s.initial_Effect(c)
+function s.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DAMAGE)
