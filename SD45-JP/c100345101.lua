@@ -33,7 +33,7 @@ function s.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_REMOVE)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,id)
+	e3:SetCountLimit(1,{id,1})
 	e3:SetTarget(s.ovtg)
 	e3:SetOperation(s.ovop)
 	c:RegisterEffect(e3)
@@ -72,7 +72,7 @@ end
 function s.ovtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(s.ovfilter,1,nil,e,e:GetHandler(),tp) end
 	if e:GetCode()==EVENT_TO_GRAVE then
-		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,1-tp,0)
 	end
 end
 function s.ovop(e,tp,eg,ep,ev,re,r,rp)

@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	e3:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(LOCATION_SZONE,0)
-	e3:SetTarget(aux.TargetBoolFunction(Card.IsFacedown))
+	e3:SetTarget(function(_,c) return c:IsFacedown() and c:GetSequence()<5 end)
 	e3:SetValue(function(_,_,r) return (r&REASON_EFFECT==REASON_EFFECT) and 1 or 0 end)
 	c:RegisterEffect(e3)
 end

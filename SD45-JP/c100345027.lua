@@ -12,17 +12,12 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
-	e1:SetCondition(s.descon)
+	e1:SetCondition(function(_,tp) return Duel.GetActivityCount(1-tp,ACTIVITY_SPSUMMON)>0 end)
 	e1:SetTarget(s.destg)
 	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
-	-- Count Special Summons
-	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,aux.FALSE)
 end
 s.listed_series={SET_TRAPTRIX,SET_HOLE}
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCustomActivityCount(id,1-tp,ACTIVITY_SPSUMMON)>0
-end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() and chkc:IsAttackAbove(2000) end
 	if chk==0 then return Duel.IsExistingTarget(aux.FaceupFilter(Card.IsAttackAbove,2000),tp,0,LOCATION_MZONE,1,nil) end

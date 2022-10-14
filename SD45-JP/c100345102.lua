@@ -58,7 +58,7 @@ function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetTargetCards(e)
+	local g=Duel.GetTargetCards(e):Match(Card.IsFaceup,nil)
 	if #g==0 then return end
 	local neg_chk=false
 	local c=e:GetHandler()
@@ -82,10 +82,8 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	local srg=rg:Select(tp,1,1,nil)
 	if #srg==0 then return end
 	Duel.BreakEffect()
-	if Duel.Remove(srg,POS_FACEUP,REASON_EFFECT)==0
-		or not srg:IsExists(Card.IsLocation,1,nil,LOCATION_REMOVED)
-		or #g:Match(Card.IsRelateToEffect,nil,e)==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	if Duel.Remove(srg,POS_FACEUP,REASON_EFFECT)==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local dg=g:Select(tp,1,1,nil)
 	if #dg>0 then
 		Duel.HintSelection(dg,true)
