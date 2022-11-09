@@ -1,4 +1,4 @@
---キノの蟲惑魔
+--プティカの蟲惑魔
 --Traptrix Pudica
 --Scripted by Hatter
 local s,id=GetID()
