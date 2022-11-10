@@ -46,9 +46,6 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
-function s.tdfilter(c)
-	return c:IsFaceup() and c:IsAbleToDeck() and s.filter(c)
-end
 s.tdfilter=aux.AND(Card.IsFaceup,s.filter,Card.IsAbleToDeck)
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and s.tdfilter(chkc) end

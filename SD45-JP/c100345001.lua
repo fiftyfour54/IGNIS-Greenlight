@@ -24,7 +24,7 @@ function s.initial_effect(c)
 	--Banish 1 opponent monster
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_REMOVE)
+	e3:SetCategory(CATEGORY_REMOVE+CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -34,7 +34,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_names={100345023}
-s.listed_series={SET_TRAPTRIX,SET_HOLE}
+s.listed_series={SET_TRAPTRIX,SET_HOLE,SET_TRAP_HOLE}
 function s.immfilter(e,te)
 	local c=te:GetOwner()
 	return c:IsNormalTrap() and (c:IsSetCard(SET_HOLE) or c:IsSetCard(SET_TRAP_HOLE))
@@ -63,6 +63,7 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,s.rmfilter,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,1-tp,LOCATION_REMOVED)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -80,16 +81,21 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	e1:SetReset(reset,reset_ct)
 	e1:SetCountLimit(1)
+	e1:SetCondition(s.spcon)
 	e1:SetOperation(s.spop)
 	Duel.RegisterEffect(e1,tp)
 	aux.RegisterClientHint(c,0,tp,0,1,aux.Stringid(id,2),reset,reset_ct)
 end
 function s.spfilter(c,e,tp)
-	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCanBeSpecialSummoned(e,0,1-tp,false,false)
+end
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(s.spfilter,tp,0,LOCATION_REMOVED,1,nil,e,tp)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.spfilter,tp,0,LOCATION_REMOVED,nil,e,1-tp)
+	local g=Duel.GetMatchingGroup(s.spfilter,tp,0,LOCATION_REMOVED,nil,e,tp)
 	if #g==0 or not Duel.SelectYesNo(1-tp,aux.Stringid(id,3)) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=g:Select(1-tp,1,1,nil)
 	if #sg>0 then
 		Duel.SpecialSummon(sg,0,1-tp,1-tp,false,false,POS_FACEUP)
