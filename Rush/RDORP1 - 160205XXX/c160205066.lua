@@ -34,6 +34,9 @@ end
 function s.posfilter(c)
 	return c:IsFaceup() and c:IsAttackPos() and c:IsCanChangePositionRush()
 end
+function s.posfilter2(c)
+	return c:IsCode(80304126) and s.posfilter(c)
+end
 function s.rescon(sg,e,tp,mg)
 	return sg:IsExists(Card.IsCode,1,nil,80304126) 
 end
@@ -46,7 +49,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 		local g2=Duel.GetMatchingGroup(s.posfilter,tp,LOCATION_MZONE,0,e:GetHandler())
-		if #g2>0 and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,80304126),tp,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		if #g2>0 and Duel.IsExistingMatchingCard(s.posfilter2,tp,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			local og=aux.SelectUnselectGroup(g2,e,tp,1,3,s.rescon,1,tp,HINTMSG_POSCHANGE,s.rescon)
 			Duel.HintSelection(og,true)
 			Duel.ChangePosition(og,POS_FACEUP_DEFENSE)
