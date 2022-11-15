@@ -46,7 +46,7 @@ function s.initial_effect(c)
 end
 local function getcount(tp)
 	local tottype=0
-	Duel.GetMatchingGroup(s.ctfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil):ForEach(function(c) tottype=tottype|c:GetType() end)
+	Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil,TYPES):ForEach(function(c) tottype=tottype|c:GetType() end)
 	tottype=tottype&(TYPES)
 	local ct=0
 	while tottype~=0 do
