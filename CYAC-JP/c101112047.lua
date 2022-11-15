@@ -45,16 +45,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 local function getcount(tp)
-	local tottype=0
-	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil,TYPES)
-	g:ForEach(function(c) tottype=tottype|c:GetType() end)
-	tottype=tottype&(TYPES)
-	local ct=0
-	while tottype~=0 do
-		if tottype&0x1~=0 then ct=ct+1 end
-		tottype=tottype>>1
-	end
-	return ct
+	return Duel.GetFieldGroup(tp,LOCATION_MZONE+LOCATION_GRAVE,0):GetBinClassCount(function(c) c:GetType()&TYPES end)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
