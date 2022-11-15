@@ -1,5 +1,5 @@
---
---
+--サイバネット・ロールバック
+--Cynet Rollback
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
@@ -10,6 +10,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
@@ -20,6 +21,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(function(e,tp) return Duel.GetLP(tp)<=2000 end)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.thtg)

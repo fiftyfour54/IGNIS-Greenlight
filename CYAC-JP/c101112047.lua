@@ -1,5 +1,5 @@
---
---
+--ファイアウォール・ドラゴン・シンギュラリティ
+--Firewall Dragon Singularity
 --Scripted by Larry126
 local s,id=GetID()
 local TYPES=TYPE_FUSION+TYPE_RITUAL+TYPE_SYNCHRO+TYPE_XYZ
