@@ -71,7 +71,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummonComplete()
 end
 function s.tdfilter(c)
-	return c:IsSetCard(SET_FIREWALL) and c:IsAbleToExtra()
+	return c:IsSetCard(SET_FIREWALL) and c:IsLinkMonster() and c:IsAbleToExtra()
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tdfilter,tp,LOCATION_GRAVE,0,1,nil) end
