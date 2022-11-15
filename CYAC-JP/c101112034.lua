@@ -46,6 +46,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0
 		and c:IsRelateToEffect(e) and c:IsFaceup() 
 		and not c:IsLevel(tc:GetLevel()) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		Duel.BreakEffect()
 		local e1=Effect.CreateEffect(c)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetType(EFFECT_TYPE_SINGLE)
