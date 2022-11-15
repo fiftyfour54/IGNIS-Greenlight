@@ -45,7 +45,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 local function getcount(tp)
-	return Duel.GetFieldGroup(tp,LOCATION_MZONE+LOCATION_GRAVE,0):GetBinClassCount(function(c) c:GetType()&TYPES end)
+	return Duel.GetFieldGroup(tp,LOCATION_MZONE+LOCATION_GRAVE,0):GetBinClassCount(function(c) return c:GetType()&TYPES end)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
