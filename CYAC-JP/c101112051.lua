@@ -3,7 +3,7 @@
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
-	--Activate/Special banished Cyberse
+	--Special Summon 1 banished Cyberse monster
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	-- Add 1 banished Cyberse monster to the hand
+	--Add 2 banished Cyberse monster to the hand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(function(e,tp) return Duel.GetLP(tp)<=2000 end)
+	e2:SetCondition(function(_,tp) return Duel.GetLP(tp)<=2000 end)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
@@ -56,8 +56,8 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,#g,0,0)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+	local g=Duel.GetTargetCards(e)
+	if #g>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
 	end
 end
