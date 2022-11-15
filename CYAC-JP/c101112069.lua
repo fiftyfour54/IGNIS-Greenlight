@@ -1,9 +1,9 @@
---
+--サイバネット・サーキット
 --Cynet Circuit
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
-	--Activate/Special Summon
+	--Special Summon monsters from the GY
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -14,14 +14,14 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--Return to Extra Deck
+	--Return a "Firewall" monster to the Extra Deck and Special Summon it
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOEXTRA+CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(function(e,tp) return Duel.GetLP(tp)<=2000 end)
+	e2:SetCondition(function(_,tp) return Duel.GetLP(tp)<=2000 end)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.tdtg)
 	e2:SetOperation(s.tdop)
@@ -34,8 +34,8 @@ function s.spfilter(c,e,summonPlayer,targetCard,targetCardZones,toFieldPlayer)
 end
 function s.filter(c,e,tp)
 	return c:IsSetCard(SET_FIREWALL) and c:IsLinkMonster()
-		and (Duel.IsExistingMatchingCard(spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c,c:GetLinkedZone(tp),tp)
-		or Duel.IsExistingMatchingCard(spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c,c:GetLinkedZone(1-tp),1-tp))
+		and (Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c,c:GetLinkedZone(tp),tp)
+		or Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c,c:GetLinkedZone(1-tp),1-tp))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_REMOVED) and s.filter(chkc,e,tp) end
@@ -48,8 +48,8 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
-	local g1=Duel.GetMatchingGroup(spfilter,tp,LOCATION_GRAVE,0,nil,e,tp,tc,tc:GetLinkedZone(tp),tp)
-	local g2=Duel.GetMatchingGroup(spfilter,tp,LOCATION_GRAVE,0,nil,e,tp,tc,tc:GetLinkedZone(1-tp),1-tp)
+	local g1=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp,tc,tc:GetLinkedZone(tp),tp)
+	local g2=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp,tc,tc:GetLinkedZone(1-tp),1-tp)
 	while #(g1+g2)>0 do
 		local sc=(g1+g2):Select(tp,1,1,nil):GetFirst()
 		local b1=g1:IsContains(sc)
@@ -61,8 +61,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		local zone=tc:GetLinkedZone(toFieldPlayer)+sc:IsLinkMonster() and tc:GetToBeLinkedZone(sc,toFieldPlayer) or 0
 		Duel.SpecialSummon(sc,0,tp,toFieldPlayer,false,false,POS_FACEUP)
 		if not Duel.SelectYesNo(tp,aux.Stringid(id,4)) then break end
-		g1=Duel.GetMatchingGroup(spfilter,tp,LOCATION_GRAVE,0,nil,e,tp,tc,tc:GetLinkedZone(tp),tp)
-		g2=Duel.GetMatchingGroup(spfilter,tp,LOCATION_GRAVE,0,nil,e,tp,tc,tc:GetLinkedZone(1-tp),1-tp)
+		g1=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp,tc,tc:GetLinkedZone(tp),tp)
+		g2=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp,tc,tc:GetLinkedZone(1-tp),1-tp)
 	end
 end
 function s.tdfilter(c)
@@ -76,7 +76,7 @@ end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,s.tdfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.HintSelection(g)
+	Duel.HintSelection(g,true)
 	if #g>0 and Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0
 		and Duel.GetLocationCountFromEx(tp,tp,nil,g:GetFirst())>0 then
 		local sc=Duel.GetOperatedGroup():GetFirst()

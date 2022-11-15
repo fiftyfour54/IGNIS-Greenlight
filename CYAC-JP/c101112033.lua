@@ -6,6 +6,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	local params = {matfilter=Fusion.OnFieldMat(Card.IsAbleToRemove),
 					extrafil=s.fextra,extraop=Fusion.BanishMaterial,extratg=s.extratarget}
+	--Fusion Summon a Fusion monster, including a Cyberse monster as material
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
@@ -15,7 +16,7 @@ function s.initial_effect(c)
 	e1:SetTarget(Fusion.SummonEffTG(params))
 	e1:SetOperation(Fusion.SummonEffOP(params))
 	c:RegisterEffect(e1)
-	-- Banish 1 card from the field or GY
+	--Add 1 Cyberse monster or Ritual Spell from the GY to the hand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -30,7 +31,7 @@ function s.initial_effect(c)
 end
 s.listed_names={34767865}
 function s.fcheck(tp,sg,fc)
-	return sg:IsExists(Card.IsRace,1,nil,RACE_SPELLCASTER)
+	return sg:IsExists(Card.IsRace,1,nil,RACE_CYBERSE)
 end
 function s.fextra(e,tp,mg)
 	if not Duel.IsPlayerAffectedByEffect(tp,69832741) then
@@ -43,7 +44,7 @@ function s.extratarget(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,0,tp,LOCATION_MZONE+LOCATION_GRAVE)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r&REASON_SYNCHRO>0
 end
 function s.thfilter(c)
 	return (c:IsRace(RACE_CYBERSE) or c:IsRitualSpell()) and c:IsAbleToHand()
