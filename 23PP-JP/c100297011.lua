@@ -51,7 +51,7 @@ function s.cfilter(c)
 	return c:IsFieldSpell() and Duel.IsExistingMatchingCard(s.thfilter2,tp,LOCATION_DECK,0,1,nil,c:Getcode())
 end
 function s.thfilter2(c,code)
-	return c:IsFieldSpell() and c:IsCode(code) and c:IsAbleToHand()
+	return c:IsCode(code) and c:IsAbleToHand()
 end
 function s.thtg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.cfilter(chkc) end
