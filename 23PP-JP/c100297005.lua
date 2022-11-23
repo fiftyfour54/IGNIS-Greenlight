@@ -19,8 +19,8 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCost(aux.bfgcost)
@@ -33,13 +33,13 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	return true
 end
 function s.cfilter(c,e,tp)
-	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_DARK|ATTRIBUTE_LIGHT)
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,nil,e,tp,c:GetOriginalRace(),c:GetOriginalLevel(),c:GetOriginalAttribute())
+	return c:IsAttribute(ATTRIBUTE_DARK|ATTRIBUTE_LIGHT)
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_EXTRA,0,1,nil,e,tp,c:GetOriginalRace(),c:GetOriginalLevel(),c:GetOriginalAttribute())
 end
 function s.spfilter(c,e,tp,race,lvl,att)
-	return c:IsOriginalRace(race) and c:GetOriginalLevel()==lvl and not c:IsOriginalAttribute(att)
+	return c:IsAttribute(ATTRIBUTE_DARK|ATTRIBUTE_LIGHT) and c:IsOriginalRace(race) and c:GetOriginalLevel()==lvl and not c:IsOriginalAttribute(att)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and ((c:IsLocation(LOCATION_HAND) and Duel.GetMZoneCount(tp,c)>0) or Duel.GetLocationCountFromEx(tp,tp,nil,c)>0)
+		and ((c:IsLocation(LOCATION_HAND) and Duel.GetMZoneCount(tp,c)>0) or (c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -51,14 +51,14 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rc=Duel.SelectReleaseGroupCost(tp,s.cfilter,1,1,false,nil,nil,e,tp):GetFirst()
 	e:SetLabel(rc:GetOriginalRace(),rc:GetOriginalLevel(),rc:GetOriginalAttribute())
 	Duel.Release(rc,REASON_COST)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_EXTRA)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_EXTRA)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local race,lvl,att=e:GetLabel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,1,nil,e,tp,race,lvl,att):GetFirst()
-	if tc then 
-		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND|LOCATION_EXTRA,0,1,1,nil,e,tp,race,lvl,att)
+	if #g>0 then 
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
 function s.tdfilter(c,e)
@@ -80,12 +80,11 @@ function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetTargetCards(e)
-	if #tg~=2 then return end
-	Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
+	if #tg~=2 or Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)~=2 then return end
 	local g=Duel.GetOperatedGroup()
 	if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end
-	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)
-	if ct>0 then
+	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK|LOCATION_EXTRA)
+	if ct==2 and Duel.IsPlayerCanDraw(tp) then
 		Duel.BreakEffect()
 		Duel.Draw(tp,1,REASON_EFFECT)
 	end

@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.spcon)
+	e1:SetCondition(function(_,tp) return Duel.GetAttacker():IsControler(1-tp) end)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
@@ -28,10 +28,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_GALAXY,SET_PHOTON}
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local at=Duel.GetAttacker()
-	return at and at:IsControler(1-tp)
-end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -48,23 +44,20 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTargetRange(1,0)
 	if Duel.IsTurnPlayer(tp) and Duel.IsBattlePhase() then
 		e1:SetLabel(Duel.GetTurnCount())
-		e1:SetCondition(s.skipcon)
+		e1:SetCondition(function(e) return Duel.GetTurnCount()~=e:GetLabel() end)
 		e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,2)
 	else
 		e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,1)
 	end
 	Duel.RegisterEffect(e1,tp)
 	--Special Summon itself and end the Battle Phase
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
 		Duel.BreakEffect()
 		Duel.SkipPhase(Duel.GetTurnPlayer(),PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE_STEP,1)
 	end
 end
-function s.skipcon(e)
-	return Duel.GetTurnCount()~=e:GetLabel()
-end
 function s.thfilter(c)
-	return (c:IsSetCard(SET_GALAXY) or c:IsSetCard(SET_PHOTON)) and c:IsSpellTrap() and c:IsAbleToHand()
+	return c:IsSetCard({SET_GALAXY,SET_PHOTON}) and c:IsSpellTrap() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

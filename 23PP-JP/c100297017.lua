@@ -11,11 +11,11 @@ function s.initial_effect(c)
 	--Non-Syncho Monsters cannot declare attack
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e2:SetTarget(s.target)
+	e2:SetTarget(function(_,c) return not c:IsType(TYPE_SYNCHRO) end)
 	c:RegisterEffect(e2)
 	--Special Summon 1 non-Tuner monster that was sent to the GY
 	local e3=Effect.CreateEffect(c)
@@ -50,14 +50,11 @@ function s.initial_effect(c)
 	e5:SetRange(LOCATION_SZONE)
 	e5:SetHintTiming(0,TIMING_MAIN_END)
 	e3:SetCountLimit(1,{id,1})
-	e5:SetCondition(s.synchcond)
+	e5:SetCondition(function(_,tp) return Duel.IsMainPhase() and Duel.IsTurnPlayer(1-tp) end)
 	e5:SetCost(s.synchcost)
 	e5:SetTarget(s.synchtg)
 	e5:SetOperation(s.synchop)
 	c:RegisterEffect(e5)
-end
-function s.target(e,c)
-	return not c:IsType(TYPE_SYNCHRO)
 end
 function s.cfilter(c,e,tp)
 	return c:IsMonster() and c:IsType(TYPE_SYNCHRO) and not c:IsType(TYPE_TUNER)
@@ -80,7 +77,7 @@ end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=e:GetLabelObject():Filter(s.cfilter,nil,e,tp)
 	if chkc then return g:IsContains(chkc) and s.cfilter(chkc,e,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #g>0 end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #g>0 and Duel.GetCurrentPhase()~=PHASE_DAMAGE end
 	local tc=nil
 	if #g==1 then
 		tc=g:GetFirst()
@@ -94,7 +91,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
+	if tc:IsRelateToEffect(e) and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
 		--Treated as a Tuner
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -104,9 +101,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1)
 	end
-end
-function s.synchcond(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsMainPhase() and Duel.IsTurnPlayer(1-tp)
+	Duel.SpecialSummonComplete()
 end
 function s.synchcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

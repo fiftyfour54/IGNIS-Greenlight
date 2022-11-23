@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--Negate an effect that targets a Link monster you control
+	--Negate an effect that targets a Link Monster you control
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DISABLE)
@@ -66,7 +66,7 @@ end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	if rp==tp or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return g and g:IsExists(s.tgfilter,1,nil,tp) and Duel.IsChainDisablable(ev)
+	return g:IsExists(s.tgfilter,1,nil,tp) and Duel.IsChainDisablable(ev)
 end
 function s.costfilter(c)
 	return c:IsSpell() and c:IsAbleToRemoveAsCost()
