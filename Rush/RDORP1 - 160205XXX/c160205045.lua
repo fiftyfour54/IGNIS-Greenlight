@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e0:SetCondition(s.drcon)
 	e0:SetOperation(s.predrop)
 	c:RegisterEffect(e0)
-	--Performs the extra
+	--Performs the Extra draw
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -28,21 +28,18 @@ function s.drcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.predrop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local hc=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
-	if hc<5 and Duel.IsPlayerCanDraw(tp,6-hc) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-		c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DRAW,0,1)
-		--prevents activating Trap card after the "initial Normal Draw"
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DRAW)
-		e1:SetTargetRange(0,1)
-		e1:SetValue(s.aclimit)
-		e1:SetCondition(s.actcon)
-		c:RegisterEffect(e1)
-	end
+	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DRAW,0,1)
+	--prevents activating Trap card after the "initial Normal Draw"
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DRAW)
+	e1:SetTargetRange(0,1)
+	e1:SetValue(s.aclimit)
+	e1:SetCondition(s.actcon)
+	c:RegisterEffect(e1)
 end
 function s.aclimit(e,re,tp)
 	return (re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:IsActiveType(TYPE_TRAP))
