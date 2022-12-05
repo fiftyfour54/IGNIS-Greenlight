@@ -41,7 +41,6 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<2 then return end
 	local c=e:GetHandler()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local tg=aux.SelectUnselectGroup(sg,e,tp,2,2,s.rescon,1,tp,HINTMSG_TOFIELD)
 	local chkct=0
 	for tc in tg:Iter() do
@@ -58,7 +57,9 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if chkct==2 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)		
 		local eq=Duel.SelectMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp,tg):GetFirst()
-		if eq and Duel.SpecialSummon(eq,0,tp,tp,false,false,POS_FACEUP)>0 then
+		if not eq then return end
+		Duel.BreakEffect()
+		if Duel.SpecialSummon(eq,0,tp,tp,false,false,POS_FACEUP)>0 then
 			Duel.Equip(tp,c,eq)
 			--Add Equip limit
 			local e1=Effect.CreateEffect(eq)
