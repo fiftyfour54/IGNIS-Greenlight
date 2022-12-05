@@ -63,11 +63,11 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		for tc in g:Iter() do
 			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
 			--Level becomes 5
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_CHANGE_LEVEL)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-			e2:SetValue(5)
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CHANGE_LEVEL+EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+			e1:SetValue(5)
 			tc:RegisterEffect(e2)
 			--Can only be used as Xyz material for an Insect monster
 			local e2=Effect.CreateEffect(c)
