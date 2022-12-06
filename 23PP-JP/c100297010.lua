@@ -24,16 +24,15 @@ function s.initial_effect(c)
 	end)
 end
 s.listed_series={SET_WARRIOR,SET_SYNCHRON,SET_STARDUST}
-function s.synchfilter(c,tp)
-	return c:IsType(TYPE_SYNCHRO) and c:IsControler(tp)
-end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(s.synchfilter,1,nil,tp) then
-		Duel.RegisterFlagEffect(0,id,RESET_PHASE+PHASE_END,0,1)
+	for tc in eg:Iter() do
+		if tc:IsType(TYPE_SYNCHRO) then
+			Duel.RegisterFlagEffect(tc:GetControler(),id,RESET_PHASE+PHASE_END,0,1)
+		end
 	end
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(0,id)>0 and Duel.IsAbleToEnterBP()
+	return Duel.GetFlagEffect(tp,id)>0 and Duel.IsAbleToEnterBP()
 end
 function s.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) and c:CanAttack() and not c:IsHasEffect(EFFECT_EXTRA_ATTACK)
