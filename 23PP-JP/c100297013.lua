@@ -1,7 +1,6 @@
---Japanese name
---Splitting Mother Spider
+--分裂するマザー・スパイダー
+--Fissioning Mother Spider
 --scripted by Naim
-local CARD_BABYSPIDER=100297000 --temporay, as we don't know the card's code
 local s,id=GetID()
 function s.initial_effect(c)
 	--Special Summon itself from the hand
@@ -24,14 +23,14 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 end
-s.listed_cards={CARD_BABYSPIDER}
+s.listed_cards={100297014}
 function s.selfspcon(e,c)
 	if c==nil then return true end
 	local tp=e:GetHandlerPlayer()
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0,nil)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 end
 function s.spfilter(c,e,tp)
-	return c:IsCode(CARD_BABYSPIDER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(100297014) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
@@ -69,7 +68,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 			e1:SetValue(5)
 			tc:RegisterEffect(e2)
-			--Can only be used as Xyz material for an Insect monster
+			--Can only be used as Xyz material for a DARK monster
 			local e2=Effect.CreateEffect(c)
 			e2:SetType(EFFECT_TYPE_SINGLE)
 			e2:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
@@ -89,5 +88,5 @@ function s.lizfilter(e,c)
 end
 function s.xyzlimit(e,c)
 	if not c then return false end
-	return not c:IsRace(RACE_INSECT)
+	return not c:IsAttribute(ATTRIBUTE_DARK)
 end

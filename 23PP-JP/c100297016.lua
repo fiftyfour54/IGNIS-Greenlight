@@ -1,4 +1,4 @@
---Japanese name
+--アディショナル・ミラー・レベル７
 --Additional Mirror Level 7
 --scripted by Naim
 local s,id=GetID()
@@ -62,8 +62,10 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,2,2,nil,e,tp,tc:GetCode())
 	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
-		local sum=Duel.GetOperatedGroup():GetSum(Card.GetAttack)
-		if sum>0 then Duel.Damage(tp,sum,REASON_EFFECT) end
+		local sum=Duel.GetOperatedGroup():GetSum(Card.GetBaseAttack)
+		if sum>0 then
+			Duel.Damage(tp,sum,REASON_EFFECT)
+		end
 	end
 end
 function s.cfilter(c,tp)
@@ -82,8 +84,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(s.splimit)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
-	--Clock Lizard check
-	aux.addTempLizardCheck(e:GetHandler(),tp)
 end
 function s.splimit(e,c)
 	return c:IsLocation(LOCATION_EXTRA)

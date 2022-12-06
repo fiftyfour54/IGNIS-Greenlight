@@ -1,4 +1,4 @@
---
+--金科玉条
 --Golden Rule
 --Scripted by Larry126
 local s,id=GetID()
@@ -55,7 +55,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RaiseEvent(tc,EVENT_CUSTOM+47408488,e,0,tp,0,0)
 	end
 	if chkct==2 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)		
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local eq=Duel.SelectMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp,tg):GetFirst()
 		if not eq then return end
 		Duel.BreakEffect()
