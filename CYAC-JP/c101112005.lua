@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetRange(LOCATION_HAND+LOCATION_MZONE)
+	e1:SetRange(LOCATION_HAND|LOCATION_MZONE)
 	e1:SetTarget(s.eqtg)
 	e1:SetOperation(s.eqop)
 	c:RegisterEffect(e1)
@@ -30,8 +30,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	if not (Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and tc and tc:IsFaceup()
-		and tc:IsRelateToEffect(e)
+		and tc:IsFaceup() and tc:IsRelateToEffect(e)
 		and Duel.Equip(tp,c,tc,true)) then
 		Duel.SendtoGrave(c,REASON_RULE)
 	end
