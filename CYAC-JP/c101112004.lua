@@ -3,8 +3,8 @@
 -- Scripted by Satella
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Special Summon from your hand
-    local e1=Effect.CreateEffect(c)
+        -- Special Summon from your hand
+        local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
@@ -12,8 +12,8 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(s.spcon)
 	c:RegisterEffect(e1)
-    -- Set 1 Spell/Trap in your opponent's GY to your field
-    local e2=Effect.CreateEffect(c)
+       -- Set 1 Spell/Trap in your opponent's GY to your field
+       local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_LEAVE_GRAVE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
