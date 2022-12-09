@@ -3,21 +3,20 @@
 -- Scripted by Satella
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Add 1 "Superheavy Samurai"
-    local e1=Effect.CreateEffect(c)
+        -- Add 1 "Superheavy Samurai"
+        local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.thcon)
-    e1:SetCost(s.thcost)
+        e1:SetCost(s.thcost)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-    -- Increase Level of a Superheavy Samurai by 2
+        -- Increase Level of a Superheavy Samurai by 2
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
