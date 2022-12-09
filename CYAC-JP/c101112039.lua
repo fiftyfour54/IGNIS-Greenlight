@@ -1,10 +1,11 @@
+--超重天神マスラ－Ｏ
 --Superheavy Samurai Overlord Masurao
 local s,id=GetID()
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
 	--Synchro summon procedure
-	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_MACHINE),1,1,Synchro.NonTuner(Card.IsSetCard,0x9a),1,99)
+	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_MACHINE),1,1,Synchro.NonTuner(Card.IsSetCard,SET_SUPERHEAVY_SAMURAI),1,99)
 	--Attack while in defense position
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -21,7 +22,7 @@ function s.initial_effect(c)
 	e2:SetValue(s.repval)
 	e2:SetOperation(s.repop)
 	c:RegisterEffect(e2)
-	--draw
+	--Draw cards up to 3 cards
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_DRAW)
@@ -36,9 +37,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_SUPERHEAVY_SAMURAI}
---destroy replace
 function s.repfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_ONFIELD) and c:IsSetCard(0x29)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_ONFIELD) and c:IsSetCard(SET_SUPERHEAVY_SAMURAI)
 		and (c:IsReason(REASON_BATTLE) or c:IsReason(REASON_EFFECT)) and not c:IsReason(REASON_REPLACE)
 end
 function s.desfilter(c,e,tp)
@@ -65,7 +65,6 @@ function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	tc:SetStatus(STATUS_DESTROY_CONFIRMED,false)
 	Duel.Destroy(tc,REASON_EFFECT+REASON_REPLACE)
 end
---draw
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and re:IsSpellTrapEffect()
 end
@@ -80,8 +79,8 @@ function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,3-h)
 end
 function s.drop(e,tp,eg,ep,ev,re,r,rp)
-	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local h=Duel.GetFieldGroupCount(p,LOCATION_HAND,0)
 	if h>=3 then return end
+	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	Duel.Draw(p,3-h,REASON_EFFECT)
 end

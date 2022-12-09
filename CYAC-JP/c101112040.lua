@@ -1,4 +1,5 @@
--- Superheavy Samurai General Shanao
+--超重神将シャナ－Ｏ
+--Superheavy Samurai General Shanao
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
@@ -11,7 +12,7 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_DEFENSE_ATTACK)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
-	--special summon
+	--Special summon 1 "Superheavy Samurai" monster from the GY
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -19,19 +20,20 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetHintTiming(0,TIMING_BATTLE_START)
+	e2:SetCountLimit(1)
 	e2:SetCondition(s.spcon)
-	e2:SetCost(s.spcost)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-	--summon itself
+	--Special Summon itself form the Pendulum Zone
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_ATKCHANGE+CATEGORY_DISABLE)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e3:SetRange(LOCATION_PZONE)
-	e3:SetCondition(s.spcon2)
+	e3:SetCountLimit(1,id)
+	e3:SetCondition(function(e,tp) return Duel.GetAttacker():IsControler(1-tp) end)
 	e3:SetTarget(s.sptg2)
 	e3:SetOperation(s.spop2)
 	c:RegisterEffect(e3)
@@ -39,10 +41,11 @@ end
 s.listed_series={SET_SUPERHEAVY_SAMURAI}
 --special summon
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO) and Duel.GetCurrentPhase()>=PHASE_BATTLE_START and Duel.GetCurrentPhase()<=PHASE_BATTLE
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO) and Duel.IsBattlePhase()
 end
 function s.filter(c,e,tp)
-	return c:IsSetCard(SET_SUPERHEAVY_SAMURAI) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(SET_SUPERHEAVY_SAMURAI) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE))
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -64,26 +67,21 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
---special summon (pendulum)
-function s.spcon2(e,tp,eg,ep,ev,re,r,rp)
-	local at=Duel.GetAttacker()
-	return at:GetControler()~=tp and Duel.GetAttackTarget()==nil
-end
 function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	local at=Duel.GetAttacker()
+	
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE) end
+	local at=Duel.GetAttacker()
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-	
+	Duel.SetPossibleOperationInfo(0,CATEGORY_ATKCHANGE,at,1,tp,-at:GetAttack())
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetAttacker()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0
-		and not Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_GRAVE,0,1,nil,TYPE_SPELL+TYPE_TRAP)
+		and not Duel.IsExistingMatchingCard(Card.IsSpellTrap,tp,LOCATION_GRAVE,0,1,nil)
 		and tc:IsRelateToBattle() and tc:IsFaceup()
 		and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-		if tc:IsRelateToBattle() and tc:IsFaceup() then
 			Duel.BreakEffect()
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
