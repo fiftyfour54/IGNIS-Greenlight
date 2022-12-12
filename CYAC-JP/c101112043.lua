@@ -35,6 +35,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_MANADOME}
+s.listed_names={CARD_VISAS_STARFROST}
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ct=c:GetMaterial():FilterCount(Card.IsType,nil,TYPE_TUNER)
