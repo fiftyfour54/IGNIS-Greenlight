@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
 	-- Return 1 card on the field to the hand
-  	local e2=Effect.CreateEffect(c)
+     	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -23,8 +23,9 @@ function s.initial_effect(c)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 	-- Special Summon 1 "Mikanko" monster from the GY
-  	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+    	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+     	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_GRAVE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -32,17 +33,11 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-	--Banish equip monster if it leaves the field
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_LEAVE_FIELD)
-	e4:SetOperation(s.rmop)
-	c:RegisterEffect(e4)
 end
 s.listed_series={SET_MIKANKO}
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	local bt=Duel.GetBattleMonster(0)
-	return bt and bt:IsFaceup() and bt:IsSetCard(SET_MIKANKO) and bt:IsControler(tp)
+function s.thcon(e)
+	local bc=Duel.GetBattleMonster(e:GetHandlerPlayer())
+	return bc and bc:IsFaceup() and bc:IsSetCard(SET_MIKANKO)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsAbleToHand() end
@@ -84,7 +79,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 		--Banish equip monster if it leaves the field
 		local e2=Effect.CreateEffect(c)
-    		e2:SetType(EFFECT_TYPE_SINGLE)
+        	e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
 		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e2:SetReset(RESET_EVENT+RESETS_REDIRECT)
@@ -92,11 +87,4 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 	end
 	Duel.SpecialSummonComplete()
-end
-function s.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=e:GetHandler():GetEquipTarget()
-	if tc then
-		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
-	end
 end
