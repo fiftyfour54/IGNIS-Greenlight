@@ -31,7 +31,7 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_PURERY}
 function s.thfilter(c)
-	return c:IsSetCard(SET_PURERY) and not c:IsType(TYPE_QUICKPLAY) and c:IsAbleToHand()
+	return c:IsSetCard(SET_PURERY) and not c:IsQuickPlaySpell() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -46,7 +46,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.qpfilter(c,e,tp,mc)
-	return c:IsSetCard(SET_PURERY) and c:IsType(TYPE_QUICKPLAY)
+	return c:IsSetCard(SET_PURERY) and c:IsQuickPlaySpell()
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,mc,c)
 end
 function s.spfilter(c,e,tp,mc,sc)
@@ -59,7 +59,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local pg=aux.GetMustBeMaterialGroup(tp,Group.FromCards(c),tp,nil,nil,REASON_XYZ)
 		return (#pg<=0 or (#pg==1 and pg:IsContains(c)))
-			and Duel.IsExistingMatchingCard(s.qpfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c)
+			and Duel.IsExistingTarget(s.qpfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,s.qpfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,c)
