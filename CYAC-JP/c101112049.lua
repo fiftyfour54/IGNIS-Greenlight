@@ -21,6 +21,14 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(s.effval)
 	c:RegisterEffect(e2)
+	local e2a=Effect.CreateEffect(c)
+	e2a:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2a:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2a:SetCode(EVENT_CHAINING)
+	e2a:SetRange(LOCATION_MZONE)
+	e2a:SetLabelObject(e2)
+	e2a:SetOperation(s.checkop)
+	c:RegisterEffect(e2a)
 	--Special Summon 1 "Solfachord" card with an odd Pendulum Scale
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
@@ -43,7 +51,15 @@ function s.atkval(e,c)
 end
 function s.effval(e,ct)
 	local te=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
-	return te:IsActiveType(TYPE_PENDULUM) and e:GetHandler():GetLinkedGroup():IsContains(te:GetHandler())
+	local effs=e:GetLabelObject()
+	return effs and effs[te:GetFieldID()]
+end
+function s.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local e2=e:GetLabelObject()
+	if Duel.GetCurrentChain()==1 then e2:SetLabelObject({}) end
+	if re:IsActiveType(TYPE_PENDULUM) and e:GetHandler():GetLinkedGroup():IsContains(re:GetHandler()) then
+		e2:GetLabelObject()[re:GetFieldID()]=true
+	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and Duel.IsChainDisablable(ev)
