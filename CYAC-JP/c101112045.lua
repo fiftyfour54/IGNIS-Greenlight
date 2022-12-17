@@ -65,6 +65,7 @@ function s.rmvfilter(c,tp)
 end
 function s.applycost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
+	Debug.Message(Duel.GetMatchingGroupCount(s.rmvfilter,tp,LOCATION_HAND|LOCATION_DECK,0,nil,tp))
 	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST) and
 		Duel.IsExistingMatchingCard(s.rmvfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,tp)
 	end
@@ -112,12 +113,12 @@ function s.applyop(e,tp,eg,ep,ev,re,r,rp)
 		tc:CreateEffectRelation(te)
 		Duel.BreakEffect()
 		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-		for etc in aux.Next(g) do
+		for etc in g:Iter() do
 			etc:CreateEffectRelation(te)
 		end
 		if op then op(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1) end
 		tc:ReleaseEffectRelation(te)
-		for etc in aux.Next(g) do
+		for etc in g:Iter() do
 			etc:ReleaseEffectRelation(te)
 		end
 	end
