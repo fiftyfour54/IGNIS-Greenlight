@@ -52,13 +52,14 @@ end
 function s.effval(e,ct)
 	local te=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
 	local effs=e:GetLabelObject()
-	return effs and effs[te:GetFieldID()]
+	return effs and effs[te:GetFieldID()]==e:GetHandler():GetFieldID()
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local e2=e:GetLabelObject()
 	if Duel.GetCurrentChain()==1 then e2:SetLabelObject({}) end
-	if re:IsActiveType(TYPE_PENDULUM) and e:GetHandler():GetLinkedGroup():IsContains(re:GetHandler()) then
-		e2:GetLabelObject()[re:GetFieldID()]=true
+	if re:IsActiveType(TYPE_PENDULUM) and c:GetLinkedGroup():IsContains(re:GetHandler()) then
+		e2:GetLabelObject()[re:GetFieldID()]=c:GetFieldID()
 	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
