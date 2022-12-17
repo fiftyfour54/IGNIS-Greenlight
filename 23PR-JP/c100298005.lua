@@ -21,14 +21,11 @@ function s.initial_effect(c)
 	e2:SetOperation(s.changeop)
 	c:RegisterEffect(e2)
 end
-function s.changefilter(c)
-    return c:IsFaceup() and not c:IsRace(RACE_MACHINE)
-end
 function s.changetg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.changefilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.changefilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,s.changefilter,tp, LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end
 function s.changeop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
@@ -39,7 +36,7 @@ function s.changeop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_ADD_ATTRIBUTE)
 		e1:SetValue(0x3f)
 		tc:RegisterEffect(e1)
-        	local e2=Effect.CreateEffect(c)
+         	local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_CHANGE_RACE)
 		e2:SetValue(RACE_MACHINE)
