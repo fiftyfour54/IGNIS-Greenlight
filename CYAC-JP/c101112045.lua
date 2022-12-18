@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Xyz Summon procedure
 	Xyz.AddProcedure(c,nil,4,2,nil,nil,99)
-	--Add 1 "tellarknight" and/or 1 "Constellar" card from the Gy to the hand
+	--Add 1 "tellarknight" and/or 1 "Constellar" card from the GY to the hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND)
@@ -70,6 +70,9 @@ function s.applycost(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.IsExistingMatchingCard(s.rmvfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,tp)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	--This hint only shows "select the card to banish"
+	--It might be better for the uses to have a custom string with:
+	--"Select the monster to banish and apply the effect"
 	local g=Duel.SelectMatchingCard(tp,s.rmvfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,1,nil,tp)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 	e:SetLabelObject(g:GetFirst())
@@ -80,44 +83,46 @@ function s.applytg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.applyop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc then
-		Debug.Message("Card to apply is: "..tostring(tc:GetCode()))
-		local eff={tc:GetCardEffect(id)}
-		local te=nil
-		local acd={}
-		local ac={}
-		for _,teh in ipairs(eff) do
-			local temp=teh:GetLabelObject()
-			local con=temp:GetCondition()
-			local tg=temp:GetTarget()
-			if (not con or con(temp,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) 
-				and (not tg or tg(temp,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
-				table.insert(ac,teh)
-				table.insert(acd,temp:GetDescription())
-			end
+	if not tc then return end
+	local eff={tc:GetCardEffect(id)}
+	local te=nil
+	local acd={}
+	local ac={}
+	for _,teh in ipairs(eff) do
+		local temp=teh:GetLabelObject()
+		local con=temp:GetCondition()
+		local tg=temp:GetTarget()
+		if (not con or con(temp,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) 
+			and (not tg or tg(temp,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
+			table.insert(ac,teh)
+			table.insert(acd,temp:GetDescription())
 		end
-		if #ac==1 then te=ac[1] elseif #ac>1 then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EFFECT)
-			op=Duel.SelectOption(tp,table.unpack(acd))
-			op=op+1
-			te=ac[op]
-		end
-		if not te then return end
-		Duel.ClearTargetCard()
-		local teh=te
-		te=teh:GetLabelObject()
-		local tg=te:GetTarget()
-		local op=te:GetOperation()
-		if tg then tg(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1) end
-		Duel.BreakEffect()
-		tc:CreateEffectRelation(te)
-		Duel.BreakEffect()
-		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	end
+	if #ac==1 then te=ac[1] elseif #ac>1 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EFFECT)
+		op=Duel.SelectOption(tp,table.unpack(acd))
+		op=op+1
+		te=ac[op]
+	end
+	if not te then return end
+	Duel.ClearTargetCard()
+	local teh=te
+	te=teh:GetLabelObject()
+	local tg=te:GetTarget()
+	local op=te:GetOperation()
+	if tg then tg(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1) end
+	Duel.BreakEffect()
+	tc:CreateEffectRelation(te)
+	Duel.BreakEffect()
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	if g then
 		for etc in g:Iter() do
 			etc:CreateEffectRelation(te)
 		end
-		if op then op(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1) end
-		tc:ReleaseEffectRelation(te)
+	end
+	if op then op(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1) end
+	tc:ReleaseEffectRelation(te)
+	if g then
 		for etc in g:Iter() do
 			etc:ReleaseEffectRelation(te)
 		end
