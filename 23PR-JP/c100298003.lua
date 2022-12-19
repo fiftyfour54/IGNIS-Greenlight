@@ -25,7 +25,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCost(aux.dxmcostgen(1,1))
-	e2:SetTarget(s.pentg)
+	e2:SetTarget(s.pltg)
 	e2:SetOperation(s.plop)
 	c:RegisterEffect(e2)
 	--Place this card in the Pendulum Zone if destroyed
@@ -57,22 +57,23 @@ function s.ovop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(tc,e:GetHandler())
 	end
 end
+function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckPendulumZones(tp) and e:GetHandler():IsType(TYPE_PENDULUM) end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOEXTRA,nil,1,tp,LOCATION_GRAVE)
+end
 function s.tefilter(c)
 	return c:IsType(TYPE_PENDULUM) and not c:IsForbidden()
-end
-function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckPendulumZones(tp) end
-	Duel.SetPossibleOperationInfo(0,CATEGORY_TOEXTRA,nil,1,tp,LOCATION_GRAVE)
 end
 function s.plop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.CheckPendulumZones(tp) then return end
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
-		and Duel.IsExistingMatchingCard(s.tefilter,tp,LOCATION_GRAVE,0,1,nil)
+		and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.tefilter),tp,LOCATION_GRAVE,0,1,nil)
 		and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SELECT)
-		local g=Duel.SelectMatchingCard(tp,s.tefilter,tp,LOCATION_GRAVE,0,1,1,nil)
+		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.tefilter),tp,LOCATION_GRAVE,0,1,1,nil)
 		if #g>0 then
+			Duel.BreakEffect()
 			Duel.SendtoExtraP(g,tp,REASON_EFFECT)
 		end
 	end
