@@ -65,4 +65,5 @@ function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	sc:SetMaterial(tc)
 	Duel.Overlay(sc,tc)
 	Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
+	sc:CompleteProcedure()
 end

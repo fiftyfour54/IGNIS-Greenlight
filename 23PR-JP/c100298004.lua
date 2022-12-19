@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_EVENT_PLAYER)
 	e2:SetCode(EVENT_DRAW)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetCondition(s.drcon)
@@ -42,23 +42,23 @@ function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local tg=eg:Filter(s.cfilter,nil)
 	if #tg>1 then
-		tg=tg:Select(ep,1,1,nil)
+		tg=tg:Select(tp,1,1,nil)
 	end
-	Duel.ConfirmCards(1-ep,tg)
-	Duel.ShuffleHand(ep)
+	Duel.ConfirmCards(1-tp,tg)
+	Duel.ShuffleHand(tp)
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(ep,2) end
-	Duel.SetTargetPlayer(ep)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
+	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(2)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,ep,2)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 end
 function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
 	local c=e:GetHandler()
 	if p~=c:GetControler() then
-		Duel.RaiseSingleEvent(c,EVENT_CUSTOM+id,e,0,ep,ep,0)
+		Duel.RaiseSingleEvent(c,EVENT_CUSTOM+id,e,0,tp,tp,0)
 	end
 end
 function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk)
