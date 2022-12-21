@@ -19,6 +19,7 @@ function s.initial_effect(c)
 	--Special Summon itself if an EARTH Machine monster is banished face-up
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_REMOVE)
+	e2:SetCondition(s.spcond2)
 	c:RegisterEffect(e2)
 	-- If attached to a Machine Xyz monster, monsters your opponent controls are changed to Defense Position
 	local e3=Effect.CreateEffect(c)
