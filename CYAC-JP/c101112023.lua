@@ -17,13 +17,13 @@ function s.initial_effect(c)
 	--Shuffle itself into the Deck, summon a copy and change the target's ATK to 0
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_TODECK)
+	e2:SetCategory(CATEGORY_TODECK+CATEGORY_SPECIAL_SUMMON+CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
-	e2:SetCountLimit(1,id)
+	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(function(_,tp) return Duel.IsTurnPlayer(1-tp) end)
 	e2:SetTarget(s.tdtg)
 	e2:SetOperation(s.tdop)
@@ -63,7 +63,7 @@ end
 function s.spfilter(c,e,tp)
 	return c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.cfilter(chkc) and chkc~=c end
 	if chk==0 then return c:IsAbleToDeck() and Duel.GetMZoneCount(tp,c)>0
@@ -78,8 +78,8 @@ end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 and c:IsLocation(LOCATION_DECK) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) then
+	if Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 and c:IsLocation(LOCATION_DECK)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 		if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
