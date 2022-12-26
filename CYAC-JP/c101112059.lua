@@ -62,7 +62,7 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
-	if #g==0 then return end
+	if #g<2 then return end
 	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,aux.dncheck,1,tp,HINTMSG_ATOHAND)
 	if #sg>0 then
 		Duel.SendtoHand(sg,tp,REASON_EFFECT)
@@ -88,6 +88,6 @@ end
 function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,s.rmfilter,tp,LOCATION_EXTRA,0,1,1,nil,tp)
-	Duel.Remove(g,POS_FACEDOWN,REASON_COST)
+	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT+REASON_REPLACE)
 	Duel.Hint(HINT_CARD,0,id)
 end
