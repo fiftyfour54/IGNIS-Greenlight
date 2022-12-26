@@ -1,5 +1,5 @@
---驚楽園の死配人 ＜Ａｒｌｅｃｈｉｎｏ＞
---Amazement Administrator Arlekino
+--恐楽園の死配人 ＜Ａｒｌｅｃｈｉｎｏ＞
+--Amazement Dominator Arlekino
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
@@ -14,14 +14,14 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--Shuffle itself into the Deck, summon a copy and change the target's ATK to 0
+	--Shuffle itself into the Deck and Special Summon "Amazement Administrator Arlekino"
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TODECK+CATEGORY_SPECIAL_SUMMON+CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(function(_,tp) return Duel.IsTurnPlayer(1-tp) end)
@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_AMAZEMENT}
-s.listed_names={id,20989253}
+s.listed_names={94821366,20989253}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_AMAZEMENT),tp,LOCATION_MZONE,0,1,nil)
 end
@@ -61,7 +61,7 @@ function s.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and c:GetAttack()>0
 end
 function s.spfilter(c,e,tp)
-	return c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(94821366) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
@@ -78,13 +78,15 @@ end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 and c:IsLocation(LOCATION_DECK)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) then
+	if Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 and c:IsLocation(LOCATION_DECK|LOCATION_EXTRA)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 		if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
 			local tc=Duel.GetFirstTarget()
-			if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
+			if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+				Duel.BreakEffect()
+				--Change its ATK to 0
 				local e1=Effect.CreateEffect(c)
 				e1:SetType(EFFECT_TYPE_SINGLE)
 				e1:SetCode(EFFECT_SET_ATTACK_FINAL)
