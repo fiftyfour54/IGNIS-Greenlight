@@ -1,4 +1,6 @@
+--ロードアームズ－ソードブレイカー
 --Road Arms - Sword Breaker
+--scripted by YoshiDuels
 local s,id=GetID()
 function s.initial_effect(c)
 	--equip
