@@ -50,9 +50,6 @@ end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==1-tp and re:IsMonsterEffect()-- and Duel.IsChainDisablable(ev) or re:GetHandler():IsDestructable() --to be checked later
 end
-function s.spfilter(c,e,tp)
-	return c:IsCode(CARD_DARK_MAGICIAN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsAbleToDeck() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToDeck,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,nil) end
@@ -61,7 +58,7 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,tc,1,0,0)
 	if tc:GetOwner()==tp and re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,tp,0)
-	elseif tc:GetOwner()==1-tp
+	elseif tc:GetOwner()==1-tp then
 		Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 	end
 end
@@ -70,7 +67,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if not (tc:IsRelateToEffect(e) and Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0) then return end
 	if tc:GetOwner()==tp and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
-	elseif tc:GetOwner()==1-tp
+	elseif tc:GetOwner()==1-tp then
 		Duel.NegateEffect(ev)
 	end
 end
