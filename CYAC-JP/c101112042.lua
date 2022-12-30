@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1)
 	e1:SetCondition(s.atkcon)
 	e1:SetTarget(s.atktg)
-	e1:SetOperation(a.atkop)
+	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
 	--special summon
 	local e2=Effect.CreateEffect(c)
@@ -36,8 +36,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
 	if #g==0 then return end
-	local tc=g:GetFirst()
-	for tc in aux.Next(g) do
+	for tc in g:Iter do
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -48,6 +47,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local dg=Duel.GetMatchingGroup(Card.IsNegatable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	if #dg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 		Duel.BreakEffect()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
 		local dc=g:Select(tp,1,1,nil):GetFirst()
 		Duel.NegateRelatedChain(dc,RESET_TURN_SET)
 		local e1=Effect.CreateEffect(c)
