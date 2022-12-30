@@ -81,7 +81,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.spfilter(c,e,tp)
 	return c:IsRace(RACE_SPELLCASTER) and c:IsAttribute(ATTRIBUTE_LIGHT)
-		c:GetAttack()==c:GetDefense() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and c:GetAttack()==c:GetDefense() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
