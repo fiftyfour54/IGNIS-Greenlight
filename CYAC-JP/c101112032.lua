@@ -1,10 +1,9 @@
 --ウサミミ導師
 --Bunny Instruct-ear
 --scripted by Naim
-local BUNNY_EARS_COUNTER=0x1208
 local s,id=GetID()
 function s.initial_effect(c)
-	--Add Counters
+	--Add 1 Bunny Ears Counter to a monster on the field
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_COUNTER)
@@ -15,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.countertg)
 	e1:SetOperation(s.counterop)
 	c:RegisterEffect(e1)
-	--Monsters with counters cannot be destroyed by battle
+	--Monsters with Bunny Ears counters cannot be destroyed by battle
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
@@ -24,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetTarget(function(e,c) return c:GetCounter(0x1208)>0 end)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
-	--Banish itself and a monster with counters
+	--Banish itself and a monster with a Bunny Ears Counter
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_REMOVE)
