@@ -30,26 +30,26 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	--Cannot activate monsters effects from the hand
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e1:SetTargetRange(1,0)
 	e1:SetValue(s.aclimit)
 	Duel.RegisterEffect(e1,tp)
-	--Can Normal Summon/Set twice per turn
+	--Draw 2 cards during the Draw Phase
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_SET_SUMMON_COUNT_LIMIT)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetCode(EFFECT_DRAW_COUNT)
 	e2:SetTargetRange(1,0)
 	e2:SetValue(2)
 	Duel.RegisterEffect(e2,tp)
-	--Draw 2 cards during the Draw Phase
+	--Can Normal Summon/Set twice per turn
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_DRAW_COUNT)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetCode(EFFECT_SET_SUMMON_COUNT_LIMIT)
 	e3:SetTargetRange(1,0)
 	e3:SetValue(2)
 	Duel.RegisterEffect(e3,tp)
@@ -68,17 +68,17 @@ function s.gycost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,s.cfilter,1,1,REASON_COST+REASON_DISCARD)
 end
 function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,id+1)==0 end
+	if chk==0 then return Duel.GetFlagEffect(tp,id+100)==0 end
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.RegisterFlagEffect(tp,id+1,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,id+100,RESET_PHASE+PHASE_END,0,1)
 	--Prevent activations when you Normal Summon
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(s.limcon)
 	e1:SetOperation(s.limop)
+	e1:SetReset(RESET_PHASE|PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.limcon(e,tp,eg,ep,ev,re,r,rp)
@@ -88,5 +88,5 @@ function s.limop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SetChainLimitTillChainEnd(s.chainlm)
 end
 function s.chainlm(e,rp,tp)
-	return tp==rp and not e:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return tp==rp or not e:IsMonsterEffect()
 end
