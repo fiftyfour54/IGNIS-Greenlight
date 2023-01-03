@@ -29,7 +29,7 @@ end
 function s.cfilter2(c)
 	return s.cfilter(c) and c:IsNegatableMonster()
 end
-function s.cilter3(c)
+function s.cfilter3(c)
 	return s.cfilter(c) and c:IsAbleToHand()
 end
 function s.costfilter(c,op1,op2,op3)
