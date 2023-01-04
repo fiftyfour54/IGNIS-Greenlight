@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(TIMING_DAMAGE_STEP,TIMING_DAMAGE_STEP+TIMINGS_CHECK_MONSTER_E)
-	e1:SetCountLimit(1,id)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
@@ -41,11 +41,10 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local op1=Duel.IsExistingTarget(s.cfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) and (phase~=PHASE_DAMAGE or not Duel.IsDamageCalculated())
 	local op2=Duel.IsExistingTarget(s.cfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) and phase~=PHASE_DAMAGE
 	local op3=Duel.IsExistingTarget(s.cfilter3,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) and phase~=PHASE_DAMAGE
-	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_DECK|LOCATION_EXTRA,0,1,nil,op1,op2,op3) end
+	if chk==0 then return (op1 or op2 or op3) and Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_DECK|LOCATION_EXTRA,0,1,nil,op1,op2,op3) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_DECK|LOCATION_EXTRA,0,1,1,nil,op1,op2,op3)
-	Duel.SendtoGrave(g,REASON_COST)
-	local sc=g:GetFirst()
+	local sc=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_DECK|LOCATION_EXTRA,0,1,1,nil,op1,op2,op3):GetFirst()
+	Duel.SendtoGrave(sc,REASON_COST)
 	if sc:IsMonster() then
 		e:SetLabel(1)
 		e:SetCategory(CATEGORY_ATKCHANGE)
@@ -68,26 +67,26 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not (tc:IsRelateToEffect(e) and tc:IsFaceup()) then return end
-	if e:GetLabel()==1 then
-		--Change its ATK to 0 until the End Phase
+	if not tc:IsRelateToEffect(e) then return end
+	if e:GetLabel()==1 and tc:IsFaceup() then
+		--Change its ATK to 0 until the end of this turn
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e1:SetValue(0)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
-	elseif e:GetLabel()==2 then
-		--Negate its effects until the End Phase
+	elseif e:GetLabel()==2 and tc:IsFaceup() then
+		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+		--Negate its effects until the end of this turn
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_SINGLE)
+		local e2=e1:Clone()
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e2:SetValue(RESET_TURN_SET)
 		tc:RegisterEffect(e2)
 	elseif e:GetLabel()==3 then
 		--Return it to the hand

@@ -9,11 +9,11 @@ function s.initial_effect(c)
 	--Can only Special Summon Insect monsters
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(1,0)
-	e1:SetTarget(aux.NOT(aux.TargetBoolFunction(Card.IsRace,RACE_INSECT)))
+	e1:SetTarget(function(_,c) return not c:IsRace(RACE_INSECT) end)
 	c:RegisterEffect(e1)
 	--Add 1 "Beetrooper" card from the Deck to the hand
 	local e2=Effect.CreateEffect(c)
@@ -57,7 +57,8 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.spcfilter(c)
-	return c:IsFaceup() and c:IsMonster() and c:IsRace(RACE_INSECT)
+	if c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousRaceOnField()&RACE_INSECT==0 then return false end
+	return c:IsFaceup() and c:IsRace(RACE_INSECT)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.spcfilter,1,nil,tp)

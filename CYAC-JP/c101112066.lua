@@ -56,44 +56,40 @@ function s.shipfilter(c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.shipfilter,tp,LOCATION_EXTRA,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_COUNTER,e:GetHandler(),1,tp,0x20d)
+	local c=e:GetHandler()
+	Duel.SetOperationInfo(0,CATEGORY_COUNTER,c,1,tp,0x20d)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TODECK,c,1,0,0)
 end
 function s.thfilter(c,code)
 	return c:IsCode(code) and c:IsAbleToHand()
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFaceup() and c:IsRelateToEffect(e) and c:AddCounter(0x20d,1) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-		local g=Duel.SelectMatchingCard(tp,s.shipfilter,tp,LOCATION_EXTRA,0,1,1,nil)
-		if #g>0 then
-			Duel.ConfirmCards(1-tp,g)
-			Duel.ShuffleHand(tp)
-			local res=Duel.SelectCardsFromCodes(1-tp,1,1,false,false,suship_names)
-			Duel.Hint(HINT_CARD,1-tp,res)
-			if Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,res) then
-				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-				local sc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,res)
-				if #sc>0 then
-					Duel.SendtoHand(sc,nil,REASON_EFFECT)
-					Duel.ConfirmCards(1-tp,sc)
-				end
-			elseif e:GetHandler():IsAbleToDeck() then
-				Duel.SendtoDeck(e:GetHandler(),nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
-			end
-		end
+	if not c:AddCounter(0x20d,1) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+	local g=Duel.SelectMatchingCard(tp,s.shipfilter,tp,LOCATION_EXTRA,0,1,1,nil)
+	if #g==0 then return end
+	Duel.ConfirmCards(1-tp,g)
+	Duel.ShuffleExtra(tp)
+	local res=Duel.SelectCardsFromCodes(1-tp,1,1,false,false,suship_names)
+	Duel.Hint(HINT_CARD,1-tp,res)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local sc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,res)
+	if #sc>0 then
+		Duel.SendtoHand(sc,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,sc)
+	elseif c:IsRelateToEffect(e) then
+		Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	end
 end
 function s.lpcond(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousControler(tp) and c:IsReason(REASON_DESTROY) and c:GetReasonPlayer()==1-tp 
-		and e:GetLabelObject():GetLabel()>0
 end
 function s.lpop(e,tp,eg,ep,ev,re,r,rp)
 	local value=e:GetLabelObject():GetLabel()*500
-	if Duel.GetLP(1-tp) >= value then
+	if Duel.GetLP(1-tp)>=value then
 		Duel.PayLPCost(1-tp,value)
 	end
 end

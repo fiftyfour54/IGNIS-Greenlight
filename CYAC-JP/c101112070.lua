@@ -21,12 +21,13 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetHintTiming(0,TIMING_END_PHASE)
 	e2:SetCountLimit(1,id)
-	e2:SetCondition(s.thcon)
+	e2:SetCondition(function(_,tp) return Duel.GetFlagEffect(tp,id)>0 and Duel.GetCurrentPhase()==PHASE_END end)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
-	-- Check for Fusion Monsters sent to the GY
+	--Check for Fusion Monsters sent to the GY
 	aux.GlobalCheck(s,function()
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -36,37 +37,6 @@ function s.initial_effect(c)
 	end)
 end
 s.listed_names={CARD_ALBAZ}
-function s.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:ListsCodeAsMaterial(CARD_ALBAZ)
-		and Duel.IsExistingMatchingCard(Card.IsNegatable,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
-end
-function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil,tp) end
-	local g=Duel.GetMatchingGroup(Card.IsNegatable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,(#g-1),0,0)
-end
-function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local exc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil)
-	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(Card.IsNegatable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
-	g:RemoveCard(exc)
-	if #g==0 then return end
-	for tc in g:Iter() do
-		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e2:SetValue(RESET_TURN_SET)
-		tc:RegisterEffect(e2)
-	end
-end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	for tc in eg:Iter() do
 		if tc:IsType(TYPE_FUSION) then 
@@ -74,15 +44,46 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,id)>0 and Duel.GetCurrentPhase()==PHASE_END
+function s.cfilter(c,sc)
+	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:ListsCodeAsMaterial(CARD_ALBAZ)
+		and Duel.IsExistingMatchingCard(Card.IsNegatable,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,Group.FromCards(c,sc))
+end
+function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil,c) end
+	local g=Duel.GetMatchingGroup(Card.IsNegatable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,c)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,(#g-1),0,0)
+end
+function s.disop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local exc=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil,c)
+	if #exc==0 then return end
+	Duel.HintSelection(exc,true)
+	local g=Duel.GetMatchingGroup(Card.IsNegatable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,exc:AddCard(c))
+	for tc in g:Iter() do
+		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+		--Negate its effects
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_DISABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_DISABLE_EFFECT)
+		e2:SetValue(RESET_TURN_SET)
+		tc:RegisterEffect(e2)
+	end
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToHand() end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToHand() end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,c,1,0,0)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsRelateToEffect(e) then
-		Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.SendtoHand(c,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,c)
 	end
 end
