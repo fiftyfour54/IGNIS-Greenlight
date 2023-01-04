@@ -89,7 +89,7 @@ function s.lpcond(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.lpop(e,tp,eg,ep,ev,re,r,rp)
 	local value=e:GetLabelObject():GetLabel()*500
-	if Duel.GetLP(1-tp)>=value then
+	if value>0 and Duel.GetLP(1-tp)>=value then
 		Duel.PayLPCost(1-tp,value)
 	end
 end

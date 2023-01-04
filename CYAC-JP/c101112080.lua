@@ -13,16 +13,13 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--Create the table for declaring a number
-	aux.GlobalCheck(s,function()
-		s.declare_lp_table={}
-		for i=1,30 do
-			s.declare_lp_table[i]=i*100
-		end
-	end)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>=5 end
+end
+local declare_lp_table={}
+for i=1,30 do
+	declare_lp_table[i]=i*100
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmDecktop(1-tp,5)
@@ -31,7 +28,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local sc=g:Select(tp,1,1,nil):GetFirst()
 	Duel.ConfirmCards(1-tp,sc)
-	local ac=Duel.AnnounceNumber(tp,s.declare_lp_table)
+	local ac=Duel.AnnounceNumber(tp,declare_lp_table)
 	if sc:IsAbleToHand() and Duel.SelectYesNo(1-tp,aux.Stringid(id,1))
 		and Duel.Recover(1-tp,ac,REASON_EFFECT)>0 then
 		Duel.SetLP(tp,Duel.GetLP(tp)-ac)
