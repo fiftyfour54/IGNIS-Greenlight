@@ -44,9 +44,6 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local flag=e:GetLabel()
 	local c=e:GetHandler()
-	
-	-- CHANGE THE FLAG ID?
-	
 	if (flag&1)>0 then
 		--The ATK of your "Dual Avatar" monsters become 3000 during Damage Calculation
 		local e1=Effect.CreateEffect(c)
