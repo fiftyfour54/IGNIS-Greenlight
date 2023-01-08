@@ -1,5 +1,5 @@
---Japanese name
---Dual Avatar Lion Disciples - Aun
+--双天の獅使－阿吽
+--Dual Avatar Lion Envoys - Ah-Un
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
@@ -37,27 +37,29 @@ s.listed_series={SET_DUAL_AVATAR}
 function s.valcheck(e,c)
 	local g=c:GetMaterial()
 	local flag=0
-	if g:IsExists(Card.IsCode,1,nil,33026283) then flag=flag+1 end
-	if g:IsExists(Card.IsCode,1,nil,284224) then flag=flag+2 end
+	if g:IsExists(Card.IsOriginalCode,1,nil,33026283) then flag=flag+1 end
+	if g:IsExists(Card.IsOriginalCode,1,nil,284224) then flag=flag+2 end
 	e:GetLabelObject():SetLabel(flag)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local flag=e:GetLabel()
 	local c=e:GetHandler()
+	
+	-- CHANGE THE FLAG ID?
+	
 	if (flag&1)>0 then
 		--The ATK of your "Dual Avatar" monsters become 3000 during Damage Calculation
 		local e1=Effect.CreateEffect(c)
-		e1:SetCategory(CATEGORY_ATKCHANGE)
 		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e1:SetRange(LOCATION_MZONE)
 		e1:SetTargetRange(LOCATION_MZONE,0)
-		e1:SetTarget(s.atktg)
 		e1:SetCondition(function() return Duel.GetCurrentPhase()==PHASE_DAMAGE_CAL end)
+		e1:SetTarget(function(_,c) return c:IsSetCard(SET_DUAL_AVATAR) and c:IsRelateToBattle() end)
 		e1:SetValue(3000)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		c:RegisterEffect(e1)
-		c:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,2))
+		c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,2))
 	end
 	if (flag&2)>0 then
 		--Banish 1 card on the field during the opponent's turn
@@ -65,8 +67,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetDescription(aux.Stringid(id,1))
 		e2:SetCategory(CATEGORY_REMOVE)
 		e2:SetType(EFFECT_TYPE_QUICK_O)
-		e2:SetCode(EVENT_FREE_CHAIN)
 		e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+		e2:SetCode(EVENT_FREE_CHAIN)
 		e2:SetRange(LOCATION_MZONE)
 		e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 		e2:SetCountLimit(1)
@@ -75,11 +77,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetOperation(s.rmop)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 		c:RegisterEffect(e2)
-		c:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,3))
+		c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,3))
 	end
-end
-function s.atktg(e,c)
-	return c:IsSetCard(SET_DUAL_AVATAR) and c:IsRelateToBattle()
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsAbleToRemove() end
@@ -117,13 +116,14 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if #g==0 then return end
 	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,1,tp,HINTMSG_SPSUMMON)
 	if #sg==0 then return end
+	local c=e:GetHandler()
 	for tc in sg:Iter() do
 		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
 			--Cannot be destroyed by battle
-			local e1=Effect.CreateEffect(e:GetHandler())
+			local e1=Effect.CreateEffect(c)
 			e1:SetDescription(3008)
-			e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 			e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 			e1:SetValue(1)
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
