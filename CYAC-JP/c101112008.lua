@@ -31,48 +31,39 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
-function s.spfilter(c,e,tp)
-	return c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function s.ctrlfilter(c)
-	return c:IsFaceup() and c:IsRace(RACE_DRAGON) and c:IsControlerCanBeChanged(true)
+function s.cfilter(c,e,tp)
+	return c:IsRace(RACE_DRAGON) and
+		((c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsControlerCanBeChanged(true))
+		 or (c:IsLocation(LOCATION_GRAVE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetMZoneCount(tp,e:GetHandler())>0))
 end
 --Note:
 --the parameter set to true in IsControlerCanBeChanged allows this to be activated even if all mzones are full
 --because Aluber will send itself to the graveyard. If this is incorrect, remove the parameter.
---A similar reason is being used with "b2", for the special summon alternative (a zone will be free after using it)
+--A similar reason is being used for the special summon (a zone will be free after using it)
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local c=e:GetHandler()
-	local b1=Duel.IsExistingTarget(s.ctrlfilter,tp,0,LOCATION_MZONE,1,nil)
-	local b2=Duel.GetMZoneCount(tp,c)>0 and Duel.IsExistingTarget(s.spfilter,tp,0,LOCATION_GRAVE,1,nil,e,tp)
-	if chkc then
-		--TO DO
-	end
-	if chk==0 then return c:IsAbleToGrave() and (b1 or b2) end
-	local op=Duel.SelectEffect(tp,{b1,aux.Stringid(id,1)},{b2,aux.Stringid(id,2)})
-	if op==1 then
+	if chkc then return s.cfilter(chkc,e,tp) end
+	if chk==0 then return e:GetHandler():IsAbleToGrave() and Duel.IsExistingTarget(s.cfilter,tp,0,LOCATION_MZONE|LOCATION_GRAVE,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_APPLYTO)
+	local tc=Duel.SelectTarget(tp,s.cfilter,tp,0,LOCATION_MZONE|LOCATION_GRAVE,1,1,nil,e,tp):GetFirst()
+	if tc:IsLocation(LOCATION_MZONE) then
+		e:SetLabel(1)
 		e:SetCategory(CATEGORY_CONTROL)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
-		local g=Duel.SelectTarget(tp,s.ctrlfilter,tp,0,LOCATION_MZONE,1,1,nil)
-		Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_CONTROL,tc,1,0,0)
 	else
+		e:SetLabel(2)
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectTarget(tp,s.spfilter,tp,0,LOCATION_GRAVE,1,1,nil,e,tp)
-		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,tc,1,0,0)
 	end
-	e:SetLabel(op)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,c,1,tp,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,e:GetHandler(),1,tp,0)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsAbleToGrave() and Duel.SendtoGrave(c,REASON_EFFECT)>0 and c:IsLocation(LOCATION_GRAVE) then
 		local tc=Duel.GetFirstTarget()
 		if not tc:IsRelateToEffect(e) then return end
-		local op=e:GetLabel()
-		if op==1 then
+		if e:GetLabel()==1 then
 			Duel.GetControl(tc,tp,PHASE_END,1)
-		elseif op==2 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+		elseif e:GetLabel()==2 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
