@@ -8,12 +8,14 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--Synchro Summon
+	--Synchro Summon using a Dragon monster
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_SZONE)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e2:SetCountLimit(1,id)
 	e2:SetTarget(s.sctg)
 	e2:SetOperation(s.scop)
@@ -21,10 +23,11 @@ function s.initial_effect(c)
 	--Banished instead
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_TO_GRAVE_REDIRECT)
 	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e3:SetCode(EFFECT_TO_GRAVE_REDIRECT)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetTargetRange(0,0xff)
+	e3:SetCondition(s.rmcon)
 	e3:SetTarget(s.rmtg)
 	e3:SetValue(LOCATION_REMOVED)
 	c:RegisterEffect(e3)
@@ -52,9 +55,12 @@ function s.scop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Synchro.CheckAdditional=nil
 end
+function s.rmcon(e)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_BYSTIAL),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+end
 function s.rmtg(e,c)
 	local tp=e:GetHandlerPlayer()
-	return c:GetOwner()~=tp and Duel.IsPlayerCanRemove(tp,c) 
+	return c:GetOwner()==1-tp and Duel.IsPlayerCanRemove(tp,c) 
 		and (c:GetReason()&(REASON_RELEASE|REASON_RITUAL)==(REASON_RELEASE|REASON_RITUAL)
 		or c:IsReason(REASON_FUSION|REASON_SYNCHRO|REASON_LINK))
 end

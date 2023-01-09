@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_MOVE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,{id,1})
@@ -31,7 +31,8 @@ function s.initial_effect(c)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
 end
-s.listed_names={CARD_ALBAZ}
+s.listed_series={SET_DOGMATIKA,SET_DESPIA}
+s.listed_names={CARD_ALBAZ,id}
 function s.tgfilter(c)
 	return (c:IsCode(CARD_ALBAZ) or c:ListsCode(CARD_ALBAZ)) and c:IsAbleToGrave()
 end
