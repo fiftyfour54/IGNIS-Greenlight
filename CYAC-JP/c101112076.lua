@@ -26,6 +26,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.nodamop)
 	c:RegisterEffect(e2)
 end
+s.listed_series={SET_DINOMORPHIA}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsMonsterEffect() and Duel.IsChainNegatable(ev)
 		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_DINOMORPHIA),tp,LOCATION_ONFIELD,0,1,nil)
@@ -49,7 +50,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(1,0)
 	e1:SetValue(function(e) return Duel.GetLP(e:GetHandlerPlayer())//2 end)
-	e1:SetReset(RESET_PHASE+PHASE_END,1)
+	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 	--Negate the activation and destroy the monster
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
