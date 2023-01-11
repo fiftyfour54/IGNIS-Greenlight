@@ -8,12 +8,12 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--Apply one effect if the opponent Special Summons a monster
+	--Activate 1 effect if the opponent Special Summons a monster
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetCondition(s.condition)
 	e2:SetTarget(s.target)
@@ -22,13 +22,13 @@ function s.initial_effect(c)
 end
 s.listed_names={CARD_ALBAZ}
 function s.cfilter(c,tp)
-	return c:IsSummonPlayer(tp) and c:IsType(TYPE_RITUAL|TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
+	return c:IsSummonPlayer(1-tp) and c:IsType(TYPE_RITUAL|TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK) and c:IsFaceup()
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
 end
 function s.albazfilter(c)
-	return (c:IsCode(CARD_ALBAZ) or (c:IsMonster() and c:ListsCode(CARD_ALBAZ)))
+	return c:IsCode(CARD_ALBAZ) or (c:IsMonster() and c:ListsCode(CARD_ALBAZ))
 end
 function s.thfilter(c)
 	return s.albazfilter(c) and c:IsAbleToHand()
@@ -45,9 +45,11 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		{b1,aux.Stringid(id,1)},
 		{b2,aux.Stringid(id,2)})
 	if op==1 then
+		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 		e:SetCategory(CATEGORY_SEARCH|CATEGORY_TOHAND)
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 	else
+		Duel.RegisterFlagEffect(tp,id+100,RESET_PHASE+PHASE_END,0,1)
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 	end
