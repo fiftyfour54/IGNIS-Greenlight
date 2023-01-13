@@ -41,32 +41,32 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not (tc:IsRelateToEffect(e) and tc:IsFaceup()) then return end
 	local paylp=false
 	local c=e:GetHandler()
-	local atk,o_atk=tc:GetAttack(),tc:GetBaseAttack()
-	if atk~=o_atk then
+	local current,origin=tc:GetAttack(),tc:GetBaseAttack()
+	if current~=origin then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e1:SetValue(o_atk)
+		e1:SetValue(origin)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1)
 		paylp=true
 	end
-	local def,o_def=tc:GetDefense(),tc:GetBaseDefense()
-	if def~=o_def then
+	current,origin=tc:GetDefense(),tc:GetBaseDefense()
+	if current~=origin then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_DEFENSE_FINAL)
-		e1:SetValue(o_def)
+		e1:SetValue(origin)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1)
 		paylp=true
 	end
-	local lvl,o_lvl=tc:GetLevel(),tc:GetOriginalLevel()
-	if lvl~=o_lvl then
+	current,origin=tc:GetLevel(),tc:GetOriginalLevel()
+	if current~=origin then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CHANGE_LEVEL_FINAL)
-		e1:SetValue(o_lvl)
+		e1:SetValue(origin)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1)
 		paylp=true
