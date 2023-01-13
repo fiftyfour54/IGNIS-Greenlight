@@ -58,20 +58,6 @@ function s.thtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_EXTRA)
 end
 function s.thop2(e,tp,eg,ep,ev,re,r,rp)
-	local lsc=Duel.GetFieldCard(tp,LOCATION_PZONE,0)
-	local rsc=Duel.GetFieldCard(tp,LOCATION_PZONE,1)
-	if not (lsc and rsc) then return end
-	lsc=lsc:GetLeftScale()
-	rsc=rsc:GetRightScale()
-	if lsc>rsc then lsc,rsc=rsc,lsc end
-	Debug.Message(lsc)
-	Debug.Message(rsc)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local sg=Duel.SelectMatchingCard(tp,s.thfilter2,tp,LOCATION_EXTRA,0,1,2,nil,lsc,rsc)
-	if #sg>0 then
-		Duel.SendtoHand(sg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,sg)
-	end
 	local c=e:GetHandler()
 	-- Cannot activate monster effects
 	local e1=Effect.CreateEffect(c)
@@ -98,6 +84,19 @@ function s.thop2(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetOperation(s.checkop)
 	e3:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e3,tp)
+	--Add cards to the hand
+	local lsc=Duel.GetFieldCard(tp,LOCATION_PZONE,0)
+	local rsc=Duel.GetFieldCard(tp,LOCATION_PZONE,1)
+	if not (lsc and rsc) then return end
+	lsc=lsc:GetLeftScale()
+	rsc=rsc:GetRightScale()
+	if lsc>rsc then lsc,rsc=rsc,lsc end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local sg=Duel.SelectMatchingCard(tp,s.thfilter2,tp,LOCATION_EXTRA,0,1,2,nil,lsc,rsc)
+	if #sg>0 then
+		Duel.SendtoHand(sg,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,sg)
+	end
 end
 function s.psfilter(c,tp)
 	return c:IsSummonPlayer(tp) and c:IsSummonType(SUMMON_TYPE_PENDULUM)
