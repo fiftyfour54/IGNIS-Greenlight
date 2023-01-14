@@ -26,8 +26,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.cfilter(c)
-	return c:IsFaceup() and (Duel.GetCurrentPhase()~=PHASE_DAMAGE) or 
-		((c:GetAttack()~=c:GetBaseAttack() or c:GetDefense()~=c:GetBaseDefense()) and not Duel.IsDamageCalculated())
+	return c:IsFaceup() and (c:GetLevel()>c:GetOriginalLevel()or c:GetAttack()>c:GetBaseAttack() or c:GetDefense()>c:GetBaseDefense())
+		and ((Duel.GetCurrentPhase()~=PHASE_DAMAGE) or (c:GetAttack()>c:GetBaseAttack() or c:GetDefense()>c:GetBaseDefense()) and not Duel.IsDamageCalculated())
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.cfilter(chkc) end
