@@ -33,12 +33,13 @@ function s.counterfilter(c)
 	return not (c:IsType(TYPE_SYNCHRO) and c:IsSummonType(SUMMON_TYPE_SYNCHRO))
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsNonEffectMonster),tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsNonEffectMonster),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -57,8 +58,12 @@ function s.tkop(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,101112129,0,TYPES_TOKEN,100,100,2,RACE_WYRM,ATTRIBUTE_LIGHT) then
 		local token=Duel.CreateToken(tp,101112129)
 		if Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP) then
-			--Can be treated as Tuner for Synchro Summon
-			--To be added
+			--Can be treated as a Tuner if used as Synchro Material
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(30765615)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+			token:RegisterEffect(e1)
 		end
 		Duel.SpecialSummonComplete()
 	end

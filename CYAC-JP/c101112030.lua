@@ -40,21 +40,25 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_EXTRA,0,1,1,nil):GetFirst()
 	if tc and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND) then
 		Duel.ConfirmCards(1-tp,tc)
+		local c=e:GetHandler()
+		if not c:IsRelateToEffect(e) then return end
 		Duel.BreakEffect()
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+		Duel.Destroy(c,REASON_EFFECT)
 	end
 end
 function s.thfilter2(c,lsc,rsc)
 	return c:IsFaceup() and c:HasLevel() and c:IsType(TYPE_PENDULUM) and c:GetLevel()>lsc and c:GetLevel()<rsc and c:IsAbleToHand()
 end
 function s.thtg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	local lsc=Duel.GetFieldCard(tp,LOCATION_PZONE,0)
-	local rsc=Duel.GetFieldCard(tp,LOCATION_PZONE,1)
-	if chk==0 and not (lsc and rsc) then return false end
-	lsc=lsc:GetLeftScale()
-	rsc=rsc:GetRightScale()
-	if lsc>rsc then lsc,rsc=rsc,lsc end
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter2,tp,LOCATION_EXTRA,0,1,nil,lsc,rsc) end
+	if chk==0 then
+		local lsc=Duel.GetFieldCard(tp,LOCATION_PZONE,0)
+		local rsc=Duel.GetFieldCard(tp,LOCATION_PZONE,1)
+		if not (lsc and rsc) then return false end
+		lsc=lsc:GetLeftScale()
+		rsc=rsc:GetRightScale()
+		if lsc>rsc then lsc,rsc=rsc,lsc end
+		return Duel.IsExistingMatchingCard(s.thfilter2,tp,LOCATION_EXTRA,0,1,nil,lsc,rsc)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_EXTRA)
 end
 function s.thop2(e,tp,eg,ep,ev,re,r,rp)

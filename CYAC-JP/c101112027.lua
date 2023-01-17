@@ -15,7 +15,6 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetRange(LOCATION_HAND)
 	e2:SetCountLimit(1,id)
 	e2:SetCost(s.nscost)
@@ -35,8 +34,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function s.nscost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not e:GetHandler():IsPublic() end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
+	local c=e:GetHandler()
+	if chk==0 then return not c:IsPublic() end
+	Duel.ConfirmCards(1-tp,c)
 	Duel.ShuffleHand(tp)
 end
 function s.sumfilter(c)

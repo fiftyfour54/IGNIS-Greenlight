@@ -3,12 +3,12 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Change monster's attribute to FIRE
+	--Change monsters' Attribute to FIRE
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
 	e1:SetValue(ATTRIBUTE_FIRE)
 	c:RegisterEffect(e1)
 	--Special Summon itself from GY
