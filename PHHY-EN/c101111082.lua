@@ -61,7 +61,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
 	if not g then return end
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
-	g:DeleteGroup()
 	local hc=g:FilterCount(Card.IsPreviousLocation,nil,LOCATION_HAND)
 	local gc=g:FilterCount(Card.IsPreviousLocation,nil,LOCATION_GRAVE)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
@@ -83,6 +82,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
 		c:RegisterEffect(e2)
 	end
+	g:DeleteGroup()
 end
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
