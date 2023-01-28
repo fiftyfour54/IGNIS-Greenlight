@@ -71,24 +71,59 @@ function s.GetDeclarableLevels(g)
 	for i=1,12 do
 		res[i] = i
 	end
-	local levels=g:GetClass(Card.GetLevel)
-	local n_mon=#g
-	local n_levels=#levels
-	if n_levels==1 then --If all monsters have the same level, remove that level
-		table.remove(res,levels[#levels])
-		return res
-	elseif (n_mon==2 and n_levels==2) then--If 2 monsters with different levels, remove those levels
-		table.sort(levels)
-		for i=2,1,-1 do
-			table.remove(res,levels[i])
-		end
-	else
+	if (not g or #g<2) then
 		return res
 	end
+	--Particular cases: only 1 or 2 levels among the monsters
+	local n_mon=#g
+	local levels=g:GetClass(Card.GetLevel)
+	local n_levels=#levels
+	
+	if (n_levels==1) then
+		--All monsters with the same level: that level can't be declared
+		table.remove(res,levels[1])
+	elseif (n_levels==2) then
+		table.sort(levels)
+		if (n_mon==2) then
+			--2 monsters, 2 different levels: those levels can't be declared
+			local i=2
+			while i>0 do
+				table.remove(res,levels[i])
+				i=i-1
+			end
+		elseif (n_mon==3) then
+			--If 3 monsters, 2 different levels: the most repeated level can't be declared
+			local temp_lv=s.GetMostCommonLevel(g)
+			table.remove(res,levels[temp_lv])
+		end
+	end
+	return res
 end
 function s.checklevels(c,t)
 	for _,level in ipairs(t) do
 		if c:GetLevel()==level then return true end
 	end
 	return false
+end
+function s.GetMostCommonLevel(g)
+	local templvs={}
+	for tc in g:Iter() do
+		table.insert(templvs,tc:GetLevel())
+	end
+	table.sort(templvs)
+	local res=templvs[1]
+	local ct=1
+	local max_ct= 1
+	for i=2,#templvs do
+		if (templvs[i] == templvs[i - 1]) then
+			ct = ct+1
+		else
+			ct = 1
+		end
+		if (max_ct < ct) then
+			max_ct = ct
+			res = templvs[i-1]
+		end
+	end
+	return res
 end
