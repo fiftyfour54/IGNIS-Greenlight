@@ -1,6 +1,6 @@
+--Japanese name
 --Orphebull the Harmonious Bullfighter Bard
 --Scripted by fiftyfour
-
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableUnsummonable()
@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetValue(aux.FALSE)
-	--Special Summon Condition
+	--Special Summon by banishing 2 LIGHTs and 2 DARK monsters
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
@@ -32,41 +32,38 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function s.spfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and c:IsAbleToRemoveAsCost()
-		and ((c:IsLocation(LOCATION_GRAVE+LOCATION_MZONE) and aux.SpElimFilter(c,true)) or c:IsLocation(LOCATION_HAND))
+	return c:IsMonster() and c:IsAbleToRemoveAsCost() and c:IsAttribute(ATTRIBUTE_LIGHT|ATTRIBUTE_DARK)
+		and ((c:IsLocation(LOCATION_GRAVE|LOCATION_MZONE) and aux.SpElimFilter(c,true)) or c:IsLocation(LOCATION_HAND))
+end
+function s.rescon(sg,e,tp,mg)
+	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(s.attchk,2,nil,sg)
+end
+function s.attchk(c,sg)
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and sg:FilterCount(Card.IsAttribute,c,ATTRIBUTE_DARK)==2
 end
 function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local rg1=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_HAND,0,e:GetHandler(),ATTRIBUTE_DARK)
-	local rg2=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_HAND,0,e:GetHandler(),ATTRIBUTE_LIGHT)
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-4 and #rg1>1 and #rg2>1 and aux.SelectUnselectGroup(rg1:Merge(rg2),e,tp,4,4,aux.ChkfMMZ(1),0)
+	local rg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_MZONE|LOCATION_GRAVE|LOCATION_HAND,0,e:GetHandler())
+	return #rg>=4 and aux.SelectUnselectGroup(rg,e,tp,4,4,s.rescon,0)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,c)
-	local rg1=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_HAND,0,e:GetHandler(),ATTRIBUTE_DARK)
-	local rg2=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_HAND,0,e:GetHandler(),ATTRIBUTE_LIGHT)
-	local rg=rg1:Clone()	
-	rg:Merge(rg2)
-	local g=aux.SelectUnselectGroup(rg,e,tp,4,4,aux.ChkfMMZ(1),1,tp,HINTMSG_REMOVE,nil,nil)
-	if	#g>0 then
-		local tab={}
-		for card in aux.Next(g) do
-			table.insert(tab,card:GetCardID())
-		end
-		e:SetLabel(table.unpack(tab))
+	local rg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_MZONE|LOCATION_GRAVE|LOCATION_HAND,0,e:GetHandler())
+	local g=aux.SelectUnselectGroup(rg,e,tp,4,4, s.rescon,1,tp,HINTMSG_REMOVE)
+	if #g>0 then
+		g:KeepAlive()
+		e:SetLabelObject(g)
 		return true
 	end
 	return false
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Group.CreateGroup()
-	for _,id in pairs({e:GetLabel()}) do
-		local card=Duel.GetCardFromCardID(id)
-		if not card then return end
-		g:AddCard(card)
-	end
-	local hc=g:FilterCount(Card.IsLocation,nil,LOCATION_HAND)
-	local gc=g:FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)
+	local g=e:GetLabelObject()
+	if not g then return end
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
+	g:DeleteGroup()
+	local hc=g:FilterCount(Card.IsPreviousLocation,nil,LOCATION_HAND)
+	local gc=g:FilterCount(Card.IsPreviousLocation,nil,LOCATION_GRAVE)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 	if hc>0 then
 		--Attack gain
@@ -77,7 +74,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
 		e:GetHandler():RegisterEffect(e1)
 	end
-	if gc>0then
+	if gc>0 then
 		--Multiple attacks
 		local e2 = Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
