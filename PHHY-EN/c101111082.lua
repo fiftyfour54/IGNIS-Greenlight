@@ -63,7 +63,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 	local hc=g:FilterCount(Card.IsPreviousLocation,nil,LOCATION_HAND)
 	local gc=g:FilterCount(Card.IsPreviousLocation,nil,LOCATION_GRAVE)
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
 	if hc>0 then
 		--Attack gain
 		local e1=Effect.CreateEffect(e:GetHandler())
