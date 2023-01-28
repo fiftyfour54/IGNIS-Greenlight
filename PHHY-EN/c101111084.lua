@@ -32,7 +32,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local lv=Duel.AnnounceNumber(tp,table.unpack(opts))
 	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon(lv),1,tp,HINTMSG_TARGET)
 	Duel.SetTargetCard(sg)
-	e:SetLabel(lv,sg:GetFirst():GetRace()&sg:GetNext():GetRace())
+	e:SetLabel(lv,sg:GetFirst():GetRace()|sg:GetNext():GetRace())
 	Duel.SetOperationInfo(0,CATEGORY_LVCHANGE,sg,#sg,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
