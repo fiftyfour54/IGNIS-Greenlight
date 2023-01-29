@@ -3,13 +3,14 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Change levels of 2 targets to a declared level
+	--Change Levels of 2 targets to a declared Level
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_LVCHANGE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
@@ -37,7 +38,7 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local lv,races=e:GetLabel()
 	local c=e:GetHandler()
-	--Cannot Special Summon from the Extra Deck, except monster with the same type as the targets
+	--Cannot Special Summon from the Extra Deck, except monster with the same Type as the targets
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(id,1))
@@ -57,7 +58,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CHANGE_LEVEL)
 		e1:SetValue(lv)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 	end
 end

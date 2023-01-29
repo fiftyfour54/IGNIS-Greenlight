@@ -10,11 +10,11 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetValue(aux.FALSE)
-	--Special Summon by banishing 2 LIGHTs and 2 DARK monsters
+	--Special Summon by banishing 2 LIGHT and 2 DARK monsters
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_SPSUMMON_PROC)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetCode(EFFECT_SPSUMMON_PROC)
 	e2:SetRange(LOCATION_HAND)
 	e2:SetCondition(s.spcon)
 	e2:SetTarget(s.sptg)
@@ -65,12 +65,12 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local gc=g:FilterCount(Card.IsPreviousLocation,nil,LOCATION_GRAVE)
 	if hc>0 then
 		--Attack gain
-		local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(hc*1000)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
-		e:GetHandler():RegisterEffect(e1)
+		c:RegisterEffect(e1)
 	end
 	if gc>0 then
 		--Multiple attacks
