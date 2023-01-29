@@ -35,7 +35,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			local sc=g:Select(tp,1,1,nil)
 			Duel.BreakEffect()
 			Duel.SendtoHand(sc,tp,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,sc)
+			Duel.ConfirmCards(1-tp,sc)
 		end
 	end
 end
