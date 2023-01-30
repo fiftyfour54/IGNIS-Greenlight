@@ -19,8 +19,8 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(function (_,tp) return Duel.IsTurnPlayer(1-tp) end)
 	e2:SetTarget(s.tkntg)
@@ -56,41 +56,59 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.tkntg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,NYTRO_TOKEN,0,TYPES_TOKEN,0,0,8,RACE_PYRO,ATTRIBUTE_FIRE) end
+	if chk==0 then return Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,NYTRO_TOKEN,0,TYPES_TOKEN,0,0,8,RACE_PYRO,ATTRIBUTE_FIRE,POS_FACEUP,1-tp) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
 end
 function s.tknop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,NYTRO_TOKEN,0,TYPES_TOKEN,0,0,8,RACE_PYRO,ATTRIBUTE_FIRE) then
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,NYTRO_TOKEN,0,TYPES_TOKEN,0,0,8,RACE_PYRO,ATTRIBUTE_FIRE,POS_FACEUP,1-tp) then
 		local token=Duel.CreateToken(tp,NYTRO_TOKEN)
-		Duel.SpecialSummon(token,0,tp,1-tp,false,false,POS_FACEUP)
+		if Duel.SpecialSummonStep(token,0,tp,1-tp,false,false,POS_FACEUP) then
+			--Cannot be used as Link Material
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetDescription(3312)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+			e1:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+			e1:SetValue(1)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+			token:RegisterEffect(e1)
+		end
+		Duel.SpecialSummonComplete()
 	end
 end
-function s.cfilter(c,tc)
-	if not c:IsControler(tc:GetControler()) then return false end
-	if tc:IsLocation(LOCATION_SZONE) then
-		if c:IsLocation(LOCATION_SZONE) then return c:GetSequence()~=tc:GetSequence() end
-		if c:IsLocation(LOCATION_MZONE) then return c:GetSequence()==tc:GetSequence() end
+function s.cfilter(c,tc,seq)
+	if tc:IsLocation(LOCATION_SZONE) and c:IsControler(tc:GetControler()) then
+		if c:IsLocation(LOCATION_MZONE) then return c:IsSequence(seq) end
+		return true
 	elseif tc:IsLocation(LOCATION_MZONE) then
-		if c:IsLocation(LOCATION_SZONE) then return c:GetSequence()==tc:GetSequence() end
-		if c:IsLocation(LOCATION_MZONE) then return c:GetSequence()~=tc:GetSequence() end
+		if c:IsLocation(LOCATION_SZONE) then
+			return tc:IsInMainMZone() and tc:GetColumnGroup():IsContains(c) and c:IsControler(tc:GetControler())
+		elseif c:IsLocation(LOCATION_MZONE) then
+			if c:IsInExtraMZone() or tc:IsInExtraMZone() then
+				return tc:GetColumnGroup():IsContains(c)
+			else
+				return c:IsSequence(seq-1,seq+1) and c:IsControler(tc:GetControler())
+			end
+		end
 	end
+	return false
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsFaceup() and c:IsCode(NYTRO_TOKEN) end
 	if chk==0 then return Duel.IsExistingTarget(aux.FaceupFilter(Card.IsCode,NYTRO_TOKEN),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local tc=Duel.SelectTarget(tp,aux.FaceupFilter(Card.IsCode,NYTRO_TOKEN),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil):GetFirst()
-	local g=tc:GetColumnGroup(1,1):Filter(s.cfilter,nil,tc)
+	local g=tc:GetColumnGroup(1,1):Filter(s.cfilter,nil,tc,tc:GetSequence())
 	g:Merge(tc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then --and tc:IsType(TYPES_TOKEN) ?
-		local g=tc:GetColumnGroup(1,1):Filter(s.cfilter,nil,tc)
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsType(TYPE_TOKEN) then
+		local g=tc:GetColumnGroup(1,1):Filter(s.cfilter,nil,tc,tc:GetSequence())
 		g:Merge(tc)
 		Duel.Destroy(g,REASON_EFFECT)
 	end

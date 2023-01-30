@@ -1,5 +1,5 @@
 --Japanese name
---Gold Pride - The Crowd Goes Wild
+--Gold Pride - The Crowd Goes Wild!
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
@@ -24,9 +24,6 @@ end
 function s.thfilter(c,code)
 	return c:IsSetCard(SET_GOLD_PRIDE) and c:IsMonster() and not c:IsCode(code) and c:IsAbleToHand()
 end
-function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_GOLD_PRIDE) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
@@ -40,23 +37,25 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(SET_GOLD_PRIDE) and c:IsMonster() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,e:GetLabel())
-	if #g==0 then return end
-	if Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
-		Duel.ConfirmCards(1-tp,g)
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp)
-			and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
-			if tc then
-				Duel.BreakEffect()
-				Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-				local atk=tc:GetTextAttack()
-				if atk>0 then
-					Duel.SetLP(tp,Duel.GetLP(tp)-atk)
-				end
+	if #g==0 or Duel.SendtoHand(g,nil,REASON_EFFECT)==0 then return end
+	Duel.ConfirmCards(1-tp,g)
+	Duel.ShuffleHand(tp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp)
+		and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
+		if not sc then return end
+		Duel.BreakEffect()
+		if Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)>0 then
+			local atk=sc:GetTextAttack()
+			if atk>0 then
+				Duel.SetLP(tp,Duel.GetLP(tp)-atk)
 			end
 		end
 	end

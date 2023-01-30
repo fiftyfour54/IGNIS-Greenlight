@@ -4,19 +4,19 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	--Synchro Summon
+	--Synchro Summon procedure
 	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),1,99)
 	--Increase its own ATK and destroy target
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DESTROY)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetRange(LOCATION_MZONE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetRange(LOCATION_MZONE)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(function() return Duel.IsMainPhase() end )
+	e1:SetCondition(function() return Duel.IsMainPhase() end)
 	e1:SetTarget(s.atktg)
 	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
@@ -28,7 +28,7 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
-	e2:SetCondition(function (_,tp) return Duel.GetFlagEffect(tp,id)>0 end)
+	e2:SetCondition(function (e) return e:GetHandler():GetFlagEffect(id)>0 end)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
@@ -45,43 +45,36 @@ function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,e:GetHandler(),1,0,g:GetFirst():GetBaseAttack())
 	Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	--Register that this effect was activated this turn
-	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not (c:IsRelateToEffect(e) and c:IsFaceup()) then return end
 	local tc=Duel.GetFirstTarget()
+	if not tc:IsRelateToEffect(e)then return end
 	local atk=tc:GetBaseAttack()
-	if c:IsRelateToEffect(e) and c:UpdateAttack(atk,RESET_EVENT+RESETS_STANDARD,c)==atk then
-		if tc:IsRelateToEffect(e) and Duel.GetLP(tp)<Duel.GetLP(1-tp) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-			Duel.BreakEffect()
-			Duel.Destroy(tc,REASON_EFFECT)
-		end
+	if c:UpdateAttack(atk,RESET_EVENT+RESETS_STANDARD,c)==atk and Duel.GetLP(tp)<Duel.GetLP(1-tp)
+		and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		Duel.BreakEffect()
+		Duel.Destroy(tc,REASON_EFFECT)
 	end
-end
-function s.spfilter(c,e,tp)
-	return c:IsCode(101111101) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOEXTRA,e:GetHandler(),1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,LOCATION_DECK|LOCATION_GRAVE)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK|LOCATION_GRAVE)
+end
+function s.spfilter(c,e,tp)
+	return c:IsCode(101111101) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsAbleToExtra() and Duel.SendtoDeck(c,nil,SEQ_DECKBOTTOM,REASON_EFFECT)>0
 		and c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_DECK|LOCATION_GRAVE,0,1,1,nil,e,tp)
-		if tc then
-			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_DECK|LOCATION_GRAVE,0,1,1,nil,e,tp)
+		if #g>0 then
+			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end
-
---[[
-
-1 Tuner + 1+ non-Tuner monsters
-During the Main Phase (Quick Effect): You can target 1 face-up monster your opponent controls; this card gains ATK equal to that target's original ATK, then, if your LP are lower than your opponent's, you can destroy that monster. You can only use the previous effect of "Gold Pride - Star Leon" once per turn. Once per turn, during the End Phase, if the previous effect was activated this turn: Return this card to the Extra Deck, and if you do, Special Summon 1 "Gold Pride - Leon" from your Deck or GY.
-
-]]
