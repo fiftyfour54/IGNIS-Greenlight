@@ -40,7 +40,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function s.tgfilter(e,c)
-	return c:Israce(RACE_DINOSAUR) and c:IsSummonLocation(LOCATION_GRAVE)
+	return c:IsRace(RACE_DINOSAUR) and c:IsSummonLocation(LOCATION_GRAVE)
 end
 function s.tdfilter(c)
 	return c:IsMonster() and c:IsType(TYPE_NORMAL) and c:IsAbleToDeck()
