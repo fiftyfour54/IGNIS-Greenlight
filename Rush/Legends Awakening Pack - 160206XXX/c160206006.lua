@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	end)
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) then
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsSpellEffect() then
 		Duel.RegisterFlagEffect(rp,id,RESET_PHASE+PHASE_END,0,1)
 	end
 end
