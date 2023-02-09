@@ -63,10 +63,10 @@ function s.cfilter(c,tp)
 	return c:IsReleasableByEffect() and (s.selfnouvfilter(c,tp) or c:IsAttackPos())
 end
 function s.rescon(sg,e,tp,mg)
-	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(s.atkposchk,2,nil,sg.tp)
+	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(s.atkposchk,2,nil,sg,tp)
 end
 function s.atkposchk(c,sg,tp)
-	return c:IsAttackPos() and sg:IsExists(s.selfnouvfilter,1,c)
+	return c:IsAttackPos() and sg:IsExists(s.selfnouvfilter,1,c,tp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
