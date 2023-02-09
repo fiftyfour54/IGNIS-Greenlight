@@ -3,7 +3,6 @@
 --scripted by Naim
 local SET_RECIPE=0x193
 local SET_NOUVELLEZ=0x28e
-local SUMMON_BY_NOUVELLEZ=SUMMON_TYPE_SPECIAL+181
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
