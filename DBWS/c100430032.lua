@@ -1,8 +1,6 @@
 --フォアグラシャ・ド・ヌーベルズ
 --Foie Glasya de Nouvellez
 --scripted by Naim
-local SET_RECIPE=0x193
-local SET_NOUVELLEZ=0x28e
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
@@ -33,7 +31,7 @@ function s.initial_effect(c)
 	e3:SetCondition(s.spcond)
 	c:RegisterEffect(e3)
 end
-s.listed_series={SET_RECIPE}
+s.listed_series={SET_RECIPE,SET_NOUVELLEZ}
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsAbleToDeck() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToDeck,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil) end
@@ -54,7 +52,8 @@ function s.spcond(e,tp,eg,ep,ev,re,r,rp)
 	return g:IsExists(s.tgtfilter,1,nil)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_NOUVELLEZ) and c:IsCanBeSpecialSummoned(e,SUMMON_BY_NOUVELLEZ,tp,false,true)
+	return c:IsSetCard(SET_NOUVELLEZ) and c:IsRitualMonster() and (c:IsLevel(5) or c:IsLevel(6))
+		and c:IsCanBeSpecialSummoned(e,SUMMON_BY_NOUVELLEZ,tp,false,true)
 end
 function s.selfnouvfilter(c,tp)
 	return c:IsControler(tp) and c:IsSetCard(SET_NOUVELLEZ)
@@ -70,8 +69,7 @@ function s.atkposchk(c,sg,tp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
-	if chk==0 then
-		return #g>=2 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp)
+	if chk==0 then return #g>=2 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp)
 		and aux.SelectUnselectGroup(g,e,tp,2,2,s.rescon,0) end
 	Duel.SetOperationInfo(0,CATEGORY_RELEASE,g,2,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK)
