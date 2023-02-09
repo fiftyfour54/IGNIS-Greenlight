@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	-- Special Summon 1 Level 2 or 3 "Nouvellez" monster
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetCategory(CATEGORY_RELEASE+CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EVENT_BECOME_TARGET)
@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	e3:SetCondition(s.spcon)
 	c:RegisterEffect(e3)
 end
-s.listed_series={SET_NOUVELLEZ,0x193}
+s.listed_series={SET_NOUVELLEZ,SET_RECIPE}
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>4 end
 	Duel.SetTargetPlayer(tp)
