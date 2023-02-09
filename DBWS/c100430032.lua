@@ -3,6 +3,7 @@
 --scripted by Naim
 local SET_RECIPE=0x193
 local SET_NOUVELLEZ=0x28e
+local SUMMON_BY_NOUVELLEZ=SUMMON_TYPE_SPECIAL+181
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
@@ -54,7 +55,7 @@ function s.spcond(e,tp,eg,ep,ev,re,r,rp)
 	return g:IsExists(s.tgtfilter,1,nil)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_NOUVELLEZ) and c:IsCanBeSpecialSummoned(e,183,tp,false,false)
+	return c:IsSetCard(SET_NOUVELLEZ) and c:IsCanBeSpecialSummoned(e,SUMMON_BY_NOUVELLEZ,tp,false,false)
 end
 function s.selfnouvfilter(c,tp)
 	return c:IsControler(tp) and c:IsSetCard(SET_NOUVELLEZ)
@@ -83,7 +84,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,e,tp)
 		if #g>0 then
-			Duel.SpecialSummon(g,183,tp,tp,false,false,POS_FACEUP)
+			Duel.SpecialSummon(g,SUMMON_BY_NOUVELLEZ,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end
