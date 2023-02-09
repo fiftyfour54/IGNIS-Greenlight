@@ -4,7 +4,8 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Ritual Summon any "Nouvellez" monster
-	local e1=Ritual.AddProcGreater({handler=c,filter=aux.FilterBoolFunction(Card.IsSetCard,SET_NOUVELLEZ),stage2=s.stage2})
+	local e1=Ritual.AddProcGreater({handler=c,filter=aux.FilterBoolFunction(Card.IsSetCard,SET_NOUVELLEZ),
+		stage2=s.stage2,extratg=s.extratg})
 	e1:SetCategory(e1:GetCategory()|CATEGORY_SEARCH|CATEGORY_TOHAND)
 end
 s.listed_series={SET_RECIPE,SET_NOUVELLEZ}
@@ -22,4 +23,8 @@ function s.stage2(mat,e,tp,eg,ep,ev,re,r,rp,tc)
 		Duel.SendtoHand(sg,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,sg)
 	end
+end
+function s.extratg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE|LOCATION_DECK)
 end
