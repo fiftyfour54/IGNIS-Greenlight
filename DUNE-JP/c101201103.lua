@@ -32,8 +32,8 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetHintTiming(0,TIMING_MAIN_END)
 	e3:SetCost(s.spcost)
-	e3:SetTarget(s.sptg2)
-	e3:SetOperation(s.spop2)
+	e3:SetTarget(s.sptg)
+	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
 end
 s.synchro_tuner_required=1
