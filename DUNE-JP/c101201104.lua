@@ -54,7 +54,7 @@ end
 function s.spfilter(c,e,tp,lvl)
 	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_SYNCHRO) and c:IsLevel(lvl) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.texfilter(chkc,e,tp) and c:IsAbleToExtra()  end
 	if chk==0 then return Duel.IsExistingTarget(s.texfilter,tp,LOCATION_MZONE,0,1,c,e,tp) end
@@ -63,7 +63,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if Duel.SendtoDeck(c,nil,SEQ_DECKBOTTOM,REASON_EFFECT)>0 and c:IsLocation(LOCATION_EXTRA)
