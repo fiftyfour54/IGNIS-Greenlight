@@ -9,14 +9,14 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--add counter
+	--Place Signal Counter on this card
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetOperation(s.ctop)
 	c:RegisterEffect(e2)
-	--special summon (crimson)
+	--Special Summon 1 "The Crimson Dragon" from the Extra Deck
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -28,7 +28,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-	--lv change
+	--Change level of a monster
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_LVCHANGE)
 	e4:SetDescription(aux.Stringid(id,1))
@@ -38,7 +38,7 @@ function s.initial_effect(c)
 	e4:SetTarget(s.lvtg)
 	e4:SetOperation(s.lvop)
 	c:RegisterEffect(e4)
-	--special summon (tuner)
+	--Special Summon 1 Tuner monster from the GY
 	local e5=Effect.CreateEffect(c)
 	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e5:SetDescription(aux.Stringid(id,2))
@@ -48,7 +48,7 @@ function s.initial_effect(c)
 	e5:SetTarget(s.sptg1)
 	e5:SetOperation(s.spop1)
 	c:RegisterEffect(e5)
-	--special summon (synchro)
+	---Special Summon 1 Synchro monster from the GY
 	local e6=Effect.CreateEffect(c)
 	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e6:SetDescription(aux.Stringid(id,3))
@@ -59,10 +59,10 @@ function s.initial_effect(c)
 	e6:SetOperation(s.spop2)
 	c:RegisterEffect(e6)
 end
-s.listed_names={CARD_CRIMSON_DRAGON }
+s.listed_names={CARD_CRIMSON_DRAGON}
 s.counter_list={0x1148}
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(function(c) c:IsSummonType(SUMMON_TYPE_SYNCHRO) end,1,nil) then
+	if eg:IsExists(Card.IsSummonType,1,nil,SUMMON_TYPE_SYNCHRO) then
 		e:GetHandler():AddCounter(0x1148,2)
 	end
 end
@@ -72,7 +72,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 		and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function s.spfilter(c,e,tp)
-	return c:IsCode(CARD_CRIMSON_DRAGON) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 
+	return c:IsCode(CARD_CRIMSON_DRAGON) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

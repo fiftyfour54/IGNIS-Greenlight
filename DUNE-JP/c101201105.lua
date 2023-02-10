@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop2)
 	c:RegisterEffect(e2)
 end
-s.listed_names={101201104} --The Crimson Dragon
+s.listed_names={CARD_CRIMSON_DRAGON}
 function s.spfilter1(c,e,tp)
 	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_SYNCHRO) and (c:IsLevel(7) or c:IsLevel(8))
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
@@ -104,8 +104,8 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
 end
 function s.spfilter2(c,e,tp)
-	return c:IsCode(101201104) and c:IsCanBeSpecialSummoned(e,0,tp,false,true)
-		and Duel.GetLocationCountFromEx(tp,tp,nil,c)
+	return c:IsCode(CARD_CRIMSON_DRAGON) and Duel.GetLocationCountFromEx(tp,tp,nil,c)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,true)
 end
 function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_EXTRA,0,1,nil,e,tp) end

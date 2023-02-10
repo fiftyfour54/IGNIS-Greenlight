@@ -4,6 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--Can be used as material from the hand for "Power Tool" Synchro Monster or Level 7/8 Dragon Monster
+	--Incomplete, synchro summon procedure might not support it
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -24,10 +25,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.lsited_series={SET_POWER_TOOL}
-function s.cfilter(c)
-	return c:IsType(TYPE_SYNCHRO)
-		and (c:IsSetCard(SET_POWER_TOOL) or (c:IsType(TYPE_DRAGON) and (c:IsLevel(7) or c:IsLevel(8))))
-end
+
 function s.spconfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) and c:IsLevelAbove(7)
 end
@@ -57,20 +55,20 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummonComplete()
 	end
 end
-
-
-
+function s.cfilter(c)
+	return c:IsType(TYPE_SYNCHRO) and (c:IsSetCard(SET_POWER_TOOL) or (c:IsType(TYPE_DRAGON) and (c:IsLevel(7) or c:IsLevel(8))))
+end
 function s.synval(e,c,sc) --effect's handler, card being used, monster to be summoned
-	if s.cfilter(sc) then
-		Debug.Message("Material test passed")
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_HAND_SYNCHRO+EFFECT_SYNCHRO_CHECK)
-		e1:SetLabel(id)
-		e1:SetTarget(s.synchktg)
-		c:RegisterEffect(e1)
-		return true
-	else return false end
+	return s.cfilter(sc)
+	-- if s.cfilter(sc) then
+		-- local e1=Effect.CreateEffect(e:GetHandler())
+		-- e1:SetType(EFFECT_TYPE_SINGLE)
+		-- e1:SetCode(EFFECT_HAND_SYNCHRO+EFFECT_SYNCHRO_CHECK)
+		-- e1:SetLabel(id)
+		-- e1:SetTarget(s.synchktg)
+		-- e:GetHandler():RegisterEffect(e1)
+		-- return true
+	-- else return false end
 end
 function s.chk(c)
 	if not c:IsHasEffect(EFFECT_HAND_SYNCHRO+EFFECT_SYNCHRO_CHECK) then return false end
@@ -102,11 +100,3 @@ function s.synchktg(e,c,sg,tg,ntg,tsg,ntsg)
 		return true
 	end
 end
-
-
---[[
-If you would Synchro Summon a "Power Tool" Synchro Monster, or a Level 7 or 8 Dragon Synchro Monster, this card in your hand can also be used as material. You can only use this effect of "Revolution Synchron" once per turn.
-
-If this card is in your GY and you control a Level 7 or higher Synchro Monster: You can send the top card of your Deck to the GY, and if you do, Special Summon this card, but its Level becomes 1. You can only use this effect of "Revolution Synchron" once per Duel.
-
-]]
