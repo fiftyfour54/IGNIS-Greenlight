@@ -38,6 +38,9 @@ function s.initial_effect(c)
 end
 s.material_setcode={SET_ELEMENTAL_HERO}
 s.listed_series={SET_ELEMENTAL_HERO,SET_FAVOURITE}
+function s.fusfilter(c,attr,fc,sumtype,tp)
+	return c:IsAttribute(attr,fc,sumtype,tp) and not c:IsHasEffect(511002961)
+end
 function s.ffilter(c,fc,sumtype,tp,sub,mg,sg)
 	return c:IsSetCard(SET_ELEMENTAL_HERO,fc,sumtype,tp) and c:GetAttribute(fc,sumtype,tp)~=0
 		and (not sg or not sg:IsExists(s.fusfilter,1,c,c:GetAttribute(fc,sumtype,tp),fc,sumtype,tp))
