@@ -1,5 +1,5 @@
 --E・HERO フレイム・ウィングマン－フレイム・シュート
---Elemental HERO Flame Wingman - Skydive Scorcher
+--Elemental HERO Flame Wingman - Infernal Rage
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
