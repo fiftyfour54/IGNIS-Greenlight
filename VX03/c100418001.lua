@@ -1,4 +1,4 @@
---E・HERO フレイム・ウィングマン－フレイム・シュート
+--Ｅ・ＨＥＲＯ フレイム・ウィングマン－フレイム・シュート
 --Elemental HERO Flame Wingman - Infernal Rage
 --Scripted by Larry126
 local s,id=GetID()
