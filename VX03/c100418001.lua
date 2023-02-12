@@ -37,7 +37,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.material_setcode={SET_ELEMENTAL_HERO}
-s.listed_series={SET_ELEMENTAL_HERO,SET_FAVOURITE}
+s.listed_series={SET_ELEMENTAL_HERO,SET_FAVORITE}
 function s.fusfilter(c,attr,fc,sumtype,tp)
 	return c:IsAttribute(attr,fc,sumtype,tp) and not c:IsHasEffect(511002961)
 end
