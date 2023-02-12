@@ -46,7 +46,7 @@ function s.ffilter(c,fc,sumtype,tp,sub,mg,sg)
 		and (not sg or not sg:IsExists(s.fusfilter,1,c,c:GetAttribute(fc,sumtype,tp),fc,sumtype,tp))
 end
 function s.thfilter(c)
-	return c:IsSetCard(SET_FAVOURITE) and c:IsAbleToHand()
+	return c:IsSetCard(SET_FAVORITE) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
