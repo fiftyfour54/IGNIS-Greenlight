@@ -9,17 +9,17 @@ function s.initial_effect(c)
 	e1:SetCategory(e1:GetCategory()|CATEGORY_SEARCH|CATEGORY_TOHAND)
 end
 s.listed_series={SET_RECIPE,SET_NOUVELLEZ}
-s.listed_names={id,100430033} --Buerillabaisse de Nouvellez
+s.listed_names={id,100430029} --Buerillabaisse de Nouvellez
 function s.thfilter(c)
 	return c:IsSetCard(SET_RECIPE) and c:IsRitualSpell() and not c:IsCode(id) and c:IsAbleToHand()
 end
 function s.stage2(mat,e,tp,eg,ep,ev,re,r,rp,tc)
-	if not tc:IsCode(100430033) then return end
+	if not tc:IsCode(100430029) then return end
 	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.thfilter),tp,LOCATION_GRAVE|LOCATION_DECK,0,nil)
 	if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local sg=g:Select(tp,1,1,nil)
+		Duel.BreakEffect()
 		Duel.SendtoHand(sg,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,sg)
 	end

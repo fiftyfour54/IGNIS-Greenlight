@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.drtg)
 	e1:SetOperation(s.drop)
 	c:RegisterEffect(e1)
-	--Tribute 2 monsters and Special Summon 1 Level 4/5 "Nouvellez" Ritual Monster from hand/Deck
+	--Special Summon 1 Level 4 or 5 "Nouvellez" Ritual Monster
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_RELEASE+CATEGORY_SPECIAL_SUMMON)
@@ -27,8 +27,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
-	e3:SetCode(EVENT_CHAINING)
-	e3:SetCondition(s.spcond)
+	e3:SetCode(EVENT_BECOME_TARGET)
+	e3:SetCondition(function(_,_,eg) return eg:IsExists(Card.IsLocation,1,nil,LOCATION_MZONE) end)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_RECIPE,SET_NOUVELLEZ}
@@ -42,26 +42,18 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
-function s.tgtfilter(c)
-	return c:IsMonster() and c:IsLocation(LOCATION_MZONE)
-end
-function s.spcond(e,tp,eg,ep,ev,re,r,rp)
-	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
-	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return g:IsExists(s.tgtfilter,1,nil)
-end
-function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_NOUVELLEZ) and c:IsRitualMonster() and (c:IsLevel(4) or c:IsLevel(5))
-		and c:IsCanBeSpecialSummoned(e,SUMMON_BY_NOUVELLEZ,tp,false,true)
+function s.cfilter(c,tp)
+	return c:IsReleasableByEffect() and (s.selfnouvfilter(c,tp) or c:IsAttackPos())
 end
 function s.selfnouvfilter(c,tp)
 	return c:IsControler(tp) and c:IsSetCard(SET_NOUVELLEZ)
 end
-function s.cfilter(c,tp)
-	return c:IsReleasableByEffect() and (s.selfnouvfilter(c,tp) or c:IsAttackPos())
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(SET_NOUVELLEZ) and c:IsRitualMonster() and c:IsLevel(4,5)
+		and c:IsCanBeSpecialSummoned(e,SUMMON_BY_NOUVELLEZ,tp,false,true)
 end
 function s.rescon(sg,e,tp,mg)
-	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(s.atkposchk,1,nil,sg,tp)
+	return Duel.GetMZoneCount(tp,sg)>0 and sg:IsExists(s.atkposchk,1,nil,sg,tp)
 end
 function s.atkposchk(c,sg,tp)
 	return c:IsAttackPos() and sg:IsExists(s.selfnouvfilter,1,c,tp)

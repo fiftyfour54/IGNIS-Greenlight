@@ -9,13 +9,13 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.tdtg)
 	e1:SetOperation(s.tdop)
 	c:RegisterEffect(e1)
-	--Tribute 2 monsters and Special Summon 1 Level 5/6 "Nouvellez" Ritual Monster from hand/Deck
+	--Special Summon 1 Level 5 or 6 "Nouvellez" Ritual Monster
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_RELEASE+CATEGORY_SPECIAL_SUMMON)
@@ -27,8 +27,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
-	e3:SetCode(EVENT_CHAINING)
-	e3:SetCondition(s.spcond)
+	e3:SetCode(EVENT_BECOME_TARGET)
+	e3:SetCondition(function(_,_,eg) return eg:IsExists(Card.IsLocation,1,nil,LOCATION_MZONE) end)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_RECIPE,SET_NOUVELLEZ}
@@ -41,28 +41,21 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.GetTargetCards(e)
+	if #sg==0 then return end
 	Duel.SendtoDeck(sg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
-end
-function s.tgtfilter(c)
-	return c:IsMonster() and c:IsLocation(LOCATION_MZONE)
-end
-function s.spcond(e,tp,eg,ep,ev,re,r,rp)
-	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
-	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return g:IsExists(s.tgtfilter,1,nil)
-end
-function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_NOUVELLEZ) and c:IsRitualMonster() and (c:IsLevel(5) or c:IsLevel(6))
-		and c:IsCanBeSpecialSummoned(e,SUMMON_BY_NOUVELLEZ,tp,false,true)
-end
-function s.selfnouvfilter(c,tp)
-	return c:IsControler(tp) and c:IsSetCard(SET_NOUVELLEZ)
 end
 function s.cfilter(c,tp)
 	return c:IsReleasableByEffect() and (s.selfnouvfilter(c,tp) or c:IsAttackPos())
 end
+function s.selfnouvfilter(c,tp)
+	return c:IsControler(tp) and c:IsSetCard(SET_NOUVELLEZ)
+end
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(SET_NOUVELLEZ) and c:IsRitualMonster() and c:IsLevel(5,6)
+		and c:IsCanBeSpecialSummoned(e,SUMMON_BY_NOUVELLEZ,tp,false,true)
+end
 function s.rescon(sg,e,tp,mg)
-	return aux.ChkfMMZ(1)(sg,e,tp,mg) and sg:IsExists(s.atkposchk,1,nil,sg,tp)
+	return Duel.GetMZoneCount(tp,sg)>0 and sg:IsExists(s.atkposchk,1,nil,sg,tp)
 end
 function s.atkposchk(c,sg,tp)
 	return c:IsAttackPos() and sg:IsExists(s.selfnouvfilter,1,c,tp)
