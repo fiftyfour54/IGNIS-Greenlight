@@ -2,21 +2,21 @@
 --The Crimson Dragon
 local s,id=GetID()
 function s.initial_effect(c)
-	--Synchro summon
-	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),1,99)
 	c:EnableReviveLimit()
-	--Search a Spell/Trap that mentions "The Crimson Dragon"
+	--Synchro Summon procedure
+	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),1,99)
+	--Search 1 Spell/Trap that mentions "The Crimson Dragon"
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-	--Summon a dragon
+	--Special Summon 1 Dragon Synchro Monster from your Extra Deck
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOEXTRA+CATEGORY_SPECIAL_SUMMON)
@@ -24,6 +24,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetHintTiming(0,TIMING_MAIN_END+TIMINGS_CHECK_MONSTER_E)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
@@ -45,32 +46,32 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function s.texfilter(c,e,tp)
+function s.tgfilter(c,e,tp,mc)
 	return c:IsFaceup() and c:IsLevelAbove(7) and c:IsType(TYPE_SYNCHRO) and not c:IsCode(CARD_CRIMSON_DRAGON)
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetLevel())
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetLevel(),mc)
 end
-function s.spfilter(c,e,tp,lvl)
-	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_SYNCHRO) and c:IsLevel(lvl)
+function s.spfilter(c,e,tp,lvl,mc)
+	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_SYNCHRO) and c:IsLevel(lvl) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.texfilter(chkc,e,tp) end
-	if chk==0 then return c:IsAbleToExtra() and Duel.IsExistingTarget(s.texfilter,tp,LOCATION_MZONE,0,1,c,e,tp) end
-	local g=Duel.SelectTarget(tp,s.texfilter,tp,LOCATION_MZONE,0,1,1,c,e,tp)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc~=c and s.tgfilter(chkc,e,tp,c) end
+	if chk==0 then return c:IsAbleToExtra() and Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,c,e,tp,c) end
+	Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,c,e,tp,c)
 	Duel.SetOperationInfo(0,CATEGORY_TOEXTRA,c,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not (c:IsRelateToEffect(e) and Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 and c:IsLocation(LOCATION_EXTRA)) then return end
 	local tc=Duel.GetFirstTarget()
-	if Duel.SendtoDeck(c,nil,SEQ_DECKBOTTOM,REASON_EFFECT)>0 and c:IsLocation(LOCATION_EXTRA)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc:GetLevel())
-		if #g>0 then
-			Duel.SpecialSummon(g,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
-			g:GetFirst():CompleteProcedure()
+		local sc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc:GetLevel()):GetFirst()
+		if sc then
+			Duel.SpecialSummon(sc,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
+			sc:CompleteProcedure()
 		end
 	end
 end
