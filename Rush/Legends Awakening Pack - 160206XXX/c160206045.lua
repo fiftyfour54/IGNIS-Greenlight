@@ -16,6 +16,7 @@ function s.initial_effect(c)
 	e2:SetValue(200)
 	c:RegisterEffectRush(e2)
 end
+s.listed_names={160206036}
 function s.eqfilter(c)
 	return c:IsFaceup() and not c:IsMaximumModeSide()
 end
