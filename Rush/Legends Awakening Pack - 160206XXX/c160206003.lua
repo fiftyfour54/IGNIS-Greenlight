@@ -35,5 +35,5 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.aclimit(e,re,tp)
 	local rc=re:GetHandler()
-	return re:IsActiveType(TYPE_MONSTER) and rc:IsOnField() and rc:IsFaceup() and rc:IsLevelBelow(4)
+	return re:IsMonsterEffect() and rc:IsOnField() and rc:IsFaceup() and rc:IsLevelBelow(4)
 end
