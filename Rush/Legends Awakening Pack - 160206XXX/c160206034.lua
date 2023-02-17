@@ -1,4 +1,6 @@
+--昇格の魔鏡
 --Class-Change Mirror
+--scripted by YoshiDuels
 local s,id=GetID()
 function s.initial_effect(c)
 	--Special summon Summoned Skull from GY
