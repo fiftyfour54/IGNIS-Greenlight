@@ -1,4 +1,4 @@
---JP name
+--JP Name
 --Gate Guardians Combined
 --Scripted by Eerie Code
 local s,id=GetID()
