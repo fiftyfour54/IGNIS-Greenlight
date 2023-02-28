@@ -39,12 +39,12 @@ function s.initial_effect(c)
 	e4:SetOperation(s.desop)
 	c:RegisterEffect(e4)
 end
-s.listed_names=CARDS_SANGA_KAJEZIN_SUIJIN
+s.listed_names=CARDS_SANGA_KAZEJIN_SUIJIN
 function s.limtg(e,c)
 	return c:IsStatus(STATUS_SUMMON_TURN|STATUS_FLIP_SUMMON_TURN|STATUS_SPSUMMON_TURN) and (c:GetOriginalLevel()<5 or not c:HasLevel())
 end
 function s.plfilter(c)
-	return c:IsCode(CARDS_SANGA_KAJEZIN_SUIJIN) and not c:IsForbidden() and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED))
+	return c:IsCode(CARDS_SANGA_KAZEJIN_SUIJIN) and not c:IsForbidden() and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED))
 end
 function s.placetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0

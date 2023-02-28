@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 end
-s.listed_names=CARDS_SANGA_KAJEZIN_SUIJIN
+s.listed_names=CARDS_SANGA_KAZEJIN_SUIJIN
 function s.contactfil(tp)
 	return Duel.GetMatchingGroup(Card.IsAbleToRemoveAsCost,tp,LOCATION_ONFIELD,0,nil)
 end

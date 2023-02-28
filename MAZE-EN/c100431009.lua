@@ -27,7 +27,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
-s.listed_names=CARDS_SANGA_KAJEZIN_SUIJIN
+s.listed_names=CARDS_SANGA_KAZEJIN_SUIJIN
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() and chkc:IsOriginalSetCard(SET_GATE_GUARDIAN) end
 	if chk==0 then return Duel.IsExistingTarget(aux.FaceupFilter(Card.IsOriginalSetCard,SET_GATE_GUARDIAN),tp,LOCATION_MZONE,0,1,nil) end
@@ -43,7 +43,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.thfilter(c)
-	return c:IsCode(CARDS_SANGA_KAJEZIN_SUIJIN) and c:IsAbleToHand() and (c:IsLocation(LOCATION_DECK) or c:IsFaceup())
+	return c:IsCode(CARDS_SANGA_KAZEJIN_SUIJIN) and c:IsAbleToHand() and (c:IsLocation(LOCATION_DECK) or c:IsFaceup())
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK|LOCATION_REMOVED,0,1,nil) end

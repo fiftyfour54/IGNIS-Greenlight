@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Fusion Materials
-	Fusion.AddProcMix(c,true,true,table.unpack(CARDS_SANGA_KAJEZIN_SUIJIN))
+	Fusion.AddProcMix(c,true,true,table.unpack(CARDS_SANGA_KAZEJIN_SUIJIN))
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,true)
 	--Negate an opponent's targeting effect
 	local e1=Effect.CreateEffect(c)
@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 end
-s.listed_names=CARDS_SANGA_KAJEZIN_SUIJIN
+s.listed_names=CARDS_SANGA_KAZEJIN_SUIJIN
 s.listed_series={SET_GATE_GUARDIAN}
 function s.contactfil(tp)
 	local loc=LOCATION_HAND|LOCATION_ONFIELD|LOCATION_GRAVE
