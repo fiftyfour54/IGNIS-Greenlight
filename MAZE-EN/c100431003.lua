@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Fusion Materials
 	c:EnableReviveLimit()
-	Fusion.AddProcMix(c,true,true,table.unpack(CARDS_GATE_GUARDIAN))
+	Fusion.AddProcMix(c,true,true,table.unpack(CARDS_SANGA_KAJEZIN_SUIJIN))
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,true)
 	--Negate
 	local e1=Effect.CreateEffect(c)
@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 end
-s.listed_names=CARDS_GATE_GUARDIAN
+s.listed_names=CARDS_SANGA_KAJEZIN_SUIJIN
 s.listed_series={SET_GATE_GUARDIAN}
 function s.contactfil(tp)
 	local loc=LOCATION_ONFIELD|LOCATION_GRAVE
