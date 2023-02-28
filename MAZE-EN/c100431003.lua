@@ -35,8 +35,8 @@ end
 s.listed_names=CARDS_SANGA_KAJEZIN_SUIJIN
 s.listed_series={SET_GATE_GUARDIAN}
 function s.contactfil(tp)
-	local loc=LOCATION_ONFIELD|LOCATION_GRAVE
-	if Duel.IsPlayerAffectedByEffect(tp,CARD_SPIRIT_ELIMINATION) then loc=LOCATION_ONFIELD end
+	local loc=LOCATION_HAND|LOCATION_ONFIELD|LOCATION_GRAVE
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_SPIRIT_ELIMINATION) then loc=LOCATION_HAND|LOCATION_ONFIELD end
 	return Duel.GetMatchingGroup(Card.IsAbleToRemoveAsCost,tp,loc,0,nil)
 end
 function s.contactop(g)
@@ -66,7 +66,7 @@ end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousPosition(POS_FACEUP) and c:IsSummonType(SUMMON_TYPE_SPECIAL)
-		and c:IsPreviousControler(tp) and rp==1-tp and not c:IsLocation(LOCATION_DECK)
+		and c:IsPreviousControler(tp) and rp==1-tp
 end
 function s.spfilter(c,e,tp)
 	if c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(tp,tp,nil,c)==0 then return false end
