@@ -6,9 +6,8 @@ function s.initial_effect(c)
 	--Special Summon this card
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetHintTiming(0,TIMING_MAIN_END+TIMINGS_CHECK_MONSTER_E)
@@ -22,10 +21,12 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetHintTiming(0,TIMING_MAIN_END)
+	e2:SetHintTiming(TIMING_DAMAGE_STEP,TIMING_MAIN_END+TIMING_DAMAGE_STEP)
 	e2:SetCountLimit(1,{id,1})
+	e2:SetCondition(function() return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated() end)
 	e2:SetCost(s.opccost)
 	e2:SetTarget(s.vstg)
 	e2:SetOperation(s.vsop)
@@ -37,10 +38,10 @@ function s.opccost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
 end
 function s.spconfilter(c,tp)
-	return c:IsFacedown() or not c:IsSetCard(SET_VANQUISH_SOUL) and c:IsInMainMZone(tp)
+	return c:IsFacedown() or not c:IsSetCard(SET_VANQUISH_SOUL)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsTurnPlayer(1-tp) and not Duel.IsExistingMatchingCard(s.spconfilter,tp,LOCATION_MZONE,0,1,nil,tp)
+	return Duel.IsTurnPlayer(1-tp) and not Duel.IsExistingMatchingCard(s.spconfilter,tp,LOCATION_MMZONE,0,1,nil)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -63,7 +64,7 @@ function s.vsrescon(sg)
 end
 function s.vstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local cg1=Duel.GetMatchingGroup(s.vscostfilter,tp,LOCATION_HAND,0,nil,ATTRIBUTE_FIRE)
-	local b1=#cg1>0 and Duel.IsPlayerCanDraw(tp,1)
+	local b1=#cg1>0
 	local cg2=Duel.GetMatchingGroup(s.vscostfilter,tp,LOCATION_HAND,0,nil,ATTRIBUTE_DARK|ATTRIBUTE_EARTH)
 	local b2=aux.SelectUnselectGroup(cg2,e,tp,1,2,s.vsrescon,0)
 	if chk==0 then return b1 or b2 end
@@ -86,11 +87,11 @@ function s.vstg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.vsop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
+	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
 	local op=e:GetLabel()
 	if op==1 then
-		c:UpdateDefense(3000,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+		c:UpdateDefense(3000,RESET_EVENT|RESETS_STANDARD_DISABLE|RESET_PHASE|PHASE_END)
 	elseif op==2 then
-		c:UpdateAttack(3000,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+		c:UpdateAttack(3000,RESET_EVENT|RESETS_STANDARD_DISABLE|RESET_PHASE|PHASE_END)
 	end
 end

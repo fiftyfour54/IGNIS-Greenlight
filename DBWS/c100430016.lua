@@ -7,7 +7,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
@@ -84,15 +84,15 @@ function s.vstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function s.vsop(e,tp,eg,ep,ev,re,r,rp)
-	local op=e:GetLabel()
 	local c=e:GetHandler()
-	if op==1 then
-		if not c:IsRelateToEffect(e) then return end
+	if not c:IsRelateToEffect(e) then return end
+	local op=e:GetLabel()
+	if op==1 and c:IsFaceup() then
 		--Cannot be destroyed by card effects
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3001)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 		e1:SetValue(1)
 		e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)

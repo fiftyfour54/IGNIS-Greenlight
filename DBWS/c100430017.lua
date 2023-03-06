@@ -8,10 +8,10 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
+	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
+	e1:SetCondition(function(_,tp) return Duel.GetFieldGroupCount(tp,LOCATION_MMZONE,0)==0 end)
 	e1:SetCost(s.opccost)
-	e1:SetCondition(s.spcon)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetHintTiming(0,TIMING_MAIN_END)
+	e2:SetHintTiming(0,TIMING_MAIN_END+TIMINGS_CHECK_MONSTER_E)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCost(s.opccost)
 	e2:SetTarget(s.vstg)
@@ -31,9 +31,6 @@ end
 function s.opccost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
 	Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
-end
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_MMZONE,0)==0
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -58,7 +55,7 @@ function s.vstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local cg1=Duel.GetMatchingGroup(s.vscostfilter,tp,LOCATION_HAND,0,nil,ATTRIBUTE_EARTH)
 	local b1=#cg1>0
 	local cg2=cg1+Duel.GetMatchingGroup(s.vscostfilter,tp,LOCATION_HAND,0,nil,ATTRIBUTE_FIRE)
-	local colg=e:GetHandler():GetColumnGroup():Match(Card.IsLocation,nil,LOCATION_SZONE)
+	local colg=e:GetHandler():GetColumnGroup():Match(Card.IsSpellTrap,nil)
 	local b2=#colg>0 and aux.SelectUnselectGroup(cg2,e,tp,1,2,s.vsrescon,0)
 	if chk==0 then return b1 or b2 end
 	local op=Duel.SelectEffect(tp,
@@ -80,21 +77,21 @@ function s.vstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function s.vsop(e,tp,eg,ep,ev,re,r,rp)
-	local op=e:GetLabel()
 	local c=e:GetHandler()
-	if op==1 then
-		if not c:IsRelateToEffect(e) then return end
+	if not c:IsRelateToEffect(e) then return end
+	local op=e:GetLabel()
+	if op==1 and c:IsFaceup() then
 		--Cannot be destroyed by card effects
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(3000)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 		e1:SetValue(1)
 		e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
 		c:RegisterEffect(e1)
 	elseif op==2 then
-		local cg=c:GetColumnGroup():Match(Card.IsLocation,nil,LOCATION_SZONE)
+		local cg=c:GetColumnGroup():Match(Card.IsSpellTrap,nil)
 		if #cg==0 then return end
 		Duel.Destroy(cg,REASON_EFFECT)
 	end

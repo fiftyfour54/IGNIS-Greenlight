@@ -7,7 +7,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
@@ -22,9 +22,10 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetHintTiming(0,TIMING_MAIN_END+TIMINGS_CHECK_MONSTER_E)
+	e3:SetHintTiming(TIMING_DAMAGE_STEP,TIMING_MAIN_END+TIMINGS_CHECK_MONSTER_E+TIMING_DAMAGE_STEP)
 	e3:SetCountLimit(1,{id,1})
 	e3:SetCost(s.opccost)
 	e3:SetTarget(s.vstg)
@@ -59,12 +60,13 @@ function s.vsrescon(sg)
 		and sg:FilterCount(Card.IsAttribute,nil,ATTRIBUTE_EARTH)>0
 end
 function s.vstg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local not_dmg_step=Duel.GetCurrentPhase()~=PHASE_DAMAGE
 	local cg1=Duel.GetMatchingGroup(s.vscostfilter,tp,LOCATION_HAND,0,nil,ATTRIBUTE_DARK)
 	local fg1=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
-	local b1=#cg1>0 and #fg1>0
+	local b1=#cg1>0 and #fg1>0 and (not_dmg_step or not Duel.IsDamageCalculated())
 	local cg2=cg1+Duel.GetMatchingGroup(s.vscostfilter,tp,LOCATION_HAND,0,nil,ATTRIBUTE_EARTH)
-	local fg2=fg1+Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
-	local b2=#fg2>0 and aux.SelectUnselectGroup(cg2,e,tp,1,2,s.vsrescon,0)
+	local fg2=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsAbleToHand),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local b2=#fg2>0 and aux.SelectUnselectGroup(cg2,e,tp,1,2,s.vsrescon,0) and not_dmg_step
 	if chk==0 then return b1 or b2 end
 	local op=Duel.SelectEffect(tp,
 		{b1,aux.Stringid(id,2)},
@@ -87,23 +89,21 @@ end
 function s.vsop(e,tp,eg,ep,ev,re,r,rp)
 	local op=e:GetLabel()
 	local c=e:GetHandler()
-	local g1=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
 	if op==1 then
+		local g1=
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
-		local tc=g1:Select(tp,1,1,nil):GetFirst()
+		local tc=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,1,nil):GetFirst()
 		if not tc then return end
 		Duel.HintSelection(tc,true)
 		tc:UpdateAttack(-500,RESET_EVENT|RESETS_STANDARD,c)
 		tc:UpdateDefense(-500,RESET_EVENT|RESETS_STANDARD,c)
 	elseif op==2 then
-		local g2=(g1+Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil))
-			:GetMinGroup(Card.GetDefense)
-			:Match(Card.IsAbleToHand,nil)
+		local g2=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsAbleToHand),tp,LOCATION_MZONE,LOCATION_MZONE,nil):GetMinGroup(Card.GetDefense)
+		if #g2==0 then return end
 		if #g2>1 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 			g2=g2:Select(tp,1,1,nil)
 		end
-		if #g2==0 then return end
 		Duel.HintSelection(g2,true)
 		Duel.SendtoHand(g2,tp,REASON_EFFECT)
 	end
