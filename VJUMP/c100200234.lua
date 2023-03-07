@@ -1,5 +1,5 @@
 --血肉の代償
---Final Offering
+--Terminal Offering
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
