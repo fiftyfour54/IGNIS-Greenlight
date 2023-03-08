@@ -30,7 +30,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if #g<2 then return end
 	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,aux.dncheck,1,tp,HINTMSG_CONFIRM)
 	Duel.ConfirmCards(1-tp,sg)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND) --maybe a custom string because this is "Select the card(s) to add to your hand"
+	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND) --maybe a custom string because this is "Select the card(s) to add to your hand"
 	local g=sg:Select(1-tp,1,1,nil)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
