@@ -1,5 +1,5 @@
 --シャルル大帝
---Charles the Great
+--Charlemagne
 --Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -58,10 +58,10 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EFFECT_CHANGE_CODE)
 		e1:SetValue(code)
-		e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 		c:RegisterEffect(e1)
 		if tc:IsMonster() then
-			c:CopyEffect(code,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,1)
+			c:CopyEffect(code,RESET_EVENT|RESETS_STANDARD)
 		end
 		Duel.BreakEffect()
 		s.equipop(c,e,tp,tc)
