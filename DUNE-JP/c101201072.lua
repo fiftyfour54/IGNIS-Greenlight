@@ -28,7 +28,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_NOBLE_ARMS,SET_INFERNOBLE_KNIGHT,SET_NOBLE_KNIGHT}
-s.listed_names={CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES}
+s.listed_names={CARD_INFERNOBLE_CHARLES}
 function s.cfilter(c,sft)
 	return c:IsSetCard(SET_NOBLE_ARMS) and c:IsEquipSpell() and not c:IsPublic()
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp,c,sft)
@@ -72,9 +72,9 @@ function s.eqfilter(c)
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE)
-		and chkc:IsFaceup() and chkc:IsCode(CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES) end
+		and chkc:IsFaceup() and chkc:IsCode(CARD_INFERNOBLE_CHARLES) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingTarget(aux.FaceupFilter(Card.IsCode,CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES),tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingTarget(aux.FaceupFilter(Card.IsCode,CARD_INFERNOBLE_CHARLES),tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,s.efilter,tp,LOCATION_MZONE,0,1,1,nil,tp)

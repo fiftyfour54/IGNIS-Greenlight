@@ -42,7 +42,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 s.listed_series={SET_NOBLE_ARMS}
-s.listed_names={CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES}
+s.listed_names={CARD_INFERNOBLE_CHARLES}
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1200) end
 	Duel.PayLPCost(1200)
@@ -74,7 +74,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_SZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
-	if not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES),tp,LOCATION_ONFIELD,0,1,nil) then e:SetLabel(1)
+	if not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_INFERNOBLE_CHARLES),tp,LOCATION_ONFIELD,0,1,nil) then e:SetLabel(1)
 	else e:SetLabel(0) end
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)

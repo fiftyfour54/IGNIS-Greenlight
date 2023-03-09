@@ -34,10 +34,10 @@ function s.initial_effect(c)
 	e3:SetCondition(s.tgatkcon)
 	c:RegisterEffect(e3)
 end
-s.listed_names={CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES,55749927}
+s.listed_names={CARD_INFERNOBLE_CHARLES,55749927}
 s.listed_series={SET_ROLAND}
 function s.thfilter(c)
-	return (c:ListsCode(CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES) or c:IsCode(55749927)) and c:IsAbleToHand()
+	return (c:ListsCode(CARD_INFERNOBLE_CHARLES) or c:IsCode(55749927)) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

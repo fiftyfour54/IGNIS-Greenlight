@@ -32,12 +32,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	aux.AddEREquipLimit(c,nil,s.eqval,s.equipop,e1)
 end
-s.listed_names={CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES}
+s.listed_names={CARD_INFERNOBLE_CHARLES}
 function s.matfilter(c,scard,sumtype,tp)
-	return c:IsLevel(9) and c:IsCode(CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES) and c:GetEquipCount()>0
+	return c:IsLevel(9) and c:IsCode(CARD_INFERNOBLE_CHARLES) and c:GetEquipCount()>0
 end
 function s.eqfilter(c,p)
-	return c:IsCode(CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES) and c:CheckUniqueOnField(p) and not c:IsForbidden()
+	return c:IsCode(CARD_INFERNOBLE_CHARLES) and c:CheckUniqueOnField(p) and not c:IsForbidden()
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.eqfilter(chkc,tp) end
@@ -68,7 +68,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.eqval(ec,c,tp)
-	return ec:IsControler(tp) and ec:IsCode(CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES)
+	return ec:IsControler(tp) and ec:IsCode(CARD_INFERNOBLE_CHARLES)
 end
 function s.equipop(c,e,tp,tc)
 	if not c:EquipByEffectAndLimitRegister(e,tp,tc) then return end
