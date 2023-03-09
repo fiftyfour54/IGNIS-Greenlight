@@ -31,14 +31,14 @@ s.listed_series={SET_INFERNOBLE_ARMS}
 function s.eqtcfilter(c,ec)
 	return c:IsFaceup() and ec:CheckEquipTarget(c)
 end
-function s.eqfilter(c,ec)
+function s.eqfilter(c)
 	return c:IsEquipSpell() and c:IsSetCard(SET_INFERNOBLE_ARMS) and not c:IsCode(id)
 		and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 		and Duel.IsExistingMatchingCard(s.eqtcfilter,tp,LOCATION_MZONE,0,1,nil,c)
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil,e:GetHandler()) end
+		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,0,LOCATION_DECK|LOCATION_GRAVE)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 end
@@ -51,7 +51,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local eqtc=Duel.SelectMatchingCard(tp,s.eqtcfilter,tp,LOCATION_MZONE,0,1,1,nil,eq):GetFirst()
 	if Duel.Equip(tp,eq,eqtc) then
 		Duel.BreakEffect()
-		Duel.Destroy(c,REASON_EFFECT)
+		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 	end
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)

@@ -34,7 +34,7 @@ function s.initial_effect(c)
 	e3:SetCondition(s.tgatkcon)
 	c:RegisterEffect(e3)
 end
-s.listed_names={CARD_INFERNOBLE_CHARLES,55749927}
+s.listed_names={CARD_INFERNOBLE_CHARLES,55749927} --"Horn of Olifant" 
 s.listed_series={SET_ROLAND}
 function s.thfilter(c)
 	return (c:ListsCode(CARD_INFERNOBLE_CHARLES) or c:IsCode(55749927)) and c:IsAbleToHand()
@@ -62,7 +62,7 @@ function s.tgfilter(c)
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) and c:IsAbleToRemove() end
+	if chk==0 then return c:IsAbleToRemove() and Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,c,1,0,0)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK|LOCATION_EXTRA)

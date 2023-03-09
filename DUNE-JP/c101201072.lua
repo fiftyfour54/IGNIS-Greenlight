@@ -39,8 +39,9 @@ function s.spfilter(c,e,tp,eq,sft)
 		and eq:CheckUniqueOnField(tp) and not eq:IsForbidden()))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local sft=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil,Duel.GetLocationCount(tp,LOCATION_SZONE),e,tp) end
+		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil,sft,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_HAND)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_HAND)
