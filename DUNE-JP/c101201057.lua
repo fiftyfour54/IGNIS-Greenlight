@@ -37,8 +37,8 @@ function s.initial_effect(c)
 	e4:SetRange(LOCATION_FZONE)
 	e4:SetCountLimit(1)
 	e4:SetCondition(function(e) return e:GetHandler():GetFlagEffect(id)>0 end)
-	e4:SetTarget(s.thtg)
-	e4:SetOperation(s.thop)
+	e4:SetTarget(s.sptg)
+	e4:SetOperation(s.spop)
 	c:RegisterEffect(e4)
 end
 s.listed_series={SET_NOBLE_ARMS}
@@ -67,21 +67,6 @@ function s.spfilter(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(SET_NOBLE_ARMS) and c:IsOriginalType(TYPE_MONSTER)
 		and c:IsCanBeSpecialSummoned(e,0,sp,false,false)
 end
-function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	--If you activated this effect while you did not control "Infernoble Knight Emperor Charles", for the rest of this turn, you cannot Special Summon monsters, except Warrior monsters
-	if not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES),tp,LOCATION_ONFIELD,0,1,nil) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetDescription(aux.Stringid(id,3))
-		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT+EFFECT_FLAG_OATH)
-		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-		e1:SetReset(RESET_PHASE+PHASE_END)
-		e1:SetTargetRange(1,0)
-		e1:SetTarget(function(e,c) return not c:IsRace(RACE_WARRIOR) end)
-		Duel.RegisterEffect(e1,tp)
-	end
-end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_SZONE) and s.spfilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -89,10 +74,23 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_SZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+	if not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES),tp,LOCATION_ONFIELD,0,1,nil) then e:SetLabel(1)
+	else e:SetLabel(0) end
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	end
+	if e:GetLabel()==1 then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetDescription(aux.Stringid(id,3))
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT+EFFECT_FLAG_OATH)
+		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+		e1:SetReset(RESET_PHASE+PHASE_END)
+		e1:SetTargetRange(1,0)
+		e1:SetTarget(function(_,c) return not c:IsRace(RACE_WARRIOR) end)
+		Duel.RegisterEffect(e1,tp)
 	end
 end
