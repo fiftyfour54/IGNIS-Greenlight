@@ -1,5 +1,5 @@
 --大聖剣博物館
---The Great Noble Arms Museum
+--The Noble Arms Museum
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
@@ -36,16 +36,16 @@ function s.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetRange(LOCATION_FZONE)
 	e4:SetCountLimit(1)
-	e4:SetCondition(function(e) return e:GetHandler():GetFlagEffect(id)>0 end)
+	e4:SetCondition(function(e) return e:GetHandler():HasFlagEffect(id) end)
 	e4:SetTarget(s.sptg)
 	e4:SetOperation(s.spop)
 	c:RegisterEffect(e4)
 end
-s.listed_series={SET_NOBLE_ARMS}
-s.listed_names={CARD_INFERNOBLE_CHARLES}
+s.listed_series={SET_NOBLE_ARMS,SET_NOBLE_KNIGHT}
+s.listed_names={id,CARD_INFERNOBLE_CHARLES}
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1200) end
-	Duel.PayLPCost(1200)
+	Duel.PayLPCost(tp,1200)
 end
 function s.thfilter(c)
 	return c:IsSetCard(SET_NOBLE_ARMS) and not c:IsCode(id) and c:IsAbleToHand()
@@ -64,15 +64,15 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.spfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_NOBLE_ARMS) and c:IsOriginalType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsSetCard(SET_NOBLE_KNIGHT) and c:IsOriginalType(TYPE_MONSTER)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_SZONE) and s.spfilter(chkc,e,tp) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_STZONE) and s.spfilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_SZONE,0,1,nil,e,tp) end
+		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_STZONE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_SZONE,0,1,1,nil,e,tp)
+	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_STZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 	if not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_INFERNOBLE_CHARLES),tp,LOCATION_ONFIELD,0,1,nil) then
 		e:SetLabel(1)
@@ -86,6 +86,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 	if e:GetLabel()==1 then
+		--Cannot Special Summon, except Warrior monsters
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(aux.Stringid(id,3))
 		e1:SetType(EFFECT_TYPE_FIELD)

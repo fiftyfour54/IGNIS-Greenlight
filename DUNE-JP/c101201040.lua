@@ -1,5 +1,5 @@
 --聖剣を巡る王姫アンジェリカ
---Angelica, Queen of Noble Arms
+--Angelica, Princess of Noble Arms
 --Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -25,13 +25,12 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_BECOME_TARGET)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(s.tgeffcon)
+	e2:SetCondition(function(e,tp,eg) return eg:IsContains(e:GetHandler()) end)
 	e2:SetTarget(s.tgtg)
 	e2:SetOperation(s.tgop)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_BE_BATTLE_TARGET)
-	e3:SetCondition(s.tgatkcon)
 	c:RegisterEffect(e3)
 end
 s.listed_names={CARD_INFERNOBLE_CHARLES,55749927} --"Horn of Olifant" 
@@ -50,12 +49,6 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
-end
-function s.tgeffcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp==1-tp and eg:IsContains(e:GetHandler())
-end
-function s.tgatkcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsContains(e:GetHandler())
 end
 function s.tgfilter(c)
 	return c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToGrave()

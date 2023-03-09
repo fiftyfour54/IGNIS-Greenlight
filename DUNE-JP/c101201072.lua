@@ -1,5 +1,5 @@
 --シャルルの叙事詩
---The Epic of Charles
+--The Epic Poem of Charles
 --Scripted by Larry126
 local s,id=GetID()
 function s.initial_effect(c)
@@ -9,6 +9,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_EQUIP+CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
@@ -17,10 +18,11 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_EQUIP)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e2:SetCountLimit(1,{id,1})
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.eqtg)
@@ -34,12 +36,13 @@ function s.cfilter(c,sft,e,tp)
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp,c,sft)
 end
 function s.spfilter(c,e,tp,eq,sft)
-	return c:IsSetCard(SET_INFERNOBLE_KNIGHT) and c:IsCanBeSpecialSummoned(e,0,sp,false,false)
-		and (eq:IsAbleToGrave() or (sft>0 and eq:CheckEquipTarget(tc)
+	return c:IsSetCard(SET_INFERNOBLE_KNIGHT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and (eq:IsAbleToGrave() or (sft>0 and eq:CheckEquipTarget(c)
 		and eq:CheckUniqueOnField(tp) and not eq:IsForbidden()))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local sft=Duel.GetLocationCount(tp,LOCATION_SZONE)
+	if e:GetHandler():IsLocation(LOCATION_HAND) then sft=sft-1 end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil,sft,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK)
@@ -60,7 +63,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		local tgBool=eq:IsAbleToGrave()
 		if eqBool or tgBool then
 			Duel.BreakEffect()
-			local op=Duel.SelectEffect(tp,{eqBool,aux.Stringid(id,2)},{tgBool,aux.Stringid(id,3)})
+			local op=Duel.SelectEffect(tp,
+				{eqBool,aux.Stringid(id,2)},
+				{tgBool,aux.Stringid(id,3)})
 			if op==1 then
 				Duel.Equip(tp,eq,tc)
 			else
@@ -99,7 +104,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 		eq:RegisterEffect(e1)
 		--Increase 500 ATK
-		local e2=Effect.CreateEffect(c)
+		local e2=Effect.CreateEffect(eq)
 		e2:SetType(EFFECT_TYPE_EQUIP)
 		e2:SetCode(EFFECT_UPDATE_ATTACK)
 		e2:SetValue(500)
