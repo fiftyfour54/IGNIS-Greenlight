@@ -29,10 +29,8 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_EQUIP)
 	e3:SetCode(30765615)
-	tc:RegisterEffect(e3)
+	c:RegisterEffect(e3)
 end
-s.listed_names={63184228}
-s.listed_series={0x66,0x1017,0xa3}
 function s.spcfilter(c)
 	return c:GetEquipCount()>0
 end
