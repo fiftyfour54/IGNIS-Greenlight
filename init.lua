@@ -1,0 +1,2 @@
+--need a shorter name for this
+CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES=77656797
