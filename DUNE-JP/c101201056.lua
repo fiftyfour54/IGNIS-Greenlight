@@ -48,7 +48,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local eq=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.eqfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil):GetFirst()
 	if not eq then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local eqtc=Duel.SelectMatchingCard(tp,s.eqtcfilter,tp,LOCATION_MZONE,0,1,1,nil,eq):GetFirst
+	local eqtc=Duel.SelectMatchingCard(tp,s.eqtcfilter,tp,LOCATION_MZONE,0,1,1,nil,eq):GetFirst()
 	Duel.Equip(tp,eq,eqtc)
 	Duel.BreakEffect()
 	Duel.Destroy(c,REASON_EFFECT)
