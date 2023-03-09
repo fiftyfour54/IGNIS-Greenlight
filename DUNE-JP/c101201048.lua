@@ -30,21 +30,21 @@ function s.initial_effect(c)
 	e2:SetTarget(s.negtg)
 	e2:SetOperation(s.negop)
 	c:RegisterEffect(e2)
-	aux.AddEREquipLimit(c,nil,s.eqval,s.equipop,e2)
+	aux.AddEREquipLimit(c,nil,s.eqval,s.equipop,e1)
 end
 s.listed_names={CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES}
 function s.matfilter(c,scard,sumtype,tp)
 	return c:IsLevel(9) and c:IsCode(CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES) and c:GetEquipCount()>0
 end
-function s.eqfilter(c)
-	return c:IsCode(CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES) and c:IsType(TYPE_EFFECT) and not c:IsForbidden()
+function s.eqfilter(c,p)
+	return c:IsCode(CARD_INFERNOBLE_KNIGHT_EMPEROR_CHARLES) and c:CheckUniqueOnField(p) and not c:IsForbidden()
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.eqfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.eqfilter,tp,LOCATION_GRAVE,0,1,nil)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.eqfilter(chkc,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.eqfilter,tp,LOCATION_GRAVE,0,1,nil,tp)
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,s.eqfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.eqfilter,tp,LOCATION_GRAVE,0,1,1,nil,tp)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
@@ -60,7 +60,9 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(code)
 		e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
 		c:RegisterEffect(e1)
-		c:CopyEffect(code,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,1)
+		if tc:IsMonster() then
+			c:CopyEffect(code,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,1)
+		end
 		Duel.BreakEffect()
 		s.equipop(c,e,tp,tc)
 	end
