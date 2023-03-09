@@ -1,5 +1,5 @@
 --Voici la Carte～メニューはこちら～
---Voici la Carte ~ This is the Menu ~
+--Voici la Carte - Here is the Menu
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
@@ -16,30 +16,29 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_NOUVELLEZ}
 s.listed_names={100430037,100430038} -- Recette de Poisson - Fish Recipe, Recette de Viande - Meat Recipe
-function s.thfilter(c)
-	return c:IsMonster() and c:IsSetCard(SET_NOUVELLEZ) and c:IsAbleToHand() and not c:IsPublic()
+function s.revfilter(c)
+	return c:IsSetCard(SET_NOUVELLEZ) and c:IsMonster() and c:IsAbleToHand() and not c:IsPublic()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
+	local g=Duel.GetMatchingGroup(s.revfilter,tp,LOCATION_DECK,0,nil)
 	if chk==0 then return #g>=2 and aux.SelectUnselectGroup(g,e,tp,2,2,aux.dncheck,0) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK|LOCATION_GRAVE)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
+	local g=Duel.GetMatchingGroup(s.revfilter,tp,LOCATION_DECK,0,nil)
 	if #g<2 then return end
 	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,aux.dncheck,1,tp,HINTMSG_CONFIRM)
 	Duel.ConfirmCards(1-tp,sg)
-	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND) --maybe a custom string because this is "Select the card(s) to add to your hand"
+	Duel.Hint(HINT_SELECTMSG,1-tp,aux.Stringid(id,1))
 	local g=sg:Select(1-tp,1,1,nil)
-	if #g>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+	if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
+		Duel.ShuffleDeck(tp)
 		local rac=g:GetFirst():GetRace()
-		if Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.cfilter),tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil,rac) and
-			Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		if Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil,rac)
+			and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-			local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.cfilter),tp,LOCATION_DECK|LOCATION_GRAVE,0,1,1,nil,rac)
+			local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK|LOCATION_GRAVE,0,1,1,nil,rac)
 			if #tc>0 then
 				Duel.BreakEffect()
 				Duel.SendtoHand(tc,nil,REASON_EFFECT)
@@ -48,7 +47,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function s.cfilter(c,rac)
-	return c:IsAbleToHand() and ((rac==RACE_BEASTWARRIOR and c:IsCode(100430037))
-		or (rac==RACE_WARRIOR and c:IsCode(100430038)))
+function s.thfilter(c,rac)
+	if not c:IsAbleToHand() then return false end
+	if rac==RACE_BEASTWARRIOR then
+		return c:IsCode(100430037)
+	elseif rac==RACE_WARRIOR then
+		return c:IsCode(100430038)
+	end
 end
