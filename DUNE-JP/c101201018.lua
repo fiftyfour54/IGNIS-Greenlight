@@ -23,21 +23,17 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,{id,1})
-	e3:SetCondition(function(e) return e:GetHandler():HasFlagEffect(id) end)
+	e3:SetCondition(s.tgcon)
 	e3:SetTarget(s.tgtg)
 	e3:SetOperation(s.tgop)
 	c:RegisterEffect(e3)
-	--Register a flag when it is Normal Summoned or Special Summoned by a FIRE monster's effect
+	--Check if it's Special Summoned by a FIRE monster's effect
 	local e3a=Effect.CreateEffect(c)
 	e3a:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e3a:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e3a:SetCode(EVENT_SUMMON_SUCCESS)
+	e3a:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3a:SetOperation(s.regop)
 	c:RegisterEffect(e3a)
-	local e3b=e3a:Clone()
-	e3b:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3b:SetCondition(s.regcon)
-	c:RegisterEffect(e3b)
 end
 s.listed_names={93504463,74100225} --Evolutionary Bridge, Evo-Singularity
 function s.setfilter(c)
@@ -53,6 +49,10 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SSet(tp,g)
 	end
 end
+function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsSummonType(SUMMON_TYPE_NORMAL) or (c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:HasFlagEffect(id))
+end
 function s.tgfilter(c)
 	return c:IsMonster() and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsRace(RACE_REPTILE|RACE_DINOSAUR) and c:IsAbleToGrave()
 end
@@ -61,7 +61,7 @@ function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function s.cfilter(c,lv,rac)
-	return c:IsFaceup() and ((not c:IsRace(rac)) or (c:HasLevel() and c:GetLevel()~=lv))
+	return c:IsFaceup() and c:HasLevel() and (not c:IsRace(rac) or not c:IsLevel(lv))
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
@@ -78,7 +78,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 			local c=e:GetHandler()
 			for tc in sg:Iter() do
 				--Level becomes the sent monster's level
-				if tc:HasLevel() then
+				if not tc:IsLevel(lv) then
 					local e1=Effect.CreateEffect(c)
 					e1:SetType(EFFECT_TYPE_SINGLE)
 					e1:SetCode(EFFECT_CHANGE_LEVEL)
@@ -99,9 +99,8 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function s.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return re and re:IsMonsterEffect() and re:GetHandler():IsAttribute(ATTRIBUTE_FIRE)
-end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD,0,1)
+	if re and re:IsMonsterEffect() and re:GetHandler():IsAttribute(ATTRIBUTE_FIRE) then
+		e:GetHandler():RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD&~(RESET_LEAVE|RESET_TEMP_REMOVE),0,1)
+	end
 end
