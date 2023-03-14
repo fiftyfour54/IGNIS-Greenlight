@@ -85,7 +85,7 @@ end
 function s.spfilter(c,e,tp,mustg)
 	return c:IsLevel(7) and c:IsSetCard(SET_URSARCTIC)
 		and c:IsType(TYPE_SYNCHRO) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
-		and (mustg and Duel.GetLocationCountFromEx(tp,tp,mustg,c)>0 or Duel.GetLocationCountFromEx(tp,tp,nil,c)>0)
+		and Duel.GetLocationCountFromEx(tp,tp,mustg,c)>0
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroupCost(tp,nil,2,2,true,s.spcheck,nil,e) end
