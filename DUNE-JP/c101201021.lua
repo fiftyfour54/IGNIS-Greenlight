@@ -1,5 +1,5 @@
 --天極輝士－熊斗竜巧α
---Celestial Knight - Ursatron Alpha
+--Ultimate Knight Alpha Ursatron
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e0:SetValue(function(e,se) return se:IsHasType(EFFECT_TYPE_ACTIONS) end)
 	c:RegisterEffect(e0)
-	--Special Summon itself from the hand and search 1 "Drytron" or "Ursarctic"Spell/Trap
+	--Special Summon itself from the hand and search 1 "Ursarctic" or "Drytron" Spell/Trap
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -51,7 +51,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.BreakEffect()
 			Duel.SendtoHand(sg,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,sg)
-			Duel.ShuffleDeck(tp)
 		end
 	end
 end
