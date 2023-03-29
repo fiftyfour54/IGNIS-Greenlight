@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_MOVE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1)
@@ -34,20 +34,22 @@ end
 function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MMZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() and chkc:IsType(TYPE_EFFECT) end
 	local c=e:GetHandler()
-	local b1=Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_MZONE,0,1,nil)
-	local b2=c:IsAbleToGraveAsCost() and c:IsStatus(STATUS_EFFECT_ENABLED)
+	local not_dmg_step=Duel.GetCurrentPhase()~=PHASE_DAMAGE
+	local b1=Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_MZONE,0,1,nil) and (not_dmg_step or not Duel.IsDamageCalculated())
+	local b2=c:IsAbleToGraveAsCost() and c:IsStatus(STATUS_EFFECT_ENABLED) and not_dmg_step
 		and Duel.IsExistingTarget(aux.FaceupFilter(Card.IsType,TYPE_EFFECT),tp,0,LOCATION_MMZONE,1,nil)
 	if chk==0 then return b1 or b2 end
 	local op=Duel.SelectEffect(tp,
 		{b1,aux.Stringid(id,1)},
 		{b2,aux.Stringid(id,2)})
 	e:SetLabel(op)
+	local prop=EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP
 	if op==1 then
 		e:SetCategory(CATEGORY_ATKCHANGE)
-		e:SetProperty(EFFECT_FLAG_DELAY)
+		e:SetProperty(prop)
 	elseif op==2 then
 		e:SetCategory(CATEGORY_DESTROY)
-		e:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
+		e:SetProperty(prop+EFFECT_FLAG_CARD_TARGET)
 		Duel.SendtoGrave(c,REASON_COST)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 		local tc=Duel.SelectTarget(tp,aux.FaceupFilter(Card.IsType,TYPE_EFFECT),tp,0,LOCATION_MMZONE,1,1,nil,tp):GetFirst()
