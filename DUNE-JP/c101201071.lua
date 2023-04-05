@@ -56,7 +56,7 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c:IsControler(tp) and s.tdfilter(chkc,tohand) end
 	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_GRAVE,0,1,1,nil,tohand)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,tp,0)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,g,1,tp,0)
 end
