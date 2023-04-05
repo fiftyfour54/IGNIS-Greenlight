@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCondition(s.condition)
 	c:RegisterEffect(e1)
-	--Set 1 Spell/Trap that mentions "Visas Starfrost" from your GY
+	--Activate 1 of these effects
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -68,6 +68,7 @@ function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function s.effop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local g=Duel.GetTargetCards(e)
 	local op=e:GetLabel()
 	if #g==0 and op~=4 then return end
@@ -77,28 +78,29 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 		if #sg>0 then
 			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 		end
-	elseif op==2 then
-		local tg=g:Filter(Card.IsAttackAbove,nil,0)
-		if #tg>0 then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEFCHANGE)
-			local tuner=Duel.SelectMatchingCard(tp,aux.FaceupFilter(Card.IsType,TYPE_TUNER),tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
-			if tuner then
-				local tc=tg:Select(tp,1,1,nil):GetFirst()
-				local e1=Effect.CreateEffect(e:GetHandler())
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_UPDATE_ATTACK)
-				e1:SetValue(tc:GetAttack()/2)
-				e1:SetReset(RESET_EVENT|RESETS_STANDARD)
-				tuner:RegisterEffect(e1)
-			end
+	elseif op==2 and g:IsExists(Card.IsAttackAbove,1,nil,0) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEFCHANGE)
+		local tuner=Duel.SelectMatchingCard(tp,aux.FaceupFilter(Card.IsType,TYPE_TUNER),tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
+		if tuner then
+			local tc=g:FilterSelect(tp,Card.IsAttackAbove,1,1,nil,0):GetFirst()
+			Duel.HintSelection(tc,true)
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_UPDATE_ATTACK)
+			e1:SetValue(tc:GetAttack()/2)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+			tuner:RegisterEffect(e1)
 		end
 	elseif op==3 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-		local tg=g:FilterSelect(tp,Card.IsAbleToDeck,1,1,nil)
-		if #tg>0 and Duel.SendtoDeck(tg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 then
-			Duel.Draw(tp,1,REASON_EFFECT)
+		local tc=g:FilterSelect(tp,Card.IsAbleToDeck,1,1,nil):GetFirst()
+		if tc then
+			Duel.HintSelection(tc,true)
+			if Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_DECK) then
+				Duel.Draw(tp,1,REASON_EFFECT)
+			end
 		end
-	elseif op==4 and Duel.SendtoDeck(e:GetHandler(),nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 then
+	elseif op==4 and Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 and c:IsLocation(LOCATION_DECK) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local th=Duel.SelectMatchingCard(tp,aux.AND(Card.IsFieldSpell,Card.IsAbleToHand),tp,LOCATION_GRAVE,0,1,1,nil)
 		if #th>0 then
