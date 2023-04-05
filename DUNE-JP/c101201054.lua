@@ -30,7 +30,7 @@ function s.synchfilter(c,e,tp,zonecheck)
 		and (zonecheck or Duel.GetLocationCountFromEx(tp,tp,nil,c)>0)
 end
 function s.rescon(sg,e,tp,mg)
-	return Duel.GetLocationCountFromEx(tp,tp,sg)>0 and sg:IsExists(s.cfilter,1,nil,sg)
+	return Duel.GetLocationCountFromEx(tp,tp,sg,TYPE_SYNCHRO)>0 and sg:IsExists(s.cfilter,1,nil,sg)
 end
 function s.cfilter(c,sg)
 	return c:IsCode(CARD_VISAS_STARFROST) and sg:FilterCount(s.statsfilter,c,nil)==4
