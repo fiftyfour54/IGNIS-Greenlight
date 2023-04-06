@@ -15,6 +15,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
+s.listed_series={SET_BATTLIN_BOXER,SET_NUMBER}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and re:IsMonsterEffect() and Duel.IsChainNegatable(ev)
 end
