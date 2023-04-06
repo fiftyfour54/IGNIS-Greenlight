@@ -14,15 +14,15 @@ function s.initial_effect(c)
 end
 s.listed_names={CARD_VISAS_STARFROST}
 s.listed_series={SET_VISAS}
-function s.visasfilter(c,e,tp)
-	return c:IsCode(CARD_VISAS_STARFROST) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.gyspfilter(c,e,tp)
+	return s.statsfilter(c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.statsfilter(c)
 	return c:IsAttack(1500) and c:IsDefense(2100)
 end
 function s.tdfilter(c)
 	return c:IsFaceup() and c:IsAbleToDeck()
-		and (c:IsCode(CARD_VISAS_STARFROST) or (c:IsMonster() and s.statsfilter(c)))
+		and (c:IsCode(CARD_VISAS_STARFROST) or s.statsfilter(c))
 end
 function s.synchfilter(c,e,tp,zonecheck)
 	return c:IsSetCard(SET_VISAS) and c:IsType(TYPE_SYNCHRO)
@@ -33,10 +33,10 @@ function s.rescon(sg,e,tp,mg)
 	return Duel.GetLocationCountFromEx(tp,tp,sg,TYPE_SYNCHRO)>0 and sg:IsExists(s.cfilter,1,nil,sg)
 end
 function s.cfilter(c,sg)
-	return c:IsCode(CARD_VISAS_STARFROST) and sg:FilterCount(s.statsfilter,c,nil)==4
+	return c:IsCode(CARD_VISAS_STARFROST) and sg:FilterCount(s.statsfilter,c)==4
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.visasfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
+	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.gyspfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
 	local g=Duel.GetMatchingGroup(s.tdfilter,tp,LOCATION_MZONE|LOCATION_GRAVE|LOCATION_REMOVED,0,nil)
 	local b2=#g>=5 and Duel.IsExistingMatchingCard(s.synchfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,true)
 		and aux.SelectUnselectGroup(g,e,tp,5,5,s.rescon,0)
@@ -59,7 +59,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.visasfilter),tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,s.gyspfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
@@ -68,10 +68,12 @@ function s.synchop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.tdfilter),tp,LOCATION_MZONE|LOCATION_GRAVE|LOCATION_REMOVED,0,nil)
 	if #g<5 then return end
 	local rg=aux.SelectUnselectGroup(g,e,tp,5,5,s.rescon,1,tp,HINTMSG_TODECK)
-	if #rg==5 and Duel.SendtoDeck(rg,tp,SEQ_DECKSHUFFLE,REASON_EFFECT)>0
+	if #rg~=5 then return end
+	Duel.HintSelection(rg,true)
+	if Duel.SendtoDeck(rg,tp,SEQ_DECKSHUFFLE,REASON_EFFECT)==5
 		and Duel.IsExistingMatchingCard(s.synchfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,false) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sc=Duel.SelectMatchingCard(tp,synchfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,false):GetFirst()
+		local sc=Duel.SelectMatchingCard(tp,s.synchfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,false):GetFirst()
 		if sc then
 			Duel.SpecialSummon(sc,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
 			sc:CompleteProcedure()

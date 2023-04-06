@@ -22,10 +22,12 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_TODECK+CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_PHASE+PHASE_END)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1,id)
+	e3:SetHintTiming(TIMING_END_PHASE,0)
 	e3:SetCondition(s.tdcond)
 	e3:SetTarget(s.tdtg)
 	e3:SetOperation(s.tdop)
@@ -43,10 +45,11 @@ function s.indesval(e,re,r,rp)
 	end
 end
 function s.tdcond(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsTurnPlayer(tp) and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_VISAS_STARFROST),tp,LOCATION_ONFIELD,0,1,nil)
+	return Duel.IsTurnPlayer(tp) and Duel.GetCurrentPhase()==PHASE_END
+		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_VISAS_STARFROST),tp,LOCATION_ONFIELD,0,1,nil)
 end
 function s.tdfilter(c,tohand)
-	return c:IsMonster() and (c:IsAbleToDeck() or tohand and c:IsAbleToHand())
+	return c:IsMonster() and (c:IsAbleToDeck() or (tohand and c:IsAbleToHand()))
 end
 function s.tunersyncfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_TUNER) and c:IsType(TYPE_SYNCHRO)
@@ -57,7 +60,10 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE,0,1,nil,tohand) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_GRAVE,0,1,1,nil,tohand)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,tp,0)
+	if not tohand then
+		Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,tp,0)
+	end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TODECK,g,1,tp,0)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,g,1,tp,0)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
