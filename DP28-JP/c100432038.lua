@@ -20,10 +20,10 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and re:IsMonsterEffect() and Duel.IsChainNegatable(ev)
 end
 function s.desfilter(c,e)
-	return c:IsFaceup() and c:IsSetCard({SET_BATTLIN_BOXER,SET_NUMBER}) and c:IsType(TYPE_XYZ) and c:IsDestructable(e)
+	return c:IsFaceup() and c:IsSetCard({SET_BATTLIN_BOXER,SET_NUMBER}) and c:IsType(TYPE_XYZ)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_MZONE,0,1,nil,e) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
@@ -36,7 +36,7 @@ function s.spfilter(c,e,tp,code)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local dc=Duel.SelectMatchingCard(tp,s.desfilter,tp,LOCATION_MZONE,0,1,1,nil,e):GetFirst()
+	local dc=Duel.SelectMatchingCard(tp,s.desfilter,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
 	if dc and Duel.Destroy(dc,REASON_EFFECT)>0 and Duel.NegateActivation(ev)
 		and re:GetHandler():IsRelateToEffect(re) and Duel.Destroy(eg,REASON_EFFECT)>0 then
 		local code=dc:GetCode()

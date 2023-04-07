@@ -17,19 +17,20 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
-	-- Special Summon or Set
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCountLimit(1,id)
-	e2:SetCondition(function(e) return e:GetHandler():IsReason(REASON_EFFECT) end)
-	e2:SetTarget(s.efftg)
-	e2:SetOperation(s.effop)
-	c:RegisterEffect(e2)
+	-- Activate 1 of these effects
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_TO_GRAVE)
+	e3:SetCountLimit(1,id)
+	e3:SetCondition(function(e) return e:GetHandler():IsReason(REASON_EFFECT) end)
+	e3:SetTarget(s.efftg)
+	e3:SetOperation(s.effop)
+	c:RegisterEffect(e3)
 end
 s.listed_series={SET_BATTLIN_BOXER,SET_COUNTER}
+s.listed_names={id}
 function s.thfilter(c)
 	return (c:IsSetCard(SET_BATTLIN_BOXER) and c:IsMonster() or c:IsSetCard(SET_COUNTER) and c:IsCounterTrap()) and not c:IsCode(id) and c:IsAbleToHand()
 end
@@ -52,7 +53,7 @@ function s.setfilter(c)
 	return c:IsSetCard(SET_COUNTER) and c:IsCounterTrap() and c:IsSSetable()
 end
 function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local b1=Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
 	local b2=Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_GRAVE,0,1,nil)
 	if chk==0 then return b1 or b2 end
 	local op=Duel.SelectEffect(tp,
@@ -64,10 +65,12 @@ function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 	elseif op==2 then
 		e:SetCategory(0)
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,tp,LOCATION_GRAVE)
 	end
 end
 function s.effop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==1 then
+		-- Special Summon 1 "Battlin' Boxer" monster from your GY
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
@@ -75,6 +78,7 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end
 	else
+		-- Set 1 "Counter" Counter Trap from your GY
 		if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 		local g=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_GRAVE,0,1,1,nil)

@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.selfspcon)
+	e1:SetCondition(function(_,tp) return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0 end)
 	e1:SetCost(s.sumlimitcost)
 	e1:SetTarget(s.selfsptg)
 	e1:SetOperation(s.selfspop)
@@ -22,27 +22,25 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCost(s.spcost)
+	e2:SetCost(s.combined_costs(s.sumlimitcost,aux.selfreleasecost))
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	--Increase or decrease the Level of all "Battlin' Boxer" monsters you control
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetCategory(CATEGORY_LVCHANGE)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_GRAVE)
 	e3:SetCountLimit(1,{id,2})
-	e3:SetCost(s.lvcost)
+	e3:SetCost(s.combined_costs(s.sumlimitcost,aux.bfgcost))
 	e3:SetTarget(s.lvtg)
 	e3:SetOperation(s.lvop)
 	c:RegisterEffect(e3)
-	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.activityfilter)
+	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,function(_c) return _c:IsSetCard(SET_BATTLIN_BOXER) end)
 end
 s.listed_names={id}
 s.listed_series={SET_BATTLIN_BOXER}
-function s.activityfilter(c)
-	return c:IsSetCard(SET_BATTLIN_BOXER)
-end
 function s.sumlimitcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
 	--Cannot Special Summon, except "Battlin' Boxer" monsters
@@ -56,9 +54,6 @@ function s.sumlimitcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE|PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
-function s.selfspcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0
-end
 function s.selfsptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -71,14 +66,14 @@ function s.selfspop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return aux.selfreleasecost(e,tp,eg,ep,ev,re,r,rp,0)
-		and s.sumlimitcost(e,tp,eg,ep,ev,re,r,rp,0) end
-	aux.selfreleasecost(e,tp,eg,ep,ev,re,r,rp,1)
-	s.sumlimitcost(e,tp,eg,ep,ev,re,r,rp,1)
+function s.combined_costs(cost1,cost2)
+	return	function(...)
+				local b1,b2=cost1(...),cost2(...)
+				return b1 and b2
+			end
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(SET_BATTLIN_BOXER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
+	return c:IsSetCard(SET_BATTLIN_BOXER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetMZoneCount(tp,e:GetHandler())>0
@@ -86,21 +81,16 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if ft==0 then return end
 	local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
-	if #g<2 then return end
-	local ft=math.min(Duel.GetLocationCount(tp,LOCATION_MZONE),#g,2)
-	if ft<1 then return end
+	if #g==0 then return end
+	ft=math.min(ft,#g,2)
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
 	local sg=aux.SelectUnselectGroup(g,e,tp,1,ft,aux.dncheck,1,tp,HINTMSG_SPSUMMON)
 	if #sg>0 then
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-function s.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToRemoveAsCost() and s.sumlimitcost(e,tp,eg,ep,ev,re,r,rp,0) end
-	Duel.Remove(c,POS_FACEUP,REASON_COST)
-	s.sumlimitcost(e,tp,eg,ep,ev,re,r,rp,1)
 end
 function s.lvfilter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_BATTLIN_BOXER) and c:HasLevel()
@@ -113,16 +103,18 @@ end
 function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.lvfilter,tp,LOCATION_MZONE,0,nil)
 	if #g==0 then return end
-	local decrease=g:FilterCount(Card.IsLevel,nil,1)<#g
-	local value=Duel.SelectEffect(tp,
-		{true,aux.Stringid(id,4)}, --increase levels by 1
-		{decrease,aux.Stringid(id,5)}) --decrease levels by 1
-	if value==2 then value=-1 end
+	local b1=true
+	local b2=g:IsExists(Card.IsLevelAbove,1,nil,2)
+	local op=Duel.SelectEffect(tp,
+		{b1,aux.Stringid(id,4)},
+		{b2,aux.Stringid(id,5)})
+	local value=(op==1 and op) or -1
 	local c=e:GetHandler()
 	for tc in g:Iter() do
-		---Increase or decrease the level of "Battlin' Boxer" monsters
+		---Increase or decrease the Level by 1
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EFFECT_UPDATE_LEVEL)
 		e1:SetValue(value)
 		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
