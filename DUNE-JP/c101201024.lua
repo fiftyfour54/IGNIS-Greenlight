@@ -1,5 +1,5 @@
 --百戦王 ベヒーモス
---War King Behemoth
+--Behemoth the King of All Wars
 --Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e4:SetCode(EFFECT_IMMUNE_EFFECT)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_NORMAL) end)
-	e4:SetValue(function(_,te) return te:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL) end)
+	e4:SetValue(s.imnval)
 	c:RegisterEffect(e4)
 	--Gain 700 ATK
 	local e5=Effect.CreateEffect(c)
@@ -48,6 +48,7 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,e:GetHandler(),1,tp,-700)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -58,6 +59,9 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		if not c:IsRelateToEffect(e) then return end
 		c:UpdateAttack(-700)
 	end
+end
+function s.imnval(e,te)
+	return te:IsMonsterEffect() and te:IsActivated() and te:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL) 
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
