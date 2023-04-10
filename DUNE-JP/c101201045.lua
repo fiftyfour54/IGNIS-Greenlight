@@ -4,7 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableCounterPermit(COUNTER_SPELL)
-	c:SetCounterLimit(COUNTER_SPELL,3)
+	c:SetCounterLimit(COUNTER_SPELL,9)
 	c:EnableReviveLimit()
 	--2 Level 8 monsters
 	Xyz.AddProcedure(c,nil,8,2)
@@ -44,7 +44,7 @@ function s.initial_effect(c)
 end
 function s.acop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if ep==1-tp and not re:IsActiveType(TYPE_SPELL) and c:GetFlagEffect(1)>0 then
+	if ep==1-tp and not re:IsSpellEffect() and c:GetFlagEffect(1)>0 then
 		c:AddCounter(COUNTER_SPELL,1)
 	end
 end
@@ -91,7 +91,7 @@ function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return not c:IsReason(REASON_REPLACE) and c:CheckRemoveOverlayCard(tp,1,REASON_EFFECT) end
 	if Duel.SelectEffectYesNo(tp,c,96) then
-		c:RemoveOverlayCard(tp,1,1,REASON_EFFECT)
+		c:RemoveOverlayCard(tp,1,1,REASON_EFFECT|REASON_REPLACE)
 		return true
 	else return false end
 end
