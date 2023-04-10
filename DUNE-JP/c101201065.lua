@@ -1,5 +1,5 @@
 --誇大化
---Hypermorph
+--Egomorph
 --Scripted by Hatter
 local s,id=GetID()
 function s.initial_effect(c)
