@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
-	e1:SetCondition(aux.bdcon)
+	e1:SetCondition(s.abdcon)
 	e1:SetOperation(function() Duel.ChainAttack() end)
 	c:RegisterEffect(e1)
 	--Add FIRE monsters to the hand
@@ -31,8 +31,12 @@ function s.initial_effect(c)
 	e2a:SetCode(EVENT_BATTLE_DESTROYING)
 	e2a:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2a:SetCondition(aux.bdcon)
-	e2a:SetOperation(s.bdop)
+	e2a:SetOperation(function(e) e:GetHandler():RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,0,1) end)
 	c:RegisterEffect(e2a)
+end
+function s.abdcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and Duel.GetAttacker()==c and c:CanChainAttack()
 end
 function s.thfilter(c)
 	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToHand()
@@ -51,7 +55,4 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
-end
-function s.bdop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,0,1,1)
 end

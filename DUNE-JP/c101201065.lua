@@ -40,16 +40,19 @@ function s.actop(e,tp,eg,ep,ev,re,r,rp)
 	local ac=Duel.GetAttacker()
 	local dc=Duel.GetAttackTarget()
 	if op==1 then
+		--Change the attacking monster to Defense Position
 		if ac:IsAttackPos() and ac:IsRelateToBattle() then
 			Duel.ChangePosition(ac,POS_FACEUP_DEFENSE)
 		end
 	elseif op==2 then
+		--Return the attack target to the hand
 		if dc and dc:IsRelateToBattle() then
 			Duel.SendtoHand(dc,nil,REASON_EFFECT)
 		end
 	elseif op==3 then
+		--Destroy both battling monsters
 		local g=Group.FromCards(ac,dc):Match(Card.IsRelateToBattle,nil)
-		if #g==0 then return end
+		if #g~=2 then return end
 		Duel.Destroy(g,REASON_EFFECT)
 	end
 end

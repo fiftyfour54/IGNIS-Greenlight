@@ -36,6 +36,7 @@ function s.initial_effect(c)
 	e5:SetCode(EVENT_PHASE+PHASE_END)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1)
+	e5:SetCondition(function(e,tp) return Duel.IsTurnPlayer(tp) end)
 	e5:SetOperation(s.atkop)
 	c:RegisterEffect(e5)
 end
@@ -56,7 +57,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		and tc:IsLocation(LOCATION_HAND) then
 		Duel.ConfirmCards(1-tp,tc)
 		local c=e:GetHandler()
-		if not c:IsRelateToEffect(e) then return end
+		if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 		c:UpdateAttack(-700)
 	end
 end
@@ -65,7 +66,7 @@ function s.imnval(e,te)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
+	if c:IsFaceup() and c:IsRelateToEffect(e) then
 		c:UpdateAttack(700)
 	end
 end

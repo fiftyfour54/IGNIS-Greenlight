@@ -10,14 +10,14 @@ function s.initial_effect(c)
 	Xyz.AddProcedure(c,nil,8,2)
 	--Place Spell Counter on this card
 	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e0:SetCode(EVENT_CHAINING)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetOperation(aux.chainreg)
 	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_CHAIN_SOLVED)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetOperation(s.acop)
@@ -35,16 +35,17 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	--Destruction replacement
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e3:SetCode(EFFECT_DESTROY_REPLACE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTarget(s.reptg)
 	c:RegisterEffect(e3)
 end
+s.counter_place_list={COUNTER_SPELL}
 function s.acop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if ep==1-tp and not re:IsSpellEffect() and c:GetFlagEffect(1)>0 then
+	if ep==1-tp and not re:IsSpellEffect() and c:HasFlagEffect(1) then
 		c:AddCounter(COUNTER_SPELL,1)
 	end
 end
@@ -54,7 +55,7 @@ function s.ctcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	c:RemoveCounter(tp,COUNTER_SPELL,3,REASON_COST)
 end
 function s.thfilter(c)
-	return (c:IsSpell() or c:IsRace(RACE_SPELLCASTER)) and c:IsAbleToHand()
+	return (c:IsSpell() or (c:IsRace(RACE_SPELLCASTER) and c:IsType(TYPE_EFFECT))) and c:IsAbleToHand()
 end
 function s.spfilter(c,e,tp)
 	return c:IsRace(RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

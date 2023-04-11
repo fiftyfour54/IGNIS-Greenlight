@@ -5,12 +5,13 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--1 monster Special Summoned from the Extra Deck + 1 monster in the hand
-	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSummonLocation,LOCATION_EXTRA),aux.FilterBoolFunctionEx(Card.IsLocation,LOCATION_HAND))
-	--Place 1 "Polymerization" or "Fusion" Spell to the bottom of the Deck
+	Fusion.AddProcMix(c,true,true,s.edmatfilter,aux.FilterBoolFunctionEx(Card.IsLocation,LOCATION_HAND))
+	--Place 1 "Polymerization" or "Fusion" Spell on the bottom of the Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.tdtg)
@@ -21,6 +22,7 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,{id,1})
@@ -31,6 +33,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_FUSION}
+function s.edmatfilter(c)
+	return c:IsSummonLocation(LOCATION_EXTRA) and c:IsLocation(LOCATION_MZONE)
+end
 function s.tdfilter(c)
 	return c:IsSetCard(SET_FUSION) and c:IsSpell() and c:IsAbleToDeck()
 end
