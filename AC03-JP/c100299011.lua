@@ -4,7 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	Duel.EnableGlobalFlag(GLOBALFLAG_SELF_TOGRAVE)
-	c:EnableCounterPermit(0x20e)
+	c:EnableCounterPermit(0x20f)
 	--Activate
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
@@ -38,7 +38,7 @@ function s.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e3:SetCode(EFFECT_SELF_TOGRAVE)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetCondition(function(e) return e:GetHandler():GetCounter(0x20e)>=3 end)
+	e3:SetCondition(function(e) return e:GetHandler():GetCounter(0x20f)>=3 end)
 	c:RegisterEffect(e3)
 	--Double any effect damage the opponent takes this turn
 	local e4=Effect.CreateEffect(c)
@@ -56,14 +56,14 @@ function s.filter(c)
 end
 function s.btcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return not c:HasFlagEffect(id) and c:IsCanAddCounter(0x20e,1) end
+	if chk==0 then return not c:HasFlagEffect(id) and c:IsCanAddCounter(0x20f,1) end
 	c:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_DAMAGE,0,1)
 end
 function s.btop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if Duel.NegateAttack() and c:IsCanAddCounter(0x20e,1) then
+	if Duel.NegateAttack() and c:IsRelateToEffect(e) and c:IsCanAddCounter(0x20f,1) then
 		Duel.BreakEffect()
-		c:AddCounter(0x20e,1)
+		c:AddCounter(0x20f,1)
 	end
 end
 function s.damcon(e,tp,eg,ep,ev,re,r,rp)
