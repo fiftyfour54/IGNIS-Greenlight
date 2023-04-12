@@ -85,7 +85,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetCurrentPhase()&(PHASE_DAMAGE|PHASE_DAMAGE_CAL)==0 or Duel.IsDamageCalculated() then return false end
-	local a=Duel.GetAttack()
+	local a=Duel.GetAttacker()
 	return a:IsControler(tp) and a:IsSetCard(SET_CODE_TALKER) and ep==1-tp and Duel.IsChainNegatable(ev)
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
