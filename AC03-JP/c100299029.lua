@@ -43,10 +43,10 @@ function s.initial_effect(c)
 	e4:SetOperation(s.negop)
 	c:RegisterEffect(e4)
 end
-s.listed_series={SET_CODETALKER}
+s.listed_series={SET_CODE_TALKER}
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local sc,oc=Duel.GetBattleMonster(tp)
-	if chk==0 then return sc and oc:IsFaceup() and oc:GetAttack()>0 end
+	if chk==0 then return sc and oc and oc:IsFaceup() and oc:GetAttack()>0 end
 	Duel.SetTargetCard(Group.FromCards(oc,sc))
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
@@ -88,7 +88,7 @@ end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetCurrentPhase()&(PHASE_DAMAGE|PHASE_DAMAGE_CAL)==0 or Duel.IsDamageCalculated() then return false end
 	local a=Duel.GetAttack()
-	return a:IsControler(tp) and a:IsSetCard(SET_CODETALKER) and ep==1-tp and Duel.IsChainNegatable(ev)
+	return a:IsControler(tp) and a:IsSetCard(SET_CODE_TALKER) and ep==1-tp and Duel.IsChainNegatable(ev)
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
