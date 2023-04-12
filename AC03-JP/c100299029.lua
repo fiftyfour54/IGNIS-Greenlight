@@ -52,7 +52,7 @@ end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tg=Duel.GetTargetCards(e)
-	if #tg>0 end
+	if #tg>0 then
 		local oc=tg:GetFirst()
 		if oc:IsControler(tp) then oc=tg:GetNext() end
 		if oc and oc:IsFaceup() then
