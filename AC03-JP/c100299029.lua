@@ -52,38 +52,36 @@ end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tg=Duel.GetTargetCards(e)
-	if #tg==0 then return end
-	local oc=tg:GetFirst()
-	if oc:IsControler(tp) then oc=tg:GetNext() end
-	if oc and oc:IsFaceup() and not oc:IsImmuneToEffect(e) then
-		--Change ATK to 0
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
-		e1:SetValue(0)
-		oc:RegisterEffect(e1)
-		--Cannot be destroyed by that battle
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-		e2:SetValue(1)
-		e2:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_DAMAGE)
-		oc:RegisterEffect(e2)
-		local sc=(tg-oc):GetFirst()
-		if sc then
-			local e3=e2:Clone()
-			sc:RegisterEffect(e2)
+	if #tg>0 end
+		local oc=tg:GetFirst()
+		if oc:IsControler(tp) then oc=tg:GetNext() end
+		if oc and oc:IsFaceup() then
+			--Change ATK to 0
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+			e1:SetValue(0)
+			oc:RegisterEffect(e1)
 		end
-		--Take no battle damage from that battle
-		local e4=Effect.CreateEffect(c)
-		e4:SetType(EFFECT_TYPE_FIELD)
-		e4:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-		e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e4:SetTargetRange(1,1)
-		e4:SetReset(RESET_PHASE|PHASE_DAMAGE)
-		Duel.RegisterEffect(e4,tp)
+		--Cannot be destroyed by that battle
+		for tc in tg:Iter() do
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+			e2:SetValue(1)
+			e2:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_DAMAGE)
+			tc:RegisterEffect(e2)
+		end
 	end
+	--Take no battle damage from that battle
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetTargetRange(1,1)
+	e3:SetReset(RESET_PHASE|PHASE_DAMAGE)
+	Duel.RegisterEffect(e3,tp)
 end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetCurrentPhase()&(PHASE_DAMAGE|PHASE_DAMAGE_CAL)==0 or Duel.IsDamageCalculated() then return false end
