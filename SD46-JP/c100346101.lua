@@ -46,7 +46,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
 	if tc and Duel.SpecialSummon(tc,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)>0 then
 		tc:CompleteProcedure()
-		if (c:IsLocation(LOCATION_GRAVE) and (r&REASON_SYNCHRO)==REASON_SYNCHRO and c:GetReasonCard():IsAttribute(ATTRIBUTE_DARK) and and c:GetReasonCard():IsRace(RACE_DRAGON)) and Duel.SelectYesNo(tp,aux.Stringid(id,1) then
+		if (c:IsLocation(LOCATION_GRAVE) and (r&REASON_SYNCHRO)==REASON_SYNCHRO
+			and c:GetReasonCard():IsAttribute(ATTRIBUTE_DARK) and c:GetReasonCard():IsRace(RACE_DRAGON))
+			and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			local g=Duel.GetMatchingGroup(Card.IsAttackPos,tp,0,LOCATION_MZONE,nil)
 			if #g>0 then
 				Duel.Destroy(g,REASON_EFFECT)
