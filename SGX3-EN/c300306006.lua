@@ -29,7 +29,7 @@ function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 		local og=Duel.GetOperatedGroup():GetFirst()
 		local att=0
 		if og:IsPreviousLocation(LOCATION_ONFIELD) then
-			att==og:GetPreviousAttributeOnField()
+			att=og:GetPreviousAttributeOnField()
 		else
 			att=og:GetAttribute()
 		end
