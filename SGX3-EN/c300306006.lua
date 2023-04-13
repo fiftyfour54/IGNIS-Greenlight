@@ -82,7 +82,7 @@ function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 				c:RegisterEffect(e3)
 				local e4=e3:Clone()
 				e4:SetCode(EFFECT_UNRELEASABLE_SUM)
-				e4:SetValue(function(e,c) return not c:IsCode(27408609))
+				e4:SetValue(function(e,c) return not c:IsCode(27408609) end)
 				c:RegisterEffect(e4)
 			end
 		end
