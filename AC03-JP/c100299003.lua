@@ -4,7 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	--“Kaitoptera” + 1 Dinosaur or Dragon monster
+	--"Kaitoptera" + 1 Dinosaur or Dragon monster
 	Fusion.AddProcMix(c,true,true,100299002,aux.FilterBoolFunctionEx(Card.IsRace,RACE_DINOSAUR|RACE_DRAGON))
 	--Place 1 Field Spell face-up in the Field Zone
 	local e1=Effect.CreateEffect(c)
@@ -40,7 +40,7 @@ function s.plfilter(c)
 	return c:IsFieldSpell() and not c:IsForbidden()
 end
 function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.plfilter),tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.plfilter,tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil) end
 	Duel.SetPossibleOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,tp,LOCATION_GRAVE)
 end
 function s.plop(e,tp,eg,ep,ev,re,r,rp)
@@ -50,8 +50,8 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 	local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
 	if fc then
 		Duel.SendtoGrave(fc,REASON_RULE)
+		Duel.BreakEffect()
 	end
-	Duel.BreakEffect()
 	Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
 end
 function s.nsfilter(c)
@@ -59,7 +59,7 @@ function s.nsfilter(c)
 end
 function s.nstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.nsfilter,tp,LOCATION_HAND|LOCATION_MZONE,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,0,LOCATION_HAND|LOCATION_MZONE)
+	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_MZONE)
 end
 function s.nsop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)

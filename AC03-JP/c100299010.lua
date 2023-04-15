@@ -46,13 +46,13 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	--Reflect effect damage
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetCode(EFFECT_REFLECT_DAMAGE)
 	e1:SetTargetRange(1,0)
 	e1:SetValue(function(e,_,_,r) return (r&REASON_EFFECT)==REASON_EFFECT end)
-	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetReset(RESET_PHASE|PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.tdfilter(c,e)
@@ -62,16 +62,19 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(s.tdfilter,tp,LOCATION_GRAVE,0,c,e)
-	if chk==0 then return aux.SelectUnselectGroup(g,e,tp,3,3,aux.dncheck,0) end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,3) and aux.SelectUnselectGroup(g,e,tp,3,3,aux.dncheck,0) end
 	local g=aux.SelectUnselectGroup(g,e,tp,3,3,aux.dncheck,1,tp,HINTMSG_TODECK)
 	Duel.SetTargetCard(g)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,3,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,3)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetTargetCards(e)
 	if #g>0 and Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0
 		and g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK|LOCATION_EXTRA) then
+		if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then
+			Duel.ShuffleDeck(tp)
+		end
 		Duel.BreakEffect()
 		Duel.Draw(tp,3,REASON_EFFECT)
 	end

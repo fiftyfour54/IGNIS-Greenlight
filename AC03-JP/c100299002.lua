@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(s.imcon)
-	e1:SetValue(function(e,c) return aux.imval2(e,c) and s.imconfilter(c) end)
+	e1:SetValue(function(e,c) return aux.imval2(e,c) and c:IsFaceup() and c:IsAttributeExcept(ATTRIBUTE_WIND) end)
 	c:RegisterEffect(e1)
 	--Search 1 "Polymerization"
 	local e2=Effect.CreateEffect(c)
@@ -35,11 +35,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_names={CARD_POLYMERIZATION}
-function s.imconfilter(c)
-	return c:IsFaceup() and not c:IsAttribute(ATTRIBUTE_WIND)
-end
 function s.imcon(e)
-	return Duel.IsExistingMatchingCard(s.imconfilter,e:GetHandlerPlayer(),0,LOCATION_MZONE,2,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsAttributeExcept,ATTRIBUTE_WIND),e:GetHandlerPlayer(),0,LOCATION_MZONE,2,nil)
 end
 function s.thfilter(c)
 	return c:IsCode(CARD_POLYMERIZATION) and c:IsAbleToHand()
@@ -65,12 +62,13 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,nil)
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0
+		and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.thfilter),tp,LOCATION_GRAVE,0,1,nil)
 		and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_GRAVE,0,1,1,nil)
 		if #g==0 then return end
+		Duel.BreakEffect()
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end

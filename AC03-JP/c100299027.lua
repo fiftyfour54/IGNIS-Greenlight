@@ -27,20 +27,21 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return ct>1 and #g==ct
 		and Duel.GetCustomActivityCount(id,tp,ACTIVITY_SUMMON)==0
 		and Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
 	local c=e:GetHandler()
+	--Cannot Normal or Special Summon monsters, except Cyberse monsters
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetReset(RESET_PHASE|PHASE_END)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(function(_,_c) return not _c:IsRace(RACE_CYBERSE) end)
+	e1:SetReset(RESET_PHASE|PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_CANNOT_SUMMON)
 	Duel.RegisterEffect(e2,tp)
-	aux.RegisterClientHint(c,EFFECT_FLAG_OATH,tp,1,0)
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,3) end
