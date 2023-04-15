@@ -1,8 +1,8 @@
---ソウル・リゾネーター
---Soul Resonator
+-- ソウル・リゾネーター
+-- Soul Resonator
 local s,id=GetID()
 function s.initial_effect(c)
-	--Add 1 Level 4 or lower Fiend monster from your Deck to your hand
+	--Search 1 Level 4 or lower Fiend monster
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
-	--Destruction replacement for Set card(s)
+	--Banish this card from your GY instead of a card(s) you control being destroyed
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EFFECT_DESTROY_REPLACE)
@@ -28,9 +28,9 @@ function s.initial_effect(c)
 	e3:SetOperation(s.repop)
 	c:RegisterEffect(e3)
 end
-s.listed_names={id,CARD_RED_DRAGON_ARCHFIEND}
+s.listed_names={id,70902743}
 function s.thfilter(c)
-	return c:IsRace(RACE_FIEND) and c:IsLevelBelow(4) and not c:IsCode(id) and c:IsAbleToHand()
+	return not c:IsCode(id) and c:IsRace(RACE_FIEND) and c:IsLevelBelow(4) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -43,18 +43,18 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
-	-- Cannot Summon from the Extra Deck, except DARK Synchro monsters
 	local c=e:GetHandler()
+	-- Cannot Special Summon from the Extra Deck, except DARK Synchro Monsters
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(s.splimit)
 	e1:SetReset(RESET_PHASE|PHASE_END)
 	Duel.RegisterEffect(e1,tp)
-	-- lizard check
+	-- Clock Lizard check
 	aux.addTempLizardCheck(c,tp,s.lizfilter)
 end
 function s.splimit(e,c)
@@ -63,22 +63,19 @@ end
 function s.lizfilter(e,c)
 	return not (c:IsOriginalType(TYPE_SYNCHRO) and c:IsOriginalAttribute(ATTRIBUTE_DARK))
 end
---destroy replacement
 function s.cfilter(c)
-	return (c:IsCode(CARD_RED_DRAGON_ARCHFIEND)
-		or (c:IsMonster() and c:IsType(TYPE_SYNCHRO) and c:ListsCode(CARD_RED_DRAGON_ARCHFIEND)))
+	return c:IsCode(70902743) or (c:IsType(TYPE_SYNCHRO) and c:ListsCode(70902743))
 end
 function s.repcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function s.repfilter(c,tp)
-	return c:IsControler(tp) and c:IsLocation(LOCATION_ONFIELD)
+	return c:IsControler(tp) and c:IsLocation(LOCATION_ONFIELD) 
 		and not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_EFFECT)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return not c:IsStatus(STATUS_DESTROY_CONFIRMED)
-		and c:IsAbleToRemove() and eg:IsExists(s.repfilter,1,nil,tp) end
+	if chk==0 then return c:IsAbleToRemove() and eg:IsExists(s.repfilter,1,nil,tp) end
 	return Duel.SelectEffectYesNo(tp,c,96)
 end
 function s.repval(e,c)
