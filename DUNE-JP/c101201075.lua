@@ -54,16 +54,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local success=false
 	if mc then
 		success=Duel.SpecialSummonStep(mc,0,tp,tp,false,false,POS_FACEUP)
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		mc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-		mc:RegisterEffect(e2)		
+		mc:NegateEffects(c)		
 	end
 	Duel.SpecialSummonComplete()
 	if not success then return end
