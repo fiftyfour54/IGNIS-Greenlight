@@ -11,8 +11,8 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetCost(s.thcost)
 	e1:SetTarget(s.thtg)
@@ -26,7 +26,6 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(3)
 	e2:SetCondition(s.attachcond)
-	e2:SetTarget(s.attachtg)
 	e2:SetOperation(s.attachop)
 	c:RegisterEffect(e2)
 end
@@ -56,9 +55,6 @@ function s.attachcond(e,tp,eg,ep,ev,re,r,rp)
 	return rc:IsSetCard(SET_PURRELY) and rc:IsQuickPlaySpell() and rc:IsOnField()
 		and rc:IsCanBeXyzMaterial(e:GetHandler(),tc,REASON_EFFECT)
 end
-function s.attachtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-end
 function s.setfilter(c)
 	return c:IsSetCard(SET_PURRELY) and c:IsTrap() and c:IsSSetable()
 end
@@ -72,9 +68,9 @@ function s.attachop(e,tp,eg,ep,ev,re,r,rp)
 		rc:CancelToGrave()
 		local g=Duel.GetMatchingGroup(s.setfilter,tp,LOCATION_DECK,0,nil)
 		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 			local sg=g:Select(tp,1,1,nil)
+			Duel.BreakEffect()
 			Duel.SSet(tp,sg)
 		end
 	end

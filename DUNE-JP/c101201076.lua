@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	--Equip 1 monster the opponent controls to a "Mikanko" monster you control
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_EQUIP)
+	e1:SetCategory(CATEGORY_EQUIP+CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -34,7 +34,7 @@ function s.eqfilter(c)
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.eqfilter(chkc) end
-	local ft=e:GetHandler():IsLocation(LOCATION_SZONE) and 0 or 1
+	local ft=e:GetHandler():IsLocation(LOCATION_HAND) and 1 or 0
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>ft
 		and Duel.IsExistingTarget(s.eqfilter,tp,0,LOCATION_MZONE,1,nil)
 		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_MIKANKO),tp,LOCATION_MZONE,0,1,nil) end
@@ -42,27 +42,29 @@ function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,s.eqfilter,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
+function s.ritmonfilter(c)
+	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER) and c:IsOriginalType(TYPE_RITUAL)
+end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsControler(1-tp) and tc:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_MIKANKO),tp,LOCATION_MZONE,0,1,nil) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-		local eqc=Duel.SelectMatchingCard(tp,aux.FaceupFilter(Card.IsSetCard,SET_MIKANKO),tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
-		if eqc and Duel.Equip(tp,tc,eqc) then
-			--Equip limit
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_EQUIP_LIMIT)
-			e1:SetReset(RESET_EVENT|RESETS_STANDARD)
-			e1:SetValue(function(e,c) return c==e:GetLabelObject() end)
-			e1:SetLabelObject(eqc)
-			tc:RegisterEffect(e1)
-			local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsEquipSpell),tp,LOCATION_ONFIELD,0,nil)
-			if Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsRitualMonster),tp,LOCATION_MZONE,0,1,nil)
-				and ct>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-				Duel.BreakEffect()
-				Duel.Damage(1-tp,ct*500,REASON_EFFECT)
-			end
+	if not (tc:IsFaceup() and tc:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local eqc=Duel.SelectMatchingCard(tp,aux.FaceupFilter(Card.IsSetCard,SET_MIKANKO),tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
+	if not eqc then return end
+	Duel.HintSelection(eqc,true)
+	if Duel.Equip(tp,tc,eqc) then
+		--Equip limit
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_EQUIP_LIMIT)
+		e1:SetValue(function(e,c) return c==eqc end)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+		tc:RegisterEffect(e1)
+		local ct=Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsEquipSpell),tp,LOCATION_ONFIELD,0,nil)
+		if Duel.IsExistingMatchingCard(s.ritmonfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+			and ct>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+			Duel.BreakEffect()
+			Duel.Damage(1-tp,ct*500,REASON_EFFECT)
 		end
 	end
 end
