@@ -75,10 +75,3 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 	end
 end
---[[
-2+ "Altergeist" Monsters
-You can only use the (1) and (2) effects of this card's name once per turn.
-(1) If this card is Link Summoned: You can set 1 "Altergeist" Trap directly from your Deck onto your field.
-(2) Once while this card remains face-up on the field, during the Main Phase (Quick Effect): You can send 1 card you control to the GY, then target 1 effect monster your opponent controls; Take control of that effect monster. That monster is also always treated as a "Altergeist" monster.
-
-]]
