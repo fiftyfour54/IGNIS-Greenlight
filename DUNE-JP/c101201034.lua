@@ -1,6 +1,7 @@
 --幻想魔獣キマイラ
 --Chimera the Illusion Magical Beast
 --Scripted by Eerie Code
+local CARD_CHIMERA=4796100 --Chimera the Flying Mythical Beast, to be removed
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
@@ -10,7 +11,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetCode(EFFECT_CHANGE_CODE)
-	e1:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
+	e1:SetRange(LOCATION_MZONE|LOCATION_GRAVE)
 	e1:SetValue(CARD_CHIMERA)
 	c:RegisterEffect(e1)
 	--multiattack
@@ -39,7 +40,7 @@ function s.initial_effect(c)
 	e4:SetOperation(s.operation)
 	c:RegisterEffect(e4)
 end
-s.listed_names={CARD_CHIMERA }
+s.listed_names={CARD_CHIMERA}
 function s.matcheck(e,c)
 	local g=c:GetMaterial()
 	local e1=Effect.CreateEffect(c)
@@ -64,7 +65,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e1:SetValue(0)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 		tc:RegisterEffect(e1)
 		tc:NegateEffects(c)
 	end
