@@ -68,7 +68,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.cfilter(c,tp)
-	return c:IsPreviousControler(tp) and c:GetPreviousAttributeOnField()&ATTRIBUTE_EARTH>0
+	return c:IsPreviousControler(tp) and c:GetPreviousAttributeOnField()&ATTRIBUTE_FIRE>0
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
