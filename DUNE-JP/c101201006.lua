@@ -39,12 +39,13 @@ function s.initial_effect(c)
 	e3:SetOperation(s.negop)
 	c:RegisterEffect(e3)
 end
-s.listed_name={id,CARD_CHIMERA,101201052} --Chimera Fusion
+s.listed_name={id,CARD_CHIMERA_MYTHICAL_BEAST,CARD_CHIMERA_FUSION}
 function s.indestg(e,c)
-	return c==e:GetHandler() or c==e:GetHandler():GetBattleTarget()
+	local handler=e:GetHandler()
+	return c==handler or c==handler:GetBattleTarget()
 end
 function s.spfilter(c,e,tp)
-	return c:ListsCode(101201052) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:ListsCode(CARD_CHIMERA_FUSION) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return  Duel.GetMZoneCount(tp,e:GetHandler())>0
@@ -60,7 +61,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_CHIMERA),tp,LOCATION_ONFIELD,0,1,nil) then return false end
+	if not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_CHIMERA_MYTHICAL_BEAST),tp,LOCATION_ONFIELD,0,1,nil) then return false end
 	return rp==1-tp and re:IsMonsterEffect() and re:GetActivateLocation()==LOCATION_MZONE
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
