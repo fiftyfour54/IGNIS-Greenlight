@@ -1,4 +1,4 @@
---Japanese name
+--デュエリスト・ジェネシス
 --Duelist Genesis
 --scripted by Naim
 local s,id=GetID()
@@ -16,9 +16,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_series={SET_SYNCHRO}
-function s.cfilter(c)
-	return c:IsMonster() and c:IsType(TYPE_TUNER) and c:IsFaceup()
-end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsType,TYPE_TUNER),tp,LOCATION_MZONE|LOCATION_GRAVE,0,1,nil)
 end

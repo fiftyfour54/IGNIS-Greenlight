@@ -27,14 +27,13 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={id}
 s.listed_series={SET_CHARMER}
 function s.costfilter(c,tp)
 	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsDiscardable()
 		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,c:GetAttack())
 end
 function s.thfilter(c,atk)
-	return c:IsMonster() and c:IsAttribute(ATTRIBUTE_FIRE) and c:GetAttack()>atk and c:IsAbleToHand()
+	return c:IsAttribute(ATTRIBUTE_FIRE) and c:GetAttack()>atk and c:IsAbleToHand()
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
