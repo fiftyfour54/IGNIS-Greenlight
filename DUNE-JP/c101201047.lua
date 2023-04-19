@@ -3,16 +3,16 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Link Summon Procedure
 	c:EnableReviveLimit()
+	--Link Summon Procedure
 	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_ALTERGEIST),2)
 	--Set 1 "Altergeist" Trap form the Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCountLimit(1,{id,1})
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCountLimit(1,id)
 	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK) end)
 	e1:SetTarget(s.settg)
 	e1:SetOperation(s.setop)
@@ -25,8 +25,8 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_NO_TURN_RESET)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER|TIMING_MAIN_END)
+	e2:SetCountLimit(1,{id,1})
 	e2:SetCondition(function() return Duel.IsMainPhase() end)
 	e2:SetCost(s.ctcost)
 	e2:SetTarget(s.cttg)
@@ -65,7 +65,7 @@ function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() and Duel.GetControl(tc,tp) then
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsType(TYPE_EFFECT) and Duel.GetControl(tc,tp) then
 		--Monster is also treated as an "Altergeist" monster
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)

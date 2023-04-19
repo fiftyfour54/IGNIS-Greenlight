@@ -1,5 +1,5 @@
 --オルターガイスト・ペリネトレータ
---Altergeist Pelinetrator
+--Altergeist Perinetrator
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
@@ -12,11 +12,11 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_DRAW)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCode(EVENT_BATTLE_DAMAGE)
 	e2:SetCountLimit(1,id)
-	e2:SetCondition(function (e,tp,eg,ep) return ep==1-tp end)
+	e2:SetCondition(function(e,tp,eg,ep) return ep==1-tp end)
 	e2:SetTarget(s.drwtg)
 	e2:SetOperation(s.drwop)
 	c:RegisterEffect(e2)
@@ -25,15 +25,16 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_TOGRAVE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetCountLimit(1,{id,1})
-	e3:SetCondition(function (e) return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) end)
+	e3:SetCondition(function(e) return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) end)
 	e3:SetTarget(s.tgtg)
 	e3:SetOperation(s.tgop)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_ALTERGEIST}
+s.listed_names={id}
 function s.drwtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetTargetPlayer(tp)
@@ -46,10 +47,10 @@ function s.drwop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.tgfilter(c)
 	return c:IsSetCard(SET_ALTERGEIST) and not c:IsCode(id)
-		and (c:IsFaceup() or not c:IsLocation(LOCATION_ONFIELD)) and c:IsAbleToGrave()
+		and (c:IsFaceup() or not c:IsOnField()) and c:IsAbleToGrave()
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_ONFIELD,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_ONFIELD)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
