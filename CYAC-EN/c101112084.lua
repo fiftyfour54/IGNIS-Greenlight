@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--Reduce a pendulum scale by 1
+	--Reduce a Pendulum Scale by 1
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -30,10 +30,6 @@ function s.pendfilter(c)
 end
 function s.cstfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_PENDULUM) and c:IsAbleToRemoveAsCost()
-end
-function s.filter(c,e,tp,b1,setcode)
-	return c:IsSetCard(setcode) and c:IsType(TYPE_PENDULUM) and not c:IsForbidden()
-		and (b1 or c:IsCanBeSpecialSummoned(e,0,tp,false,false))
 end
 function s.zones(e,tp,eg,ep,ev,re,r,rp)
 	local zone=0xff
