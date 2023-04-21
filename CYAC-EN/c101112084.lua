@@ -8,14 +8,12 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetProperty(EFFECT_FLAG_LIMIT_ZONE)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetValue(s.zones)
 	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
-	if not Duel.IsDuelType(DUEL_SEPARATE_PZONE) then
-		e1:SetProperty(EFFECT_FLAG_LIMIT_ZONE)
-		e1:SetValue(s.zones)
-	end
 	c:RegisterEffect(e1)
 	--Reduce a Pendulum Scale by 1
 	local e2=Effect.CreateEffect(c)
@@ -36,6 +34,7 @@ function s.cstfilter(c)
 end
 function s.zones(e,tp,eg,ep,ev,re,r,rp)
 	local zone=0xff
+	if Duel.IsDuelType(DUEL_SEPARATE_PZONE) then return zone end
 	local p0=Duel.CheckLocation(tp,LOCATION_PZONE,0)
 	local p1=Duel.CheckLocation(tp,LOCATION_PZONE,1)
 	if p0==p1 then return zone end
