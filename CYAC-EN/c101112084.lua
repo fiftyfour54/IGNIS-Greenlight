@@ -11,6 +11,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_LIMIT_ZONE)
 	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e1:SetValue(s.zones)
+	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
@@ -45,13 +46,16 @@ function s.rescon(pg)
 		return #sg==5 and pg:IsExists(aux.TRUE,1,sg)
 	end
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.costfilter,tp,LOCATION_EXTRA,0,nil)
 	local pg=Duel.GetMatchingGroup(s.pendfilter,tp,LOCATION_EXTRA|LOCATION_DECK,0,nil)
-	if chk==0 then return #g>=5 and Duel.CheckPendulumZones(tp)
-		and aux.SelectUnselectGroup(g,e,tp,5,5,s.rescon(pg),0) end
+	if chk==0 then return #g>=5 and aux.SelectUnselectGroup(g,e,tp,5,5,s.rescon(pg),0) end
 	local rg=aux.SelectUnselectGroup(g,e,tp,5,5,s.rescon(pg),1,tp,HINTMSG_REMOVE)
 	Duel.Remove(rg,POS_FACEUP,REASON_COST)
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckPendulumZones(tp)
+		and Duel.IsExistingMatchingCard(s.pendfilter,tp,LOCATION_EXTRA|LOCATION_DECK,0,1,nil) end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.CheckPendulumZones(tp) then return end
