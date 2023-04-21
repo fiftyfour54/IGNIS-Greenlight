@@ -34,6 +34,7 @@ function s.cstfilter(c)
 end
 function s.zones(e,tp,eg,ep,ev,re,r,rp)
 	local zone=0xff
+	if Duel.IsDuelType(DUEL_SEPARATE_PZONE) then return zone end
 	local p0=Duel.CheckLocation(tp,LOCATION_PZONE,0)
 	local p1=Duel.CheckLocation(tp,LOCATION_PZONE,1)
 	if p0==p1 then return zone end
