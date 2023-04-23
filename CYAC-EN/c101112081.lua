@@ -19,20 +19,18 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_DRAW)
-	e2:SetRange(LOCATION_HAND)
 	e2:SetCondition(function(e,tp) return Duel.IsTurnPlayer(tp) and Duel.GetCurrentPhase()<PHASE_END end)
 	e2:SetCost(s.pendscost)
 	e2:SetTarget(s.pendstg)
 	e2:SetOperation(s.pendsop)
 	c:RegisterEffect(e2)
 end
-function s.filter(c,tp)
+function s.cfilter(c,tp)
 	return c:IsSummonType(SUMMON_TYPE_PENDULUM) and c:IsSummonPlayer(tp)
 end
 function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.filter,1,nil,tp)
+	return eg:IsExists(s.cfilter,1,nil,tp)
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -41,11 +39,8 @@ end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsAbleToDeck() then
-		if Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))==0 then
-			Duel.SendtoDeck(c,nil,SEQ_DECKTOP,REASON_EFFECT)
-		else
-			Duel.SendtoDeck(c,nil,SEQ_DECKBOTTOM,REASON_EFFECT)
-		end
+		local seq_op=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))
+		Duel.SendtoDeck(c,nil,seq_op,REASON_EFFECT)
 	end
 end
 function s.pendscost(e,tp,eg,ep,ev,re,r,rp,chk)
