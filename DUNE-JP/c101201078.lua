@@ -20,7 +20,7 @@ function s.spfilter(c,e,tp,zone)
 end
 --implemented to only select a zone on tp's field since selecting
 --the corresponding opponent zone is redundant (it's already checked)
-function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local zones=0
 	for seq=0,4 do
 		local z1=1<<seq
@@ -28,7 +28,6 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		if Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_TOFIELD,z1)>0
 			and Duel.GetLocationCount(1-tp,LOCATION_MZONE,1-tp,LOCATION_REASON_TOFIELD,z2)>0
 			and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp,z1) then
-			Debug.Message(seq)
 			zones=zones|z1
 		end
 	end
@@ -44,15 +43,17 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local z2=1<<(4-math.log(z1,2))
 	if Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_TOFIELD,z1)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g1=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,1,nil,e,tp,z1)
-	if #g1>0 and Duel.SpecialSummon(g1,0,tp,tp,false,false,POS_FACEUP_ATTACK|POS_FACEDOWN_DEFENSE,z1)>0
-		and Duel.GetLocationCount(1-tp,LOCATION_MZONE,1-tp,LOCATION_REASON_TOFIELD,z2)>0
+	local sc1=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,1,nil,e,tp,z1):GetFirst()
+	if not sc1 or Duel.SpecialSummon(sc1,0,tp,tp,false,false,POS_FACEUP_ATTACK|POS_FACEDOWN_DEFENSE,z1)==0 then return end
+	if sc1:IsFacedown() then Duel.ConfirmCards(1-tp,sc1) end
+	if Duel.GetLocationCount(1-tp,LOCATION_MZONE,1-tp,LOCATION_REASON_TOFIELD,z2)>0
 		and Duel.IsExistingMatchingCard(s.spfilter,1-tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,1-tp,z2)
-		and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		and Duel.SelectYesNo(1-tp,aux.Stringid(id,2)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g2=Duel.SelectMatchingCard(1-tp,s.spfilter,1-tp,LOCATION_HAND|LOCATION_DECK,0,1,1,nil,e,1-tp,z2)
-		if #g2==0 then return end
+		local sc2=Duel.SelectMatchingCard(1-tp,s.spfilter,1-tp,LOCATION_HAND|LOCATION_DECK,0,1,1,nil,e,1-tp,z2):GetFirst()
+		if not sc2 then return end
 		Duel.BreakEffect()
-		Duel.SpecialSummon(g2,0,1-tp,1-tp,false,false,POS_FACEUP_ATTACK|POS_FACEDOWN_DEFENSE,z2)
+		Duel.SpecialSummon(sc2,0,1-tp,1-tp,false,false,POS_FACEUP_ATTACK|POS_FACEDOWN_DEFENSE,z2)
+		if sc2:IsFacedown() then Duel.ConfirmCards(tp,sc2) end
 	end
 end

@@ -10,12 +10,12 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_CANNOT_BE_MATERIAL)
 	e1:SetValue(aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ))
 	c:RegisterEffect(e1)
-	--Cannot be tributed while it is in the monster zone
+	--Cannot be Tributed while face-up in the Monster Zone
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EFFECT_UNRELEASABLE_SUM)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
@@ -27,7 +27,6 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_BE_MATERIAL)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCountLimit(2,id)
 	e2:SetCondition(s.spcond)
 	e2:SetTarget(s.sptg)
@@ -52,7 +51,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.SpecialSummonStep(c,0,tp,1-rp,false,false,POS_FACEUP) then
-		c:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD&~RESET_TOFIELD,0,1)
-		Duel.SpecialSummonComplete()
+		c:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD,0,1)
 	end
+	Duel.SpecialSummonComplete()
 end
