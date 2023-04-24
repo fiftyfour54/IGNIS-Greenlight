@@ -16,6 +16,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
+s.listed_names={CARD_REDBOOT_B_DRAGON,160013004}
 function s.tdfilter(c)
 	return c:IsAbleToDeck() and c:IsMonster()
 end
