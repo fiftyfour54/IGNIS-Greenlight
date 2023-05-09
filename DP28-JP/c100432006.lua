@@ -64,7 +64,29 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.SendtoDeck(tdg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 then
 			local tc=g:GetFirst()
 			if tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
-				Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+				if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+					local c=e:GetHandler()
+					--Negate its effects
+					local e1=Effect.CreateEffect(c)
+					e1:SetType(EFFECT_TYPE_SINGLE)
+					e1:SetCode(EFFECT_DISABLE)
+					e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+					e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+					tc:RegisterEffect(e1)
+					local e2=e1:Clone()
+					e2:SetCode(EFFECT_DISABLE_EFFECT)
+					e2:SetValue(RESET_TURN_SET)
+					c:RegisterEffect(e2)
+					--Cannot attack
+					local e3=Effect.CreateEffect(c)
+					e3:SetDescription(3206)
+					e3:SetType(EFFECT_TYPE_SINGLE)
+					e3:SetCode(EFFECT_CANNOT_ATTACK)
+					e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CLIENT_HINT)
+					e3:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+					tc:RegisterEffect(e3)
+				end
+				Duel.SpecialSummonComplete()
 			end
 		end
 	else --Destroy 1 card on the field
