@@ -80,6 +80,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not fc then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sc=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,mg):GetFirst()
+	if not sc then return end
 	local g=Group.FromCards(fc,sc)
 	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 end
