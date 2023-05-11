@@ -14,9 +14,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function s.cfilter(c,tp)
-	return c:IsFaceup() and Duel.IsExistingTarget(s.eqfilter,tp,LOCATION_GRAVE,0,1,nil)
-end
 function s.eqfilter(c)
 	return c:IsType(TYPE_XYZ) and not c:IsForbidden()
 end
@@ -24,9 +21,10 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	if e:GetHandler():IsLocation(LOCATION_HAND) then ft=ft-1 end
-	if chk==0 then return ft>0 and Duel.IsExistingTarget(s.cfilter,tp,LOCATION_MZONE,0,1,nil,tp) end
+	if chk==0 then return ft>0 and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil,tp)
+		and Duel.IsExistingTarget(s.eqfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local tc=Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
+	local tc=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	local eqc=Duel.SelectTarget(tp,s.eqfilter,tp,LOCATION_GRAVE,0,1,1,nil,tp)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,eqc,1,tp,0)
@@ -38,12 +36,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:Filter(Card.IsLocation,nil,LOCATION_MZONE):GetFirst()
 	local eqc=g:Filter(Card.IsLocation,nil,LOCATION_GRAVE):GetFirst()
 	if tc and eqc then
-
 		if not tc:EquipByEffectAndLimitRegister(e,tp,eqc,nil,true) then return end
 		local atk=eqc:GetTextAttack()
 		local att=eqc:GetAttribute()
-		Debug.Message("atk : "..tostring(atk))
-		Debug.Message("att : "..tostring(att))
 		--Equip limit
 		local e0=Effect.CreateEffect(tc)
 		e0:SetType(EFFECT_TYPE_SINGLE)
