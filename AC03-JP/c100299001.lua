@@ -31,15 +31,18 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		{b3,aux.Stringid(id,3)})
 	e:SetLabel(op)
 	if op==1 then
+		--Your Illusion or Spellcaster monsters cannot be destroyed by battle this turn
 		e:SetCategory(0)
 		e:SetProperty(0)
 	elseif op==2 then
+		--Take control of 1 opponent's face-up monster
 		e:SetCategory(CATEGORY_CONTROL)
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 		local g=Duel.SelectTarget(tp,aux.FaceupFilter(Card.IsControlerCanBeChanged),tp,0,LOCATION_MZONE,1,1,nil)
 		Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
 	else
+		--Change attack target to 1 opponent's face-up monster
 		e:SetCategory(0)
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
