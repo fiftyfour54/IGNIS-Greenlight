@@ -29,11 +29,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_SALAMANGREAT}
-function s.cfilter(c)
+function s.filter(c)
 	return c:IsSetCard(SET_SALAMANGREAT) and c:IsMonster()
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetMatchingGroupCount(s.cfilter,tp,LOCATION_GRAVE,0,nil)>=2
+	return Duel.GetMatchingGroupCount(s.filter,tp,LOCATION_GRAVE,0,nil)>=2
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
