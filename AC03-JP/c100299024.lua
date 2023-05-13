@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetTarget(s.target)
 	c:RegisterEffect(e1)
-	--Additional Normal Summon for 1 "Earthbound" monster
+	--Additional Normal Summon of 1 "Earthbound" monster
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_FIELD)

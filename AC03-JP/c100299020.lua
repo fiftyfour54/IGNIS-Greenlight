@@ -54,9 +54,6 @@ end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.descfilter,1,nil,tp)
 end
-function s.desfilter(c)
-	return c:IsStatus(STATUS_SPSUMMON_TURN)
-end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(Card.IsStatus,tp,0,LOCATION_MZONE,nil,STATUS_SPSUMMON_TURN)
 	if chk==0 then return #g>0 end
