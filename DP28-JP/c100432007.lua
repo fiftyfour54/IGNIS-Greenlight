@@ -20,10 +20,12 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TODECK+CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetHintTiming(TIMING_DAMAGE_STEP,TIMING_DAMAGE_STEP|TIMINGS_CHECK_MONSTER_E)
 	e2:SetCountLimit(1,{id,1})
+	e2:SetCondition(function() return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated() end)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.tdtg)
 	e2:SetOperation(s.tdop)
@@ -48,8 +50,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.atkfilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(SET_SALAMANGREAT) and c:GetAttack()>0
-		and Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE,0,1,nil,c:GetCode())
+	return c:IsFaceup() and c:IsSetCard(SET_SALAMANGREAT) and Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE,0,1,nil,c:GetCode())
 end
 function s.tdfilter(c,code)
 	return c:IsMonster() and c:IsCode(code) and c:IsAbleToDeck()
@@ -65,6 +66,7 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetTargetCards(e)
+	if #g==0 then return end
 	local tc=g:Filter(Card.IsLocation,nil,LOCATION_GRAVE):GetFirst()
 	local atkc=g:Filter(Card.IsLocation,nil,LOCATION_MZONE):GetFirst()
 	if tc and Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0

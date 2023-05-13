@@ -17,7 +17,7 @@ function s.initial_effect(c)
 end
 function s.filter1(c,e,tp)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsCanBeEffectTarget(e)
-		and (c:IsAbleToDeck() or c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP))
+		and (c:IsAbleToDeck() or c:IsCanBeSpecialSummoned(e,0,tp,false,false))
 end
 function s.filter2(c)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_FIRE)
@@ -34,8 +34,8 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.GetMatchingGroup(s.filter1,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,nil,e,tp)
 	local b1=#g>=3 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and aux.SelectUnselectGroup(g,e,tp,3,3,s.rescon,0)
 	local b2=Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
-	if chkc then return b2 and chkc:IsOnField() and chkc:IsFaceup() and chck~=c end
+		and Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
+	if chkc then return e:GetLabel()==2 and chkc:IsOnField() and chck~=c end
 	if chk==0 then return b1 or b2 end
 	local op=Duel.SelectEffect(tp,
 		{b1,aux.Stringid(id,1)},
@@ -50,46 +50,37 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	else
 		e:SetCategory(CATEGORY_DESTROY)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local tc=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,c)
+		local tc=Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,c)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,tp,0)
 	end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local op=e:GetLabel()
-	if op==1 then --Shuffle 2 FIRE monsters and Special Summon another
+	if op==1 then
+		--Shuffle 2 FIRE monsters and Special Summon another
 		local g=Duel.GetTargetCards(e)
 		if #g<3 then return end
 		local tdg=aux.SelectUnselectGroup(g,e,tp,2,2,s.selectcond(g),1,tp,HINTMSG_TODECK)
 		g:RemoveCard(tdg)
-		if Duel.SendtoDeck(tdg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 then
-			local tc=g:GetFirst()
-			if tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
-				if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
-					local c=e:GetHandler()
-					--Negate its effects
-					local e1=Effect.CreateEffect(c)
-					e1:SetType(EFFECT_TYPE_SINGLE)
-					e1:SetCode(EFFECT_DISABLE)
-					e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-					e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
-					tc:RegisterEffect(e1)
-					local e2=e1:Clone()
-					e2:SetCode(EFFECT_DISABLE_EFFECT)
-					e2:SetValue(RESET_TURN_SET)
-					c:RegisterEffect(e2)
-					--Cannot attack
-					local e3=Effect.CreateEffect(c)
-					e3:SetDescription(3206)
-					e3:SetType(EFFECT_TYPE_SINGLE)
-					e3:SetCode(EFFECT_CANNOT_ATTACK)
-					e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CLIENT_HINT)
-					e3:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
-					tc:RegisterEffect(e3)
-				end
-				Duel.SpecialSummonComplete()
-			end
+		if Duel.SendtoDeck(tdg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)==0 then return end
+		local tc=g:GetFirst()
+		if tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+			and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+			local c=e:GetHandler()
+			--Negate its effects
+			tc:NegateEffects(c,RESET_PHASE|PHASE_END)
+			--Cannot attack
+			local e1=Effect.CreateEffect(c)
+			e1:SetDescription(3206)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CLIENT_HINT)
+			e1:SetCode(EFFECT_CANNOT_ATTACK)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+			tc:RegisterEffect(e1)
 		end
-	else --Destroy 1 card on the field
+		Duel.SpecialSummonComplete()
+	else
+		--Destroy 1 card on the field
 		local tc=Duel.GetFirstTarget()
 		if tc:IsRelateToEffect(e) then
 			Duel.Destroy(tc,REASON_EFFECT)

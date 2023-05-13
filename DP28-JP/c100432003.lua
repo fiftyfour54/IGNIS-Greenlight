@@ -18,11 +18,11 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EFFECT_NONTUNER)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(function(_,sc) return sc and sc:IsAttribute(ATTRIBUTE_FIRE) end)
 	c:RegisterEffect(e2)
-	--Increase or decrease its own Level by 1
+	--Increase or decrease this card's Level by 1
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_LVCHANGE)
@@ -38,8 +38,9 @@ function s.cfilter(c)
 	return c:IsSetCard(SET_SALAMANGREAT) and c:IsDiscardable()
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
-	Duel.DiscardHand(tp,s.cfilter,1,1,REASON_COST|REASON_DISCARD,e:GetHandler())
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,c) end
+	Duel.DiscardHand(tp,s.cfilter,1,1,REASON_COST|REASON_DISCARD,c)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -60,19 +61,16 @@ function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFaceup() and c:IsRelateToEffect(e) then
-		local sel=0
-		if c:GetLevel()>1 then
-			sel=Duel.SelectOption(tp,aux.Stringid(id,2),aux.Stringid(id,3))
-		end
+	if c:IsFaceup() and c:IsRelateToEffect(e) and c:HasLevel() then
+		local op=Duel.SelectEffect(tp,
+			{true,aux.Stringid(id,2)},
+			{c:IsLevelAbove(2),aux.Stringid(id,3)})
+		local lvl=op==2 and -1 or 1
+		--Increase or decrease this card's Level by 1
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_LEVEL)
-		if sel==0 then
-			e1:SetValue(1)
-		else
-			e1:SetValue(-1)
-		end
+		e1:SetValue(lvl)
 		e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE)
 		c:RegisterEffect(e1)
 	end
