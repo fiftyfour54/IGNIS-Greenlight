@@ -18,7 +18,7 @@ end
 s.listed_series={SET_NUMBER,SET_NUMBER_C,SET_BARIANS,SET_RANK_UP_MAGIC,SET_SEVENTH}
 s.listed_names={id}
 function s.cfilter(c)
-	return c:IsReason(REASON_BATTLE|REASON_EFFECT) and c:IsPreviousLocation(LOCATION_MZONE) or (c:IsMonster() and not c:IsPreviousLocation(LOCATION_SZONE))
+	return c:IsReason(REASON_BATTLE|REASON_EFFECT) and (c:IsPreviousLocation(LOCATION_MZONE) or (c:IsMonster() and not c:IsPreviousLocation(LOCATION_SZONE)))
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsBattlePhase() and eg:IsExists(s.cfilter,1,nil)
