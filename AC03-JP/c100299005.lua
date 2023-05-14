@@ -34,7 +34,7 @@ s.toss_coin=true
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsDiscardable() end
-	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
+	Duel.SendtoGrave(c,REASON_COST|REASON_DISCARD)
 end
 function s.thfilter(c)
 	return c:IsCode(CARD_LIGHT_BARRIER) and c:IsAbleToHand()
@@ -64,6 +64,7 @@ function s.coinop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetCondition(s.descon(COIN_HEADS))
 	e1:SetTarget(s.hdestg)
@@ -99,7 +100,7 @@ function s.hdestg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.hdesop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)>0 then
+	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)>0 then
 		Duel.Damage(tc:GetPreviousControler(),500,REASON_EFFECT)
 	end
 end

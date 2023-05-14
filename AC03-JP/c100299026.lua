@@ -17,8 +17,8 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_DAMAGE_STEP_END)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCondition(s.extatkcond)
-	e2:SetCost(s.extatktg)
+	e2:SetCondition(function(e) return e:GetHandler():GetEquipTarget()==Duel.GetAttacker() end)
+	e2:SetCost(s.extatkcost)
 	e2:SetOperation(s.extatkop)
 	c:RegisterEffect(e2)
 	--Add itself to the hand
@@ -40,20 +40,18 @@ end
 function s.cfilter(c)
 	return c:IsAttribute(ATTRIBUTE_FIRE) or c:IsRace(RACE_WARRIOR)
 end
-function s.extatkcond(e,tp,eg,ep,ev,re,r,rp)
-	local bc=Duel.GetBattleMonster(tp)
-	local ec=e:GetHandler():GetEquipTarget()
-	return bc and bc==ec
-end
-function s.extatktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
-	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
+function s.extatkcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToGraveAsCost() and not Duel.HasFlagEffect(tp,id) end
+	Duel.SendtoGrave(c,REASON_COST)
 end
 function s.extatkop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.HasFlagEffect(tp,id) then return end
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE|PHASE_END,0,1)
+	--Your Warrior and FIRE monsters can attack twice
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_EXTRA_ATTACK)
-	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetTarget(function(e,c) return c:IsAttribute(ATTRIBUTE_FIRE) or c:IsRace(RACE_WARRIOR) end)
 	e1:SetValue(1)
