@@ -94,28 +94,23 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_EXTRA)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function s.exfilter(c,spf)
-	return c:IsSetCard(SET_SUPREME_KING_DRAGON) and spf(c)
+function s.exfilter(c)
+	return c:IsSetCard(SET_SUPREME_KING_DRAGON) and (c:IsSynchroSummonable() or c:IsXyzSummonable())
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_EXTRA,0,1,1,nil)
 	if #g==0 or Duel.SendtoHand(g,nil,REASON_EFFECT)==0 or not g:GetFirst():IsLocation(LOCATION_HAND) then return end
-	local sg=Duel.GetMatchingGroup(s.exfilter,tp,LOCATION_EXTRA,0,nil,Card.IsSynchroSummonable)
-	local xg=Duel.GetMatchingGroup(s.exfilter,tp,LOCATION_EXTRA,0,nil,Card.IsXyzSummonable)
-	local op=Duel.SelectEffect(tp,
-		{#sg>0,aux.Stringid(id,5)},
-		{#xg>0,aux.Stringid(id,6)})
-	if op==1 then
-		Duel.BreakEffect()
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local ssg=sg:Select(tp,1,1,nil)
-		Duel.SynchroSummon(tp,ssg:GetFirst())
-	elseif op==2 then
-		Duel.BreakEffect()
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local ssg=xg:Select(tp,1,1,nil)
-		Duel.XyzSummon(tp,ssg:GetFirst())
+	local sg=Duel.GetMatchingGroup(s.exfilter,tp,LOCATION_EXTRA,0,nil)
+	if #sg==0 or not Duel.SelectYesNo(tp,aux.String(id,5)) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local sc=sg:Select(tp,1,1,nil):GetFirst()
+	if not sc then return end
+	Duel.BreakEffect()
+	if sc:IsType(TYPE_SYNCHRO) then
+		Duel.SynchroSummon(tp,sc)
+	elseif sc:IsType(TYPE_XYZ) then
+		Duel.XyzSummon(tp,sc)
 	end
 end
 function s.ethfilter(c,tp)
