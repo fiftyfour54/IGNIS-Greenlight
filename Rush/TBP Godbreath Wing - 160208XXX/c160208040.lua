@@ -46,7 +46,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.damfilter(c,tp)
-	return not c:IsMaximumModeSide()
+	return not c:WasMaximumModeSide()
 end
 function s.rescon(sg,e,tp,mg)
 	return sg:IsExists(Card.IsRace,1,nil,RACE_WYRM)

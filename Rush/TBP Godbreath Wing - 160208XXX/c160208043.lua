@@ -1,4 +1,4 @@
---[Japanese name]
+--幻壊兵ヘル・メット
 --Demolition Soldier Hell Met
 --scripted by YoshiDuels
 local s,id=GetID()
