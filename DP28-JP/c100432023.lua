@@ -21,7 +21,7 @@ function s.damfilter(c)
 	return c:IsRace(RACE_PYRO) and c:IsFaceup() and c:GetBaseAttack()>0
 end
 function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.damfilter(chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.damfilter(chkc) end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local b1=not Duel.HasFlagEffect(tp,id)
 		and Duel.IsExistingMatchingCard(s.thspfilter,tp,LOCATION_DECK,0,1,nil,e,tp,ft)
