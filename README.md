@@ -42,7 +42,7 @@ artworks.
 Release date | Set | Prefix | Prerelease passcode
 --- | --- | --- | ---
 27-May-2023 | [Duelist Pack: Duelists of Explosion][DP28]              | DP28-JP    | 100432XXX
-10-Jun-2023 | [Animation Chronicle 2023][ACO03]                        | AC03-JP    | 100299XXX
+10-Jun-2023 | [Animation Chronicle 2023][AC03]                         | AC03-JP    | 100299XXX
 24-Jun-2023 | [Structure Deck: Pulse of the King][SD46]                | SD46-JP    | 100346XXX
 22-Jul-2023 | [Age of Overlord][AGOV]                                  | AGOV-JP    | 101202XXX
 28-Jul-2023 | [Duelist Nexus][DUNE]                                    | DUNE-EN    | 101201XXX
