@@ -60,5 +60,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.effcon(e)
 	local c=e:GetHandler()
-	return c:IsRelateToBattle() and c:GetBattleTarget() and e:GetOwnerPlayer()==e:GetHandlerPlayer()
+	local bc=c:GetBattleTarget()
+	local tp=e:GetHandlerPlayer()
+	return c:IsRelateToBattle() and bc and bc:IsControler(1-tp) and e:GetOwnerPlayer()==tp
 end
