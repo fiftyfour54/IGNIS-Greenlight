@@ -12,7 +12,6 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e1:SetCountLimit(1,id)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetTarget(s.tdtg)
 	e1:SetOperation(s.tdop)
 	c:RegisterEffect(e1)
@@ -46,7 +45,7 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 then
 		local rac=tc:GetRace()
 		local lv=tc:GetLevel() or tc:GetRank() or tc:GetLink()
-		--The owner can search a monster with different type and lowe Level
+		--The owner can search a monster with different type and lower Level
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(aux.Stringid(id,1))
 		e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
