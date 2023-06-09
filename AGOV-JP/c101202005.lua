@@ -4,28 +4,32 @@
 local s,id=GetID()
 local COUNTER_VEDA=0x14f
 function s.initial_effect(c)
-	Pendulum.AddProcedure(c)
-	c:SetSPSummonOnce(id)
 	c:EnableReviveLimit()
 	c:EnableCounterPermit(COUNTER_VEDA,LOCATION_PZONE)
+	--Can only be Special Summoned once per turn
+	c:SetSPSummonOnce(id)
+	--Pendulum attributes
+	Pendulum.AddProcedure(c)
 	--Special Summon condition
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
 	c:RegisterEffect(e0)
-	--place counter
+	--Place 1 Counter when a monster is destroyed
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_COUNTER)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_DESTROYED)
 	e1:SetRange(LOCATION_PZONE)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_CHAIN)
 	e1:SetCondition(s.ctcon)
 	e1:SetCost(s.ctcost)
 	e1:SetTarget(s.cttg)
 	e1:SetOperation(s.ctop)
 	c:RegisterEffect(e1)
-	--increase scale
+	--Increase Scale by the number of counters on itself
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -36,8 +40,9 @@ function s.initial_effect(c)
 	local e2b=e2:Clone()
 	e2b:SetCode(EFFECT_UPDATE_RSCALE)
 	c:RegisterEffect(e2b)
-	--special summon
+	--Special summon itself from the Pendulum Zone
 	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_PZONE)
@@ -45,8 +50,9 @@ function s.initial_effect(c)
 	e3:SetTarget(s.psptg)
 	e3:SetOperation(s.pspop)
 	c:RegisterEffect(e3)
-	--skip to end phase
+	--Skip to the End Phase
 	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,2))
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetProperty(EFFECT_FLAG_DELAY)
@@ -56,37 +62,29 @@ function s.initial_effect(c)
 	e4:SetCost(s.epcost)
 	e4:SetOperation(s.epop)
 	c:RegisterEffect(e4)
-	--to hand and summon
+	--Return itself to the hand and Special Summon 1 "Veda" monster
 	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(id,3))
 	e5:SetCategory(CATEGORY_TOHAND|CATEGORY_SPECIAL_SUMMON)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e5:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1)
-	e5:SetCondition(function(e,tp,_,_,_,_,_,_) return Duel.GetTurnPlayer()==tp end)
+	e5:SetCondition(function(e,tp) return Duel.IsTurnPlayer(tp) end)
 	e5:SetTarget(s.thtg)
 	e5:SetOperation(s.thop)
 	c:RegisterEffect(e5)
 end
-s.listed_series={SET_VEDA }
-function s.ctcfilter(c,tp)
-	return c:GetPreviousTypeOnField() & TYPE_MONSTER ~= 0 and c:IsPreviousControler(tp)
-end
+s.listed_series={SET_VEDA}
+s.listed_counter={COUNTER_VEDA}
 function s.ctcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp==tp and eg:IsExists(s.ctcfilter,1,nil,1-tp)
-end
-function s.ctcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:GetFlagEffect(id)==0 end
-	c:RegisterFlagEffect(id,RESET_CHAIN,0,1)
+	return eg:IsExists(function(c) return c:GetPreviousTypeOnField()&TYPE_MONSTER>0 end,1,nil)
 end
 function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsCanAddCounter(COUNTER_VEDA,3) end
 end
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-	c:AddCounter(COUNTER_VEDA,3)
+	e:GetHandler():AddCounter(COUNTER_VEDA,3)
 end
 function s.slval(e)
 	return e:GetHandler():GetCounter(COUNTER_VEDA)
@@ -132,7 +130,7 @@ function s.epop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)
 	e1:SetTargetRange(0,1)
-	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetReset(RESET_PHASE|PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -147,10 +145,11 @@ end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.SendtoHand(c,nil,REASON_EFFECT)~=0 then return end
-	local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED,0,nil,e,tp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.spfilter),tp,LOCATION_HAND|LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED,0,nil,e,tp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,4)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:Select(tp,1,1,nil)
+		Duel.BreakEffect()
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
