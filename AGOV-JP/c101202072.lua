@@ -44,7 +44,7 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0 then
 		local rac=tc:GetRace()
-		local lv=tc:GetLevel() or tc:GetRank() or tc:GetLink()
+		local val=math.max(tc:GetLevel(),tc:GetRank(),tc:GetLink())
 		--The owner can search a monster with different type and lower Level
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(aux.Stringid(id,1))
@@ -55,7 +55,7 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCondition(s.srchcon)
 		e1:SetOperation(s.srchop)
 		e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
-		e1:SetLabel(rac,lv)
+		e1:SetLabel(rac,val)
 		Duel.RegisterEffect(e1,tc:GetOwner())
 	end
 end
