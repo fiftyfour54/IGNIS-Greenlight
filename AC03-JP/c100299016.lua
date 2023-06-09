@@ -3,8 +3,9 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Special Summon 1 "Battlin' Boxer" monster form the hand and destory Spell/Trap cards
+	--Special Summon 1 "Battlin' Boxer" monster form the hand and destory Spells/Traps
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -32,7 +33,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.GetMatchingGroup(Card.IsSpellTrap,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
 		if ct>0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-			local dg=g:Select(tp,1,ct,e:GetHandler())
+			local dg=g:Select(tp,1,ct,nil)
 			Duel.HintSelection(dg,true)
 			Duel.BreakEffect()
 			Duel.Destroy(dg,REASON_EFFECT)
