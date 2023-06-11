@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	--Special Summon 1 "Heart" monster with 3000 ATK
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_MAIN_END)
@@ -19,8 +19,8 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY,EFFECT_FLAG2_CHECK_SIMULTANEOUS)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
@@ -42,90 +42,61 @@ end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.spcostfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local rc=Duel.SelectMatchingCard(tp,s.spcostfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp):GetFirst()
-	if Duel.Remove(rc,POS_FACEUP,REASON_COST|REASON_TEMPORARY)>0 then
-		--Return in the End Phase
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetDescription(aux.Stringid(id,2)) --"Return the banished monster
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_PHASE+PHASE_END)
-		e1:SetReset(RESET_PHASE|PHASE_END)
-		e1:SetLabelObject(rc)
-		e1:SetCountLimit(1)
-		e1:SetOperation(function(e) Duel.ReturnToField(e:GetLabelObject()) end)
-		Duel.RegisterEffect(e1,tp)
-	end
+	local g=Duel.SelectMatchingCard(tp,s.spcostfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
+	aux.RemoveUntil(g,nil,REASON_COST,PHASE_END,id,e,tp,aux.DefaultFieldReturnOp,nil,nil,nil,nil,aux.Stringid(id,2))
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_MZONE)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
-	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,true,false,POS_FACEUP) then
+	local sc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
+	if sc and Duel.SpecialSummonStep(sc,0,tp,tp,true,false,POS_FACEUP) then
 		local c=e:GetHandler()
-		local fid=c:GetFieldID()
-		tc:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD,0,1,fid)
 		--Can only activate its effects once
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_CHAIN_SOLVED)
-		e1:SetCondition(s.limactcon)
-		e1:SetOperation(s.limactop)
-		e1:SetLabelObject(tc)
-		Duel.RegisterEffect(e1,tp)
-		--Banish it during the End Phase
-		local e2=Effect.CreateEffect(c)
-		e2:SetDescription(aux.Stringid(id,3)) --"Banish the summoned monster"
-		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e2:SetCode(EVENT_PHASE+PHASE_END)
-		e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-		e2:SetCountLimit(1)
-		e2:SetLabel(fid)
-		e2:SetLabelObject(tc)
-		e2:SetCondition(s.rmcon)
-		e2:SetOperation(s.rmop)
-		Duel.RegisterEffect(e2,tp)
-		Duel.SpecialSummonComplete()
+		e1:SetCode(EVENT_CHAINING)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetOperation(s.aclimit)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+		sc:RegisterEffect(e1)
+		local e2=e1:Clone()
+		e2:SetCode(EVENT_CHAIN_NEGATED)
+		sc:RegisterEffect(e2)
+		local e3=Effect.CreateEffect(e:GetHandler())
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e3:SetCode(EFFECT_CANNOT_TRIGGER)
+		e3:SetCondition(function(e) return e:GetHandler():HasFlagEffect(id+100) end)
+		e3:SetReset(RESET_EVENT|RESETS_STANDARD)
+		sc:RegisterEffect(e3)
+		--Banish it face-down during the End Phase
+		aux.DelayedOperation(sc,PHASE_END,id,e,tp,function(ag) Duel.Remove(ag,POS_FACEDOWN,REASON_EFFECT) end,nil,0,0,aux.Stringid(id,3),aux.Stringid(id,4))
 	end
+	Duel.SpecialSummonComplete()
 end
-function s.limactcon(e,tp,eg,ep,ev,re,r,rp)
-	return re:GetHandler()==e:GetLabelObject()
-end
-function s.limactop(e,tp,eg,ep,ev,re,r,rp)
-	--Cannot activate its effects
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetDescription(3302)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_TRIGGER)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
-	e1:SetReset(RESET_EVENT|RESETS_STANDARD)
-	e:GetLabelObject():RegisterEffect(e1)
-	e:Reset()
-end
-function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	if tc:GetFlagEffectLabel(id)~=e:GetLabel() then
-		e:Reset()
-		return false
+function s.aclimit(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if re:GetHandler()~=c then return end
+	if e:GetCode()==EVENT_CHAINING then
+		c:RegisterFlagEffect(id+100,RESET_EVENT|RESETS_STANDARD,0,1)
 	else
-		return true
+		c:ResetFlagEffect(id+100)
 	end
-end
-function s.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	Duel.Remove(tc,POS_FACEDOWN,REASON_EFFECT)
 end
 function s.cfilter(c,tp)
-	return c:IsSummonLocation(LOCATION_EXTRA) and c:IsSummonPlayer(1-tp)
+	return c:IsSummonPlayer(1-tp) and c:IsSummonLocation(LOCATION_EXTRA)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToHand() end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,tp,0)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToHand() end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,c,1,tp,0)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

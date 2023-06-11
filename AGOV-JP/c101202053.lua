@@ -22,8 +22,8 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCost(aux.bfgcost)
 	e2:SetCondition(s.descond)
+	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.destg)
 	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
@@ -31,8 +31,8 @@ end
 s.listed_series={SET_VEDA}
 s.listed_names={CARD_VISAS_STARFROST}
 function s.cfilter(c,e,tp)
-	return (c:IsControler(tp)) or (c:IsControler(1-tp) and not c:IsDisabled() and c:IsType(TYPE_EFFECT))
-		and c:IsFaceup() and c:IsCanBeEffectTarget(e)
+	return (c:IsControler(tp) or (c:IsControler(1-tp) and c:IsNegatableMonster() and c:IsType(TYPE_EFFECT)))
+		and c:IsCanBeEffectTarget(e)
 end
 function s.rescon(sg,e,tp,mg)
 	return sg:FilterCount(Card.IsControler,nil,tp)==1
@@ -43,9 +43,8 @@ function s.negttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return aux.SelectUnselectGroup(rg,e,tp,2,2,s.rescon,0) end
 	local tg=aux.SelectUnselectGroup(rg,e,tp,2,2,s.rescon,1,tp,HINTMSG_TARGET)
 	Duel.SetTargetCard(tg)
-	local dg=tg:Filter(Card.IsControler,nil,tp)
+	local dg,ng=tg:Split(Card.IsControler,nil,tp)
 	e:SetLabelObject(dg:GetFirst())
-	local ng=tg:Filter(Card.IsControler,nil,1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,ng,1,0,0)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,ng,1,0,0)
@@ -56,10 +55,12 @@ function s.negtop(e,tp,eg,ep,ev,re,r,rp)
 	local dc=g:GetFirst()
 	local negc=g:GetNext()
 	if negc==e:GetLabelObject() then dc,negc=negc,dc end
-	if dc:IsControler(tp) and Duel.Destroy(dc,REASON_EFFECT)>0 and negc and negc:IsControler(1-tp) then
+	if dc and dc:IsControler(tp) and Duel.Destroy(dc,REASON_EFFECT)>0
+		and negc and negc:IsControler(1-tp) and negc:IsFaceup() and negc:IsCanBeDisabledByEffect(e) then
 		negc:NegateEffects(e:GetHandler(),RESET_PHASE|PHASE_END)
-		if Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_VISAS_STARFROST),tp,LOCATION_ONFIELD,0,1,nil)
+		if Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_VISAS_STARFROST),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 			and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+			Duel.AdjustInstantly()
 			Duel.BreakEffect()
 			Duel.Destroy(negc,REASON_EFFECT)
 		end
@@ -80,6 +81,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_MZONE,0,1,1,nil)
 	if #g>0 then
+		Duel.HintSelection(g,true)
 		Duel.Destroy(g,REASON_EFFECT)
 	end
 end
