@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--"Horus" monsters cannot be destroyed by effects that do not target them
+	--Your "Horus" monsters cannot be destroyed by effects that do not target them
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
@@ -23,10 +23,10 @@ function s.initial_effect(c)
 	e3:SetCategory(CATEGORY_TOGRAVE)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetCountLimit(1,id)
-	e3:SetCost(s.tgcost)
-	e3:SetTarget(s.tgtg)
-	e3:SetOperation(s.tgop)
+	e3:SetCountLimit(4,id)
+	e3:SetCost(s.dtgcost)
+	e3:SetTarget(s.dtgtg)
+	e3:SetOperation(s.dtgop)
 	c:RegisterEffect(e3)
 	--Send to the GY an opponent's monster that battles your "Horus" monster
 	local e4=Effect.CreateEffect(c)
@@ -36,9 +36,9 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_BATTLE_START)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCountLimit(1)
-	e4:SetCondition(s.tgcond)
-	e4:SetTarget(s.tgtg2)
-	e4:SetOperation(s.tgop2)
+	e4:SetCondition(s.btgcond)
+	e4:SetTarget(s.btgtg)
+	e4:SetOperation(s.btgop)
 	c:RegisterEffect(e4)
 end
 s.listed_series={SET_HORUS}
@@ -47,35 +47,35 @@ function s.indvalue(e,re,rp,c)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	return not g:IsContains(c)
 end
-function s.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.dtgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,Card.IsAbleToGraveAsCost,1,1,REASON_COST,nil)
 end
 function s.tgfilter(c)
 	return c:IsSetCard(SET_HORUS) and c:IsMonster() and c:IsAbleToGrave()
 end
-function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.dtgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
-function s.tgop(e,tp,eg,ep,ev,re,r,rp)
+function s.dtgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
-function s.tgcond(e,tp,eg,ep,ev,re,r,rp)
+function s.btgcond(e,tp,eg,ep,ev,re,r,rp)
 	local a,at=Duel.GetBattleMonster(tp)
 	return a and at and a:IsSetCard(SET_HORUS) and a:IsFaceup()
 end
-function s.tgtg2(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.btgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local a,at=Duel.GetBattleMonster(tp)
 	if chk==0 then return at and at:IsAbleToGrave() end
 	e:SetLabelObject(at)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,at,1,tp,0)
 end
-function s.tgop2(e,tp,eg,ep,ev,re,r,rp)
+function s.btgop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	if tc and tc:IsRelateToBattle() and tc:IsControler(1-tp) then
 		Duel.SendtoGrave(tc,REASON_EFFECT)
