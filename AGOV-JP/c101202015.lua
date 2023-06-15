@@ -80,8 +80,9 @@ function s.spsyncop(e,tp,eg,ep,ev,re,r,rp)
 	g:Merge(c)
 	if #g<2 then return end
 	local rg=aux.SelectUnselectGroup(g,e,tp,2,#g,s.rescon,1,tp,HINTMSG_RELEASE)
-	if #rg==2 and Duel.Release(rg,REASON_EFFECT)>0 then
-		local lv=Duel.GetOperatedGroup():GetSum(Card.GetLevel)
+	if #rg~=2 then return end
+	local lv=rg:GetSum(Card.GetLevel)
+	if Duel.Release(rg,REASON_EFFECT)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,nil,lv):GetFirst()
 		if sc then
