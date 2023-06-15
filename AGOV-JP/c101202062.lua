@@ -79,7 +79,6 @@ function s.actlimit(e,re,tp)
 	local efftyp=re:GetType()
 	local effcod=re:GetCode()
 	return re:IsMonsterEffect() --monster effect
-		and tc:IsLocation(LOCATION_MZONE) --probably redundant, but makes it return earlier is many cases without the group checks
 		and (e:GetHandler():GetColumnGroup():IsContains(tc)--same column as this card's
 		or tc:GetColumnGroup():IsExists(s.wattfilter,1,nil,e:GetHandlerPlayer())) --same column as an "Watt" monster you control
 		and efftyp&EFFECT_TYPE_SINGLE>0 and ((efftyp&EFFECT_TYPE_TRIGGER_O)>0 or (efftyp&EFFECT_TYPE_TRIGGER_F)) --trigger effects
