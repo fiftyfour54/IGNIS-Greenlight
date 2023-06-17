@@ -13,10 +13,10 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_DAMAGE_STEP_END)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetCode(EVENT_BATTLE_DAMAGE)
 	e2:SetCountLimit(1,id)
-	e2:SetCondition(s.spcon)
+	e2:SetCondition(function(e,tp) return Duel.HasFlagEffect(tp,id) end)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
@@ -31,10 +31,21 @@ function s.initial_effect(c)
 	e3:SetTarget(s.spsynctg)
 	e3:SetOperation(s.spsyncop)
 	c:RegisterEffect(e3)
+	--Check that a monster inflicted battle damage to the opponent
+	aux.GlobalCheck(s,function()
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_BATTLE_DAMAGE)
+		ge1:SetOperation(s.checkop)
+		Duel.RegisterEffect(ge1,0)
+	end)
 end
 s.listed_series={SET_WATT}
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==1-tp and eg:GetFirst():IsControler(tp)
+function s.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local player=eg:GetFirst():GetControler()
+	if ep==1-player then
+		Duel.RegisterFlagEffect(player,id,RESET_PHASE|PHASE_DAMAGE,0,1)
+	end
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -51,7 +62,7 @@ end
 function s.spsynccon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==1-tp and Duel.GetAttackTarget()==nil
 end
-function s.filter(c,e)
+function s.relfilter(c,e)
 	return c:HasLevel() and not c:IsType(TYPE_TUNER) and c:IsReleasableByEffect(e)
 		and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
 end
@@ -66,21 +77,21 @@ function s.rescon(sg,e,tp,mg)
 end
 function s.spsynctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_HAND|LOCATION_MZONE,0,nil,e)
+	local g=Duel.GetMatchingGroup(s.relfilter,tp,LOCATION_HAND|LOCATION_MZONE,0,nil,e)
 	g:Merge(c)
 	if chk==0 then return c:HasLevel() and #g>=2
 		and aux.SelectUnselectGroup(g,e,tp,2,#g,s.rescon,0) end
-	Duel.SetOperationInfo(0,CATEGORY_RELEASE,nil,1,tp,0) --not sure if the group g should be set here
+	Duel.SetOperationInfo(0,CATEGORY_RELEASE,c,1,tp,LOCATION_HAND|LOCATION_MZONE)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.spsyncop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not (c:IsFaceup() and c:IsRelateToEffect(e)) then return end
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_HAND|LOCATION_MZONE,0,nil,e)
+	if not c:IsRelateToEffect(e) then return end
+	local g=Duel.GetMatchingGroup(s.relfilter,tp,LOCATION_HAND|LOCATION_MZONE,0,nil,e)
 	g:Merge(c)
 	if #g<2 then return end
 	local rg=aux.SelectUnselectGroup(g,e,tp,2,#g,s.rescon,1,tp,HINTMSG_RELEASE)
-	if #rg~=2 then return end
+	if #rg<2 then return end
 	local lv=rg:GetSum(Card.GetLevel)
 	if Duel.Release(rg,REASON_EFFECT)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

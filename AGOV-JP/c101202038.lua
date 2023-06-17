@@ -47,7 +47,7 @@ end
 function s.spsynctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g1=Duel.GetMatchingGroup(s.gyfilter,tp,LOCATION_GRAVE,0,nil)
 	local g2=Duel.GetMatchingGroup(s.mzfilter,tp,LOCATION_MZONE,0,nil)
-	if chk==0 then return #g1>=1 and #g2>=1
+	if chk==0 then return #g1>0 and #g2>0
 		and aux.SelectUnselectGroup(g1+g2,e,tp,2,2,s.rescon,0) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,2,tp,LOCATION_MZONE|LOCATION_GRAVE)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
@@ -57,7 +57,9 @@ function s.spsyncop(e,tp,eg,ep,ev,re,r,rp)
 	local g2=Duel.GetMatchingGroup(s.mzfilter,tp,LOCATION_MZONE,0,nil)
 	if #g1<1 or #g2<1 then return end
 	local rg=aux.SelectUnselectGroup(g1+g2,e,tp,2,2,s.rescon,1,tp,HINTMSG_TODECK)
-	if #rg==2 and Duel.SendtoDeck(rg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0
+	if #rg~=2 then return end
+	Duel.HintSelection(rg,true)
+	if Duel.SendtoDeck(rg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0
 		and Duel.GetOperatedGroup():IsExists(Card.IsLocation,1,nil,LOCATION_DECK|LOCATION_EXTRA) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,nil):GetFirst()
