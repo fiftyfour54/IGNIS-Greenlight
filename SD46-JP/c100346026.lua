@@ -44,7 +44,7 @@ function s.initial_effect(c)
 	e4:SetOperation(s.spop)
 	c:RegisterEffect(e4)
 end
-s.listed_names={CARD_RED_DRAGON_ARCHFIEND}
+s.listed_names={CARD_RED_DRAGON_ARCHFIEND,id}
 function s.thfilter(c)
 	return (c:IsCode(CARD_RED_DRAGON_ARCHFIEND) or c:ListsCode(CARD_RED_DRAGON_ARCHFIEND))
 		and not c:IsCode(id) and c:IsAbleToHand()
@@ -77,7 +77,7 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.cfilter(c)
-	return c:IsReason(REASON_BATTLE+REASON_EFFECT) and c:IsPreviousLocation(LOCATION_MZONE)
+	return c:IsReason(REASON_BATTLE|REASON_EFFECT) and c:IsPreviousLocation(LOCATION_MZONE)
 end
 function s.spcond(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil)
