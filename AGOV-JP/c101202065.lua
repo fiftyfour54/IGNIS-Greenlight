@@ -1,4 +1,4 @@
--- 天子の指輪
+--天子の指輪
 --Angel Ring
 --scripted by Naim
 local s,id=GetID()
@@ -41,6 +41,7 @@ function s.lptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(500)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,500)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,tp,0)
 end
 function s.lpop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
