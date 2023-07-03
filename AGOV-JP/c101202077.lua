@@ -12,8 +12,8 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetRange(LOCATION_SZONE)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.condition)
@@ -22,20 +22,21 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_NEMLERIA}
+s.listed_names={CARD_DREAMING_NEMLERIA}
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_NEMLERIA),tp,LOCATION_ONFIELD,0,1,e:GetHandler())
 end
 function s.cfilter(c)
-	return c:IsFacedown() and c:IsAbleToRemoveAsCost(POS_FACEDOWN)
+	return c:IsAbleToRemoveAsCost(POS_FACEDOWN) and not c:IsCode(CARD_DREAMING_NEMLERIA)
 end
 function s.thfilter(c)
 	return c:IsSetCard(SET_NEMLERIA) and c:IsAbleToHand()
 end
 function s.tgfilter(c)
-	return c:IsLevel(10) and c:IsRace(RACE_BEAST) and c:IsAbleToGrave()
+	return c:IsLevel(10) and c:IsRace(RACE_BEAST) and c:IsFaceup() and c:IsAbleToGrave()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ct=Duel.GetMatchingGroupCount(Card.IsAbleToRemoveAsCost,tp,LOCATION_EXTRA,0,nil,POS_FACEDOWN)
+	local ct=Duel.GetMatchingGroupCount(s.cfilter,tp,LOCATION_EXTRA,0,nil)
 	local b1=ct>=1 and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,nil)
 	local b2=ct>=2 and not Duel.HasFlagEffect(tp,id)
 	local b3=ct>=3 and Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_MZONE,0,1,nil)
@@ -47,11 +48,13 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		{b3,aux.Stringid(id,3)})
 	e:SetLabel(op)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_EXTRA,0,op,op,nil,POS_FACEDOWN)
+	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_EXTRA,0,op,op,nil)
 	Duel.Remove(g,POS_FACEDOWN,REASON_COST)
 	if op==1 then
 		e:SetCategory(CATEGORY_TOHAND)
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
+	elseif op==2 then
+		e:SetCategory(0)
 	elseif op==3 then
 		e:SetCategory(CATEGORY_TOGRAVE|CATEGORY_DISABLE)
 		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_MZONE)
@@ -70,17 +73,18 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ConfirmCards(1-tp,g)
 		end
 	elseif op==2 then
+		if Duel.HasFlagEffect(tp,id) then return end
+		Duel.RegisterFlagEffect(tp,id,RESET_PHASE|PHASE_END,0,1)
 		--Any damage you take this turn is halved
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(id,4))
 		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetCode(EFFECT_CHANGE_DAMAGE)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+		e1:SetCode(EFFECT_CHANGE_DAMAGE)
 		e1:SetTargetRange(1,0)
 		e1:SetValue(function(e,re,val,r,rp,rc) return math.floor(val/2) end)
 		e1:SetReset(RESET_PHASE|PHASE_END)
 		Duel.RegisterEffect(e1,tp)
-		Duel.RegisterFlagEffect(tp,id,RESET_PHASE|PHASE_END,0,1)
 	elseif op==3 then
 		--Send 1 Level 10 Beast monster to the GY and negate the effects of monsters your opponent controls
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
