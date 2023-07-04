@@ -37,7 +37,6 @@ function s.initial_effect(c)
 	end)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	Debug.Message(e:GetLabel())
 	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)
 	if chk==0 then return ct>0 end
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,ct*300)
