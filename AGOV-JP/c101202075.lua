@@ -46,7 +46,10 @@ function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE|LOCATION_GRAVE) and s.tgfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,0,LOCATION_MZONE|LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,s.tgfilter,tp,0,LOCATION_MZONE|LOCATION_GRAVE,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.tgfilter,tp,0,LOCATION_MZONE|LOCATION_GRAVE,1,1,nil)
+	if g:GetFirst():IsLocation(LOCATION_GRAVE)
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
+	end
 end
 function s.spfilter(c,e,tp)
 	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER) and c:IsContinuousSpell()
