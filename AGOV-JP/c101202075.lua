@@ -47,7 +47,7 @@ function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,0,LOCATION_MZONE|LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,s.tgfilter,tp,0,LOCATION_MZONE|LOCATION_GRAVE,1,1,nil)
-	if g:GetFirst():IsLocation(LOCATION_GRAVE)
+	if g:GetFirst():IsLocation(LOCATION_GRAVE) then
 		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
 	end
 end
