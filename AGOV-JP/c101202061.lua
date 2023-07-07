@@ -9,12 +9,8 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
 	--Ritual Summon 1 WIND monster from the Deck by tributing Spirit monsters and or "Shinobird Tokens" you control
-	local e2=Ritual.CreateProc({handler=c,
-								lvtype=RITPROC_GREATER,
-								filter=aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WIND),
-								desc=aux.Stringid(id,0),
-								matfilter=s.matfilter,
-								location=LOCATION_DECK})
+	local e2=Ritual.CreateProc({handler=c, lvtype=RITPROC_GREATER,filter=aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WIND),
+								desc=aux.Stringid(id,0), matfilter=s.matfilter,location=LOCATION_DECK})
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_FZONE)
 	c:RegisterEffect(e2)
