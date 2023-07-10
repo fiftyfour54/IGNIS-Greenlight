@@ -4,6 +4,8 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
+	--Return this card to the hand during the End Phase of the turn it was Special Summoned
+	Spirit.AddProcedure(c,EVENT_SPSUMMON_SUCCESS)
 	--This card's name become "Shinobaroness Peacock"
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -12,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE|LOCATION_HAND)
 	e1:SetValue(25415052)
 	c:RegisterEffect(e1)
-	--Search Spell/trap that lists 'Spirit monster' in its text
+	--Search 1 Spell/Trap that has "Spirit monster" in its text
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -32,22 +34,13 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetRange(LOCATION_REMOVED)
 	e3:SetCountLimit(1)
-	e3:SetCondition(s.selfspcond)
+	e3:SetCondition(function(e) return Duel.GetTurnCount()==e:GetHandler():GetTurnID()+1 end)
 	e3:SetTarget(s.selfsptg)
 	e3:SetOperation(s.selfspop)
 	c:RegisterEffect(e3)
-	--Spirit return
-	local sme,soe=Spirit.AddProcedure(c,EVENT_SPSUMMON_SUCCESS)
-	--Mandatory return
-	sme:SetCategory(CATEGORY_TOHAND)
-	sme:SetTarget(s.mrettg)
-	sme:SetOperation(s.retop)
-	--Optional return
-	soe:SetCategory(CATEGORY_TOHAND)
-	soe:SetTarget(s.orettg)
-	soe:SetOperation(s.retop)
 end
 s.listed_names={73055622,25415052} --Shinobird's Calling, Shinobaroness Peacock
+s.listed_card_types={TYPE_SPIRIT}
 function s.thfilter(c)
 	return c:IsSpellTrap() and c:ListsCardType(TYPE_SPIRIT) and c:IsAbleToHand()
 end
@@ -63,9 +56,6 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function s.selfspcond(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()==e:GetHandler():GetTurnID()+1
-end
 function s.selfsptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -76,19 +66,5 @@ function s.selfspop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-	end
-end
-function s.mrettg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Spirit.MandatoryReturnTarget(e,tp,eg,ep,ev,re,r,rp,1)
-end
-function s.orettg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Spirit.OptionalReturnTarget(e,tp,eg,ep,ev,re,r,rp,0)  end
-	Spirit.OptionalReturnTarget(e,tp,eg,ep,ev,re,r,rp,1)
-end
-function s.retop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SendtoHand(c,nil,REASON_EFFECT)
 	end
 end
