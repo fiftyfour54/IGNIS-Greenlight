@@ -41,6 +41,9 @@ artworks.
 
 Release date | Set | Prefix | Prerelease passcode
 --- | --- | --- | ---
+
+18-Mar-2023 | [Deck Build Pack: Wild Survivors][DBWS]                  | DBWS-JP    | 100430XXX
+26-Aug-2023 | [Deck Build Pack: Valiant Smashers][DBVS]                | DBVS-JP    | 100431XXX
 27-May-2023 | [Duelist Pack: Duelists of Explosion][DP28]              | DP28-JP    | 100432XXX
 10-Jun-2023 | [Animation Chronicle 2023][AC03]                         | AC03-JP    | 100299XXX
 24-Jun-2023 | [Structure Deck: Pulse of the King][SD46]                | SD46-JP    | 100346XXX
@@ -49,6 +52,8 @@ Release date | Set | Prefix | Prerelease passcode
 24-Jun-2023 | [Triple Build Pack: Godbreath Wing][RD/TB01]             | RD/TB01-JP | 160208XXX
 ??-???-???? | [Saikyō Jump Promos][RD/SJMP]                            | RD/SJMP-JP | 160402XXX
 
+[DBWS]: https://yugipedia.com/wiki/Deck_Build_Pack:_Wild_Survivors
+[DBVS]: https://yugipedia.com/wiki/Deck_Build_Pack:_Valiant_Smashers
 [DP28]: https://yugipedia.com/wiki/Duelist_Pack:_Duelists_of_Explosion
 [AC03]: https://yugipedia.com/wiki/Animation_Chronicle_2023
 [SD46]: https://yugipedia.com/wiki/Structure_Deck:_Pulse_of_the_King
