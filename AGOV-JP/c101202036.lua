@@ -12,7 +12,6 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetValue(aux.synlimit)
 	c:RegisterEffect(e1)
-
 	--remove
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
@@ -35,7 +34,6 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_REMOVE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,{id,1})
-	e3:SetCondition(s.sscon)
 	e3:SetTarget(s.sstg)
 	e3:SetOperation(s.ssop)
 end
@@ -68,9 +66,6 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 	end
 end
-
---special summon
-	--Check for opponent's sent monster in GY/banished
 function s.ssfilter(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,true,false) and c:IsMonster() and c:IsFaceup()
 		and c:IsCanBeEffectTarget(e) and c:IsLocation(LOCATION_REMOVED)
