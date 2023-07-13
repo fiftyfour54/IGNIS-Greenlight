@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(TIMING_ATTACK,TIMINGS_CHECK_MONSTER_E+TIMING_ATTACK)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(function(_,tp) return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_MEMENTO),tp,LOCATION_MZONE,0,1,nil) end)
 	e1:SetTarget(s.destg)
@@ -31,30 +31,31 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_MEMENTO}
-s.listed_names={100431001}
+s.listed_names={CARD_MEMENTORAL_TECTOLICA}
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc~=e:GetHandler() end
-	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
+	local c=e:GetHandler()
+	if chkc then return chkc:IsOnField() and chkc~=c end
+	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler())
+	local g=Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,c)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)>0 then
 		local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,0,e:GetHandler())
-		if #g>0 and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,100431001),tp,LOCATION_MZONE,0,1,nil)
-				and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		if #g>0 and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_MEMENTORAL_TECTOLICA),tp,LOCATION_ONFIELD,0,1,nil)
+			and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 			local dg=g:Select(tp,1,1,nil)
 			if #dg==0 then return end
+			Duel.HintSelection(dg,true)
 			Duel.BreakEffect()
 			Duel.Destroy(dg,REASON_EFFECT)
 		end
 	end
 end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	-- y = your card, oc = opponent's card
 	local yc,oc=Duel.GetBattleMonster(tp)
 	return yc and oc and yc:IsFaceup() and yc:IsSetCard(SET_MEMENTO)
 end

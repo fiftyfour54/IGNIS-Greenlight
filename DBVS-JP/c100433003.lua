@@ -42,31 +42,31 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function s.rescon(lv)
-	return function(sg,e,tp,mg)
-		return sg:GetSum(Card.GetLevel)<=lv
-	end
-end
-function s.desfilter(c,e,tp)
-	local lv=c:GetOriginalLevel()
-	local g=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_DECK,0,nil,lv)
-	return c:IsFaceup() and c:IsSetCard(SET_MEMENTO) and aux.SelectUnselectGroup(g,e,tp,1,#g,aux.AND(aux.dncheck,s.rescon(lv)),0)
+function s.desfilter(c,tp)
+	return c:IsSetCard(SET_MEMENTO) and c:IsFaceup() and c:HasLevel()
+		and Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil,c:GetOriginalLevel())
 end
 function s.tgfilter(c,lv)
 	return c:IsSetCard(SET_MEMENTO) and c:IsMonster() and c:IsLevelBelow(lv) and c:IsAbleToGrave()
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_MZONE)
+	local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE,0,nil,tp)
+	if chk==0 then return #g>0 end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,tp,LOCATION_MZONE)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+end
+function s.rescon(lv)
+	return function(sg,e,tp,mg)
+		return sg:GetSum(Card.GetLevel)<=lv and sg:GetClassCount(Card.GetCode)==#sg
+	end
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local tc=Duel.SelectMatchingCard(tp,s.desfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.desfilter,tp,LOCATION_MZONE,0,1,1,nil,tp):GetFirst()
 	if tc and Duel.Destroy(tc,REASON_EFFECT)>0 then
 		local lv=tc:GetOriginalLevel()
 		local g=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_DECK,0,nil,lv)
-		local sg=aux.SelectUnselectGroup(g,e,tp,1,#g,aux.AND(aux.dncheck,s.rescon(lv)),1,tp,HINTMSG_TOGRAVE)
+		local sg=aux.SelectUnselectGroup(g,e,tp,1,lv,s.rescon(lv),1,tp,HINTMSG_TOGRAVE)
 		if #sg>0 then
 			Duel.SendtoGrave(sg,REASON_EFFECT)
 		end

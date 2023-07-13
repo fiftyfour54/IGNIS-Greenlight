@@ -27,13 +27,13 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_MEMENTO}
-function s.spfilter(c,e,tp,dc)
-	return c:IsSetCard(SET_MEMENTO) and c:IsMonster() and not c:IsCode(dc:GetCode())
-		and (c:IsAbleToHand() or (Duel.GetMZoneCount(tp,dc)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)))
-end
 function s.desfilter(c,e,tp)
-	return c:IsSetCard(SET_MEMENTO) and c:IsMonster() and c:IsDestructable()
-		and (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp,c)
+	return c:IsSetCard(SET_MEMENTO) and c:IsMonster() and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
+		and Duel.IsExistingMatchingCard(s.thspfilter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetCode(),Duel.GetMZoneCount(tp,c))
+end
+function s.thspfilter(c,e,tp,code,ft)
+	return c:IsSetCard(SET_MEMENTO) and c:IsMonster() and not c:IsCode(code)
+		and (c:IsAbleToHand() or (ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_HAND|LOCATION_MZONE,0,1,nil,e,tp) end
@@ -45,13 +45,19 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local tc=Duel.SelectMatchingCard(tp,s.desfilter,tp,LOCATION_HAND|LOCATION_MZONE,0,1,1,nil,e,tp):GetFirst()
 	if tc and Duel.Destroy(tc,REASON_EFFECT)>0 then
-		local sc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,tc):GetFirst()
+		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
+		local sc=Duel.SelectMatchingCard(tp,s.thspfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,tc:GetCode(),ft):GetFirst()
 		if not sc then return end
-		aux.ToHandOrElse(sc,tp,function(c)
-			return sc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end,
-		function(c)
-			Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP_DEFENSE) end,
-		aux.Stringid(id,2))
+		aux.ToHandOrElse(sc,tp,
+			function(c)
+				return ft>0 and sc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
+			end,
+			function(c)
+				Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
+			end,
+			aux.Stringid(id,3)
+		)
 	end
 end
 function s.cfilter(c)
@@ -61,7 +67,7 @@ function s.pdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.cfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.cfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function s.pdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -69,8 +75,8 @@ function s.pdop(e,tp,eg,ep,ev,re,r,rp)
 		-- Inflicts piercing damage
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(3208)
-		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 		e1:SetCode(EFFECT_PIERCE)
 		e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
 		tc:RegisterEffect(e1)

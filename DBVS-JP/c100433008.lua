@@ -49,17 +49,16 @@ function s.actcon(e)
 	local bc=Duel.GetBattleMonster(e:GetHandlerPlayer())
 	return bc and bc:IsFaceup() and bc:IsSetCard(SET_MEMENTO)
 end
-function s.spfilter(c,e,tp,tc)
-	return c:IsSetCard(SET_MEMENTO) and c:IsLevelBelow(tc:GetLevel()-1)
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetMZoneCount(tp)>0
-end
 function s.tcfilter(c,e,tp)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp) and c:IsReason(REASON_BATTLE|REASON_EFFECT)
-		and c:IsCanBeEffectTarget(e) and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,nil,e,tp,c)
+		and c:IsCanBeEffectTarget(e) and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,nil,e,tp,c:GetLevel())
+end
+function s.spfilter(c,e,tp,lv)
+	return c:IsSetCard(SET_MEMENTO) and c:IsLevelBelow(lv-1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return s.tcfilter(chkc,e,tp) end
-	if chk==0 then return eg:IsExists(s.tcfilter,1,nil,e,tp) end
+	if chkc then return eg:IsContains(chkc) and s.tcfilter(chkc,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and eg:IsExists(s.tcfilter,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local tc=eg:FilterSelect(tp,s.tcfilter,1,1,nil,e,tp):GetFirst()
 	Duel.SetTargetCard(tc)
@@ -69,7 +68,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_HAND|LOCATION_GRAVE,0,1,1,nil,e,tp,tc)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_HAND|LOCATION_GRAVE,0,1,1,nil,e,tp,tc:GetLevel())
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end

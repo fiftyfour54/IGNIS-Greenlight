@@ -3,15 +3,15 @@
 -- Scripted by Satellaa
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Special Summon 1 "Mementoral Tectolica, the Netherskull Dragon" from your Deck
+	-- Special Summon 1 "Mementoral Tectolica, the Netherskull Dragon" from your hand or Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_LEAVE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(function(_,tp,eg) return eg:IsExists(s.cfilter,1,nil,tp) end)
+	e1:SetCondition(s.spcon)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetProperty(EFFECT_FLAG_DELAY,EFFECT_FLAG2_CHECK_SIMULTANEOUS)
 	e2:SetCode(EVENT_LEAVE_GRAVE)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,{id,1})
@@ -31,17 +31,20 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={SET_MEMENTO}
-s.listed_names={100431001}
+s.listed_names={CARD_MEMENTORAL_TECTOLICA}
 function s.cfilter(c,tp)
 	return c:IsPreviousSetCard(SET_MEMENTO) and c:GetReasonPlayer()==1-tp and c:IsPreviousControler(tp)
 		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.cfilter,1,nil,tp)
+end
 function s.spfilter(c,e,tp)
-	return c:IsCode(100431001) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+	return c:IsCode(CARD_MEMENTORAL_TECTOLICA) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -53,19 +56,16 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.outgravecfilter(c,tp)
-	return c:IsMonster() and c:IsSetCard(SET_MEMENTO) and c:IsPreviousControler(tp) -- Not sure if the card needs to be face-up or not
+	return c:IsMonster() and c:IsSetCard(SET_MEMENTO) and c:IsPreviousControler(tp)
 end
 function s.spmanycon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and eg:IsExists(s.outgravecfilter,1,nil,tp)
 end
 function s.spmanyfilter(c,e,tp)
-	return c:IsSetCard(SET_MEMENTO) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
+	return c:IsSetCard(SET_MEMENTO) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spmanytg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		local ct=Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_TOFIELD)
-		return ct>0 and Duel.IsExistingMatchingCard(s.spmanyfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp)
-	end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spmanyfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK)
 end
 function s.spmanyop(e,tp,eg,ep,ev,re,r,rp)

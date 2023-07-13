@@ -14,8 +14,8 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_HAND|LOCATION_GRAVE)
 	e1:SetCondition(s.spproccon)
 	e1:SetTarget(s.spproctg)
@@ -44,7 +44,7 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_MEMENTO}
 function s.tdfilter(c)
-	return c:IsSetCard(SET_MEMENTO) and c:IsMonster() and (c:IsAbleToDeckAsCost() or c:IsAbleToExtraAsCost())
+	return c:IsSetCard(SET_MEMENTO) and c:IsMonster() and c:IsAbleToDeckOrExtraAsCost()
 end
 function s.spproccon(e,c)
 	if c==nil then return true end
@@ -65,6 +65,7 @@ end
 function s.spprocop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
 	if not g then return end
+	Duel.HintSelection(g,true)
 	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)
 	g:DeleteGroup()
 end
