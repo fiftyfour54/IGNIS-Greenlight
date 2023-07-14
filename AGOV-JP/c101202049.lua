@@ -31,13 +31,12 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
-function s.thfilter(c,p)
-	local code=c:GetCode
+function s.thfilter(c)
 	return c:IsSetCard(SET_TG) and c:IsMonster() and c:IsAbleToHand()
-		and Duel.IsExistingMatchingCard(aux.AND(s.thfilter,function(_c) return not _c:IsCode(code) end),p,LOCATION_DECK,0,1,c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,tp) end
+	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
+	if chk==0 then return #g>1 and aux.SelectUnselectGroup(g,e,tp,2,2,aux.dncheck,0) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,2,tp,LOCATION_DECK)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
