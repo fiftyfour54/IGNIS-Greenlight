@@ -5,7 +5,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Fusion Summon Procedure
-	Fusion.AddProcMix(c,true,true,s.matfilter1,s.matfilter2)
+	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsCode,{12275533,99733359}),aux.FilterBoolFunctionEx(Card.IsRace,RACE_MACHINE|RACE_DINOSAUR))
 	--Cannot be destroyed by battle
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -27,17 +27,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
 end
-function s.matfilter1(c)
-	return c:IsCode(12275533,99733359)
-end
-function s.matfilter2(c)
-	return c:IsRace(RACE_MACHINE|RACE_DINOSAUR)
-end
 function s.indescon(e)
 	return Duel.IsExistingMatchingCard(Card.IsSummonLocation,e:GetHandlerPlayer(),LOCATION_MZONE,LOCATION_MZONE,1,nil,LOCATION_GRAVE)
-end
-function s.filter(c)
-	return c:IsPreviousLocation(LOCATION_HAND)
 end
 function s.descond(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(Card.IsSummonLocation,1,nil,LOCATION_HAND)
