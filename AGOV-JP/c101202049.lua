@@ -37,7 +37,7 @@ function s.thfilter(c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
-	if chk==0 then return #g>1 and aux.SelectUnselectGroup(g,e,tp,2,2,aux.dncheck,0) end
+	if chk==0 then return #g>=2 and aux.SelectUnselectGroup(g,e,tp,2,2,aux.dncheck,0) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,2,tp,LOCATION_DECK)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -49,11 +49,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,thg)
 	end
 end
-function s.tdfilter(c,tohand)
-	return c:IsSetCard(SET_TG) and c:IsMonster() and (c:IsAbleToDeck() or (tohand and c:IsAbleToHand()))
-end
 function s.tohandfilter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_TG) and c:IsRace(RACE_MACHINE)
+end
+function s.tdfilter(c,tohand)
+	return c:IsSetCard(SET_TG) and c:IsMonster() and (c:IsAbleToDeck() or (tohand and c:IsAbleToHand()))
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tohand=Duel.IsExistingMatchingCard(s.tohandfilter,tp,LOCATION_MZONE,0,1,nil)
