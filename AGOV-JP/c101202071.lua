@@ -58,11 +58,11 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-		local eq=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_MZONE|LOCATION_GRAVE,0,1,1,tc):GetFirst()
+		local eq=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.eqfilter),tp,LOCATION_MZONE|LOCATION_GRAVE,0,1,1,tc):GetFirst()
 		if eq and Duel.Equip(tp,eq,tc) then
 			local c=e:GetHandler()
 			--Equip limit
-			local e1=Effect.CreateEffect(c)
+			local e1=Effect.CreateEffect(eq)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e1:SetCode(EFFECT_EQUIP_LIMIT)
