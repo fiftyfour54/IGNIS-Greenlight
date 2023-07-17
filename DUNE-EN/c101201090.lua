@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.tspop)
 	c:RegisterEffect(e3)
 end
-s.listed_names={101201089}
+s.listed_names={CARD_CRYSTAL_GOD_TISTINA}
 s.listed_series={SET_TISTINA}
 function s.tgfilter(c)
 	return c:IsSetCard(SET_TISTINA) and c:IsMonster() and c:IsAbleToGrave()
@@ -41,12 +41,12 @@ function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK)
 end
 function s.spfilter(c,e,tp)
-	return c:IsCode(101201089) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(CARD_CRYSTAL_GOD_TISTINA) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if #g>0 and Duel.SendtoGrave(g,REASON_EFFECT)>0
+	if #g>0 and Duel.SendtoGrave(g,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_GRAVE)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_ONFIELD,3,nil)
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp)
@@ -60,7 +60,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.tspcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return rp==1-tp and c:IsReason(REASON_EFFECT) and c:GetPreviousLocation()==LOCATION_FZONE
+	return rp==1-tp and c:IsReason(REASON_EFFECT) and c:IsPreviousLocation(LOCATION_FZONE)
 end
 function s.tspfilter(c,e,tp)
 	return c:IsSetCard(SET_TISTINA) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

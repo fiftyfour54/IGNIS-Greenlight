@@ -28,7 +28,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.posop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={101201089}
+s.listed_names={CARD_CRYSTAL_GOD_TISTINA}
 s.listed_series={SET_TISTINA}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,SET_TISTINA),tp,LOCATION_ONFIELD,0,1,nil)
@@ -36,7 +36,7 @@ end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP) end
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
@@ -58,13 +58,13 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.poscon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsTurnPlayer(1-tp)
-		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,101201089),tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_CRYSTAL_GOD_TISTINA),tp,LOCATION_ONFIELD,0,1,nil)
 end
 function s.postg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,0,LOCATION_MZONE,nil)
 	if chk==0 then return #g>0 end
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,#g,0,0)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,0,1-tp,LOCATION_ONFIELD)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,1-tp,LOCATION_ONFIELD)
 end
 function s.posop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,0,LOCATION_MZONE,nil)
