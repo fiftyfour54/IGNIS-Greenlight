@@ -6,7 +6,6 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Xyz Summon Procedure
 	Xyz.AddProcedure(c,nil,5,2,s.xyzfilter,aux.Stringid(id,0),2,s.xyzop)
-	c:EnableReviveLimit()
 	--Cannot be used as material for an Xyz Summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -34,12 +33,13 @@ function s.initial_effect(c)
 	e3:SetValue(aux.ChangeBattleDamage(1,DOUBLE_DAMAGE))
 	c:RegisterEffect(e3)
 end
+s.listed_names={id}
 s.listed_series={SET_ARMORED_XYZ}
 function s.xyzfilter(c,tp,xyzc)
-	return c:IsFaceup() and c:IsRankAbove(3) and c:IsRankBelow(4) and c:IsType(TYPE_XYZ,xyzc,SUMMON_TYPE_XYZ,tp)
+	return c:IsFaceup() and c:IsRank(3,4) and c:IsType(TYPE_XYZ,xyzc,SUMMON_TYPE_XYZ,tp)
 end
 function s.xyzop(e,tp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
+	if chk==0 then return not Duel.HasFlagEffect(tp,id) end
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE|PHASE_END,0,1)
 	return true
 end

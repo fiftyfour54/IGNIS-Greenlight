@@ -13,13 +13,13 @@ function s.initial_effect(c)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-	--Special Summon 1 1 Xyz Monster treated as an Equip Card from your S/T Zone
+	--Special Summon 1 Xyz Monster treated as an Equip Card from your S/T Zone
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCondition(aux.exccon)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.sptg)
@@ -31,35 +31,36 @@ function s.thfilter(c)
 	return c:IsSetCard(SET_ARMORED_XYZ) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_LVCHANGE,nil,1,0,0)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK|LOCATION_GRAVE)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_LVCHANGE,nil,1,tp,0)
 end
-function s.lvlfilter(c)
-	return c:IsFaceup() and c:HasLevel() and (c:GetLevel()~=3 or c:GetLevel()~=5)
+function s.rescon(sg,e,tp,mg)
+	return not (sg:IsExists(Card.IsLevel,1,nil,3) and sg:IsExists(Card.IsLevel,1,nil,5))
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local thg=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local thg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK|LOCATION_GRAVE,0,1,1,nil)
 	if #thg>0 and Duel.SendtoHand(thg,nil,REASON_EFFECT)>0 then
 		Duel.ConfirmCards(1-tp,thg)
-		local g=Duel.GetMatchingGroup(s.lvlfilter,tp,LOCATION_MZONE,0,nil)
-		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-			local ct=math.min(#g,2)
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-			local lvg=g:Select(tp,1,ct,nil)
-			Duel.BreakEffect()
-			for tc in lvg:Iter() do
-				Duel.HintSelection(tc,true)
-				local newlv=Duel.AnnounceLevel(tp,3,5,4,tc:GetLevel())
-				--Level becomes 3 or 5 until the End of this turn
-				local e1=Effect.CreateEffect(e:GetHandler())
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_CHANGE_LEVEL_FINAL)
-				e1:SetValue(newlv)
-				e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
-				tc:RegisterEffect(e1)
-			end
+		local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.HasLevel),tp,LOCATION_MZONE,0,nil)
+		if #g==0 or not Duel.SelectYesNo(tp,aux.Stringid(id,2)) then return end
+		local sg=aux.SelectUnselectGroup(g,e,tp,1,2,s.rescon,1,tp,HINTMSG_FACEUP)
+		if #sg==0 then return end
+		Duel.HintSelection(sg,true)
+		local lv=(sg:IsExists(Card.IsLevel,1,nil,3) and 5)
+			or (sg:IsExists(Card.IsLevel,1,nil,5) and 3)
+			or Duel.AnnounceLevel(tp,3,5,4)
+		local c=e:GetHandler()
+		Duel.BreakEffect()
+		for tc in sg:Iter() do
+			--Its Level becomes 3 or 5
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CHANGE_LEVEL_FINAL)
+			e1:SetValue(lv)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+			tc:RegisterEffect(e1)
 		end
 	end
 end
@@ -68,7 +69,7 @@ function s.spfilter(c,e,tp)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_STZONE) and s.spfilter(chkc,e,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_STZONE) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_STZONE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
