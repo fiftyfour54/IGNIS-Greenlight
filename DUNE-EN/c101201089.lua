@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_DESTROYED)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(s.posdescon)
+	e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return rp==1-tp and e:GetHandler():IsPreviousControler(tp) end)
 	e2:SetTarget(s.postg)
 	e2:SetOperation(s.posop)
 	c:RegisterEffect(e2)
@@ -40,8 +40,4 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.SendtoGrave(gg,REASON_EFFECT)
 	end
-end
-function s.posdescon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return rp==1-tp and c:IsPreviousControler(tp)
 end
