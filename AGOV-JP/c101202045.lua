@@ -10,9 +10,9 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetValue(s.val)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetValue(s.atkval)
 	c:RegisterEffect(e1)
 	--Add 1 face-up Pendulum Monster from your Extra Deck to your hand
 	local e2=Effect.CreateEffect(c)
@@ -26,16 +26,16 @@ function s.initial_effect(c)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
-	--Special Summon 1 pendulum monster from the hand or GY in Defense Position
+	--Special Summon 1 Pendulum Monster from the hand or GY in Defense Position
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetHintTiming(0,TIMING_MAIN_END+TIMINGS_CHECK_MONSTER)
 	e3:SetCountLimit(1,{id,1})
-	e3:SetCondition(function() return Duel.IsMainPhase() end)
+	e3:SetCondition(function(e,tp) return Duel.IsMainPhase() and Duel.GetFieldCard(tp,LOCATION_PZONE,0) and Duel.GetFieldCard(tp,LOCATION_PZONE,1) end)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
@@ -46,7 +46,7 @@ end
 function s.pendfilter(c)
 	return c:IsFaceup() and c:IsOriginalType(TYPE_PENDULUM) and c:IsOriginalType(TYPE_MONSTER)
 end
-function s.val(e,c)
+function s.atkval(e,c)
 	return Duel.GetMatchingGroupCount(s.pendfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,nil)*100
 end
 function s.thfilter(c)
@@ -54,7 +54,7 @@ function s.thfilter(c)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_EXTRA,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_EXTRA)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
@@ -65,15 +65,15 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.spfilter(c,e,tp,lsc,rsc)
-	return c:IsType(TYPE_PENDULUM) and c:HasLevel()
-		and c:GetLevel()>lsc and c:GetLevel()<rsc
+	local lv=c:GetLevel()
+	return c:IsType(TYPE_PENDULUM) and c:HasLevel() and lv>lsc and lv<rsc
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local lsc=Duel.GetFieldCard(tp,LOCATION_PZONE,0):GetLeftScale()
 	local rsc=Duel.GetFieldCard(tp,LOCATION_PZONE,1):GetRightScale()
 	if lsc>rsc then lsc,rsc=rsc,lsc end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE|LOCATION_HAND,0,1,nil,e,tp,lsc,rsc) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE|LOCATION_HAND)
 end

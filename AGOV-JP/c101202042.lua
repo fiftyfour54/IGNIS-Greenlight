@@ -1,11 +1,12 @@
 --厄災の星ティ・フォン
---Stellar Nemesis T-PHON – Doomsday Star
+--Stellar Nemesis T-PHON - Doomsday Star
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
+	--Xyz Summon procedure
 	Xyz.AddProcedure(c,nil,12,2,s.xyzfilter,aux.Stringid(id,0),2,s.xyzop)
-	--prevent activation
+	--Neither player can activate the effects of monsters with 3000 or more ATK
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -13,9 +14,9 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(1,1)
 	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ) end)
-	e1:SetValue(s.actlimit)
+	e1:SetValue(function(e,re,tp) return re:IsMonsterEffect() and re:GetHandler():IsAttackAbove(3000) end)
 	c:RegisterEffect(e1)
-	--to hand
+	--Return 1 monster on the field to the hand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -26,15 +27,8 @@ function s.initial_effect(c)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2,false,REGISTER_FLAG_DETACH_XMAT)
-	--summon register
+	--Register Special Summons from the Extra Deck
 	aux.GlobalCheck(s,function()
-		s.sum_count={}
-		s.sum_count[0]=0
-		s.sum_count[1]=0
-		aux.AddValuesReset(function()
-			s.sum_count[0]=0
-			s.sum_count[1]=0
-		end)
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -42,30 +36,28 @@ function s.initial_effect(c)
 		Duel.RegisterEffect(ge1,0)
 	end)
 end
-function s.checkfilter(c,tp)
-	return c:IsSummonLocation(LOCATION_EXTRA) and c:IsSummonPlayer(tp)
+function s.xyzfilter(c,tp,xyzc)
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
+	return #g>0 and g:GetMaxGroup(Card.GetAttack,nil):IsContains(c)
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	for p=0,1 do
-		local gc=eg:FilterCount(s.checkfilter,nil,p)
-		s.sum_count[p]=s.sum_count[p]+gc
-		if s.sum_count[p]>=2 and not Duel.HasFlagEffect(p,id) then
-			Duel.RegisterFlagEffect(p,id,RESET_PHASE|PHASE_END,0,2)
+	for tc in eg:Iter() do
+		if tc:IsSummonLocation(LOCATION_EXTRA) then
+			local sp=tc:GetSummonPlayer()
+			Duel.RegisterFlagEffect(sp,id,RESET_PHASE|PHASE_END,0,1)
+			if Duel.HasFlagEffect(sp,id,2) then
+				Duel.RegisterFlagEffect(sp,id+100,RESET_PHASE|PHASE_END,0,2)
+			end
 		end
 	end
 end
-function s.xyzfilter2(c,atk)
-	return c:IsFaceup() and c:GetAttack()>atk
-end
-function s.xyzfilter(c,tp,xyzc)
-	return c:IsFaceup() and not Duel.IsExistingMatchingCard(s.xyzfilter2,tp,LOCATION_MZONE,0,1,nil,c:GetAttack())
-end
 function s.xyzop(e,tp,chk)
-	if chk==0 then return Duel.HasFlagEffect(1-tp,id) end
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
+	if chk==0 then return Duel.HasFlagEffect(1-tp,id+100) end
+	--Cannot Normal or Special Summon this turn
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetCode(EFFECT_CANNOT_SUMMON)
 	e1:SetTargetRange(1,0)
 	e1:SetReset(RESET_PHASE|PHASE_END)
@@ -73,11 +65,7 @@ function s.xyzop(e,tp,chk)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	Duel.RegisterEffect(e2,tp)
-	aux.RegisterClientHint(c,nil,tp,1,0,aux.Stringid(id,2),nil)
 	return true
-end
-function s.actlimit(e,re,tp)
-	return re:IsMonsterEffect() and re:GetHandler():IsAttackAbove(3000)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
@@ -87,6 +75,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	if #g>0 then
+		Duel.HintSelection(g,true)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 	end
 end
