@@ -33,9 +33,8 @@ function s.initial_effect(c)
 		s.sum_count[0]=0
 		s.sum_count[1]=0
 		aux.AddValuesReset(function()
-				s.sum_count[0]=0
-				s.sum_count[1]=0
-			end)
+			s.sum_count[0]=0
+			s.sum_count[1]=0
 		end)
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
