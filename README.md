@@ -45,6 +45,7 @@ Release date | Set | Prefix | Prerelease passcode
 10-Jun-2023 | [Animation Chronicle 2023][AC03]                                         | AC03-JP    | 100299XXX
 24-Jun-2023 | [Structure Deck: Pulse of the King][SD46]                                | SD46-JP    | 100346XXX
 22-Jul-2023 | [Age of Overlord][AGOV]                                                  | AGOV-JP    | 101202XXX
+28-Oct-2023 | [Phantom Nightmare][PHNI]                                                | PHNI-JP    | 101203XXX
 28-Jul-2023 | [Duelist Nexus][DUNE]                                                    | DUNE-EN    | 101201XXX
 26-Aug-2023 | [Deck Build Pack: Valiant Smashers][DBVS]                                | DBVS-JP    | 100433XXX
 09-Sep-2023 | [Structure Deck R: Onslaught of the Fire Kings][SR14]                    | SR14-JP    | 100314XXX
@@ -55,6 +56,7 @@ Release date | Set | Prefix | Prerelease passcode
 [AC03]: https://yugipedia.com/wiki/Animation_Chronicle_2023
 [SD46]: https://yugipedia.com/wiki/Structure_Deck:_Pulse_of_the_King
 [AGOV]: https://yugipedia.com/wiki/Age_of_Overlord
+[PHNI]: https://yugipedia.com/wiki/Phantom_Nightmare
 [DUNE]: https://yugipedia.com/wiki/Duelist_Nexus
 [DBVS]: https://yugipedia.com/wiki/Deck_Build_Pack:_Valiant_Smashers
 [SR14]: https://yugipedia.com/wiki/Structure_Deck_R:_Onslaught_of_the_Fire_Kings
