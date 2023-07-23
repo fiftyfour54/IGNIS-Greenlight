@@ -11,22 +11,22 @@ function s.initial_effect(c)
 	--Monsters in your GY become Warrior
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_CHANGE_RACE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_GRAVE,0)
-	e2:SetCode(EFFECT_CHANGE_RACE)
 	e2:SetValue(RACE_WARRIOR)
 	e2:SetTarget(s.tg)
 	c:RegisterEffect(e2)
 	--Code check
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e3:SetCode(id)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e3:SetTargetRange(1,0)
 	e3:SetValue(s.val)
 	c:RegisterEffect(e3)
-	--Destroy alll monsters you control during the End Phase
+	--Destroy all monsters you control during the End Phase
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,0))
 	e4:SetCategory(CATEGORY_DESTROY)
@@ -48,7 +48,7 @@ function s.tg(e,c)
 			if not op or op(e,c) then return false end
 		end
 	end
-	return true
+	return c:IsMonster()
 end
 function s.val(e,c,re,chk)
 	if chk==0 then return true end

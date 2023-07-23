@@ -17,14 +17,27 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_ATKCHANGE)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetProperty(0,EFFECT_FLAG2_CHECK_SIMULTANEOUS)
-	e2:SetCode(EVENT_TOSS_COIN)
+	e2:SetCode(EVENT_CUSTOM+id)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(s.atkcon)
-	e2:SetTarget(s.atktg)
 	e2:SetOperation(s.atkop)
 	c:RegisterEffect(e2)
+	--Raise a custom event when coin tossing is detected
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_TOSS_COIN)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetOperation(s.coinop)
+	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e4:SetCode(EVENT_CHAIN_SOLVED)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetOperation(s.chainsolvedop)
+	e4:SetLabel(0,0)
+	c:RegisterEffect(e4)
+	e3:SetLabelObject(e4)
 end
 s.toss_coin=true
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -41,31 +54,38 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Draw(tp,heads//2,REASON_EFFECT)
 	end
 end
-function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	local res={Duel.GetCoinResult()}
-	for _,coin in ipairs(res) do
-		if coin==COIN_HEADS then
-			e:SetLabel(e:GetLabel()+1)
-		end
-	end
-	return true
-end
-function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not e:GetHandler():HasFlagEffect(id) end
-	e:GetHandler():RegisterFlagEffect(id,RESET_CHAIN,0,1)
-	Duel.SetTargetParam(e:GetLabel())
-	e:SetLabel(0)
-end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local heads=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
-	if heads==0 then return end
+	local heads_ct=ev
+	if heads_ct==0 then return end
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
+		--Double this card's ATK for each heads
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e1:SetValue(c:GetAttack()*(2^heads))
+		e1:SetValue(c:GetAttack()*(2^heads_ct))
 		e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE)
 		c:RegisterEffect(e1)
 	end
+end
+function s.coinop(e,tp,eg,ep,ev,re,r,rp)
+	local heads_ct=0
+	local res={Duel.GetCoinResult()}
+	for _,coin in ipairs(res) do
+		if coin==COIN_HEADS then
+			heads_ct=heads_ct+1
+		end
+	end
+	if not Duel.IsChainSolving() then
+		Duel.RaiseSingleEvent(e:GetHandler(),EVENT_CUSTOM+id,re,r,rp,ep,heads_ct)
+	else
+		local chain_solved_eff=e:GetLabelObject()
+		chain_solved_eff:SetLabel(chain_solved_eff:GetLabel()+heads_ct,#res)
+	end
+end
+function s.chainsolvedop(e,tp,eg,ep,ev,re,r,rp)
+	local heads_ct,total_ct=e:GetLabel()
+	if total_ct==0 then return end
+	Duel.RaiseSingleEvent(e:GetHandler(),EVENT_CUSTOM+id,re,r,rp,ep,heads_ct)
+	e:SetLabel(0,0)
 end
