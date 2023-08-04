@@ -98,7 +98,7 @@ function s.cpcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.cpfilter(c,tp)
 	if not (c:IsSetCard(SET_VALMONICA) and (c:IsNormalSpell() or c:IsNormalTrap()) and c:IsAbleToRemoveAsCost()) then return false end
-	local eff={c:GetCardEffect(EFFECT_REG_VALMONICA_DMG)}
+	local eff={c:GetCardEffect(REGISTER_FLAG_VALMONICA_DMG)}
 	for _,teh in ipairs(eff) do
 		local te=teh:GetLabelObject()
 		local con=te:GetCondition()
@@ -118,7 +118,7 @@ function s.cptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local tc=Duel.SelectMatchingCard(tp,s.cpfilter,tp,LOCATION_GRAVE,0,1,1,nil,tp):GetFirst()
 	Duel.SendtoGrave(tc,REASON_COST)
-	local eff={tc:GetCardEffect(EFFECT_REG_VALMONICA_DMG)}
+	local eff={tc:GetCardEffect(REGISTER_FLAG_VALMONICA_DMG)}
 	local te=nil
 	local acd={}
 	local ac={}
