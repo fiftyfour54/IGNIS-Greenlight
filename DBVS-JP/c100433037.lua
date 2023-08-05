@@ -3,85 +3,64 @@
 --Scripted by Eerie Code
 local s,id=GetID()
 function s.initial_effect(c)
-	--register effects
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_RECOVER|CATEGORY_TOHAND|CATEGORY_SEARCH)
-	e1:SetTarget(s.rctg)
-	e1:SetOperation(s.rcop)
-	c:RegisterEffect(e1,false,REGISTER_FLAG_VALMONICA_RCV)
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_DAMAGE|CATEGORY_TOGRAVE)
-	e2:SetTarget(s.dmgtg)
-	e2:SetOperation(s.dmgop)
-	c:RegisterEffect(e2,false,REGISTER_FLAG_VALMONICA_DMG)
-	--activate
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_ACTIVATE)
-	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	e3:SetLabelObject({e1,e2})
-	e3:SetTarget(s.target)
-	c:RegisterEffect(e3)
+	e1:SetCategory(CATEGORY_RECOVER+CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_DAMAGE+CATEGORY_TOGRAVE)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
+	c:RegisterEffect(e1)
 end
-s.listed_series={SET_VALMONICA }
+s.listed_series={SET_VALMONICA}
+s.listed_names={id}
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local ef=e:GetLabelObject()
-	local p=Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_PZONE,0,1,nil,SET_VALMONICA) and tp or 1-tp
-	local op=Duel.SelectOption(p,ef[1]:GetDescription(),ef[2]:GetDescription())
-	ef[op]:GetTarget()(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetCategory(ef[op]:GetCategory())
-	e:SetOperation(ef[op]:GetOperation())
-end
-function s.rctg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,500)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,500)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-end
-function s.rcop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_DECK,0,nil,SET_VALMONICA)
-	local dcount=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
-	if Duel.Recover(tp,500,REASON_EFFECT)~=0 then
-		if dcount==0 then return end
-		if #g==0 then
-			Duel.ConfirmDecktop(tp,dcount)
-			Duel.ShuffleDeck(tp)
-			return
-		end
-		if not Duel.SelectYesNo(tp,aux.Stringid(id,2)) then return end
-		Duel.BreakEffect()
-		local seq=-1
-		local spcard=nil
-		for tc in g:Iter() do
-			if tc:GetSequence()>seq then
-				seq=tc:GetSequence()
-				spcard=tc
-			end
-		end
-		Duel.ConfirmDecktop(tp,dcount-seq)
-		if spcard:IsAbleToHand() then
-			Duel.SendtoHand(spcard,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,spcard)
-			Duel.ShuffleHand(tp)
-		end
-		Duel.ShuffleDeck(tp)
-	end
-end
-function s.dmgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,500)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,500)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
-function s.gyfilter(c)
+function s.tgfilter(c)
 	return c:IsSetCard(SET_VALMONICA) and not c:IsCode(id) and c:IsAbleToGrave()
 end
-function s.dmgop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.gyfilter,tp,LOCATION_DECK,0,nil)
-	if Duel.Damage(tp,500,REASON_EFFECT)~=0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local sg=g:Select(tp,1,1,nil)
-		Duel.SendtoGrave(sg,REASON_EFFECT)
+function s.activate(e,tp,eg,ep,ev,re,r,rp,angle_or_delvin) --Additional parameter used by "Angelo Valmonica" and "Demone Valmonica"
+	local op=nil
+	if angle_or_delvin then
+		op=angle_or_delvin
+	else
+		local sel_player=Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_PZONE,0,1,nil,SET_VALMONICA) and tp or 1-tp
+		local offset=sel_player==1-tp and 2 or 0
+		op=Duel.SelectEffect(sel_player,
+			{true,aux.Stringid(id,1+offset)},
+			{true,aux.Stringid(id,2+offset)})
+	end
+	if op==1 then
+		--Gain 500 LP and excavate cards from the top of your Deck
+		local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_DECK,0,nil,SET_VALMONICA)
+		if Duel.Recover(tp,500,REASON_EFFECT)>0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,5)) then
+			local spcard,seq=g:GetMaxGroup(Card.GetSequence)
+			spcard=spcard:GetFirst()
+			if not spcard then return end
+			Duel.BreakEffect()
+			Duel.ConfirmDecktop(tp,Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)-seq)
+			if spcard:IsAbleToHand() then
+				Duel.SendtoHand(spcard,nil,REASON_EFFECT)
+				Duel.ConfirmCards(1-tp,spcard)
+			else
+				Duel.SendtoGrave(spcard,REASON_RULE)
+			end
+		end
+	elseif op==2 then
+		--Take 500 damage and send 1 "Valmonica" card from your Deck to the GY
+		local g=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_DECK,0,nil)
+		if Duel.Damage(tp,500,REASON_EFFECT)>0 and #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,6)) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+			local sg=g:Select(tp,1,1,nil)
+			Duel.BreakEffect()
+			Duel.SendtoGrave(sg,REASON_EFFECT)
+		end
 	end
 end

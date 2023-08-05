@@ -1,31 +1,35 @@
---悪魔の聲
---Demone Valmonica
---Scripted by Eerie Code
+--天使の聲
+--Angelo Valmonica
+--scripted by pyrQ
 local s,id=GetID()
 function s.initial_effect(c)
 	--Pendulum procedure
 	Pendulum.AddProcedure(c)
 	--Can place Resonance Counters on it
 	c:EnableCounterPermit(COUNTER_RESONANCE,LOCATION_PZONE)
-	--Place 1 Resonance Counter on this card each time you take effect damage
+	--Place 1 Resonance Counter on this card each time you gain LP
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_DAMAGE)
+	e1:SetCode(EVENT_RECOVER)
 	e1:SetRange(LOCATION_PZONE)
-	e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return ep==tp and r&REASON_EFFECT>0 and Duel.IsExistingMatchingCard(Card.IsOriginalRace,tp,LOCATION_PZONE,0,1,e:GetHandler(),RACE_FAIRY) end)
+	e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return ep==tp and Duel.IsExistingMatchingCard(Card.IsOriginalRace,tp,LOCATION_PZONE,0,1,e:GetHandler(),RACE_FIEND) end)
 	e1:SetOperation(s.ctop)
 	c:RegisterEffect(e1)
-	--Opponent's monsters lose 100 ATK for each Resonance Counter on your field
+	--Link Summon 1 "Valmonica" monster
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetRange(LOCATION_PZONE)
-	e2:SetTargetRange(0,LOCATION_MZONE)
-	e2:SetValue(function(e) return Duel.GetCounter(e:GetHandlerPlayer(),LOCATION_ONFIELD,0,COUNTER_RESONANCE)*-100 end)
+	e2:SetCountLimit(1)
+	e2:SetCondition(function(e,tp) return Duel.GetAttacker():IsControler(1-tp) end)
+	e2:SetTarget(s.linksptg)
+	e2:SetOperation(s.linkspop)
 	c:RegisterEffect(e2)
-	--Place both this card and 1 "Angelo Valmonica" from your Deck in your Pendulum Zone
+	--Place both this card and 1 "Demone Valmonica" from your Deck in your Pendulum Zone
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_HAND)
 	e3:SetCountLimit(1,{id,0})
@@ -33,9 +37,9 @@ function s.initial_effect(c)
 	e3:SetTarget(s.pztg)
 	e3:SetOperation(s.pzop)
 	c:RegisterEffect(e3)
-	--Apply the damage-inflicting effect of 1 "Valmonica" Normal Spell/Trap
+	--Apply the LP gain effect of 1 "Valmonica" Normal Spell/Trap
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetDescription(aux.Stringid(id,2))
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1,{id,1})
@@ -58,7 +62,7 @@ function s.initial_effect(c)
 		Duel.RegisterEffect(ge2,0)
 	end)
 end
-s.listed_names={100433031}
+s.listed_names={100433032}
 s.listed_series={SET_VALMONICA}
 s.counter_place_list={COUNTER_RESONANCE}
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
@@ -81,13 +85,27 @@ function s.addcounter(e,tp,eg,ep,ev,re,r,rp)
 	c:AddCounter(COUNTER_RESONANCE,1)
 	Duel.RaiseEvent(c,EVENT_CUSTOM+100433035,e,0,tp,tp,1)
 end
+function s.linkfilter(c)
+	return c:IsSetCard(SET_VALMONICA) and c:IsLinkSummonable()
+end
+function s.linksptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.linkfilter,tp,LOCATION_EXTRA,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+function s.linkspop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local sc=Duel.SelectMatchingCard(tp,s.linkfilter,tp,LOCATION_EXTRA,0,1,1,nil):GetFirst()
+	if sc then
+		Duel.LinkSummon(tp,sc)
+	end
+end
 function s.pzcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,c) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST|REASON_DISCARD,c)
 end
 function s.pzfilter(c)
-	return c:IsCode(100433031) and not c:IsForbidden()
+	return c:IsCode(100433032) and not c:IsForbidden()
 end
 function s.pztg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLocation(tp,LOCATION_PZONE,0) and Duel.CheckLocation(tp,LOCATION_PZONE,1)
@@ -126,6 +144,6 @@ function s.cpop(e,tp,eg,ep,ev,re,r,rp)
 	if not tc then return end
 	local eff=tc:GetActivateEffect()
 	local op=eff:GetOperation()
-	--Additional parameter checked in the script of "Valmonica" Normal Spells/Traps to correctly apply the damage-inflicting effect
-	if op then op(e,tp,eg,ep,ev,re,r,rp,2) end
+	--Additional parameter checked in the script of "Valmonica" Normal Spells/Traps to correctly apply the LP gain effect
+	if op then op(e,tp,eg,ep,ev,re,r,rp,1) end
 end
