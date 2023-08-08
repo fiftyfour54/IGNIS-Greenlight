@@ -55,7 +55,7 @@ function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 		and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function s.desfilter(c)
-	return c:IsAttribute(ATTRIBUTE_FIRE) and (c:IsLocation(LOCATION_HAND) and c:IsMonster() or c:IsFaceup())
+	return c:IsAttribute(ATTRIBUTE_FIRE) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_MZONE|LOCATION_HAND,0,1,e:GetHandler()) end
@@ -64,8 +64,10 @@ function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.NegateActivation(ev) then return end
+	local c=e:GetHandler()
+	local exc=c:IsRelateToEffect(e) and c or nil
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,s.desfilter,tp,LOCATION_MZONE|LOCATION_HAND,0,1,1,e:GetHandler())
+	local g=Duel.SelectMatchingCard(tp,s.desfilter,tp,LOCATION_MZONE|LOCATION_HAND,0,1,1,exc)
 	if #g>0 then
 		Duel.Destroy(g,REASON_EFFECT)
 	end

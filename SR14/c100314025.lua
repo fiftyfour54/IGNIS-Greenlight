@@ -6,11 +6,12 @@ function s.initial_effect(c)
 	--Destroy an equal number of "Fire King" monsters and opponent cards
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e1:SetHintTiming(0,TIMING_STANDBY_PHASE+TIMINGS_CHECK_MONSTER_E)
 	e1:SetTarget(s.destg)
 	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
@@ -30,14 +31,14 @@ function s.desfilter(c,e,tp)
 	return (c:IsControler(1-tp) or (c:IsFaceup() and c:IsSetCard(SET_FIRE_KING))) and c:IsCanBeEffectTarget(e)
 end
 function s.desrescon(sg,e,tp,mg)
-	return #sg==sg:FilterCount(Card.IsControler,nil,tp)*2
+	return sg:FilterCount(Card.IsControler,nil,tp)==sg:FilterCount(Card.IsControler,nil,1-tp)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	if chk==0 then return Duel.IsExistingTarget(aux.FaceupFilter(Card.IsSetCard,SET_FIRE_KING),tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingTarget(nil,tp,0,LOCATION_ONFIELD,1,nil) end
 	local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_MZONE,LOCATION_ONFIELD,nil,e,tp)
-	local tg=aux.SelectUnselectGroup(g,e,tp,2,#g,s.desrescon,1,tp,HINTMSG_DESTROY)
+	local tg=aux.SelectUnselectGroup(g,e,tp,2,#g,s.desrescon,1,tp,HINTMSG_DESTROY,s.desrescon)
 	Duel.SetTargetCard(tg)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tg,#tg,0,0)
 end
