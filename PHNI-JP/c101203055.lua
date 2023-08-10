@@ -34,15 +34,15 @@ function s.countertg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b1=c:IsCanRemoveCounter(tp,0x25,1,REASON_COST) and s.sptg(e,tp,eg,ep,ev,re,r,rp,0)
 	local b2=c:IsCanRemoveCounter(tp,0x25,2,REASON_COST) and s.thtg(e,tp,eg,ep,ev,re,r,rp,0)
 	local b3=c:IsCanRemoveCounter(tp,0x25,3,REASON_COST) and s.rmvtg(e,tp,eg,ep,ev,re,r,rp,0)
-	local b3=c:IsCanRemoveCounter(tp,0x25,4,REASON_COST) and s.destg(e,tp,eg,ep,ev,re,r,rp,0)
-	local b3=c:IsCanRemoveCounter(tp,0x25,5,REASON_COST) and s.superpolytg(e,tp,eg,ep,ev,re,r,rp,0)
+	local b4=c:IsCanRemoveCounter(tp,0x25,4,REASON_COST) and s.destg(e,tp,eg,ep,ev,re,r,rp,0)
+	local b5=c:IsCanRemoveCounter(tp,0x25,5,REASON_COST) and s.superpolytg(e,tp,eg,ep,ev,re,r,rp,0)
 	if chk==0 then return (b1 or b2 or b3 or b4 or b5) end
 	local op=Duel.SelectEffect(tp,
 		{b1,aux.Stringid(id,1)},
 		{b2,aux.Stringid(id,2)},
-		{b2,aux.Stringid(id,3)},
-		{b2,aux.Stringid(id,4)},
-		{b3,aux.Stringid(id,5)})
+		{b3,aux.Stringid(id,3)},
+		{b4,aux.Stringid(id,4)},
+		{b5,aux.Stringid(id,5)})
 	c:RemoveCounter(tp,0x25,op,REASON_COST)
 	if op==1 then
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
