@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
 	c:RegisterEffect(e2)
-	--Special Summon 1 "Yubel"
+	--Special Summon 1 "Yubel" from your hand/Deck/GY/banished cards
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-	--Special Summon this card
+	--Special Summon this card from your hand
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -31,14 +31,14 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e4:SetRange(LOCATION_HAND)
 	e4:SetCountLimit(1,id)
-	e4:SetCondition(function(_,tp) return Duel.IsTurnPlayer(1-tp) end)
+	e4:SetCondition(function(_,tp) return Duel.GetAttacker():IsControler(1-tp) end)
 	e4:SetTarget(s.hsptg)
 	e4:SetOperation(s.hspop)
 	c:RegisterEffect(e4)
 	--Add 1 Spell/Trap that mentions "Yubel" to the hand or Set it to the field
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,2))
-	e5:SetCategory(CATEGORY_TOHAND)
+	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetProperty(EFFECT_FLAG_DELAY)
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -49,7 +49,7 @@ function s.initial_effect(c)
 end
 s.listed_names={CARD_YUBEL}
 function s.spfilter(c,e,tp)
-	return c:IsCode(CARD_YUBEL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(CARD_YUBEL) and (c:IsFaceup() or c:IsLocation(LOCATION_HAND|LOCATION_DECK)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
