@@ -16,10 +16,12 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1,{id,1})
-	e2:SetCondition(function(e) return e:GetHandler():IsContinuousTrap() end)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
+	e2:SetCondition(function(e) return Duel.IsMainPhase() and e:GetHandler():IsContinuousTrap() end)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
@@ -27,7 +29,7 @@ end
 s.listed_names={id}
 s.listed_series={SET_CENTURION}
 function s.plfilter(c)
-	return c:IsSetCard(SET_CENTURION) and not c:IsForbidden()
+	return c:IsSetCard(SET_CENTURION) and not c:IsForbidden() and not c:IsCode(id)
 end
 function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsForbidden()
