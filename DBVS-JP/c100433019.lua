@@ -27,16 +27,16 @@ function s.initial_effect(c)
 	e2:SetOperation(s.drop)
 	c:RegisterEffect(e2)
 	--Place 1 non-Synchro "Centurion" monster in the Spell/Trap Zone as Continuous Trap
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_LEAVE_GRAVE)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,{id,1})
-	e2:SetTarget(s.pltg)
-	e2:SetOperation(s.plop)
-	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_LEAVE_GRAVE)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_PHASE+PHASE_END)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetTarget(s.pltg)
+	e3:SetOperation(s.plop)
+	c:RegisterEffect(e3)
 end
 s.listed_series={SET_CENTURION}
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -53,18 +53,20 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	if #g==0 or not Duel.SelectYesNo(tp,aux.Stringid(id,2)) then return end
 	local mg=g:GetMaxGroup(Card.GetAttack)
 	if #mg==1 then
+		Duel.HintSelection(mg,true)
+		Duel.BreakEffect()
 		Duel.Destroy(mg,REASON_EFFECT)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local tg=mg:Select(tp,1,1,nil)
 		if #tg==0 then return end
-		Duel.HintSelection(tg)
+		Duel.HintSelection(tg,true)
+		Duel.BreakEffect()
 		Duel.Destroy(tg,REASON_EFFECT)
 	end
 end
 function s.plfilter(c)
-	return c:IsSetCard(SET_CENTURION) and c:IsMonster()
-		and not c:IsType(TYPE_SYNCHRO) and not c:IsForbidden()
+	return c:IsSetCard(SET_CENTURION) and c:IsMonster() and not c:IsType(TYPE_SYNCHRO) and not c:IsForbidden()
 end
 function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
@@ -74,13 +76,13 @@ end
 function s.plop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,s.plfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,1,nil):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.plfilter),tp,LOCATION_HAND|LOCATION_GRAVE,0,1,1,nil):GetFirst()
 	if tc and Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 		--Treat as Continuous Trap
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CHANGE_TYPE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_CHANGE_TYPE)
 		e1:SetValue(TYPE_TRAP|TYPE_CONTINUOUS)
 		e1:SetReset((RESET_EVENT|RESETS_STANDARD)&~RESET_TURN_SET)
 		tc:RegisterEffect(e1)

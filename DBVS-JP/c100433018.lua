@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_HAND|LOCATION_GRAVE)
 	e1:SetCountLimit(1,id)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e1:SetHintTiming(0,TIMING_MAIN_END+TIMINGS_CHECK_MONSTER_E)
 	e1:SetCondition(function(_,tp) return Duel.IsTurnPlayer(1-tp) end)
 	e1:SetTarget(s.pltg)
 	e1:SetOperation(s.plop)
@@ -34,10 +34,11 @@ end
 s.listed_names={id}
 s.listed_series={SET_CENTURION}
 function s.plfilter(c,tp)
-	return c:IsSetCard(SET_CENTURION) and c:IsMonster() and not c:IsForbidden()
+	return c:IsSetCard(SET_CENTURION) and c:IsFaceup() and not c:IsForbidden()
 		and not c:IsCode(id) and Duel.GetMZoneCount(tp,c)>0
 end
-function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.pltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.plfilter(chkc,tp) end
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -55,19 +56,20 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 		--Treat as Continuous Trap
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CHANGE_TYPE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_CHANGE_TYPE)
 		e1:SetValue(TYPE_TRAP|TYPE_CONTINUOUS)
 		e1:SetReset((RESET_EVENT|RESETS_STANDARD)&~RESET_TURN_SET)
 		tc:RegisterEffect(e1)
-		if not c:IsRelateToEffect(e) then return end
-		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+		if c:IsRelateToEffect(e) then
+			Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+		end
 	end
 	--Cannot Special Summon "Centurion Emet VI"
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(function(_,c) return c:IsCode(id) end)

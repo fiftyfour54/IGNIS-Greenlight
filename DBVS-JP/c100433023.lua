@@ -3,12 +3,12 @@
 --scripted by Naim
 local s,id=GetID()
 function s.initial_effect(c)
-	--Banish 1 Monster card from the field
+	--Banish 1 Monster Card on the field
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_REMOVE+CATEGORY_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e1:SetCountLimit(1,id)
@@ -23,6 +23,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e2:SetCountLimit(1,id)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.sptg)
@@ -34,7 +35,7 @@ function s.rmvfilter(c)
 	return c:IsFaceup() and c:IsOriginalType(TYPE_MONSTER) and c:IsAbleToRemove()
 end
 function s.rmvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and s.rmvfilter(chkc) end
+	if chkc then return chkc:IsOnField() and s.rmvfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.rmvfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,s.rmvfilter,tp,LOCATION_ONFIELD,LOCATION_MZONE,1,1,nil)
@@ -43,29 +44,19 @@ function s.rmvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.rmvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.Remove(tc,0,REASON_EFFECT)>0 then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
-		e1:SetCountLimit(1)
-		e1:SetLabel(Duel.GetTurnCount()+1)
-		e1:SetLabelObject(tc)
-		e1:SetCondition(s.stndbyscond)
-		e1:SetOperation(s.stndbyspop)
-		e1:SetReset(RESET_PHASE|PHASE_STANDBY,Duel.GetCurrentPhase()<=PHASE_STANDBY and 2 or 1)
-		Duel.RegisterEffect(e1,tp)
-		tc:CreateEffectRelation(e1)
-	end
-end
-function s.stndbyscond(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetLabel()==Duel.GetTurnCount() and e:GetLabelObject():IsRelateToEffect(e)
-end
-function s.stndbyspop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	local p=tc:GetOwner()
-	if tc and tc:IsLocation(LOCATION_REMOVED) and tc:IsRelateToEffect(e)
-		and tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,p) then
-		Duel.SpecialSummon(tc,0,tp,p,false,false,POS_FACEUP)
+	if tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)>0 then
+		local turn_ct=Duel.GetTurnCount()
+		local reset_ct=Duel.GetCurrentPhase()<=PHASE_STANDBY and 2 or 1
+		--Special Summon it to its owner's field during the Standby Phase of the next turn
+		aux.DelayedOperation(tc,PHASE_STANDBY,id,e,tp,
+			function(ag)
+				Duel.SpecialSummon(ag,0,tp,ag:GetFirst():GetOwner(),false,false,POS_FACEUP)
+			end,
+			function()
+				return Duel.GetTurnCount()==turn_ct+1
+			end,
+			nil,reset_ct
+		)
 	end
 end
 function s.spfilter(c,e,tp)
@@ -80,15 +71,15 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+		--It loses 1500 ATK
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(-1500)
 		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 		tc:RegisterEffect(e1)
-		Duel.SpecialSummonComplete()
 	end
+	Duel.SpecialSummonComplete()
 end
