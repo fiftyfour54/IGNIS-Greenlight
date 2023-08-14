@@ -42,6 +42,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.DiscardDeck(tp,1,REASON_COST)<1 then return end
 	--Effect
 	local c=e:GetHandler()
+	--Name becomes "Blue-Eyes White Dragon"
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -49,6 +50,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(CARD_BLUEEYES_W_DRAGON)
 	e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
 	c:RegisterEffectRush(e1)
+	--Treat as 2 materials for the summon of "Blue-Eyes Ultimate Dragon"
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
