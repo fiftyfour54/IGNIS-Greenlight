@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_names={55742055} --Noble Knights of the Round Table
-s.listed_series={SET_NOBLE_KNIGHT,SET_NOBLE_ARMS}
+s.listed_series={SET_NOBLE_KNIGHT,SET_NOBLE_ARMS,SET_ARTORIGUS}
 function s.repfilter(c,tp)
 	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_ONFIELD) and c:IsSetCard(SET_NOBLE_KNIGHT)
 		and c:IsReason(REASON_BATTLE|REASON_EFFECT) and not c:IsReason(REASON_REPLACE)
