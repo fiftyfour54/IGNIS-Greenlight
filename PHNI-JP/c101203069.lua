@@ -24,7 +24,7 @@ end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local loc=LOCATION_HAND|LOCATION_GRAVE
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local cost_chk=Duel.CheckReleaseGroupCost(tp,s.spcostfilter,1,false,nil,nil,e,tp)
+	local cost_chk=e:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.CheckReleaseGroupCost(tp,s.spcostfilter,1,false,nil,nil,e,tp)
 	if chk==0 then return (cost_chk or ft>0)
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,loc|(cost_chk and LOCATION_DECK or 0),0,1,nil,e,tp)
 	end
