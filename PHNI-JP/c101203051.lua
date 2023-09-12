@@ -6,10 +6,10 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--2 Pendulum Monsters, including a "Majespecter" monster
 	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsType,TYPE_PENDULUM),2,2,s.lcheck)
-	--Add 2 "Majespecter" Pendulum monsters to the hand
+	--Add 2 "Majespecter" Pendulum Monsters to the hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_TOEXTRA)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -48,7 +48,6 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 	--Clock Lizard check
 	aux.addTempLizardCheck(c,tp,function(_,c) return not c:IsOriginalSetCard({SET_MAJESPECTER,SET_DRACOSLAYER}) end)
-
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_EXTRA,0,1,2,nil)
 	if #g==0 or Duel.SendtoHand(g,tp,REASON_EFFECT)==0 or #g:Match(Card.IsLocation,nil,LOCATION_HAND)==0 then return end

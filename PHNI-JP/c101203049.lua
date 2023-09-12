@@ -4,7 +4,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	Pendulum.AddProcedure(c)
+	Pendulum.AddProcedure(c,false)
 	--2 Level 4 monsters
 	Xyz.AddProcedure(c,nil,4,2)
 	--Search 1 "Majespecter" card
@@ -14,18 +14,19 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_PZONE)
 	e1:SetCountLimit(1,id)
+	e1:SetCondition(s.thcon)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
 	--Special Summon 1 Level 6 or lower WIND Spellcaster monster
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetProperty(EFFECT_FLAG_DELAY,EFFECT_FLAG2_CHECK_SIMULTANEOUS)
 	e2:SetCode(EVENT_RELEASE)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(2,id)
+	e2:SetCountLimit(2,{id,1})
 	e2:SetCondition(s.spcon)
 	e2:SetCost(aux.dxmcostgen(1,1,nil))
 	e2:SetTarget(s.sptg)
@@ -33,7 +34,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2,false,REGISTER_FLAG_DETACH_XMAT)
 	--Place this card in the Pendulum Zone
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_DESTROYED)
@@ -41,18 +42,22 @@ function s.initial_effect(c)
 	e3:SetTarget(s.pentg)
 	e3:SetOperation(s.penop)
 	c:RegisterEffect(e3)
+	local e4=e3:Clone()
+	e4:SetCode(EVENT_RELEASE)
+	e4:SetCondition(function(e) return e:GetHandler():IsPreviousLocation(LOCATION_MZONE) end)
+	c:RegisterEffect(e4)
 end
 s.pendulum_level=4
 s.listed_series={SET_MAJESPECTER,SET_DRACOSLAYER}
+function s.thcon(e,tp,eg,ep,ev,re,r,rp)
+	local pc=Duel.GetFirstMatchingCard(nil,tp,LOCATION_PZONE,0,e:GetHandler())
+	return pc and pc:IsSetCard({SET_MAJESPECTER,SET_DRACOSLAYER})
+end
 function s.thfilter(c)
 	return c:IsSetCard(SET_MAJESPECTER) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		local pc=Duel.GetFirstMatchingCard(nil,tp,LOCATION_PZONE,0,e:GetHandler())
-		return pc and (pc:IsSetCard(SET_MAJESPECTER) or pc:IsSetCard(SET_DRACOSLAYER))
-			and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)
-	end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_PZONE)
 end
@@ -72,7 +77,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.spconfilter(c)
-	return c:IsMonster() or c:GetPreviousTypeOnField()&TYPE_MONSTER==TYPE_MONSTER
+	return c:IsPreviousLocation(LOCATION_MZONE) or (not c:IsPreviousLocation(LOCATION_ONFIEL) and c:IsMonster())
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.spconfilter,1,nil)
