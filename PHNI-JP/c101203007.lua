@@ -20,11 +20,13 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCondition(function(e) return e:GetHandler():IsPreviousLocation(LOCATION_GRAVE) end)
+	e2:SetCondition(function(e) return e:GetHandler():IsSummonLocation(LOCATION_GRAVE) end)
+	e2:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk) if chk==0 then return not e:GetHandler():IsType(TYPE_TUNER) end end)
 	e2:SetOperation(s.tnop)
 	c:RegisterEffect(e2)
 end
 s.listed_names={id}
+s.self_tuner=true
 function s.spcostfilter(c)
 	return c:IsCode(id) and c:IsAbleToGraveAsCost()
 end
@@ -60,7 +62,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.tnop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
+	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		--Treated as a Tuner
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
